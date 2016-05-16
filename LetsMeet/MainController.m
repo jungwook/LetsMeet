@@ -56,16 +56,36 @@
     return init;
 }
 
--(void)viewDidAppear:(BOOL)animated {
-    NSLog(@"APPREARED");
+-(void)viewDidAppear:(BOOL)animated
+{
+    UITableViewController *signup = [[self storyboard] instantiateViewControllerWithIdentifier:@"SignUp"];
+
+    NSString *username = [AppEngine uniqueDeviceID];
     
-    [PFUser logOut];
-    NSLog(@"USER:%@", [PFUser currentUser].username);
-    if (![PFUser currentUser].username) {
-        UITableViewController *signup = [[self storyboard] instantiateViewControllerWithIdentifier:@"SignUp"];
-        [self presentViewController:signup animated:YES completion:^{
-            
+    PFUser *user = [PFUser currentUser];
+    NSLog(@"USER U:%@", user);
+    
+    if (![user.username isEqualToString:username]) {
+        user = [PFUser user];
+        user.username = username;
+        user.password = username;
+        
+        [user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+            if (succeeded) {
+                [PFUser logInWithUsernameInBackground:user.username password:user.password block:^(PFUser * _Nullable user, NSError * _Nullable error) {
+                    [[AppEngine engine] initLocationServices];
+                    [self presentViewController:signup animated:YES completion:^{
+                        NSLog(@"PRESENTING USER:%@", [PFUser currentUser]);
+                    }];
+                }];
+            }
+            else {
+                NSLog(@"CANNOT SIGNUP NEW USER");
+            }
         }];
+    }
+    else {
+        [[AppEngine engine] initLocationServices];
     }
 }
 

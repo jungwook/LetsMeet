@@ -193,13 +193,16 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="2FT-vU-hDK">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="SearchCell" id="2FT-vU-hDK" customClass="PFTableViewCell">
                                 <rect key="frame" x="0.0" y="92" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="2FT-vU-hDK" id="kXu-x6-gPq">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="287" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <segue destination="LYO-fH-FdB" kind="push" identifier="GotoChat" id="ElI-tg-BPi"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -218,6 +221,55 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fYH-Hx-s0E" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="711" y="2891"/>
+        </scene>
+        <!--Chat-->
+        <scene sceneID="HQC-bf-AaY">
+            <objects>
+                <viewController id="LYO-fH-FdB" customClass="Chat" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="7jH-p9-ot2"/>
+                        <viewControllerLayoutGuide type="bottom" id="XiP-xM-EGG"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Zg6-1B-VPP">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Hc6-Fh-vLi" customClass="Inputbar">
+                                <rect key="frame" x="-4" y="524" width="328" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="8KY-FC-v3w"/>
+                                </constraints>
+                                <items/>
+                            </toolbar>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="d6E-Po-DbB">
+                                <rect key="frame" x="-4" y="64" width="328" height="460"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="LYO-fH-FdB" id="aaZ-SQ-qmG"/>
+                                    <outlet property="delegate" destination="LYO-fH-FdB" id="OEx-9j-4iT"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="d6E-Po-DbB" firstAttribute="leading" secondItem="Zg6-1B-VPP" secondAttribute="leadingMargin" constant="-20" id="95M-xk-IUW"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="d6E-Po-DbB" secondAttribute="trailing" constant="-20" id="CDR-p7-FNi"/>
+                            <constraint firstItem="XiP-xM-EGG" firstAttribute="top" secondItem="Hc6-Fh-vLi" secondAttribute="bottom" id="ayx-iw-ZcB"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="Hc6-Fh-vLi" secondAttribute="trailing" constant="-20" id="fFG-qj-eDw"/>
+                            <constraint firstItem="Hc6-Fh-vLi" firstAttribute="top" secondItem="d6E-Po-DbB" secondAttribute="bottom" id="q30-eY-aGA"/>
+                            <constraint firstItem="d6E-Po-DbB" firstAttribute="top" secondItem="7jH-p9-ot2" secondAttribute="bottom" id="rxW-gu-O9q"/>
+                            <constraint firstItem="Hc6-Fh-vLi" firstAttribute="leading" secondItem="Zg6-1B-VPP" secondAttribute="leadingMargin" constant="-20" id="sXg-yX-5c4"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="6Pi-cl-QhR"/>
+                    <connections>
+                        <outlet property="inputbar" destination="Hc6-Fh-vLi" id="B19-bi-8Hg"/>
+                        <outlet property="tableView" destination="d6E-Po-DbB" id="CbK-qt-EW1"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gna-bf-Lo9" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="943" y="3643"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="FDi-l5-Mqj">
@@ -244,13 +296,16 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="Zwh-U8-Sj1">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" id="Zwh-U8-Sj1">
                                 <rect key="frame" x="0.0" y="92" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Zwh-U8-Sj1" id="XH5-Nd-AHf">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="287" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <segue destination="LYO-fH-FdB" kind="push" identifier="GotoChat" id="eox-o4-bJd"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -295,11 +350,11 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="lDg-4F-atr">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="detailButton" indentationWidth="10" id="lDg-4F-atr">
                                 <rect key="frame" x="0.0" y="92" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="lDg-4F-atr" id="pZe-P6-Z7u">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="273" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                             </tableViewCell>
@@ -388,4 +443,7 @@
         <image name="guy black" width="100" height="125"/>
         <image name="guy white" width="100" height="125"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="ElI-tg-BPi"/>
+    </inferredMetricsTieBreakers>
 </document>

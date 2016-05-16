@@ -105,7 +105,7 @@
     self.agePicker = [[UIPickerView alloc] init];
 }
 
-- (void)setupTextFields:(UITextField*) textField
+- (void)setupTextFields:(UITextField*) textField with:(NSString*) value
 {
     textField.layer.cornerRadius = textField.frame.size.height/2.0f;
     textField.layer.cornerRadius = 2.0f;
@@ -114,27 +114,10 @@
 //    textField.layer.borderWidth = 1.0f;
     
     textField.delegate = self;
-    
+    textField.text = value;
     textField.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.5f];
 }
 
-- (void)textFieldDidEndEditing:(UITextField *)textField
-{
-    NSLog(@"ENDEDIT");
-}
-
-
-- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
-{
-    NSLog(@"EDITING");
-    return YES;
-}
-
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
-{
-    NSLog(@"TEST:%@", string);
-    return YES;
-}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -145,27 +128,20 @@
     self.view.layer.contents = (id) [UIImage imageNamed:@"bg"].CGImage;
     self.view.layer.masksToBounds = YES;
     
-    [self setupTextFields:self.nickname];
-    [self setupTextFields:self.age];
-    [self setupTextFields:self.why];
-    
-    PFUser* user = [PFUser user];
-    
-    user.username = [NSUUID UUID].UUIDString;
-    user.password = user.username;
-    
-    [user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-        [[AppEngine engine] logIn];
-        [PFUser logInWithUsernameInBackground:user.username password:user.username block:^(PFUser * _Nullable user, NSError * _Nullable error) {
-            if (user) {
-                NSLog(@"LOGGED IN:%@", [PFUser currentUser]);
-            }
-        }];
-    }];
+    [self setupTextFields:self.nickname with:[[PFUser currentUser] valueForKey:@"nickname"]];
+    [self setupTextFields:self.age with:[[PFUser currentUser] valueForKey:@"age"]];
+    [self setupTextFields:self.why with:[[PFUser currentUser] valueForKey:@"why"]];
 }
 
 - (IBAction)start:(id)sender {
     if (![self.nickname.text isEqualToString:@""] && ![self.age.text isEqualToString:@""]) {
+        PFUser *user = [PFUser currentUser];
+        
+        [user setObject:self.nickname.text forKey:@"nickname"];
+        [user setObject:self.age.text forKey:@"age"];
+        [user setObject:self.why.text forKey:@"why"];
+        
+        [user saveInBackground];
         [self dismissViewControllerAnimated:YES completion:^{
            
         }];

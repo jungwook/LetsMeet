@@ -8,9 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
-@interface AppEngine : NSObject
+@interface AppEngine : NSObject <CLLocationManagerDelegate>
 + (id) engine;
-- (id) init;
-- (BOOL) isLoggedIn;
-- (void) logIn;
+- (void) initLocationServices;
++ (NSString*) uniqueDeviceID;
++ (void) clearUniqueDeviceID;
+- (PFGeoPoint*) currentLocation;
 @end
