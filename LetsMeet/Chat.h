@@ -1,13 +1,14 @@
 //
-//  Chat.h
+//  ChatV2.h
 //  LetsMeet
 //
-//  Created by 한정욱 on 2016. 5. 16..
+//  Created by 한정욱 on 2016. 5. 17..
 //  Copyright © 2016년 SMARTLY CO. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
+#import "MessageBar.h"
 
-@interface Chat : UIViewController
+@interface Chat : UIViewController <MessageBarDelegate, UITableViewDelegate, UITableViewDataSource>
 @property (nonatomic, strong) PFUser* toUser;
 @end

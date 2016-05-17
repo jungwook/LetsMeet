@@ -132,9 +132,6 @@
     return query;
 }
 
- // Override to customize the look of a cell representing an object. The default is to display
- // a UITableViewCellStyleDefault style cell with the label being the textKey in the object,
- // and the imageView being the imageKey in the object.
  - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath object:(PFObject *)object {
      static NSString *CellIdentifier = @"SearchCell";
      
@@ -143,9 +140,7 @@
          cell = [[PFTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
      }
      
-     // Configure the cell
      cell.textLabel.text = [object objectForKey:self.textKey];
-//     cell.imageView.file = [object objectForKey:self.imageKey];
      
      return cell;
  }
@@ -153,10 +148,12 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
     // Make sure your segue name in storyboard is the same as this line
+    
     if ([[segue identifier] isEqualToString:@"GotoChat"])
     {
+        PFUser *selectedUser = self.objects[[self.tableView indexPathForSelectedRow].row];
         Chat *vc = [segue destinationViewController];
-        vc.toUser = sender;
+        vc.toUser = selectedUser;
     }
 }
 

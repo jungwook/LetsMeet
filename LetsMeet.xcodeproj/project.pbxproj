@@ -7,11 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		126AF3E11CE9DEC100E3ED67 /* Chat.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3E01CE9DEC100E3ED67 /* Chat.m */; };
 		126AF3E41CE9DF1800E3ED67 /* Inputbar.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3E31CE9DF1800E3ED67 /* Inputbar.m */; };
 		126AF3E91CE9DF3A00E3ED67 /* HPGrowingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3E61CE9DF3A00E3ED67 /* HPGrowingTextView.m */; };
 		126AF3EA1CE9DF3A00E3ED67 /* HPTextViewInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3E81CE9DF3A00E3ED67 /* HPTextViewInternal.m */; };
 		126AF3ED1CE9E1B100E3ED67 /* DAKeyboardControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3EC1CE9E1B100E3ED67 /* DAKeyboardControl.m */; };
+		126AF3F31CEA966B00E3ED67 /* Chat.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3F21CEA966B00E3ED67 /* Chat.m */; };
+		126AF3F61CEA983800E3ED67 /* MessageBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3F51CEA983800E3ED67 /* MessageBar.m */; };
 		12F7418C1CE4B97100E8267A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418B1CE4B97100E8267A /* main.m */; };
 		12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418E1CE4B97100E8267A /* AppDelegate.m */; };
 		12F741951CE4B97100E8267A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12F741931CE4B97100E8267A /* Main.storyboard */; };
@@ -48,8 +49,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		126AF3DF1CE9DEC100E3ED67 /* Chat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chat.h; sourceTree = "<group>"; };
-		126AF3E01CE9DEC100E3ED67 /* Chat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Chat.m; sourceTree = "<group>"; };
 		126AF3E21CE9DF1800E3ED67 /* Inputbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Inputbar.h; sourceTree = "<group>"; };
 		126AF3E31CE9DF1800E3ED67 /* Inputbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Inputbar.m; sourceTree = "<group>"; };
 		126AF3E51CE9DF3A00E3ED67 /* HPGrowingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HPGrowingTextView.h; sourceTree = "<group>"; };
@@ -58,6 +57,10 @@
 		126AF3E81CE9DF3A00E3ED67 /* HPTextViewInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HPTextViewInternal.m; sourceTree = "<group>"; };
 		126AF3EB1CE9E1B100E3ED67 /* DAKeyboardControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DAKeyboardControl.h; sourceTree = "<group>"; };
 		126AF3EC1CE9E1B100E3ED67 /* DAKeyboardControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DAKeyboardControl.m; sourceTree = "<group>"; };
+		126AF3F11CEA966B00E3ED67 /* Chat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chat.h; sourceTree = "<group>"; };
+		126AF3F21CEA966B00E3ED67 /* Chat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Chat.m; sourceTree = "<group>"; };
+		126AF3F41CEA983800E3ED67 /* MessageBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageBar.h; sourceTree = "<group>"; };
+		126AF3F51CEA983800E3ED67 /* MessageBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageBar.m; sourceTree = "<group>"; };
 		12F741871CE4B97000E8267A /* LetsMeet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LetsMeet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12F7418B1CE4B97100E8267A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		12F7418D1CE4B97100E8267A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -228,8 +231,6 @@
 				12F741E51CE5853F00E8267A /* Search.m */,
 				12F741E71CE5854700E8267A /* InBox.h */,
 				12F741E81CE5854700E8267A /* InBox.m */,
-				126AF3DF1CE9DEC100E3ED67 /* Chat.h */,
-				126AF3E01CE9DEC100E3ED67 /* Chat.m */,
 				12F741EA1CE5855200E8267A /* Account.h */,
 				12F741EB1CE5855200E8267A /* Account.m */,
 				12F741ED1CE593A500E8267A /* Menu.h */,
@@ -238,6 +239,8 @@
 				12F741F41CE59C7F00E8267A /* MenuCell.m */,
 				12F741FE1CE6CE4000E8267A /* SignUp.h */,
 				12F741FF1CE6CE4000E8267A /* SignUp.m */,
+				126AF3F11CEA966B00E3ED67 /* Chat.h */,
+				126AF3F21CEA966B00E3ED67 /* Chat.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -255,6 +258,8 @@
 				126AF3E31CE9DF1800E3ED67 /* Inputbar.m */,
 				12F741F81CE5B13D00E8267A /* AppEngine.h */,
 				12F741F91CE5B13D00E8267A /* AppEngine.m */,
+				126AF3F41CEA983800E3ED67 /* MessageBar.h */,
+				126AF3F51CEA983800E3ED67 /* MessageBar.m */,
 			);
 			name = Engine;
 			sourceTree = "<group>";
@@ -345,13 +350,14 @@
 				12F741EC1CE5855200E8267A /* Account.m in Sources */,
 				12F742001CE6CE4000E8267A /* SignUp.m in Sources */,
 				12F741EF1CE593A500E8267A /* Menu.m in Sources */,
+				126AF3F31CEA966B00E3ED67 /* Chat.m in Sources */,
 				12F741D11CE56B3400E8267A /* FloatingDrawerView.m in Sources */,
 				12F7418C1CE4B97100E8267A /* main.m in Sources */,
+				126AF3F61CEA983800E3ED67 /* MessageBar.m in Sources */,
 				126AF3E91CE9DF3A00E3ED67 /* HPGrowingTextView.m in Sources */,
 				12F741FA1CE5B13D00E8267A /* AppEngine.m in Sources */,
 				126AF3E41CE9DF1800E3ED67 /* Inputbar.m in Sources */,
 				126AF3EA1CE9DF3A00E3ED67 /* HPTextViewInternal.m in Sources */,
-				126AF3E11CE9DEC100E3ED67 /* Chat.m in Sources */,
 				12F741D21CE56B3400E8267A /* FloatingDrawerViewController.m in Sources */,
 				126AF3ED1CE9E1B100E3ED67 /* DAKeyboardControl.m in Sources */,
 				12F741E91CE5854700E8267A /* InBox.m in Sources */,

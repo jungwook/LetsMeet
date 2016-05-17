@@ -24,6 +24,72 @@
             </objects>
             <point key="canvasLocation" x="144" y="886"/>
         </scene>
+        <!--Chat-->
+        <scene sceneID="Cwk-lb-nHa">
+            <objects>
+                <viewController id="8wM-yg-Udt" customClass="Chat" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Mwi-LU-Na8"/>
+                        <viewControllerLayoutGuide type="bottom" id="7Bc-ST-obU"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Cuq-g6-xWs">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="q02-kM-GHd" customClass="MessageBar">
+                                <rect key="frame" x="-4" y="524" width="328" height="44"/>
+                                <items/>
+                            </toolbar>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Oeg-Gb-WPp">
+                                <rect key="frame" x="-4" y="64" width="328" height="460"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="MessageCell" id="c2n-rp-k9O">
+                                        <rect key="frame" x="0.0" y="28" width="328" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="c2n-rp-k9O" id="qib-sg-RjP">
+                                            <rect key="frame" x="0.0" y="0.0" width="328" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="8wM-yg-Udt" id="zdu-vI-gZE"/>
+                                    <outlet property="delegate" destination="8wM-yg-Udt" id="f3m-3k-niP"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <gestureRecognizers/>
+                        <constraints>
+                            <constraint firstItem="q02-kM-GHd" firstAttribute="top" secondItem="Oeg-Gb-WPp" secondAttribute="bottom" id="0iB-7l-yaU"/>
+                            <constraint firstItem="q02-kM-GHd" firstAttribute="bottom" secondItem="7Bc-ST-obU" secondAttribute="top" id="51n-6p-U7T"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="q02-kM-GHd" secondAttribute="trailing" constant="-20" id="Hw2-qq-sWO"/>
+                            <constraint firstItem="q02-kM-GHd" firstAttribute="top" secondItem="Oeg-Gb-WPp" secondAttribute="bottom" id="T1f-Rg-KHt"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="Oeg-Gb-WPp" secondAttribute="trailing" constant="-20" id="eLE-WU-swV"/>
+                            <constraint firstItem="q02-kM-GHd" firstAttribute="leading" secondItem="Cuq-g6-xWs" secondAttribute="leadingMargin" constant="-20" id="nZ3-Fa-qrq"/>
+                            <constraint firstItem="Oeg-Gb-WPp" firstAttribute="leading" secondItem="Cuq-g6-xWs" secondAttribute="leadingMargin" constant="-20" id="qcy-U3-LNE"/>
+                            <constraint firstItem="Oeg-Gb-WPp" firstAttribute="top" secondItem="Mwi-LU-Na8" secondAttribute="bottom" id="wKd-kZ-BeX"/>
+                        </constraints>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="Atn-PJ-n4Q" appends="YES" id="TrN-HT-V2K"/>
+                        </connections>
+                    </view>
+                    <navigationItem key="navigationItem" id="oBS-WM-V1E"/>
+                    <connections>
+                        <outlet property="messageBar" destination="q02-kM-GHd" id="Eud-TV-yCw"/>
+                        <outlet property="tableView" destination="Oeg-Gb-WPp" id="M1U-JR-qES"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="MKL-vt-eI5" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="Atn-PJ-n4Q">
+                    <connections>
+                        <action selector="tappedOutside:" destination="8wM-yg-Udt" id="KBr-h9-vkv"/>
+                    </connections>
+                </tapGestureRecognizer>
+            </objects>
+            <point key="canvasLocation" x="938" y="3716"/>
+        </scene>
         <!--Sign Up-->
         <scene sceneID="VOf-7b-hgb">
             <objects>
@@ -201,7 +267,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <segue destination="LYO-fH-FdB" kind="push" identifier="GotoChat" id="ElI-tg-BPi"/>
+                                    <segue destination="8wM-yg-Udt" kind="push" identifier="GotoChat" id="KA2-dI-Anr"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -221,55 +287,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fYH-Hx-s0E" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="711" y="2891"/>
-        </scene>
-        <!--Chat-->
-        <scene sceneID="HQC-bf-AaY">
-            <objects>
-                <viewController id="LYO-fH-FdB" customClass="Chat" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="7jH-p9-ot2"/>
-                        <viewControllerLayoutGuide type="bottom" id="XiP-xM-EGG"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="Zg6-1B-VPP">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Hc6-Fh-vLi" customClass="Inputbar">
-                                <rect key="frame" x="-4" y="524" width="328" height="44"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="44" id="8KY-FC-v3w"/>
-                                </constraints>
-                                <items/>
-                            </toolbar>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="d6E-Po-DbB">
-                                <rect key="frame" x="-4" y="64" width="328" height="460"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <connections>
-                                    <outlet property="dataSource" destination="LYO-fH-FdB" id="aaZ-SQ-qmG"/>
-                                    <outlet property="delegate" destination="LYO-fH-FdB" id="OEx-9j-4iT"/>
-                                </connections>
-                            </tableView>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstItem="d6E-Po-DbB" firstAttribute="leading" secondItem="Zg6-1B-VPP" secondAttribute="leadingMargin" constant="-20" id="95M-xk-IUW"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="d6E-Po-DbB" secondAttribute="trailing" constant="-20" id="CDR-p7-FNi"/>
-                            <constraint firstItem="XiP-xM-EGG" firstAttribute="top" secondItem="Hc6-Fh-vLi" secondAttribute="bottom" id="ayx-iw-ZcB"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="Hc6-Fh-vLi" secondAttribute="trailing" constant="-20" id="fFG-qj-eDw"/>
-                            <constraint firstItem="Hc6-Fh-vLi" firstAttribute="top" secondItem="d6E-Po-DbB" secondAttribute="bottom" id="q30-eY-aGA"/>
-                            <constraint firstItem="d6E-Po-DbB" firstAttribute="top" secondItem="7jH-p9-ot2" secondAttribute="bottom" id="rxW-gu-O9q"/>
-                            <constraint firstItem="Hc6-Fh-vLi" firstAttribute="leading" secondItem="Zg6-1B-VPP" secondAttribute="leadingMargin" constant="-20" id="sXg-yX-5c4"/>
-                        </constraints>
-                    </view>
-                    <navigationItem key="navigationItem" id="6Pi-cl-QhR"/>
-                    <connections>
-                        <outlet property="inputbar" destination="Hc6-Fh-vLi" id="B19-bi-8Hg"/>
-                        <outlet property="tableView" destination="d6E-Po-DbB" id="CbK-qt-EW1"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="gna-bf-Lo9" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="943" y="3643"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="FDi-l5-Mqj">
@@ -304,7 +321,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <segue destination="LYO-fH-FdB" kind="push" identifier="GotoChat" id="eox-o4-bJd"/>
+                                    <segue destination="8wM-yg-Udt" kind="push" identifier="GotoChat" id="vb1-pt-HR0"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -444,6 +461,6 @@
         <image name="guy white" width="100" height="125"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="ElI-tg-BPi"/>
+        <segue reference="vb1-pt-HR0"/>
     </inferredMetricsTieBreakers>
 </document>

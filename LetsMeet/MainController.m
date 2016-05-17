@@ -87,7 +87,23 @@
     else {
         [[AppEngine engine] initLocationServices];
     }
+    [self subscribeToChannelCurrentUser];
 }
+
+- (void) subscribeToChannelCurrentUser
+{
+    PFUser *me = [PFUser currentUser];
+    PFInstallation *currentInstallation = [PFInstallation currentInstallation];
+    if (!currentInstallation[@"user"]) {
+        currentInstallation[@"user"] = me;
+        [currentInstallation saveInBackground];
+        NSLog(@"CURRENT INSTALLATION: saving user to Installation");
+    }
+    else {
+        NSLog(@"CURRENT INSTALLATION: Installation already has user. No need to set");
+    }
+}
+
 
 - (void)viewDidDisappear:(BOOL)animated
 {
