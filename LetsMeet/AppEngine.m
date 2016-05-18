@@ -8,8 +8,10 @@
 
 #import "AppEngine.h"
 @interface AppEngine()
+@property (nonatomic, strong, readonly) NSMutableArray *channels;
 @property (nonatomic, strong) CLLocationManager *locMgr;
 @property (nonatomic, strong) CLLocation* curLoc;
+@property (nonatomic, strong, readonly) PFUser *me;
 @end
 
 #define kUNIQUE_DEVICE_ID @"kUNIQUE_DEVICE_ID"
@@ -31,8 +33,113 @@
 {
     self = [super init];
     if (self) {
+        _me = [PFUser currentUser];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(doLogInEvent:)
+                                                     name:AppUserLoggedInNotification
+                                                   object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(doLogoutEvent:)
+                                                     name:AppUserLoggedInNotification
+                                                   object:nil];
     }
     return self;
+}
+
+- (void) doLogInEvent:(id)sender
+{
+    NSLog(@"USER LOGGED IN");
+    [self loadMyChatRooms];
+}
+
+- (NSArray*) allChannels
+{
+    return self.channels;
+}
+
+- (void) doLogoutEvent:(id)sender
+{
+    NSLog(@"USER LOGGED OUT");
+    [self.channels removeAllObjects];
+    _channels = nil;
+    [[NSNotificationCenter defaultCenter] postNotificationName:AppUserChannelsLoadedNotification object:nil];
+}
+
+- (void) dealloc
+{
+    // Unregister for keyboard notifications
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AppUserLoggedInNotification
+                                                  object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AppUserLoggedInNotification
+                                                  object:nil];
+}
+
+- (void) arrayOfOtherUserIdFromArray:(NSArray*) channels
+{
+    __block NSMutableArray *userIds = [NSMutableArray array];
+    
+    [channels enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSArray *members = obj[@"members"];
+        
+        [members enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            PFUser *user = obj;
+            if (![user.objectId isEqualToString:self.me.objectId]) {
+                [userIds addObject:user.objectId];
+            }
+        }];
+    }];
+    
+    
+}
+
+- (void) loadMyChatRooms
+{
+    PFQuery *query = [PFQuery queryWithClassName:@"Channel"];
+    [query whereKey:@"members" containsAllObjectsInArray:@[self.me]];
+
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"ERROR LOADING CHATROOMS: %@", error.localizedDescription);
+        }
+        else {
+            _channels = [NSMutableArray arrayWithArray:objects];
+            NSLog(@"FOUND:%ld CHATROOMS", [self.channels count]);
+            [self.channels enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                PFObject *channel = obj;
+                PFUser* user = [self otherUserInChannel:channel];
+                [user fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+                    
+                }];
+            }];
+            [[NSNotificationCenter defaultCenter] postNotificationName:AppUserChannelsLoadedNotification object:nil];
+        }
+    }];
+}
+
+- (PFUser*) otherUserInChannel:(PFObject*) channel
+{
+    __block PFUser* otherUser = nil;
+    NSArray *members = channel[@"members"];
+    
+    [members enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        PFUser *user = obj;
+        if (![user.objectId isEqualToString:self.me.objectId]) {
+            otherUser = user;
+            *stop = YES;
+        }
+    }];
+    
+    return otherUser;
+}
+
+- (NSString*) channelNameFrom:(PFUser*)user
+{
+    NSArray *names = [[NSArray arrayWithObjects:self.me.objectId, user.objectId, nil] sortedArrayUsingSelector:@selector(localizedCompare:)];
+    
+    return [[[names firstObject] stringByAppendingString:@"--"] stringByAppendingString:[names lastObject]];
 }
 
 - (void) initLocationServices

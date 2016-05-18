@@ -28,12 +28,24 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(channelsLoaded:)
+                                                 name:AppUserChannelsLoadedNotification
+                                               object:nil];
+    
 }
 
-- (void)loadChats {
-
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AppUserChannelsLoadedNotification
+                                                  object:nil];
 }
 
+- (void)channelsLoaded:(id)sender
+{
+    [self.tableView reloadData];
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -43,27 +55,31 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-#warning Incomplete implementation, return the number of sections
-    return 0;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-#warning Incomplete implementation, return the number of rows
-    return 0;
+    
+    return [[AppEngine engine] channels].count;
 }
 
 - (IBAction)toggleMenu:(id)sender {
     [AppDelegate toggleMenu];
 }
 
-/*
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    AppEngine *engine = [AppEngine engine];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"InBoxCell" forIndexPath:indexPath];
     
-    // Configure the cell...
+    PFObject* channel = [engine allChannels][indexPath.row];
+
+    cell.textLabel.text = [engine otherUserInChannel:channel][@"nickname"];
     
     return cell;
 }
+
+/*
 */
 
 /*

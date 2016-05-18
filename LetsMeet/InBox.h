@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "AppEngine.h"
 
 @interface InBox : UITableViewController
 

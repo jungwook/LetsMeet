@@ -7,10 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		126AF3E41CE9DF1800E3ED67 /* Inputbar.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3E31CE9DF1800E3ED67 /* Inputbar.m */; };
-		126AF3E91CE9DF3A00E3ED67 /* HPGrowingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3E61CE9DF3A00E3ED67 /* HPGrowingTextView.m */; };
-		126AF3EA1CE9DF3A00E3ED67 /* HPTextViewInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3E81CE9DF3A00E3ED67 /* HPTextViewInternal.m */; };
-		126AF3ED1CE9E1B100E3ED67 /* DAKeyboardControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3EC1CE9E1B100E3ED67 /* DAKeyboardControl.m */; };
 		126AF3F31CEA966B00E3ED67 /* Chat.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3F21CEA966B00E3ED67 /* Chat.m */; };
 		126AF3F61CEA983800E3ED67 /* MessageBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3F51CEA983800E3ED67 /* MessageBar.m */; };
 		12F7418C1CE4B97100E8267A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418B1CE4B97100E8267A /* main.m */; };
@@ -49,14 +45,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		126AF3E21CE9DF1800E3ED67 /* Inputbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Inputbar.h; sourceTree = "<group>"; };
-		126AF3E31CE9DF1800E3ED67 /* Inputbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Inputbar.m; sourceTree = "<group>"; };
-		126AF3E51CE9DF3A00E3ED67 /* HPGrowingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HPGrowingTextView.h; sourceTree = "<group>"; };
-		126AF3E61CE9DF3A00E3ED67 /* HPGrowingTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HPGrowingTextView.m; sourceTree = "<group>"; };
-		126AF3E71CE9DF3A00E3ED67 /* HPTextViewInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HPTextViewInternal.h; sourceTree = "<group>"; };
-		126AF3E81CE9DF3A00E3ED67 /* HPTextViewInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HPTextViewInternal.m; sourceTree = "<group>"; };
-		126AF3EB1CE9E1B100E3ED67 /* DAKeyboardControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DAKeyboardControl.h; sourceTree = "<group>"; };
-		126AF3EC1CE9E1B100E3ED67 /* DAKeyboardControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DAKeyboardControl.m; sourceTree = "<group>"; };
 		126AF3F11CEA966B00E3ED67 /* Chat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chat.h; sourceTree = "<group>"; };
 		126AF3F21CEA966B00E3ED67 /* Chat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Chat.m; sourceTree = "<group>"; };
 		126AF3F41CEA983800E3ED67 /* MessageBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageBar.h; sourceTree = "<group>"; };
@@ -248,14 +236,6 @@
 		12F741F71CE5B11000E8267A /* Engine */ = {
 			isa = PBXGroup;
 			children = (
-				126AF3EB1CE9E1B100E3ED67 /* DAKeyboardControl.h */,
-				126AF3EC1CE9E1B100E3ED67 /* DAKeyboardControl.m */,
-				126AF3E51CE9DF3A00E3ED67 /* HPGrowingTextView.h */,
-				126AF3E61CE9DF3A00E3ED67 /* HPGrowingTextView.m */,
-				126AF3E71CE9DF3A00E3ED67 /* HPTextViewInternal.h */,
-				126AF3E81CE9DF3A00E3ED67 /* HPTextViewInternal.m */,
-				126AF3E21CE9DF1800E3ED67 /* Inputbar.h */,
-				126AF3E31CE9DF1800E3ED67 /* Inputbar.m */,
 				12F741F81CE5B13D00E8267A /* AppEngine.h */,
 				12F741F91CE5B13D00E8267A /* AppEngine.m */,
 				126AF3F41CEA983800E3ED67 /* MessageBar.h */,
@@ -354,12 +334,8 @@
 				12F741D11CE56B3400E8267A /* FloatingDrawerView.m in Sources */,
 				12F7418C1CE4B97100E8267A /* main.m in Sources */,
 				126AF3F61CEA983800E3ED67 /* MessageBar.m in Sources */,
-				126AF3E91CE9DF3A00E3ED67 /* HPGrowingTextView.m in Sources */,
 				12F741FA1CE5B13D00E8267A /* AppEngine.m in Sources */,
-				126AF3E41CE9DF1800E3ED67 /* Inputbar.m in Sources */,
-				126AF3EA1CE9DF3A00E3ED67 /* HPTextViewInternal.m in Sources */,
 				12F741D21CE56B3400E8267A /* FloatingDrawerViewController.m in Sources */,
-				126AF3ED1CE9E1B100E3ED67 /* DAKeyboardControl.m in Sources */,
 				12F741E91CE5854700E8267A /* InBox.m in Sources */,
 				12F741DA1CE56F4300E8267A /* MainController.m in Sources */,
 				12F741D01CE56B3400E8267A /* FloatingDrawerSpringAnimator.m in Sources */,

@@ -74,6 +74,7 @@
             if (succeeded) {
                 [PFUser logInWithUsernameInBackground:user.username password:user.password block:^(PFUser * _Nullable user, NSError * _Nullable error) {
                     [[AppEngine engine] initLocationServices];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:AppUserLoggedInNotification object:nil];
                     [self presentViewController:signup animated:YES completion:^{
                         NSLog(@"PRESENTING USER:%@", [PFUser currentUser]);
                     }];
@@ -86,6 +87,7 @@
     }
     else {
         [[AppEngine engine] initLocationServices];
+        [[NSNotificationCenter defaultCenter] postNotificationName:AppUserLoggedInNotification object:nil];
     }
     [self subscribeToChannelCurrentUser];
 }

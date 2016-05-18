@@ -8,10 +8,17 @@
 
 #import <Foundation/Foundation.h>
 
+#define AppUserLoggedInNotification @"AppUserLoggedInNotification"
+#define AppUserLoggedOutNotification @"AppUserLoggedOutNotification"
+#define AppUserChannelsLoadedNotification @"AppUserChannelsLoadedNotification"
+
 @interface AppEngine : NSObject <CLLocationManagerDelegate>
+
+- (PFUser*) otherUserInChannel:(PFObject*) channel;
 + (id) engine;
 - (void) initLocationServices;
 + (NSString*) uniqueDeviceID;
 + (void) clearUniqueDeviceID;
 - (PFGeoPoint*) currentLocation;
+- (NSArray*) allChannels;
 @end
