@@ -9,20 +9,31 @@
 #import "InBox.h"
 
 @interface InBox ()
-
+@property (nonatomic, strong, readonly) PFUser* me;
+@property (nonatomic, strong) NSMutableArray *chats;
 @end
 
 @implementation InBox
 
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        _me = [PFUser currentUser];
+        _chats = [NSMutableArray array];
+    }
+    return self;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
+
+- (void)loadChats {
+
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

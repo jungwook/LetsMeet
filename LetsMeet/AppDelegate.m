@@ -49,6 +49,11 @@
     [application registerUserNotificationSettings:settings];
     [application registerForRemoteNotifications];
     
+    
+    // Extract the notification data
+    NSDictionary *payload = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
+    NSLog(@"PAYLOAD:%@", payload);
+    
     return YES;
 }
 
@@ -102,6 +107,8 @@
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
     [PFPush handlePush:userInfo];
+    
+    NSLog(@"userInfo:%@", userInfo);
     
     if (application.applicationState == UIApplicationStateInactive) {
         [PFAnalytics trackAppOpenedWithRemoteNotificationPayload:userInfo];
