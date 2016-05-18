@@ -105,7 +105,7 @@
 }
 
 - (void)keyBoardEvent:(CGRect)kbFrame duration:(double)duration animationType:(UIViewAnimationOptions)animation
-{
+{ 
     float w = self.view.frame.size.width;
     float m = self.messageBar.frame.size.height;
     float h = kbFrame.origin.y-m;
