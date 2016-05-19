@@ -8,14 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-#define k_MESSAGETYPE @"msgType"
-#define k_MESSAGECONTENT @"msgContent"
-#define k_MESSAGETYPEMSG @"MSG"
-#define k_MESSAGETYPEPHOTO @"PHOTO"
-#define k_MESSAGETYPEVIDEO @"VIDEO"
-#define k_MESSAGETYPEAUDIO @"AUDIO"
-#define k_MESSAGETYPEURL @"URL"
-
 @protocol MessageBarDelegate;
 
 @interface MessageBar : UIToolbar <UITextViewDelegate>

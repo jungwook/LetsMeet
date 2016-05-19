@@ -8,9 +8,10 @@
 
 #import <Parse/Parse.h>
 #import "AppDelegate.h"
+#import "AppEngine.h"
 
 @interface AppDelegate ()
-
+@property (nonatomic, weak, readonly) AppEngine *engine;
 @end
 
 @implementation AppDelegate
@@ -32,6 +33,7 @@
     PFACL *defaultACL = [PFACL ACL];
     
     defaultACL.publicReadAccess = YES;
+    defaultACL.publicWriteAccess = YES;
     
     [PFACL setDefaultACL:defaultACL withAccessForCurrentUser:YES];
     
@@ -53,6 +55,8 @@
     // Extract the notification data
     NSDictionary *payload = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
     NSLog(@"PAYLOAD:%@", payload);
+    
+    _engine = [AppEngine engine];
     
     return YES;
 }
@@ -106,9 +110,10 @@
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-    [PFPush handlePush:userInfo];
-    
+//    [PFPush handlePush:userInfo];
     NSLog(@"userInfo:%@", userInfo);
+    
+    [self.engine loadMessage:userInfo[@"messageId"] fromUserId:userInfo[@"senderId"]];
     
     if (application.applicationState == UIApplicationStateInactive) {
         [PFAnalytics trackAppOpenedWithRemoteNotificationPayload:userInfo];

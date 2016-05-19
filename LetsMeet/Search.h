@@ -8,5 +8,5 @@
 
 #import <UIKit/UIKit.h>
 
-@interface Search : PFQueryTableViewController
+@interface Search : UITableViewController
 @end

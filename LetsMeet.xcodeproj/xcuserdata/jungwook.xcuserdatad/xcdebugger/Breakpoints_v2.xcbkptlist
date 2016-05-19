@@ -9,28 +9,12 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "LetsMeet/Search.m"
-            timestampString = "485152537.324707"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "138"
-            endingLineNumber = "138"
-            landmarkName = "-tableView:cellForRowAtIndexPath:object:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "LetsMeet/Chat.m"
-            timestampString = "485229925.525042"
+            timestampString = "485360614.830596"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "162"
-            endingLineNumber = "162"
+            startingLineNumber = "119"
+            endingLineNumber = "119"
             landmarkName = "-keyBoardEvent:duration:animationType:"
             landmarkType = "5">
          </BreakpointContent>
@@ -41,13 +25,61 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "LetsMeet/Chat.m"
-            timestampString = "485231086.553057"
+            filePath = "LetsMeet/AppEngine.m"
+            timestampString = "485343795.530212"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "232"
-            endingLineNumber = "232"
-            landmarkName = "-sendPush:"
+            startingLineNumber = "134"
+            endingLineNumber = "134"
+            landmarkName = "-userWithUserId:"
+            landmarkType = "5">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "-[AppEngine userWithUserId:]"
+                  moduleName = "LetsMeet"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jungwook/Documents/Development/LetsMeet/LetsMeet/AppEngine.m"
+                  timestampString = "485343930.560855"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "134"
+                  endingLineNumber = "134"
+                  offsetFromSymbolStart = "116">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__28-[AppEngine userWithUserId:]_block_invoke"
+                  moduleName = "LetsMeet"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jungwook/Documents/Development/LetsMeet/LetsMeet/AppEngine.m"
+                  timestampString = "485343930.560971"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "134"
+                  endingLineNumber = "134"
+                  offsetFromSymbolStart = "24">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "LetsMeet/AppEngine.m"
+            timestampString = "485343941.885929"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "141"
+            endingLineNumber = "141"
+            landmarkName = "-userWithUserId:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -57,13 +89,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "LetsMeet/Chat.m"
-            timestampString = "485237708.116207"
+            filePath = "LetsMeet/AppEngine.m"
+            timestampString = "485360238.156198"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "50"
-            endingLineNumber = "50"
-            landmarkName = "-createChannelWithUser:"
+            startingLineNumber = "214"
+            endingLineNumber = "214"
+            landmarkName = "-addMessage:withUser:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

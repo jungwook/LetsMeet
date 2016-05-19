@@ -7,6 +7,7 @@
 //
 
 #import "MessageBar.h"
+#import "AppEngine.h"
 
 @interface MessageBar()
 {
@@ -67,7 +68,7 @@ static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCur
 
 - (void)doEndEditingEvent:(NSString *)string
 {
-    NSLog(@"END EDITI");
+    NSLog(@"END EDITING");
 }
 
 - (void)doKeyBoardEvent:(NSNotification *)notification
@@ -134,7 +135,7 @@ static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCur
 - (void) sendText
 {
     if ([self.messageBarDelegate respondsToSelector:@selector(sendMessage:)]) {
-        [self.messageBarDelegate sendMessage:@{ k_MESSAGETYPE: k_MESSAGETYPEMSG, k_MESSAGECONTENT : self.textView.text}];
+        [self.messageBarDelegate sendMessage:@{ AppMessageType: AppMessageTypeMessage, AppMessageContent : self.textView.text}];
     }
     
     self.textView.text = @"";

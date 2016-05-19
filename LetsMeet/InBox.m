@@ -7,10 +7,14 @@
 //
 
 #import "InBox.h"
+#import "Chat.h"
+#import "AppEngine.h"
+#import "UserCell.h"
 
 @interface InBox ()
 @property (nonatomic, strong, readonly) PFUser* me;
-@property (nonatomic, strong) NSMutableArray *chats;
+@property (nonatomic, weak, readonly) NSArray *users;
+@property (nonatomic, weak, readonly) AppEngine *engine;
 @end
 
 @implementation InBox
@@ -20,7 +24,8 @@
     self = [super initWithCoder:aDecoder];
     if (self) {
         _me = [PFUser currentUser];
-        _chats = [NSMutableArray array];
+        _engine = [AppEngine engine];
+        _users = self.engine.users;
     }
     return self;
 }
@@ -29,8 +34,8 @@
     [super viewDidLoad];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(channelsLoaded:)
-                                                 name:AppUserChannelsLoadedNotification
+                                             selector:@selector(messagesLoaded:)
+                                                 name:AppUserMessagesReloadedNotification
                                                object:nil];
     
 }
@@ -38,11 +43,11 @@
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:AppUserChannelsLoadedNotification
+                                                    name:AppUserMessagesReloadedNotification
                                                   object:nil];
 }
 
-- (void)channelsLoaded:(id)sender
+- (void)messagesLoaded:(id)sender
 {
     [self.tableView reloadData];
 }
@@ -58,26 +63,36 @@
     return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    
-    return [[AppEngine engine] channels].count;
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return self.users.count;
 }
 
 - (IBAction)toggleMenu:(id)sender {
     [AppDelegate toggleMenu];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    AppEngine *engine = [AppEngine engine];
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"InBoxCell" forIndexPath:indexPath];
-    
-    PFObject* channel = [engine allChannels][indexPath.row];
-
-    cell.textLabel.text = [engine otherUserInChannel:channel][@"nickname"];
-    
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    static NSString *CellIdentifier = @"InboxCell";
+    PFUser *user = self.users[indexPath.row];
+    UserCell *cell = (UserCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
+    [cell setUser:user andMessages:[self.engine messagesWithUser:user]];
     return cell;
 }
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    // Make sure your segue name in storyboard is the same as this line
+    
+    if ([[segue identifier] isEqualToString:@"GotoChat"])
+    {
+        NSUInteger row = [self.tableView indexPathForSelectedRow].row;
+        PFUser *selectedUser = self.users[row];
+        Chat *vc = [segue destinationViewController];
+        vc.toUser = selectedUser;
+    }
+}
+
 
 /*
 */

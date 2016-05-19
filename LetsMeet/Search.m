@@ -7,37 +7,24 @@
 //
 
 //#import "Search.h"
-#import <ParseUI/PFQueryTableViewController.h>
-#import <ParseUI/PFTableViewCell.h>
 #import "AppEngine.h"
 #import "Chat.h"
+#import "UserCell.h"
 
-@interface Search : PFQueryTableViewController
-
-
+@interface Search : UITableViewController
+@property (nonatomic, weak, readonly) NSArray *users;
+@property (nonatomic, weak, readonly) AppEngine *engine;
+@property (nonatomic, strong) UIRefreshControl *refresh;
 @end
 
 @implementation Search
 
 - (id)initWithCoder:(NSCoder *)aDecoder
 {
-    self = [super init];
     self = [super initWithCoder:aDecoder];
     if (self) {
-        // The className to query on
-        self.parseClassName = @"User";
-        
-        // The key of the PFObject to display in the label of the default cell style
-        self.textKey = @"nickname";
-        
-        // Whether the built-in pull-to-refresh is enabled
-        self.pullToRefreshEnabled = YES;
-        
-        // Whether the built-in pagination is enabled
-        self.paginationEnabled = YES;
-        
-        // The number of objects to show per page
-        self.objectsPerPage = 25;
+        _engine = [AppEngine engine];
+        _users = self.engine.usersNearMe;
     }
     return self;
 }
@@ -45,8 +32,6 @@
 - (void)didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-    
-    // Release any cached data, images, etc that aren't in use.
 }
 
 
@@ -55,21 +40,46 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
+    self.refresh = [[UIRefreshControl alloc] init];
+    [self setRefreshControl:self.refresh];
+    [self.refresh addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
     
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(usersReloaded:)
+                                                 name:AppUsersNearMeReloadedNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(usersReloaded:)
+                                                 name:AppUserMessagesReloadedNotification
+                                               object:nil];
+    
 }
 
-- (void)viewDidUnload {
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
+- (void)refresh:(id)sender
+{
+    [[AppEngine engine] reloadNearUsers];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AppUsersNearMeReloadedNotification
+                                                  object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AppUserMessagesReloadedNotification
+                                                  object:nil];
+}
+
+- (void) usersReloaded:(id)sender
+{
+    // End Refreshing
+    [(UIRefreshControl *)self.refresh endRefreshing];
+    [self.tableView reloadData];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [self.tableView reloadData];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -84,66 +94,34 @@
     [super viewDidDisappear:animated];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    // Return YES for supported orientations
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-
-#pragma mark - PFQueryTableViewController
-
-- (void)objectsWillLoad {
-    [super objectsWillLoad];
-    
-    // This method is called before a PFQuery is fired to get more objects
-}
-
-- (void)objectsDidLoad:(NSError *)error {
-    [super objectsDidLoad:error];
-    
-    NSLog(@"Objects loaded:%@", self.objects);
-    // This method is called every time objects are loaded from Parse via the PFQuery
-}
 
 /*
  // Override to customize what kind of query to perform on the class. The default is to query for
  // all objects ordered by createdAt descending.
  */
-- (PFQuery *)queryForTable {
-    PFQuery *query = [PFQuery queryWithClassName:@"_User"];
-    
-    
-    // If Pull To Refresh is enabled, query against the network by default.
-    if (self.pullToRefreshEnabled) {
-        query.cachePolicy = kPFCachePolicyNetworkOnly;
-    }
-    
-    // If no objects are loaded in memory, we look to the cache first to fill the table
-    // and then subsequently do a query against the network.
-    
-    if (self.objects.count == 0) {
-        query.cachePolicy = kPFCachePolicyCacheThenNetwork;
-    }
-    
-    NSLog(@"LOCATION:%@",[[AppEngine engine] currentLocation]);
-    
-    [query whereKey:@"location" nearGeoPoint:[[AppEngine engine] currentLocation]];
-    
-    return query;
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
 }
 
- - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath object:(PFObject *)object {
-     static NSString *CellIdentifier = @"SearchCell";
-     
-     PFTableViewCell *cell = (PFTableViewCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-     if (cell == nil) {
-         cell = [[PFTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-     }
-     
-     cell.textLabel.text = [object objectForKey:self.textKey];
-     
-     return cell;
- }
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return self.users.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    static NSString *CellIdentifier = @"SearchCell";
+    PFUser *user = self.users[indexPath.row];
+    UserCell *cell = (UserCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
+    [cell setUser:user andMessages:[self.engine messagesWithUser:user]];
+    return cell;
+}
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
@@ -151,7 +129,7 @@
     
     if ([[segue identifier] isEqualToString:@"GotoChat"])
     {
-        PFUser *selectedUser = self.objects[[self.tableView indexPathForSelectedRow].row];
+        PFUser *selectedUser = self.users[[self.tableView indexPathForSelectedRow].row];
         Chat *vc = [segue destinationViewController];
         vc.toUser = selectedUser;
     }

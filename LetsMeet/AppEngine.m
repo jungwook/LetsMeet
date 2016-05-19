@@ -8,10 +8,12 @@
 
 #import "AppEngine.h"
 @interface AppEngine()
-@property (nonatomic, strong, readonly) NSMutableArray *channels;
 @property (nonatomic, strong) CLLocationManager *locMgr;
 @property (nonatomic, strong) CLLocation* curLoc;
 @property (nonatomic, strong, readonly) PFUser *me;
+@property (nonatomic, strong, readonly) NSMutableDictionary *userMessages;
+@property (nonatomic, strong, readonly) NSMutableArray *chatUsers;
+@property (nonatomic, strong, readonly) NSMutableArray *nearUsers;
 @end
 
 #define kUNIQUE_DEVICE_ID @"kUNIQUE_DEVICE_ID"
@@ -19,7 +21,7 @@
 
 @implementation AppEngine
 
-+ (id) engine
++ (instancetype) engine
 {
     static id sharedFile = nil;
     static dispatch_once_t onceToken;
@@ -34,6 +36,10 @@
     self = [super init];
     if (self) {
         _me = [PFUser currentUser];
+        _userMessages = [NSMutableDictionary dictionary];
+        _chatUsers = [NSMutableArray array];
+        _nearUsers = [NSMutableArray array];
+        
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(doLogInEvent:)
                                                      name:AppUserLoggedInNotification
@@ -41,7 +47,7 @@
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(doLogoutEvent:)
-                                                     name:AppUserLoggedInNotification
+                                                     name:AppUserLoggedOutNotification
                                                    object:nil];
     }
     return self;
@@ -50,20 +56,172 @@
 - (void) doLogInEvent:(id)sender
 {
     NSLog(@"USER LOGGED IN");
-    [self loadMyChatRooms];
-}
-
-- (NSArray*) allChannels
-{
-    return self.channels;
+    [self loadUserMessages];
+    [self reloadNearUsers];
 }
 
 - (void) doLogoutEvent:(id)sender
 {
     NSLog(@"USER LOGGED OUT");
-    [self.channels removeAllObjects];
-    _channels = nil;
-    [[NSNotificationCenter defaultCenter] postNotificationName:AppUserChannelsLoadedNotification object:nil];
+}
+
+- (NSArray*) users
+{
+    return self.chatUsers;
+}
+
+- (NSArray *)usersNearMe
+{
+    return self.nearUsers;
+}
+
+- (void) reloadNearUsers
+{
+    PFQuery *query = [PFUser query];
+    [query whereKey:@"location" nearGeoPoint:[self currentLocation]];
+
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"ERROR LOADING USERS NEAR ME:%@", error.localizedDescription);
+        }
+        else {
+            [self.nearUsers removeAllObjects];
+            [self.nearUsers addObjectsFromArray:objects];
+            [[NSNotificationCenter defaultCenter] postNotificationName:AppUsersNearMeReloadedNotification object:nil];
+        }
+    }];
+}
+
+- (void) loadUserMessages
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:   @"fromUser == %@ OR toUser == %@", self.me, self.me];
+    PFQuery *queryMessages = [PFQuery queryWithClassName:AppMessagesCollection predicate:predicate];
+    
+    [queryMessages findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        [objects enumerateObjectsUsingBlock:^(PFObject* _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
+            PFUser *fromUser = message[@"fromUser"];
+            PFUser *toUser = message[@"toUser"];
+            PFUser *otherUser = [fromUser.objectId isEqualToString:self.me.objectId] ? toUser : fromUser;
+            
+            if (!self.userMessages[otherUser.objectId]) {
+                [self.userMessages setObject:[NSMutableArray array] forKey:otherUser.objectId];
+            }
+            [self.userMessages[otherUser.objectId] addObject:message];
+        }];
+        [self loadChatUsers];
+    }];
+}
+
+- (void) loadChatUsers
+{
+    PFQuery *query = [PFUser query];
+    [query whereKey:@"objectId" containedIn:[self.userMessages allKeys]];
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        if (error) {
+            
+        }
+        else {
+            [self.chatUsers removeAllObjects];
+            [self.chatUsers addObjectsFromArray:objects];
+            [[NSNotificationCenter defaultCenter] postNotificationName:AppUserMessagesReloadedNotification object:nil];
+        }
+    }];
+}
+
+- (PFUser*) userWithUserId:(NSString*)userId;
+{
+    __block PFUser* result = nil;
+    [self.chatUsers enumerateObjectsUsingBlock:^(PFUser*  _Nonnull user, NSUInteger idx, BOOL * _Nonnull stop) {
+        if( [user.objectId isEqualToString:userId]) {
+            result = user;
+            *stop = YES;
+        }
+    }];
+    
+    return result;
+}
+
+- (void) resetUnreadMessagesFromUser:(PFUser *)user notify:(BOOL)notify
+{
+    NSArray *messages = self.userMessages[user.objectId];
+    [messages enumerateObjectsUsingBlock:^(PFObject*  _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
+        [message setObject:@(YES) forKey:@"isRead"];
+    }];
+    if (notify) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:AppUserMessagesReloadedNotification object:nil];
+    }
+    
+    PFQuery *query = [PFQuery queryWithClassName:AppMessagesCollection];
+    [query whereKey:@"fromUser" equalTo:user];
+    [query whereKey:@"toUser" equalTo:self.me];
+    [query whereKey:@"isRead" equalTo:@(NO)];
+    
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        [objects enumerateObjectsUsingBlock:^(PFObject*  _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
+            [message setObject:@(YES) forKey:@"isRead"];
+            [message saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+                if (succeeded) {
+                    NSLog(@"SUCCESSFULLY SAVED:%@", message);
+                }
+                else {
+                    NSLog(@"ERROR SAVING:%@ - %@", message, error.localizedDescription );
+                }
+            }];
+        }];
+    }];
+}
+
+- (void) loadMessage:(NSString*)messageId fromUserId:(NSString*)userId
+{
+    PFObject *message = [PFObject objectWithClassName:AppMessagesCollection];
+    message.objectId = messageId;
+    
+    PFUser *user = [self userWithUserId:userId];
+    if (!user) {
+        user = [PFUser user];
+        user.objectId = userId;
+        [user fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+            [self.chatUsers addObject:user];
+            [self loadMessage:message withUser:user];
+        }];
+    }
+    else {
+        [self loadMessage:message withUser:user];
+    }
+}
+
+- (void) loadMessage:(PFObject*)message withUser:(PFUser*)user
+{
+    [message fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+        [self addMessage:message withUser:user];
+    }];
+}
+
+- (void) addMessage:(PFObject *)message
+{
+    PFUser *fromUser = message[@"fromUser"];
+    PFUser *toUser = message[@"toUser"];
+    PFUser *otherUser = [fromUser.objectId isEqualToString:self.me.objectId] ? toUser : fromUser;
+
+    [self addMessage:message withUser:otherUser];
+}
+
+- (void) addMessage:(PFObject*) message withUser:(PFUser *)user
+{
+    if (message && user) {
+        [user fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+            [self.userMessages[user.objectId] addObject:message];
+            [[NSNotificationCenter defaultCenter] postNotificationName:AppUserMessagesReloadedNotification object:nil];
+        }];
+    }
+    else {
+        NSLog(@"CRITICAL: user or message null");
+    }
+}
+
+- (NSArray*) messagesWithUser:(PFUser *)user
+{
+    return user ? self.userMessages[user.objectId] : nil;
 }
 
 - (void) dealloc
@@ -75,71 +233,6 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:AppUserLoggedInNotification
                                                   object:nil];
-}
-
-- (void) arrayOfOtherUserIdFromArray:(NSArray*) channels
-{
-    __block NSMutableArray *userIds = [NSMutableArray array];
-    
-    [channels enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSArray *members = obj[@"members"];
-        
-        [members enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            PFUser *user = obj;
-            if (![user.objectId isEqualToString:self.me.objectId]) {
-                [userIds addObject:user.objectId];
-            }
-        }];
-    }];
-    
-    
-}
-
-- (void) loadMyChatRooms
-{
-    PFQuery *query = [PFQuery queryWithClassName:@"Channel"];
-    [query whereKey:@"members" containsAllObjectsInArray:@[self.me]];
-
-    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
-        if (error) {
-            NSLog(@"ERROR LOADING CHATROOMS: %@", error.localizedDescription);
-        }
-        else {
-            _channels = [NSMutableArray arrayWithArray:objects];
-            NSLog(@"FOUND:%ld CHATROOMS", [self.channels count]);
-            [self.channels enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                PFObject *channel = obj;
-                PFUser* user = [self otherUserInChannel:channel];
-                [user fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
-                    
-                }];
-            }];
-            [[NSNotificationCenter defaultCenter] postNotificationName:AppUserChannelsLoadedNotification object:nil];
-        }
-    }];
-}
-
-- (PFUser*) otherUserInChannel:(PFObject*) channel
-{
-    __block PFUser* otherUser = nil;
-    NSArray *members = channel[@"members"];
-    
-    [members enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        PFUser *user = obj;
-        if (![user.objectId isEqualToString:self.me.objectId]) {
-            otherUser = user;
-            *stop = YES;
-        }
-    }];
-    
-    return otherUser;
-}
-
-- (NSString*) channelNameFrom:(PFUser*)user
-{
-    NSArray *names = [[NSArray arrayWithObjects:self.me.objectId, user.objectId, nil] sortedArrayUsingSelector:@selector(localizedCompare:)];
-    
-    return [[[names firstObject] stringByAppendingString:@"--"] stringByAppendingString:[names lastObject]];
 }
 
 - (void) initLocationServices
@@ -234,6 +327,39 @@
         [[NSUserDefaults standardUserDefaults] setObject:uid forKey:kUNIQUE_DEVICE_ID];
         return uid;
     }
+}
+
+
+- (void)sendMessage:(PFObject *)message toUser:(PFUser *)user
+{
+    [message saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+            [self sendPush:message toUser:user];
+            [self addMessage:message withUser:user];
+        }
+        else {
+            NSLog(@"ERROR SAVING MESSAGE TO PARSE:%@", error.localizedDescription);
+        }
+    }];
+}
+
+- (void)sendPush:(PFObject*)message toUser:(PFUser*) user
+{
+    [PFCloud callFunctionInBackground:@"sendPushToUser"
+                       withParameters:@{
+                                        AppPushRecipientIdField: user.objectId,
+                                        AppPushSenderIdField :   self.me.objectId,
+                                        AppPushMessageField:      message[AppMessageContent],
+                                        AppPushObjectIdFieldk:    message.objectId
+                                        }
+                                block:^(NSString *success, NSError *error) {
+                                    if (!error) {
+                                        NSLog(@"MESSAGE SENT SUCCESSFULLY:%@", message[AppMessageContent]);
+                                    }
+                                    else {
+                                        NSLog(@"ERROR SENDING PUSH:%@", error.localizedDescription);
+                                    }
+                                }];
 }
 
 @end

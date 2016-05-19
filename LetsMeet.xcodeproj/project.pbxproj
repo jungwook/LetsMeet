@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		126AF3F31CEA966B00E3ED67 /* Chat.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3F21CEA966B00E3ED67 /* Chat.m */; };
 		126AF3F61CEA983800E3ED67 /* MessageBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3F51CEA983800E3ED67 /* MessageBar.m */; };
+		126AF3FF1CED625C00E3ED67 /* UserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3FE1CED625C00E3ED67 /* UserCell.m */; };
+		126AF40B1CEDAE0E00E3ED67 /* IndentedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF40A1CEDAE0E00E3ED67 /* IndentedLabel.m */; };
 		12F7418C1CE4B97100E8267A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418B1CE4B97100E8267A /* main.m */; };
 		12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418E1CE4B97100E8267A /* AppDelegate.m */; };
 		12F741951CE4B97100E8267A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12F741931CE4B97100E8267A /* Main.storyboard */; };
@@ -49,6 +51,10 @@
 		126AF3F21CEA966B00E3ED67 /* Chat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Chat.m; sourceTree = "<group>"; };
 		126AF3F41CEA983800E3ED67 /* MessageBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageBar.h; sourceTree = "<group>"; };
 		126AF3F51CEA983800E3ED67 /* MessageBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageBar.m; sourceTree = "<group>"; };
+		126AF3FD1CED625C00E3ED67 /* UserCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserCell.h; sourceTree = "<group>"; };
+		126AF3FE1CED625C00E3ED67 /* UserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserCell.m; sourceTree = "<group>"; };
+		126AF4091CEDAE0E00E3ED67 /* IndentedLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IndentedLabel.h; sourceTree = "<group>"; };
+		126AF40A1CEDAE0E00E3ED67 /* IndentedLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IndentedLabel.m; sourceTree = "<group>"; };
 		12F741871CE4B97000E8267A /* LetsMeet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LetsMeet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12F7418B1CE4B97100E8267A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		12F7418D1CE4B97100E8267A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -128,6 +134,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		126AF4081CEDADE800E3ED67 /* Views etc */ = {
+			isa = PBXGroup;
+			children = (
+				12F741931CE4B97100E8267A /* Main.storyboard */,
+				126AF3F41CEA983800E3ED67 /* MessageBar.h */,
+				126AF3F51CEA983800E3ED67 /* MessageBar.m */,
+				12F741F31CE59C7F00E8267A /* MenuCell.h */,
+				12F741F41CE59C7F00E8267A /* MenuCell.m */,
+				126AF3FD1CED625C00E3ED67 /* UserCell.h */,
+				126AF3FE1CED625C00E3ED67 /* UserCell.m */,
+				126AF4091CEDAE0E00E3ED67 /* IndentedLabel.h */,
+				126AF40A1CEDAE0E00E3ED67 /* IndentedLabel.m */,
+			);
+			name = "Views etc";
+			sourceTree = "<group>";
+		};
 		12F7417E1CE4B97000E8267A = {
 			isa = PBXGroup;
 			children = (
@@ -148,12 +170,12 @@
 		12F741891CE4B97100E8267A /* LetsMeet */ = {
 			isa = PBXGroup;
 			children = (
+				126AF4081CEDADE800E3ED67 /* Views etc */,
 				12F741F71CE5B11000E8267A /* Engine */,
 				12F741D31CE56DD400E8267A /* ViewControllers */,
 				12F741C81CE56B2A00E8267A /* Menu System */,
 				12F7418D1CE4B97100E8267A /* AppDelegate.h */,
 				12F7418E1CE4B97100E8267A /* AppDelegate.m */,
-				12F741931CE4B97100E8267A /* Main.storyboard */,
 				12F741961CE4B97100E8267A /* Assets.xcassets */,
 				12F741981CE4B97100E8267A /* LaunchScreen.storyboard */,
 				12F7419B1CE4B97100E8267A /* Info.plist */,
@@ -223,8 +245,6 @@
 				12F741EB1CE5855200E8267A /* Account.m */,
 				12F741ED1CE593A500E8267A /* Menu.h */,
 				12F741EE1CE593A500E8267A /* Menu.m */,
-				12F741F31CE59C7F00E8267A /* MenuCell.h */,
-				12F741F41CE59C7F00E8267A /* MenuCell.m */,
 				12F741FE1CE6CE4000E8267A /* SignUp.h */,
 				12F741FF1CE6CE4000E8267A /* SignUp.m */,
 				126AF3F11CEA966B00E3ED67 /* Chat.h */,
@@ -238,8 +258,6 @@
 			children = (
 				12F741F81CE5B13D00E8267A /* AppEngine.h */,
 				12F741F91CE5B13D00E8267A /* AppEngine.m */,
-				126AF3F41CEA983800E3ED67 /* MessageBar.h */,
-				126AF3F51CEA983800E3ED67 /* MessageBar.m */,
 			);
 			name = Engine;
 			sourceTree = "<group>";
@@ -337,6 +355,8 @@
 				12F741FA1CE5B13D00E8267A /* AppEngine.m in Sources */,
 				12F741D21CE56B3400E8267A /* FloatingDrawerViewController.m in Sources */,
 				12F741E91CE5854700E8267A /* InBox.m in Sources */,
+				126AF3FF1CED625C00E3ED67 /* UserCell.m in Sources */,
+				126AF40B1CEDAE0E00E3ED67 /* IndentedLabel.m in Sources */,
 				12F741DA1CE56F4300E8267A /* MainController.m in Sources */,
 				12F741D01CE56B3400E8267A /* FloatingDrawerSpringAnimator.m in Sources */,
 			);
@@ -450,6 +470,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -464,6 +485,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = kr.smartly.letsmeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "LetsMeet/LetsMeet-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -471,6 +494,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -485,6 +509,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = kr.smartly.letsmeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "LetsMeet/LetsMeet-Bridging-Header.h";
 			};
 			name = Release;
 		};
