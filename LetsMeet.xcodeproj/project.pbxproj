@@ -11,6 +11,8 @@
 		126AF3F61CEA983800E3ED67 /* MessageBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3F51CEA983800E3ED67 /* MessageBar.m */; };
 		126AF3FF1CED625C00E3ED67 /* UserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3FE1CED625C00E3ED67 /* UserCell.m */; };
 		126AF40B1CEDAE0E00E3ED67 /* IndentedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF40A1CEDAE0E00E3ED67 /* IndentedLabel.m */; };
+		126AF4101CEEACA200E3ED67 /* ValuePopUpView.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF40D1CEEACA200E3ED67 /* ValuePopUpView.m */; };
+		126AF4111CEEACA200E3ED67 /* ValueTrackingSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF40F1CEEACA200E3ED67 /* ValueTrackingSlider.m */; };
 		12F7418C1CE4B97100E8267A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418B1CE4B97100E8267A /* main.m */; };
 		12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418E1CE4B97100E8267A /* AppDelegate.m */; };
 		12F741951CE4B97100E8267A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12F741931CE4B97100E8267A /* Main.storyboard */; };
@@ -55,6 +57,10 @@
 		126AF3FE1CED625C00E3ED67 /* UserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserCell.m; sourceTree = "<group>"; };
 		126AF4091CEDAE0E00E3ED67 /* IndentedLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IndentedLabel.h; sourceTree = "<group>"; };
 		126AF40A1CEDAE0E00E3ED67 /* IndentedLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IndentedLabel.m; sourceTree = "<group>"; };
+		126AF40C1CEEACA200E3ED67 /* ValuePopUpView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ValuePopUpView.h; sourceTree = "<group>"; };
+		126AF40D1CEEACA200E3ED67 /* ValuePopUpView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ValuePopUpView.m; sourceTree = "<group>"; };
+		126AF40E1CEEACA200E3ED67 /* ValueTrackingSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ValueTrackingSlider.h; sourceTree = "<group>"; };
+		126AF40F1CEEACA200E3ED67 /* ValueTrackingSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ValueTrackingSlider.m; sourceTree = "<group>"; };
 		12F741871CE4B97000E8267A /* LetsMeet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LetsMeet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12F7418B1CE4B97100E8267A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		12F7418D1CE4B97100E8267A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -146,6 +152,10 @@
 				126AF3FE1CED625C00E3ED67 /* UserCell.m */,
 				126AF4091CEDAE0E00E3ED67 /* IndentedLabel.h */,
 				126AF40A1CEDAE0E00E3ED67 /* IndentedLabel.m */,
+				126AF40C1CEEACA200E3ED67 /* ValuePopUpView.h */,
+				126AF40D1CEEACA200E3ED67 /* ValuePopUpView.m */,
+				126AF40E1CEEACA200E3ED67 /* ValueTrackingSlider.h */,
+				126AF40F1CEEACA200E3ED67 /* ValueTrackingSlider.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -345,6 +355,7 @@
 				12F741E61CE5853F00E8267A /* Search.m in Sources */,
 				12F741F51CE59C7F00E8267A /* MenuCell.m in Sources */,
 				12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */,
+				126AF4101CEEACA200E3ED67 /* ValuePopUpView.m in Sources */,
 				12F741EC1CE5855200E8267A /* Account.m in Sources */,
 				12F742001CE6CE4000E8267A /* SignUp.m in Sources */,
 				12F741EF1CE593A500E8267A /* Menu.m in Sources */,
@@ -357,6 +368,7 @@
 				12F741E91CE5854700E8267A /* InBox.m in Sources */,
 				126AF3FF1CED625C00E3ED67 /* UserCell.m in Sources */,
 				126AF40B1CEDAE0E00E3ED67 /* IndentedLabel.m in Sources */,
+				126AF4111CEEACA200E3ED67 /* ValueTrackingSlider.m in Sources */,
 				12F741DA1CE56F4300E8267A /* MainController.m in Sources */,
 				12F741D01CE56B3400E8267A /* FloatingDrawerSpringAnimator.m in Sources */,
 			);
