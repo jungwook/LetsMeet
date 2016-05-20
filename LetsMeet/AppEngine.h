@@ -28,6 +28,12 @@
 #define AppPushMessageField @"message"
 #define AppPushObjectIdFieldk @"messageId"
 
+#define AppFemaleUserColor [UIColor colorWithRed:255.f/255.0f green:111.f/255.0f blue:207.f/255.0f alpha:1]
+#define AppMaleUserColor [UIColor colorWithRed:42.f/255.0f green:111.f/255.0f blue:207.f/255.0f alpha:1]
+#define AppMaleUser YES
+#define AppFemaleUser NO
+#define AppMaleUserString @"남자"
+#define AppFemaleUserString @"여자"
 
 
 @interface AppEngine : NSObject <CLLocationManagerDelegate>
@@ -47,4 +53,5 @@
 + (instancetype) engine;
 + (NSString*) uniqueDeviceID;
 + (void) clearUniqueDeviceID;
++ (void) drawImage:(UIImage *)image onView:(UIView*) view;
 @end

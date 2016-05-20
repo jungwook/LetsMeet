@@ -2,21 +2,24 @@
 //  Account.m
 //  LetsMeet
 //
-//  Created by 한정욱 on 2016. 5. 13..
+//  Created by 한정욱 on 2016. 5. 20..
 //  Copyright © 2016년 SMARTLY CO. All rights reserved.
 //
 
 #import "Account.h"
+#import "AppEngine.h"
+#import "IndentedLabel.h"
 
-@interface Account ()
-@property (weak, nonatomic) IBOutlet UIView *nicknameIcon;
-@property (weak, nonatomic) IBOutlet UIView *ageIcon;
-@property (weak, nonatomic) IBOutlet UIView *introIcon;
-@property (weak, nonatomic) IBOutlet UITextField *nickname;
-@property (weak, nonatomic) IBOutlet UITextField *age;
-@property (weak, nonatomic) IBOutlet UITextField *intro;
-@property (weak, nonatomic) IBOutlet UILabel *points;
+
+@interface Account()
 @property (weak, nonatomic) IBOutlet UIView *photoView;
+@property (weak, nonatomic) IBOutlet UILabel *nickname;
+@property (weak, nonatomic) IBOutlet UILabel *intro;
+@property (weak, nonatomic) IBOutlet IndentedLabel *sex;
+@property (weak, nonatomic) IBOutlet IndentedLabel *age;
+@property (weak, nonatomic) IBOutlet UILabel *points;
+@property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
+@property (weak, nonatomic, readonly) PFUser* me;
 
 @end
 
@@ -26,83 +29,84 @@
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
+        _me = [PFUser currentUser];
     }
     return self;
 }
 
-- (IBAction)tappedView:(id)sender {
-    [self.tableView resignFirstResponder];
+- (void) additionalInits
+{
+    bool sex = [self.me[@"sex"] boolValue];
+    self.collectionView.delegate = self;
+    self.collectionView.dataSource = self;
+    
+    self.nickname.text = self.me[@"nickname"];
+    self.intro.text = self.me[@"intro"] ? self.me[@"intro"] : @"undefined";
+    self.sex.text = sex == AppMaleUser ? AppMaleUserString : AppFemaleUserString;
+    self.sex.backgroundColor = sex == AppMaleUser ? AppMaleUserColor : AppFemaleUserColor;
+    self.age.text = [NSString stringWithFormat:@"%@세", self.me[@"age"]];
+    [AppEngine drawImage:[UIImage imageNamed:@"add photo"] onView:self.photoView];
+}
+
+- (void) viewDidLoad
+{
+    [super viewDidLoad];
+    
+    [self additionalInits];
+}
+
+- (void) viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+}
+
+- (void) viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+
+}
+
+
+- (IBAction)editPhoto:(id)sender {
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"My Alert"
+                                                                   message:@"This is an alert."
+                                                            preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *camera = [UIAlertAction actionWithTitle:@"Camera" style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * action) {}];
+    UIAlertAction *library = [UIAlertAction actionWithTitle:@"Library" style:UIAlertActionStyleDefault
+                                                   handler:^(UIAlertAction * action) {}];
+    
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"취소" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        
+    }];
+    
+    [alert addAction:camera];
+    [alert addAction:library];
+    [alert addAction:action];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (IBAction)chargePoints:(id)sender {
 }
 
-- (IBAction)editPhoto:(id)sender {
-}
 
-- (void)viewWillAppear:(BOOL)animated
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(doKeyBoardEvent:) name:UIKeyboardWillChangeFrameNotification object:nil];
+    return 0;
 }
 
-- (void)viewWillDisappear:(BOOL)animated
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-//    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillChangeFrameNotification object:nil];
+    return 0;
 }
 
-- (void) dealloc
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    // Unregister for keyboard notifications
-}
-
-- (void)doKeyBoardEvent:(NSNotification *)notification
-{
-    CGRect keyboardEndFrameWindow;
-    [[notification.userInfo valueForKey:UIKeyboardFrameEndUserInfoKey] getValue: &keyboardEndFrameWindow];
+    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"Cell" forIndexPath:indexPath];
     
-    double keyboardTransitionDuration;
-    [[notification.userInfo valueForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&keyboardTransitionDuration];
-    
-    UIViewAnimationCurve keyboardTransitionAnimationCurve;
-    [[notification.userInfo valueForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&keyboardTransitionAnimationCurve];
-    
-    float w = self.view.frame.size.width;
-    float h = keyboardEndFrameWindow.origin.y;
-    float nbh = self.navigationController.navigationBar.frame.size.height+self.navigationController.navigationBar.frame.origin.y;
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(keyboardTransitionDuration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self.tableView setFrame:CGRectMake(0, nbh, w, h-nbh)];
-    });
-    [UIView animateWithDuration:keyboardTransitionDuration animations:^{
-        [self.tableView setFrame:CGRectMake(0, nbh, w, h-nbh)];
-    } completion:^(BOOL finished) {
-    }];
+    return cell;
 }
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    [self circleView:self.photoView];
-    [self circleView:self.ageIcon];
-    [self circleView:self.nicknameIcon];
-    [self circleView:self.introIcon];
-}
-
-- (void) circleView:(UIView*)view
-{
-    view.layer.cornerRadius = view.frame.size.height / 2.f;
-    view.layer.masksToBounds = YES;
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-}
-
-#pragma mark - Table view data source
-
-- (IBAction)toggleMenu:(id)sender {
-    [AppDelegate toggleMenu];
-}
-
 
 @end

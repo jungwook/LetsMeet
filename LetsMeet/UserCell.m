@@ -87,7 +87,7 @@
     int sex = [[user valueForKey:@"sex"] boolValue];
     PFObject* lastMessage = [messages lastObject];
     
-    UIColor *sexColor = sex ? [UIColor colorWithRed:255.f/255.0f green:111.f/255.0f blue:207.f/255.0f alpha:1] : [UIColor colorWithRed:42.f/255.0f green:111.f/255.0f blue:207.f/255.0f alpha:1];
+    UIColor *sexColor = (sex == AppMaleUser) ? AppMaleUserColor : AppFemaleUserColor;
     
     PFGeoPoint *location = user[@"location"];
     PFGeoPoint *here = [[AppEngine engine] currentLocation];

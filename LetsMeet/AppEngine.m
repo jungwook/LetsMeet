@@ -362,6 +362,12 @@
                                 }];
 }
 
++ (void) drawImage:(UIImage *)image onView:(UIView*) view
+{
+    view.layer.contents = (id) image.CGImage;
+    view.layer.contentsGravity = kCAGravityResizeAspect;
+    view.layer.masksToBounds = YES;
+}
 @end
 
 
