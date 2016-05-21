@@ -16,6 +16,7 @@
 @property (weak, nonatomic) IBOutlet MessageBar *messageBar;
 @property (nonatomic, strong, readonly) PFObject *me;
 @property (nonatomic, weak, readonly) AppEngine *engine;
+@property (nonatomic, strong) NSArray *messages;
 @end
 
 @implementation Chat
@@ -34,7 +35,6 @@
 {
     [super viewDidLoad];
     self.messageBar.messageBarDelegate = self;
-    
 }
 
 - (void) messagesReloaded:(id)sender
@@ -80,6 +80,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+    return self.messages.count;
     return [[self.engine messagesWithUser:self.toUser] count];
 }
 
@@ -153,7 +154,7 @@
 
 - (void) scrollToBottomAnimated:(BOOL) animated
 {
-    NSUInteger count = [self.engine messagesWithUser:self.toUser].count;
+    NSUInteger count = [self.tableView numberOfRowsInSection:0];
     if (count) {
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:count ? count-1 : 0 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:animated];
     }

@@ -14,6 +14,12 @@
 @property (nonatomic, strong, readonly) NSMutableDictionary *userMessages;
 @property (nonatomic, strong, readonly) NSMutableArray *chatUsers;
 @property (nonatomic, strong, readonly) NSMutableArray *nearUsers;
+
+
+
+//////////////////////////////////////////////////
+
+@property (nonatomic, strong, readonly) NSMutableDictionary *appEngineUserMessages;
 @end
 
 #define kUNIQUE_DEVICE_ID @"kUNIQUE_DEVICE_ID"
@@ -39,6 +45,8 @@
         _userMessages = [NSMutableDictionary dictionary];
         _chatUsers = [NSMutableArray array];
         _nearUsers = [NSMutableArray array];
+        
+        _appEngineUserMessages = [NSMutableDictionary dictionary];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(doLogInEvent:)
@@ -108,11 +116,11 @@
             }
             [self.userMessages[otherUser.objectId] addObject:message];
         }];
-        [self loadChatUsers];
+        [self reloadChatUsers];
     }];
 }
 
-- (void) loadChatUsers
+- (void) reloadChatUsers
 {
     PFQuery *query = [PFUser query];
     [query whereKey:@"objectId" containedIn:[self.userMessages allKeys]];
@@ -123,8 +131,8 @@
         else {
             [self.chatUsers removeAllObjects];
             [self.chatUsers addObjectsFromArray:objects];
-            [[NSNotificationCenter defaultCenter] postNotificationName:AppUserMessagesReloadedNotification object:nil];
         }
+        [[NSNotificationCenter defaultCenter] postNotificationName:AppUserMessagesReloadedNotification object:nil];
     }];
 }
 
@@ -369,6 +377,67 @@
     view.layer.masksToBounds = YES;
 }
 
++ (void) appEngineReloadUsersOfId:(NSArray*)userIds inBackgroundWithBlock:(ArrayResultBlock)block
+{
+    PFQuery *query = [PFUser query];
+    [query whereKey:@"objectId" containedIn:userIds];
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+        }
+        else {
+            if (block) {
+                block(objects);
+            }
+        }
+    }];
+}
+
++ (void) appEngineReloadAllChatUsersInBackground:(ArrayResultBlock)block
+{
+    AppEngine *engine = [AppEngine engine];
+    NSMutableSet *chatUsers = [NSMutableSet set];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:   @"fromUser == %@ OR toUser == %@", engine.me, engine.me];
+    PFQuery *queryMessages = [PFQuery queryWithClassName:AppMessagesCollection predicate:predicate];
+    
+    [queryMessages findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        [objects enumerateObjectsUsingBlock:^(PFObject* _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
+            PFUser *fromUser = message[@"fromUser"];
+            PFUser *toUser = message[@"toUser"];
+            PFUser *otherUser = [fromUser.objectId isEqualToString:engine.me.objectId] ? toUser : fromUser;
+            
+            [chatUsers addObject:otherUser.objectId];
+        }];
+        if (block) {
+            block([chatUsers allObjects]);
+        }
+    }];
+}
+
++ (void) appEngineReloadAllMessages
+{
+    AppEngine *engine = [AppEngine engine];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:   @"fromUser == %@ OR toUser == %@", engine.me, engine.me];
+    PFQuery *queryMessages = [PFQuery queryWithClassName:AppMessagesCollection predicate:predicate];
+    
+    [queryMessages findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        [objects enumerateObjectsUsingBlock:^(PFObject* _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
+            PFUser *fromUser = message[@"fromUser"];
+            PFUser *toUser = message[@"toUser"];
+            PFUser *otherUser = [fromUser.objectId isEqualToString:engine.me.objectId] ? toUser : fromUser;
+            
+            if (!engine.appEngineUserMessages[otherUser.objectId]) {
+                [engine.appEngineUserMessages setObject:[NSMutableArray array] forKey:otherUser.objectId];
+            }
+            [engine.appEngineUserMessages[otherUser.objectId] addObject:message];
+        }];
+        SENDNOTIFICATION(AppUserMessagesReloadedNotification, engine.appEngineUserMessages.allKeys);
+    }];
+}
+
+
 
 @end
 
@@ -398,5 +467,12 @@ void drawImage(UIImage *image, UIView* view)
     [view.layer setContentsGravity:kCAGravityResizeAspect];
     [view.layer setMasksToBounds:YES];
 }
+
+void circleizeView(UIView* view, CGFloat percent)
+{
+    view.layer.cornerRadius = view.frame.size.height * percent;
+    view.layer.masksToBounds = YES;
+}
+
 
 

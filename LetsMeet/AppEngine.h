@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#define SENDNOTIFICATION(NOTIF,OBJECT) [[NSNotificationCenter defaultCenter] postNotificationName:NOTIF object:OBJECT]
 #define AppUserLoggedInNotification @"AppUserLoggedInNotification"
 #define AppUserLoggedOutNotification @"AppUserLoggedOutNotification"
 #define AppUserMessagesReloadedNotification @"AppUserMessagesReloadedNotification"
@@ -35,9 +35,27 @@
 #define AppMaleUserString @"남자"
 #define AppFemaleUserString @"여자"
 
+#define AppProfilePhotoSize CGSizeMake(60, 60)
+#define AppProfilePhotoCompression 0.6
+#define AppProfilePhotoFileName @"profile.jpg"
+#define AppProfileOriginalPhotoFileName @"original.jpg"
+
+#define AppProfileIntroductions @[@"우리 만나요!", @"애인 찾아요", @"함께 드라이브"]
+#define AppProfileSexSelections @[@"남자", @"여자"]
+#define AppProfileAgeSelections @[@"20대", @"30대", @"40대", @"50대"]
+
+#define AppProfilePhotoField @"photo"
+#define AppProfileOriginalPhotoField @"originalPhoto"
+
+typedef void (^FileBooleanResultBlock)(PFFile *file, BOOL succeeded, NSError * error);
+typedef void (^ArrayResultBlock)(NSArray *objects);
+
+
 CALayer* drawImageOnLayer(UIImage *image, CGSize size);
 UIImage* scaleImage(UIImage* image, CGSize size);
 void drawImage(UIImage *image, UIView* view);
+void circleizeView(UIView* view, CGFloat percent);
+
 
 @interface AppEngine : NSObject <CLLocationManagerDelegate>
 - (void) resetUnreadMessagesFromUser:(PFUser*)user notify:(BOOL)notify;
@@ -51,10 +69,17 @@ void drawImage(UIImage *image, UIView* view);
 - (void) addMessage:(PFObject*)message;
 - (void) initLocationServices;
 - (void) reloadNearUsers;
+- (void) reloadChatUsers;
 - (PFGeoPoint*) currentLocation;
 
 + (instancetype) engine;
 + (NSString*) uniqueDeviceID;
 + (void) clearUniqueDeviceID;
 + (void) drawImage:(UIImage *)image onView:(UIView*) view;
+
+
+////////////////////////// NEW GLOBAL APIS ////////////////////////
++ (void) appEngineReloadAllMessages;
++ (void) appEngineReloadAllChatUsersInBackground:(ArrayResultBlock)block;
++ (void) appEngineReloadUsersOfId:(NSArray*)userIds inBackgroundWithBlock:(void(^)(NSArray *users))block;
 @end

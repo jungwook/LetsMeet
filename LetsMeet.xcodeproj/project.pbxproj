@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928831CEFF7F70038A2F3 /* ImagePicker.m */; };
+		124928871CF003420038A2F3 /* CachedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928861CF003420038A2F3 /* CachedFile.m */; };
+		1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928891CF0176C0038A2F3 /* ListPicker.m */; };
+		1249288D1CF042370038A2F3 /* ChatUsers.m in Sources */ = {isa = PBXBuildFile; fileRef = 1249288C1CF042370038A2F3 /* ChatUsers.m */; };
 		126AF3F31CEA966B00E3ED67 /* Chat.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3F21CEA966B00E3ED67 /* Chat.m */; };
 		126AF3F61CEA983800E3ED67 /* MessageBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3F51CEA983800E3ED67 /* MessageBar.m */; };
 		126AF3FF1CED625C00E3ED67 /* UserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3FE1CED625C00E3ED67 /* UserCell.m */; };
@@ -49,6 +53,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		124928821CEFF7F70038A2F3 /* ImagePicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePicker.h; sourceTree = "<group>"; };
+		124928831CEFF7F70038A2F3 /* ImagePicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImagePicker.m; sourceTree = "<group>"; };
+		124928851CF003420038A2F3 /* CachedFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CachedFile.h; sourceTree = "<group>"; };
+		124928861CF003420038A2F3 /* CachedFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CachedFile.m; sourceTree = "<group>"; };
+		124928881CF0176C0038A2F3 /* ListPicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListPicker.h; sourceTree = "<group>"; };
+		124928891CF0176C0038A2F3 /* ListPicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ListPicker.m; sourceTree = "<group>"; };
+		1249288B1CF042370038A2F3 /* ChatUsers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatUsers.h; sourceTree = "<group>"; };
+		1249288C1CF042370038A2F3 /* ChatUsers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatUsers.m; sourceTree = "<group>"; };
 		126AF3F11CEA966B00E3ED67 /* Chat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chat.h; sourceTree = "<group>"; };
 		126AF3F21CEA966B00E3ED67 /* Chat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Chat.m; sourceTree = "<group>"; };
 		126AF3F41CEA983800E3ED67 /* MessageBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageBar.h; sourceTree = "<group>"; };
@@ -156,6 +168,12 @@
 				126AF40D1CEEACA200E3ED67 /* ValuePopUpView.m */,
 				126AF40E1CEEACA200E3ED67 /* ValueTrackingSlider.h */,
 				126AF40F1CEEACA200E3ED67 /* ValueTrackingSlider.m */,
+				124928821CEFF7F70038A2F3 /* ImagePicker.h */,
+				124928831CEFF7F70038A2F3 /* ImagePicker.m */,
+				124928881CF0176C0038A2F3 /* ListPicker.h */,
+				124928891CF0176C0038A2F3 /* ListPicker.m */,
+				124928851CF003420038A2F3 /* CachedFile.h */,
+				124928861CF003420038A2F3 /* CachedFile.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -259,6 +277,8 @@
 				12F741FF1CE6CE4000E8267A /* SignUp.m */,
 				126AF3F11CEA966B00E3ED67 /* Chat.h */,
 				126AF3F21CEA966B00E3ED67 /* Chat.m */,
+				1249288B1CF042370038A2F3 /* ChatUsers.h */,
+				1249288C1CF042370038A2F3 /* ChatUsers.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -351,7 +371,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1249288D1CF042370038A2F3 /* ChatUsers.m in Sources */,
 				12F741DD1CE5851800E8267A /* Board.m in Sources */,
+				124928871CF003420038A2F3 /* CachedFile.m in Sources */,
 				12F741E61CE5853F00E8267A /* Search.m in Sources */,
 				12F741F51CE59C7F00E8267A /* MenuCell.m in Sources */,
 				12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */,
@@ -371,6 +393,8 @@
 				126AF4111CEEACA200E3ED67 /* ValueTrackingSlider.m in Sources */,
 				12F741DA1CE56F4300E8267A /* MainController.m in Sources */,
 				12F741D01CE56B3400E8267A /* FloatingDrawerSpringAnimator.m in Sources */,
+				1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */,
+				124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

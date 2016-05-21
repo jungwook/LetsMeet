@@ -58,14 +58,12 @@
 
 -(void)viewDidAppear:(BOOL)animated
 {
-    UITableViewController *signup = [[self storyboard] instantiateViewControllerWithIdentifier:@"SignUp"];
-
+    static bool firstTime = YES;
+    
     NSString *username = [AppEngine uniqueDeviceID];
-    
     PFUser *user = [PFUser currentUser];
-    NSLog(@"USER U:%@", user);
     
-    if (![user.username isEqualToString:username]) {
+    if (!user || ![user.username isEqualToString:username]) {
         user = [PFUser user];
         user.username = username;
         user.password = username;
@@ -75,6 +73,8 @@
                 [PFUser logInWithUsernameInBackground:user.username password:user.password block:^(PFUser * _Nullable user, NSError * _Nullable error) {
                     [[AppEngine engine] initLocationServices];
                     [[NSNotificationCenter defaultCenter] postNotificationName:AppUserLoggedInNotification object:nil];
+                    [self subscribeToChannelCurrentUser];
+                    UITableViewController *signup = [[self storyboard] instantiateViewControllerWithIdentifier:@"SignUp"];
                     [self presentViewController:signup animated:YES completion:^{
                         NSLog(@"PRESENTING USER:%@", [PFUser currentUser]);
                     }];
@@ -86,10 +86,11 @@
         }];
     }
     else {
-        [[AppEngine engine] initLocationServices];
-        [[NSNotificationCenter defaultCenter] postNotificationName:AppUserLoggedInNotification object:nil];
+        if (firstTime) {
+            firstTime = NO;
+            [[NSNotificationCenter defaultCenter] postNotificationName:AppUserLoggedInNotification object:nil];
+        }
     }
-    [self subscribeToChannelCurrentUser];
 }
 
 - (void) subscribeToChannelCurrentUser

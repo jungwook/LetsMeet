@@ -28,7 +28,7 @@
         configuration.server = @"http://parse.kr:1338/parse";
     }]];
     
-    [PFUser enableAutomaticUser];
+//    [PFUser enableAutomaticUser];
     
     PFACL *defaultACL = [PFACL ACL];
     

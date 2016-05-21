@@ -9,6 +9,7 @@
 #import "UserCell.h"
 #import "AppEngine.h"
 #import "IndentedLabel.h"
+#import "CachedFile.h"
 
 @interface UserCell()
 @property (weak, nonatomic) IBOutlet UIView *photoView;
@@ -17,8 +18,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *lastMessage;
 @property (weak, nonatomic) IBOutlet IndentedLabel *distance;
 @property (weak, nonatomic) IBOutlet IndentedLabel *when;
-
-@property (weak, nonatomic) PFObject *user;
 @end
 
 
@@ -113,6 +112,11 @@
     
     self.unread.text = [self unreadString:unreadCount forUser:user];
     self.unread.alpha = unreadCount > 0 ? 1.0 : 0.0f;
+    
+    [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
+        UIImage *profilePhoto = [UIImage imageWithData:data];
+        drawImage(profilePhoto, self.photoView);
+    } fromFile:user[AppProfilePhotoField]];
 }
 
 - (void) circleizeView:(UIView*) view by:(CGFloat)percent
