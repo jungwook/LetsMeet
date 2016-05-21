@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface Account : UIViewController <UICollectionViewDelegate, UICollectionViewDataSource, UIAlertViewDelegate>
+@interface Account : UIViewController <UICollectionViewDelegate, UICollectionViewDataSource, UIAlertViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
 @end

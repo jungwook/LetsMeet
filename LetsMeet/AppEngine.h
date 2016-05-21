@@ -35,6 +35,9 @@
 #define AppMaleUserString @"남자"
 #define AppFemaleUserString @"여자"
 
+CALayer* drawImageOnLayer(UIImage *image, CGSize size);
+UIImage* scaleImage(UIImage* image, CGSize size);
+void drawImage(UIImage *image, UIView* view);
 
 @interface AppEngine : NSObject <CLLocationManagerDelegate>
 - (void) resetUnreadMessagesFromUser:(PFUser*)user notify:(BOOL)notify;

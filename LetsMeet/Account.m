@@ -67,24 +67,58 @@
 
 }
 
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    
+    UIImage *chosenImage = info[UIImagePickerControllerEditedImage];
+    [AppEngine drawImage:chosenImage onView:self.photoView];
+    
+    UIImage *small = scaleImage(chosenImage, CGSizeMake(60, 60));
+    NSData *smallData = UIImageJPEGRepresentation(small, 0.6);
+    drawImage(small, self.photoView);
+    
+    
+    
+    [picker dismissViewControllerAnimated:YES completion:NULL];    
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    
+    [picker dismissViewControllerAnimated:YES completion:NULL];
+}
 
 - (IBAction)editPhoto:(id)sender {
+    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+    picker.delegate = self;
+    picker.allowsEditing = YES;
     UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"My Alert"
                                                                    message:@"This is an alert."
                                                             preferredStyle:UIAlertControllerStyleActionSheet];
     
-    UIAlertAction *camera = [UIAlertAction actionWithTitle:@"Camera" style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * action) {}];
-    UIAlertAction *library = [UIAlertAction actionWithTitle:@"Library" style:UIAlertActionStyleDefault
-                                                   handler:^(UIAlertAction * action) {}];
+    UIAlertAction *camera = [UIAlertAction actionWithTitle:@"사진촬영" style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * action) {
+                                                              picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+                                                              [self presentViewController:picker animated:YES completion:^{
+                                                                  
+                                                              }];
+                                                          }];
+    UIAlertAction *library = [UIAlertAction actionWithTitle:@"사진선택" style:UIAlertActionStyleDefault
+                                                   handler:^(UIAlertAction * action) {
+                                                       picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+                                                       [self presentViewController:picker animated:YES completion:^{
+                                                           
+                                                       }];
+                                                   }];
     
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"취소" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"취소" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
         
     }];
-    
-    [alert addAction:camera];
-    [alert addAction:library];
-    [alert addAction:action];
+    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        [alert addAction:camera];
+    }
+    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
+        [alert addAction:library];
+    }
+    [alert addAction:cancel];
     [self presentViewController:alert animated:YES completion:nil];
 }
 

@@ -368,7 +368,35 @@
     view.layer.contentsGravity = kCAGravityResizeAspect;
     view.layer.masksToBounds = YES;
 }
+
+
 @end
 
+CALayer* drawImageOnLayer(UIImage *image, CGSize size)
+{
+    CALayer *layer = [CALayer layer];
+    [layer setBounds:CGRectMake(0, 0, size.width, size.height)];
+    [layer setContents:(id)image.CGImage];
+    [layer setContentsGravity:kCAGravityResizeAspect];
+    [layer setMasksToBounds:YES];
+    return layer;
+}
+
+UIImage* scaleImage(UIImage* image, CGSize size) {
+    
+    UIGraphicsBeginImageContextWithOptions(size, false, 0.0);
+    [drawImageOnLayer(image,size) renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *smallImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return smallImage;
+}
+
+void drawImage(UIImage *image, UIView* view)
+{
+    [view.layer setContents:(id)image.CGImage];
+    [view.layer setContentsGravity:kCAGravityResizeAspect];
+    [view.layer setMasksToBounds:YES];
+}
 
 
