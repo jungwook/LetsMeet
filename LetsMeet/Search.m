@@ -131,7 +131,7 @@
     {
         PFUser *selectedUser = self.users[[self.tableView indexPathForSelectedRow].row];
         Chat *vc = [segue destinationViewController];
-        vc.toUser = selectedUser;
+//        [vc setChatUser:selectedUser];
     }
 }
 

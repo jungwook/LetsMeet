@@ -14,6 +14,7 @@
 @interface InBox ()
 @property (nonatomic, strong, readonly) PFUser* me;
 @property (nonatomic, strong) NSArray* chatUsers;
+@property (nonatomic, strong) NSDictionary *messages;
 @property (nonatomic, weak, readonly) AppEngine *engine;
 @property (nonatomic, strong) UIRefreshControl *refresh;
 @end
@@ -29,36 +30,56 @@
     }
     return self;
 }
-
-- (void) viewDidAppear:(BOOL)animated
+- (void)viewWillAppear:(BOOL)animated
 {
-    [super viewDidAppear:animated];
-    [self update];
-}
-
-- (void) viewDidDisappear:(BOOL)animated
-{
-    [super viewDidDisappear:animated];
+    [super viewWillAppear:animated];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.refresh = [[UIRefreshControl alloc] init];
     [self setRefreshControl:self.refresh];
-    [self.refresh addTarget:self action:@selector(update) forControlEvents:UIControlEventValueChanged];
-    [self update];
+    [self.refresh addTarget:self action:@selector(updateChatUsers) forControlEvents:UIControlEventValueChanged];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(newMessageReceived:)
+                                                 name:AppUserNewMessageReceivedNotification
+                                               object:nil];
+    [self updateChatUsers];
 }
 
-- (void)update
+- (void)dealloc
 {
-    [AppEngine appEngineReloadAllChatUsersInBackground:^(NSArray *objects) {
-        [AppEngine appEngineReloadUsersOfId:objects inBackgroundWithBlock:^(NSArray *users) {
-            self.chatUsers = users;
-            if ([self.refresh isRefreshing])
-                [self.refresh endRefreshing];
-            
-            [self.tableView reloadData];
-        }];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AppUserNewMessageReceivedNotification
+                                                  object:nil];
+}
+
+- (void) newMessageReceived:(NSNotification*)msg
+{
+    PFObject *message = msg.object;
+    PFUser* fromUser = message[@"fromUser"];
+    
+    if (!self.messages[fromUser.objectId]) {
+        // CHAT FROM NEW USER
+        [self updateChatUsers];
+    }
+    
+    [self.messages[fromUser.objectId] addObject:message];
+    [self.tableView reloadData];
+}
+
+
+- (void)updateChatUsers
+{
+    NSLog(@"UPDATE CHAT USERS");
+    [AppEngine appEngineLoadMyDictionaryOfUsersAndMessagesInBackground:^(NSDictionary *messages, NSArray *users) {
+        self.chatUsers = users;
+        self.messages = messages;
+        
+        if ([self.refresh isRefreshing])
+            [self.refresh endRefreshing];
+        
+        [self.tableView reloadData];
     }];
 }
 
@@ -85,7 +106,7 @@
     static NSString *CellIdentifier = @"InboxCell";
     PFUser *user = self.chatUsers[indexPath.row];
     UserCell *cell = (UserCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
-    [cell setUser:user andMessages:[self.engine messagesWithUser:user]];
+    [cell setUser:user andMessages:self.messages[user.objectId]];
     return cell;
 }
 
@@ -96,7 +117,7 @@
         NSUInteger row = [self.tableView indexPathForSelectedRow].row;
         PFUser *selectedUser = self.chatUsers[row];
         Chat *vc = [segue destinationViewController];
-        vc.toUser = selectedUser;
+        [vc setChatUser:selectedUser withMessages:self.messages[selectedUser.objectId]];
     }
 }
 

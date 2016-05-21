@@ -149,84 +149,6 @@
     return result;
 }
 
-- (void) resetUnreadMessagesFromUser:(PFUser *)user notify:(BOOL)notify
-{
-    NSArray *messages = self.userMessages[user.objectId];
-    [messages enumerateObjectsUsingBlock:^(PFObject*  _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
-        [message setObject:@(YES) forKey:@"isRead"];
-    }];
-    if (notify) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:AppUserMessagesReloadedNotification object:nil];
-    }
-    
-    PFQuery *query = [PFQuery queryWithClassName:AppMessagesCollection];
-    [query whereKey:@"fromUser" equalTo:user];
-    [query whereKey:@"toUser" equalTo:self.me];
-    [query whereKey:@"isRead" equalTo:@(NO)];
-    
-    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
-        [objects enumerateObjectsUsingBlock:^(PFObject*  _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
-            [message setObject:@(YES) forKey:@"isRead"];
-            [message saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-                if (succeeded) {
-                    NSLog(@"SUCCESSFULLY SAVED:%@", message);
-                }
-                else {
-                    NSLog(@"ERROR SAVING:%@ - %@", message, error.localizedDescription );
-                }
-            }];
-        }];
-    }];
-}
-
-- (void) loadMessage:(NSString*)messageId fromUserId:(NSString*)userId
-{
-    PFObject *message = [PFObject objectWithClassName:AppMessagesCollection];
-    message.objectId = messageId;
-    
-    PFUser *user = [self userWithUserId:userId];
-    if (!user) {
-        user = [PFUser user];
-        user.objectId = userId;
-        [user fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
-            [self.chatUsers addObject:user];
-            [self loadMessage:message withUser:user];
-        }];
-    }
-    else {
-        [self loadMessage:message withUser:user];
-    }
-}
-
-- (void) loadMessage:(PFObject*)message withUser:(PFUser*)user
-{
-    [message fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
-        [self addMessage:message withUser:user];
-    }];
-}
-
-- (void) addMessage:(PFObject *)message
-{
-    PFUser *fromUser = message[@"fromUser"];
-    PFUser *toUser = message[@"toUser"];
-    PFUser *otherUser = [fromUser.objectId isEqualToString:self.me.objectId] ? toUser : fromUser;
-
-    [self addMessage:message withUser:otherUser];
-}
-
-- (void) addMessage:(PFObject*) message withUser:(PFUser *)user
-{
-    if (message && user) {
-        [user fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
-            [self.userMessages[user.objectId] addObject:message];
-            [[NSNotificationCenter defaultCenter] postNotificationName:AppUserMessagesReloadedNotification object:nil];
-        }];
-    }
-    else {
-        NSLog(@"CRITICAL: user or message null");
-    }
-}
-
 - (NSArray*) messagesWithUser:(PFUser *)user
 {
     return user ? self.userMessages[user.objectId] : nil;
@@ -337,13 +259,123 @@
     }
 }
 
++ (void) appEngineLoadMyDictionaryOfUsersAndMessagesInBackground:(DictionaryArrayResultBlock)block
+{
+    NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+    
+    PFUser *me = [PFUser currentUser];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:   @"fromUser == %@ OR toUser == %@", me, me];
+    PFQuery *queryMessages = [PFQuery queryWithClassName:AppMessagesCollection predicate:predicate];
+    
+    [queryMessages findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        [objects enumerateObjectsUsingBlock:^(PFObject* _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
+            PFUser *fromUser = message[@"fromUser"];
+            PFUser *toUser = message[@"toUser"];
+            PFUser *otherUser = [fromUser.objectId isEqualToString:me.objectId] ? toUser : fromUser;
+            
+            if (!dictionary[otherUser.objectId]) {
+                dictionary[otherUser.objectId] = [NSMutableArray array];
+            }
+            [dictionary[otherUser.objectId] addObject:message];
+        }];
+        PFQuery *query = [PFUser query];
+        [query whereKey:@"objectId" containedIn:[dictionary allKeys]];
+        [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
+            if (error) {
+                NSLog(@"ERROR:%@", error.localizedDescription);
+            }
+            else {
+                if (block) {
+                    block(dictionary, users);
+                }
+            }
+        }];
+    }];
+}
 
-- (void)sendMessage:(PFObject *)message toUser:(PFUser *)user
++ (void) appEngineReloadAllChatUsersInBackground:(ArrayResultBlock)block
+{
+    PFUser *me = [PFUser currentUser];
+    NSMutableSet *chatUsers = [NSMutableSet set];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:   @"fromUser == %@ OR toUser == %@", me, me];
+    PFQuery *queryMessages = [PFQuery queryWithClassName:AppMessagesCollection predicate:predicate];
+    
+    [queryMessages findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        [objects enumerateObjectsUsingBlock:^(PFObject* _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
+            PFUser *fromUser = message[@"fromUser"];
+            PFUser *toUser = message[@"toUser"];
+            PFUser *otherUser = [fromUser.objectId isEqualToString:me.objectId] ? toUser : fromUser;
+            
+            [chatUsers addObject:otherUser.objectId];
+        }];
+        
+        PFQuery *query = [PFUser query];
+        [query whereKey:@"objectId" containedIn:[chatUsers allObjects]];
+        [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+            if (error) {
+                NSLog(@"ERROR:%@", error.localizedDescription);
+            }
+            else {
+                if (block) {
+                    block(objects);
+                }
+            }
+        }];
+    }];
+}
+
++ (void) appEngineReloadMessagesWithUser:(PFUser*)user inBackground:(ArrayResultBlock)block
+{
+    PFUser *me = [PFUser currentUser];
+
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:   @"(fromUser == %@ AND toUser = %@) OR (toUser == %@ AND fromUser == %@)",
+                              user, me, user, me];
+    PFQuery *queryMessages = [PFQuery queryWithClassName:AppMessagesCollection predicate:predicate];
+    
+    [queryMessages findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        if (block) {
+            block(objects);
+        }
+    }];
+}
+
++ (void) appEngineResetUnreadMessages:(NSArray*)messages fromUser:(PFUser *)user completionBlock:(CountResultBlock)block
+{
+    NSLog(@"MEssages:%ld", messages.count);
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:   @"fromUser == %@", user];
+    NSArray *recMessages = [messages filteredArrayUsingPredicate:predicate];
+    NSLog(@"MEssages:%ld", recMessages.count);
+    
+    [recMessages enumerateObjectsUsingBlock:^(PFObject*  _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
+        [message setObject:@(YES) forKey:@"isRead"];
+        [message saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+            if (!succeeded) {
+                NSLog(@"ERROR SAVING:%@ - %@", message, error.localizedDescription );
+            }
+        }];
+    }];
+    if (block) {
+        block([recMessages count]);
+    }
+}
+
++ (void) appEngineLoadMessageWithId:(id)messageId fromUserId:(id)userId
+{
+    PFObject *message = [PFObject objectWithClassName:AppMessagesCollection];
+    message.objectId = messageId;
+    
+    [message fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+        SENDNOTIFICATION(AppUserNewMessageReceivedNotification, message);
+    }];
+}
+
+
++ (void) appEngineSendMessage:(PFObject *)message toUser:(PFUser *)user
 {
     [message saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
         if (succeeded) {
-            [self sendPush:message toUser:user];
-            [self addMessage:message withUser:user];
+            [self appEngineSendPush:message toUser:user];
         }
         else {
             NSLog(@"ERROR SAVING MESSAGE TO PARSE:%@", error.localizedDescription);
@@ -351,12 +383,14 @@
     }];
 }
 
-- (void)sendPush:(PFObject*)message toUser:(PFUser*) user
++ (void) appEngineSendPush:(PFObject*)message toUser:(PFUser*) user
 {
+    PFUser *me = [PFUser currentUser];
+    
     [PFCloud callFunctionInBackground:@"sendPushToUser"
                        withParameters:@{
                                         AppPushRecipientIdField: user.objectId,
-                                        AppPushSenderIdField :   self.me.objectId,
+                                        AppPushSenderIdField :   me.objectId,
                                         AppPushMessageField:      message[AppMessageContent],
                                         AppPushObjectIdFieldk:    message.objectId
                                         }
@@ -370,75 +404,19 @@
                                 }];
 }
 
-+ (void) drawImage:(UIImage *)image onView:(UIView*) view
+- (void) addMessage:(PFObject*) message withUser:(PFUser *)user
 {
-    view.layer.contents = (id) image.CGImage;
-    view.layer.contentsGravity = kCAGravityResizeAspect;
-    view.layer.masksToBounds = YES;
-}
-
-+ (void) appEngineReloadUsersOfId:(NSArray*)userIds inBackgroundWithBlock:(ArrayResultBlock)block
-{
-    PFQuery *query = [PFUser query];
-    [query whereKey:@"objectId" containedIn:userIds];
-    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
-        if (error) {
-            NSLog(@"ERROR:%@", error.localizedDescription);
-        }
-        else {
-            if (block) {
-                block(objects);
-            }
-        }
-    }];
-}
-
-+ (void) appEngineReloadAllChatUsersInBackground:(ArrayResultBlock)block
-{
-    AppEngine *engine = [AppEngine engine];
-    NSMutableSet *chatUsers = [NSMutableSet set];
-    
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:   @"fromUser == %@ OR toUser == %@", engine.me, engine.me];
-    PFQuery *queryMessages = [PFQuery queryWithClassName:AppMessagesCollection predicate:predicate];
-    
-    [queryMessages findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
-        [objects enumerateObjectsUsingBlock:^(PFObject* _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
-            PFUser *fromUser = message[@"fromUser"];
-            PFUser *toUser = message[@"toUser"];
-            PFUser *otherUser = [fromUser.objectId isEqualToString:engine.me.objectId] ? toUser : fromUser;
-            
-            [chatUsers addObject:otherUser.objectId];
+    if (message && user) {
+        [user fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+            [self.userMessages[user.objectId] addObject:message];
+            [[NSNotificationCenter defaultCenter] postNotificationName:AppUserMessagesReloadedNotification object:nil];
         }];
-        if (block) {
-            block([chatUsers allObjects]);
-        }
-    }];
+    }
+    else {
+        NSLog(@"CRITICAL: user or message null");
+    }
 }
-
-+ (void) appEngineReloadAllMessages
-{
-    AppEngine *engine = [AppEngine engine];
-    
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:   @"fromUser == %@ OR toUser == %@", engine.me, engine.me];
-    PFQuery *queryMessages = [PFQuery queryWithClassName:AppMessagesCollection predicate:predicate];
-    
-    [queryMessages findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
-        [objects enumerateObjectsUsingBlock:^(PFObject* _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
-            PFUser *fromUser = message[@"fromUser"];
-            PFUser *toUser = message[@"toUser"];
-            PFUser *otherUser = [fromUser.objectId isEqualToString:engine.me.objectId] ? toUser : fromUser;
-            
-            if (!engine.appEngineUserMessages[otherUser.objectId]) {
-                [engine.appEngineUserMessages setObject:[NSMutableArray array] forKey:otherUser.objectId];
-            }
-            [engine.appEngineUserMessages[otherUser.objectId] addObject:message];
-        }];
-        SENDNOTIFICATION(AppUserMessagesReloadedNotification, engine.appEngineUserMessages.allKeys);
-    }];
-}
-
-
-
+/**/
 @end
 
 CALayer* drawImageOnLayer(UIImage *image, CGSize size)

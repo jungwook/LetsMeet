@@ -209,7 +209,7 @@
         NSUInteger row = [self.tableView indexPathForSelectedRow].row;
         PFUser *selectedUser = self.users[row];
         Chat *vc = [segue destinationViewController];
-        vc.toUser = selectedUser;
+//        [vc setChatUser:selectedUser];
     }
 }
 

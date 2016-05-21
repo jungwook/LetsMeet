@@ -12,6 +12,7 @@
 #define AppUserLoggedOutNotification @"AppUserLoggedOutNotification"
 #define AppUserMessagesReloadedNotification @"AppUserMessagesReloadedNotification"
 #define AppUsersNearMeReloadedNotification @"AppUsersNearMeReloadedNotification"
+#define AppUserNewMessageReceivedNotification @"AppUserNewMessageReceivedNotificaiton"
 
 #define AppMessagesCollection @"Messages"
 
@@ -49,6 +50,9 @@
 
 typedef void (^FileBooleanResultBlock)(PFFile *file, BOOL succeeded, NSError * error);
 typedef void (^ArrayResultBlock)(NSArray *objects);
+typedef void (^CountResultBlock)(NSUInteger count);
+typedef void (^DictionaryResultBlock)(NSDictionary *messages);
+typedef void (^DictionaryArrayResultBlock)(NSDictionary *messages, NSArray *users);
 
 
 CALayer* drawImageOnLayer(UIImage *image, CGSize size);
@@ -58,15 +62,10 @@ void circleizeView(UIView* view, CGFloat percent);
 
 
 @interface AppEngine : NSObject <CLLocationManagerDelegate>
-- (void) resetUnreadMessagesFromUser:(PFUser*)user notify:(BOOL)notify;
 - (NSArray*) users;
 - (NSArray*) usersNearMe;
 - (NSArray*) messagesWithUser:(PFUser*)user;
 
-- (void) sendMessage:(PFObject*)message toUser:(PFUser*) user;
-- (void) loadMessage:(NSString*)messageId fromUserId:(NSString*)userId;
-- (void) addMessage:(PFObject*)message withUser:(PFUser *)user;
-- (void) addMessage:(PFObject*)message;
 - (void) initLocationServices;
 - (void) reloadNearUsers;
 - (void) reloadChatUsers;
@@ -75,11 +74,14 @@ void circleizeView(UIView* view, CGFloat percent);
 + (instancetype) engine;
 + (NSString*) uniqueDeviceID;
 + (void) clearUniqueDeviceID;
-+ (void) drawImage:(UIImage *)image onView:(UIView*) view;
-
 
 ////////////////////////// NEW GLOBAL APIS ////////////////////////
-+ (void) appEngineReloadAllMessages;
+//+ (void) appEngineReloadAllMessages;
++ (void) appEngineReloadMessagesWithUser:(PFUser*)user inBackground:(ArrayResultBlock)block;
 + (void) appEngineReloadAllChatUsersInBackground:(ArrayResultBlock)block;
 + (void) appEngineReloadUsersOfId:(NSArray*)userIds inBackgroundWithBlock:(void(^)(NSArray *users))block;
++ (void) appEngineResetUnreadMessages:(NSArray*)messages fromUser:(PFUser *)user completionBlock:(CountResultBlock)block;
++ (void) appEngineLoadMessageWithId:(id)messageId fromUserId:(id)userId;
++ (void) appEngineSendMessage:(PFObject *)message toUser:(PFUser *)user;
++ (void) appEngineLoadMyDictionaryOfUsersAndMessagesInBackground:(DictionaryArrayResultBlock)block;
 @end

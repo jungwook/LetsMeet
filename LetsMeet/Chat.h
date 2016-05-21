@@ -10,5 +10,5 @@
 #import "MessageBar.h"
 
 @interface Chat : UIViewController <MessageBarDelegate, UITableViewDelegate, UITableViewDataSource>
-@property (nonatomic, strong) PFUser* toUser;
+- (void)setChatUser:(PFUser *)user withMessages:(NSArray*)messages;
 @end

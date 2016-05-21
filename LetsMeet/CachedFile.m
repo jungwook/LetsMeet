@@ -12,6 +12,16 @@
 
 @implementation CachedFile
 
++ (instancetype) file
+{
+    static id sharedFile = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedFile = [[self alloc] init];
+    });
+    return sharedFile;
+}
+
 - (instancetype) init
 {
     self = [super init];
@@ -19,11 +29,6 @@
         
     }
     return self;
-}
-
-+ (instancetype) file
-{
-    return [[CachedFile alloc] init];
 }
 
 + (void) getDataInBackgroundWithBlock:(PFDataResultBlock)block fromFile:(PFFile*)file
@@ -40,22 +45,22 @@
     
     NSData *data = [self objectForKey:file.name];
     if (data) {
-        NSLog(@"CACHED DATA EXISTS");
+//        NSLog(@"CACHED DATA EXISTS");
         if (block) {
-            NSLog(@"CALLING BLOCK WITH CACHED DATA");
+//            NSLog(@"CALLING BLOCK WITH CACHED DATA");
             block(data, nil);
         }
     }
     else {
-        NSLog(@"NO CACHED DATA - LOADING FROM NETWORK");
+//        NSLog(@"NO CACHED DATA - LOADING FROM NETWORK");
         [file getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
-            NSLog(@"LOADED DATA FROM NETWORK");
+//            NSLog(@"LOADED DATA FROM NETWORK");
             if (!error) {
-                NSLog(@"SETTING CACHED DATA:%@", file.name);
+//                NSLog(@"SETTING CACHED DATA:%@", file.name);
                 [self setObject:data forKey:file.name];
             }
             if (block) {
-                NSLog(@"CALLING BLOCK WITH NETWORK DATA");
+//                NSLog(@"CALLING BLOCK WITH NETWORK DATA");
                 block(data, error);
             }
         }];
@@ -70,12 +75,12 @@
 - (void) saveData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(FileBooleanResultBlock)block progressBlock:(PFProgressBlock)progressBlock
 {
     PFFile *file = [PFFile fileWithName:name data:data];
-    NSLog(@"SAVING FILE NETWORK DATA:%@", file.name);
+//    NSLog(@"SAVING FILE NETWORK DATA:%@", file.name);
     [file saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-        NSLog(@"SAVING TO CACHE:%@", file.name);
+//        NSLog(@"SAVING TO CACHE:%@", file.name);
         [self setObject:data forKey:file.name];
         if (block) {
-            NSLog(@"CALLING BLOCK WITH SAVED NETWORK DATA:%@", file.name);
+//            NSLog(@"CALLING BLOCK WITH SAVED NETWORK DATA:%@", file.name);
             block(file, succeeded, error);
         }
     } progressBlock:progressBlock];

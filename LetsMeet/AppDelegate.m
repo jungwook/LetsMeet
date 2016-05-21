@@ -113,7 +113,7 @@
 //    [PFPush handlePush:userInfo];
     NSLog(@"userInfo:%@", userInfo);
     
-    [self.engine loadMessage:userInfo[@"messageId"] fromUserId:userInfo[@"senderId"]];
+    [AppEngine appEngineLoadMessageWithId:userInfo[@"messageId"] fromUserId:userInfo[@"senderId"]];
     
     if (application.applicationState == UIApplicationStateInactive) {
         [PFAnalytics trackAppOpenedWithRemoteNotificationPayload:userInfo];
