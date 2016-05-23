@@ -128,8 +128,8 @@
     self.view.layer.contents = (id) [UIImage imageNamed:@"bg"].CGImage;
     self.view.layer.masksToBounds = YES;
     
-    [self setupTextFields:self.nickname with:[[PFUser currentUser] valueForKey:@"nickname"]];
-    [self setupTextFields:self.age with:[[PFUser currentUser] valueForKey:@"age"]];
+    [self setupTextFields:self.nickname with:[[PFUser currentUser] valueForKey:AppKeyNicknameKey]];
+    [self setupTextFields:self.age with:[[PFUser currentUser] valueForKey:AppKeyAgeKey]];
     [self setupTextFields:self.why with:[[PFUser currentUser] valueForKey:@"why"]];
 }
 
@@ -137,8 +137,8 @@
     if (![self.nickname.text isEqualToString:@""] && ![self.age.text isEqualToString:@""]) {
         PFUser *user = [PFUser currentUser];
         
-        [user setObject:self.nickname.text forKey:@"nickname"];
-        [user setObject:self.age.text forKey:@"age"];
+        [user setObject:self.nickname.text forKey:AppKeyNicknameKey];
+        [user setObject:self.age.text forKey:AppKeyAgeKey];
         [user setObject:self.why.text forKey:@"why"];
         
         [user saveInBackground];

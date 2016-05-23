@@ -10,7 +10,10 @@
 		124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928831CEFF7F70038A2F3 /* ImagePicker.m */; };
 		124928871CF003420038A2F3 /* CachedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928861CF003420038A2F3 /* CachedFile.m */; };
 		1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928891CF0176C0038A2F3 /* ListPicker.m */; };
-		1249288D1CF042370038A2F3 /* ChatUsers.m in Sources */ = {isa = PBXBuildFile; fileRef = 1249288C1CF042370038A2F3 /* ChatUsers.m */; };
+		124928AF1CF2CD370038A2F3 /* RefreshControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928AE1CF2CD370038A2F3 /* RefreshControl.m */; };
+		124928B21CF2E65A0038A2F3 /* ToggleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928B11CF2E65A0038A2F3 /* ToggleButton.m */; };
+		124928B81CF2ED810038A2F3 /* UIBarButtonItem+Badge.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928B51CF2ED810038A2F3 /* UIBarButtonItem+Badge.m */; };
+		124928B91CF2ED810038A2F3 /* UIButton+Badge.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928B71CF2ED810038A2F3 /* UIButton+Badge.m */; };
 		126AF3F31CEA966B00E3ED67 /* Chat.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3F21CEA966B00E3ED67 /* Chat.m */; };
 		126AF3F61CEA983800E3ED67 /* MessageBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3F51CEA983800E3ED67 /* MessageBar.m */; };
 		126AF3FF1CED625C00E3ED67 /* UserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3FE1CED625C00E3ED67 /* UserCell.m */; };
@@ -59,10 +62,16 @@
 		124928861CF003420038A2F3 /* CachedFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CachedFile.m; sourceTree = "<group>"; };
 		124928881CF0176C0038A2F3 /* ListPicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListPicker.h; sourceTree = "<group>"; };
 		124928891CF0176C0038A2F3 /* ListPicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ListPicker.m; sourceTree = "<group>"; };
-		1249288B1CF042370038A2F3 /* ChatUsers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatUsers.h; sourceTree = "<group>"; };
-		1249288C1CF042370038A2F3 /* ChatUsers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatUsers.m; sourceTree = "<group>"; };
+		124928AD1CF2CD370038A2F3 /* RefreshControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RefreshControl.h; sourceTree = "<group>"; };
+		124928AE1CF2CD370038A2F3 /* RefreshControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RefreshControl.m; sourceTree = "<group>"; };
+		124928B01CF2E65A0038A2F3 /* ToggleButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ToggleButton.h; sourceTree = "<group>"; };
+		124928B11CF2E65A0038A2F3 /* ToggleButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ToggleButton.m; sourceTree = "<group>"; };
+		124928B41CF2ED810038A2F3 /* UIBarButtonItem+Badge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIBarButtonItem+Badge.h"; sourceTree = "<group>"; };
+		124928B51CF2ED810038A2F3 /* UIBarButtonItem+Badge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIBarButtonItem+Badge.m"; sourceTree = "<group>"; };
+		124928B61CF2ED810038A2F3 /* UIButton+Badge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+Badge.h"; sourceTree = "<group>"; };
+		124928B71CF2ED810038A2F3 /* UIButton+Badge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+Badge.m"; sourceTree = "<group>"; };
 		126AF3F11CEA966B00E3ED67 /* Chat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chat.h; sourceTree = "<group>"; };
-		126AF3F21CEA966B00E3ED67 /* Chat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Chat.m; sourceTree = "<group>"; };
+		126AF3F21CEA966B00E3ED67 /* Chat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = Chat.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		126AF3F41CEA983800E3ED67 /* MessageBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageBar.h; sourceTree = "<group>"; };
 		126AF3F51CEA983800E3ED67 /* MessageBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageBar.m; sourceTree = "<group>"; };
 		126AF3FD1CED625C00E3ED67 /* UserCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserCell.h; sourceTree = "<group>"; };
@@ -113,14 +122,14 @@
 		12F741E41CE5853F00E8267A /* Search.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Search.h; sourceTree = "<group>"; };
 		12F741E51CE5853F00E8267A /* Search.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Search.m; sourceTree = "<group>"; };
 		12F741E71CE5854700E8267A /* InBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InBox.h; sourceTree = "<group>"; };
-		12F741E81CE5854700E8267A /* InBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InBox.m; sourceTree = "<group>"; };
+		12F741E81CE5854700E8267A /* InBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = InBox.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		12F741ED1CE593A500E8267A /* Menu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Menu.h; sourceTree = "<group>"; };
 		12F741EE1CE593A500E8267A /* Menu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Menu.m; sourceTree = "<group>"; };
 		12F741F31CE59C7F00E8267A /* MenuCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuCell.h; sourceTree = "<group>"; };
 		12F741F41CE59C7F00E8267A /* MenuCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MenuCell.m; sourceTree = "<group>"; };
 		12F741F61CE5AF6200E8267A /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
-		12F741F81CE5B13D00E8267A /* AppEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppEngine.h; sourceTree = "<group>"; };
-		12F741F91CE5B13D00E8267A /* AppEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppEngine.m; sourceTree = "<group>"; };
+		12F741F81CE5B13D00E8267A /* AppEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = AppEngine.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		12F741F91CE5B13D00E8267A /* AppEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AppEngine.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		12F741FE1CE6CE4000E8267A /* SignUp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignUp.h; sourceTree = "<group>"; };
 		12F741FF1CE6CE4000E8267A /* SignUp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignUp.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -152,6 +161,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		124928B31CF2ED790038A2F3 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				124928B41CF2ED810038A2F3 /* UIBarButtonItem+Badge.h */,
+				124928B51CF2ED810038A2F3 /* UIBarButtonItem+Badge.m */,
+				124928B61CF2ED810038A2F3 /* UIButton+Badge.h */,
+				124928B71CF2ED810038A2F3 /* UIButton+Badge.m */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
 		126AF4081CEDADE800E3ED67 /* Views etc */ = {
 			isa = PBXGroup;
 			children = (
@@ -174,6 +194,10 @@
 				124928891CF0176C0038A2F3 /* ListPicker.m */,
 				124928851CF003420038A2F3 /* CachedFile.h */,
 				124928861CF003420038A2F3 /* CachedFile.m */,
+				124928AD1CF2CD370038A2F3 /* RefreshControl.h */,
+				124928AE1CF2CD370038A2F3 /* RefreshControl.m */,
+				124928B01CF2E65A0038A2F3 /* ToggleButton.h */,
+				124928B11CF2E65A0038A2F3 /* ToggleButton.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -198,6 +222,7 @@
 		12F741891CE4B97100E8267A /* LetsMeet */ = {
 			isa = PBXGroup;
 			children = (
+				124928B31CF2ED790038A2F3 /* Extensions */,
 				126AF4081CEDADE800E3ED67 /* Views etc */,
 				12F741F71CE5B11000E8267A /* Engine */,
 				12F741D31CE56DD400E8267A /* ViewControllers */,
@@ -277,8 +302,6 @@
 				12F741FF1CE6CE4000E8267A /* SignUp.m */,
 				126AF3F11CEA966B00E3ED67 /* Chat.h */,
 				126AF3F21CEA966B00E3ED67 /* Chat.m */,
-				1249288B1CF042370038A2F3 /* ChatUsers.h */,
-				1249288C1CF042370038A2F3 /* ChatUsers.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -371,7 +394,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1249288D1CF042370038A2F3 /* ChatUsers.m in Sources */,
 				12F741DD1CE5851800E8267A /* Board.m in Sources */,
 				124928871CF003420038A2F3 /* CachedFile.m in Sources */,
 				12F741E61CE5853F00E8267A /* Search.m in Sources */,
@@ -381,13 +403,17 @@
 				12F742001CE6CE4000E8267A /* SignUp.m in Sources */,
 				12F741EF1CE593A500E8267A /* Menu.m in Sources */,
 				126AF3F31CEA966B00E3ED67 /* Chat.m in Sources */,
+				124928B21CF2E65A0038A2F3 /* ToggleButton.m in Sources */,
 				12F741D11CE56B3400E8267A /* FloatingDrawerView.m in Sources */,
 				12F7418C1CE4B97100E8267A /* main.m in Sources */,
+				124928AF1CF2CD370038A2F3 /* RefreshControl.m in Sources */,
 				126AF3F61CEA983800E3ED67 /* MessageBar.m in Sources */,
 				12F741FA1CE5B13D00E8267A /* AppEngine.m in Sources */,
 				12F741D21CE56B3400E8267A /* FloatingDrawerViewController.m in Sources */,
+				124928B91CF2ED810038A2F3 /* UIButton+Badge.m in Sources */,
 				126AF4141CEEF04300E3ED67 /* Account.m in Sources */,
 				12F741E91CE5854700E8267A /* InBox.m in Sources */,
+				124928B81CF2ED810038A2F3 /* UIBarButtonItem+Badge.m in Sources */,
 				126AF3FF1CED625C00E3ED67 /* UserCell.m in Sources */,
 				126AF40B1CEDAE0E00E3ED67 /* IndentedLabel.m in Sources */,
 				126AF4111CEEACA200E3ED67 /* ValueTrackingSlider.m in Sources */,

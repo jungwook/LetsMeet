@@ -39,21 +39,21 @@
     if (self) {
         _me = [PFUser currentUser];
         _engine = [AppEngine engine];
-        _users = self.engine.users;
+//        _users = self.engine.users;
     }
     return self;
 }
 
 - (void) additionalInits
 {
-    bool sex = [self.me[@"sex"] boolValue];
+    bool sex = [self.me[AppKeySexKey] boolValue];
     
-    self.nickname.text = self.me[@"nickname"];
-    self.intro.text = self.me[@"intro"] ? self.me[@"intro"] : @"undefined";
+    self.nickname.text = self.me[AppKeyNicknameKey];
+    self.intro.text = self.me[AppKeyIntroKey] ? self.me[AppKeyIntroKey] : @"undefined";
     self.intro.inputView = [ListPicker pickerWithArray:AppProfileIntroductions withPhotoSelectedBlock:^(id data) {
         self.intro.text = data;
         [self.intro resignFirstResponder];
-        self.me[@"intro"] = data;
+        self.me[AppKeyIntroKey] = data;
         [self.me saveInBackground];
     }];
 
@@ -61,7 +61,7 @@
         bool sex = [data isEqualToString:AppMaleUserString];
         self.sex.text = data;
         [self.sex resignFirstResponder];
-        self.me[@"sex"] = sex ? @(AppMaleUser) : @(AppFemaleUser);
+        self.me[AppKeySexKey] = sex ? @(AppMaleUser) : @(AppFemaleUser);
         self.sex.backgroundColor = sex ? AppMaleUserColor : AppFemaleUserColor;
         [self.me saveInBackground];
     }];
@@ -72,11 +72,11 @@
     self.age.inputView = [ListPicker pickerWithArray:AppProfileAgeSelections withPhotoSelectedBlock:^(id data) {
         self.age.text = data;
         [self.age resignFirstResponder];
-        self.me[@"age"] = data;
+        self.me[AppKeyAgeKey] = data;
         [self.me saveInBackground];
     }];
     
-    self.age.text = [NSString stringWithFormat:@"%@", self.me[@"age"]];
+    self.age.text = [NSString stringWithFormat:@"%@", self.me[AppKeyAgeKey]];
     
     [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
         UIImage *profilePhoto = [UIImage imageWithData:data];
@@ -95,7 +95,7 @@
 
 - (void)refresh:(id)sender
 {
-    [[AppEngine engine] reloadChatUsers];
+//    [[AppEngine engine] reloadChatUsers];
 }
 
 - (void) viewDidLoad
@@ -113,7 +113,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(messagesLoaded:)
-                                                 name:AppUserMessagesReloadedNotification
+                                                 name:AppUserNewMessageReceivedNotification
                                                object:nil];
     [self.tableView reloadData];
 }
@@ -122,7 +122,7 @@
 {
     [super viewWillDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:AppUserMessagesReloadedNotification
+                                                    name:AppUserNewMessageReceivedNotification
                                                   object:nil];
 }
 
@@ -196,7 +196,7 @@
     static NSString *CellIdentifier = @"InboxCell";
     PFUser *user = self.users[indexPath.row];
     UserCell *cell = (UserCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
-    [cell setUser:user andMessages:[self.engine messagesWithUser:user]];
+//    [cell setUser:user andMessages:[self.engine messagesWithUser:user]];
     return cell;
 }
 

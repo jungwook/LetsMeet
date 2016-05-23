@@ -7,6 +7,7 @@
 //
 
 #import "MenuCell.h"
+#import "AppEngine.h"
 
 @interface MenuCell()
 @property (weak, nonatomic) IBOutlet UIImageView *iconView;

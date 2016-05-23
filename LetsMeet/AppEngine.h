@@ -8,11 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #define SENDNOTIFICATION(NOTIF,OBJECT) [[NSNotificationCenter defaultCenter] postNotificationName:NOTIF object:OBJECT]
-#define AppUserLoggedInNotification @"AppUserLoggedInNotification"
-#define AppUserLoggedOutNotification @"AppUserLoggedOutNotification"
-#define AppUserMessagesReloadedNotification @"AppUserMessagesReloadedNotification"
-#define AppUsersNearMeReloadedNotification @"AppUsersNearMeReloadedNotification"
+
 #define AppUserNewMessageReceivedNotification @"AppUserNewMessageReceivedNotificaiton"
+#define AppUserRefreshBadgeNotificaiton @"AppUserRefreshBadgeNotificaiton"
 
 #define AppMessagesCollection @"Messages"
 
@@ -22,12 +20,13 @@
 #define AppMessageTypePhoto @"PHOTO"
 #define AppMessageTypeVideo @"VIDEO"
 #define AppMessageTypeAudio @"AUDIO"
-#define AppMessageTypeURL @"URL"
+#define AppMessageTypeURL AppKeyURLKey
 
 #define AppPushRecipientIdField @"recipientId"
-#define AppPushSenderIdField @"senderId"
+#define AppPushSenderIdField AppKeySenderId
 #define AppPushMessageField @"message"
-#define AppPushObjectIdFieldk @"messageId"
+#define AppPushObjectIdFieldk AppKeyMessageIdKey
+#define AppPushCloudAppPush @"sendPushToUser"
 
 #define AppFemaleUserColor [UIColor colorWithRed:255.f/255.0f green:111.f/255.0f blue:207.f/255.0f alpha:1]
 #define AppMaleUserColor [UIColor colorWithRed:42.f/255.0f green:111.f/255.0f blue:207.f/255.0f alpha:1]
@@ -45,11 +44,39 @@
 #define AppProfileSexSelections @[@"남자", @"여자"]
 #define AppProfileAgeSelections @[@"20대", @"30대", @"40대", @"50대"]
 
+#define AppKeyIsSyncToUserField @"isSyncToUser"
+#define AppKeyIsSyncFromUserField @"isSyncFromUser"
+#define AppKeyToUserField @"toUser"
+#define AppKeyFromUserField @"fromUser"
+#define AppKeyObjectId @"objectId"
+#define AppKeyUserMessagesFileKey @"userMessages-%@"
+#define AppKeyCreatedAtKey @"createdAt"
+#define AppKeyLocationKey @"location"
+#define AppKeyLocationUpdatedKey @"locationUpdated"
+#define AppKeyIsReadKey @"isRead"
+#define AppKeySexKey @"sex"
+#define AppKeyNicknameKey @"nickname"
+#define AppKeyIntroKey @"intro"
+#define AppKeyAgeKey @"age"
+#define AppKeyMessageIdKey @"messageId"
+#define AppKeySenderId @"senderId"
+#define AppKeyNameKey @"name"
+#define AppKeyUpdatedAtKey @"updatedAt"
+#define AppKeyURLKey @"url"
+#define AppKeyDataKey @"data"
+#define AppKeyLatitudeKey @"latitude"
+#define AppKeyLongitudeKey @"longitude"
+
 #define AppProfilePhotoField @"photo"
 #define AppProfileOriginalPhotoField @"originalPhoto"
+#define AppEngineDictionaryFile [defUrl(@"dictionary") path]
+#define AppEngineUsersFile [defUrl(@"users") path]
 
 typedef void (^FileBooleanResultBlock)(PFFile *file, BOOL succeeded, NSError * error);
 typedef void (^ArrayResultBlock)(NSArray *objects);
+typedef void (^UserResultBlock)(PFUser *user);
+typedef void (^voidBlock)(void);
+typedef void (^RefreshControlBlock)(UIRefreshControl* refreshControl);
 typedef void (^CountResultBlock)(NSUInteger count);
 typedef void (^DictionaryResultBlock)(NSDictionary *messages);
 typedef void (^DictionaryArrayResultBlock)(NSDictionary *messages, NSArray *users);
@@ -62,13 +89,7 @@ void circleizeView(UIView* view, CGFloat percent);
 
 
 @interface AppEngine : NSObject <CLLocationManagerDelegate>
-- (NSArray*) users;
-- (NSArray*) usersNearMe;
-- (NSArray*) messagesWithUser:(PFUser*)user;
-
 - (void) initLocationServices;
-- (void) reloadNearUsers;
-- (void) reloadChatUsers;
 - (PFGeoPoint*) currentLocation;
 
 + (instancetype) engine;
@@ -77,11 +98,19 @@ void circleizeView(UIView* view, CGFloat percent);
 
 ////////////////////////// NEW GLOBAL APIS ////////////////////////
 //+ (void) appEngineReloadAllMessages;
-+ (void) appEngineReloadMessagesWithUser:(PFUser*)user inBackground:(ArrayResultBlock)block;
-+ (void) appEngineReloadAllChatUsersInBackground:(ArrayResultBlock)block;
-+ (void) appEngineReloadUsersOfId:(NSArray*)userIds inBackgroundWithBlock:(void(^)(NSArray *users))block;
-+ (void) appEngineResetUnreadMessages:(NSArray*)messages fromUser:(PFUser *)user completionBlock:(CountResultBlock)block;
 + (void) appEngineLoadMessageWithId:(id)messageId fromUserId:(id)userId;
 + (void) appEngineSendMessage:(PFObject *)message toUser:(PFUser *)user;
-+ (void) appEngineLoadMyDictionaryOfUsersAndMessagesInBackground:(DictionaryArrayResultBlock)block;
++ (void) appEngineUsersFromUserIds:(NSArray*)userIds completed:(ArrayResultBlock)block;
++ (void) appEngineInboxUsers:(ArrayResultBlock)block;
++ (void) appEngineUserFromUserId:(id)userId completed:(UserResultBlock)block;
++ (NSString*) appEngineLastMessageFromUser:(PFUser*)user;
++ (NSString*) appEngineLastMessageFromUserId:(id)userId;
++ (NSArray*) appEngineMessagesWithUserId:(id)userId;
++ (void) appEngineSetReadAllMyMessagesWithUserId:(id)userId;
++ (BOOL) appEngineRemoveAllMessagesFromUserId:(id)userId;
++ (NSUInteger) appEngineUnreadCount;
+
+- (void) startTimeKeeperIfSimulator;
+- (void) AppEngineFetchLastObjects;
++ (void) appEngineResetBadge;
 @end

@@ -9,15 +9,16 @@
 #import "Chat.h"
 #import "AppEngine.h"
 
-#define NAVBARHEIGHT 64
+#define meId self.me.objectId
+#define userId self.user.objectId
 
 @interface Chat()
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet MessageBar *messageBar;
-@property (nonatomic, strong, readonly) PFObject *me;
+@property (nonatomic, strong, readonly) PFUser *me;
 @property (nonatomic, weak, readonly) AppEngine *engine;
-@property (nonatomic, strong) NSMutableArray *messages;
-@property (nonatomic, strong) PFUser* chatUser;
+
+@property (nonatomic, strong) PFUser* user;
 @end
 
 @implementation Chat
@@ -36,83 +37,93 @@
 {
     [super viewDidLoad];
     self.messageBar.messageBarDelegate = self;
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(newMessageReceived:)
-                                                 name:AppUserNewMessageReceivedNotification
-                                               object:nil];
 }
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:AppUserNewMessageReceivedNotification
-                                                  object:nil];
 }
 
-- (void)setChatUser:(PFUser *)user withMessages:(NSArray *)messages
+- (void)setChatUser:(PFUser *)user
 {
-    NSLog(@"USER:%@", user);
-    _chatUser = user;
-    self.messages = [NSMutableArray arrayWithArray:messages];
-    [self resetAllUnreadMessages];
-    [self.tableView reloadData];
-    return;
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    [self scrollToBottomAnimated:YES];
-}
-
-- (void) resetAllUnreadMessages
-{
-    [self.messages enumerateObjectsUsingBlock:^(PFObject*  _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (![message[@"isRead"] boolValue]) {
-            [message setObject:@(YES) forKey:@"isRead"];
-            [message saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-                if (!succeeded) {
-                    NSLog(@"ERROR SAVING:%@ - %@", message, error.localizedDescription );
-                }
-            }];
-        }
-    }];
-}
-
-- (void) newMessageReceived:(NSNotification*)msg
-{
-    PFObject *message = msg.object;
-    PFUser* fromUser = message[@"fromUser"];
+    _user = user;
     
-    if ([fromUser.objectId isEqualToString:self.chatUser.objectId]) {
-        [self addNewMessage:message];
-        [self resetAllUnreadMessages];
-    }
-}
-
-// From MessageBarDelegate. A message was sent from the messageBar.
-
-- (void)sendMessage:(id)message
-{
-    PFObject* messageObject= [self messageToObject:message];
-    [AppEngine appEngineSendMessage:messageObject toUser:self.chatUser];
-    [self addNewMessage:messageObject];
-}
-
-- (void)addNewMessage:(PFObject*)message
-{
-    if (!self.messages) {
-        self.messages = [NSMutableArray array];
-    }
-    [self.messages addObject:message];
+    [AppEngine appEngineSetReadAllMyMessagesWithUserId:userId];
     [self.tableView reloadData];
-    [self scrollToBottomAnimated:YES];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     [self scrollToBottomAnimated:NO];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(newMessageReceived:)
+                                                 name:AppUserNewMessageReceivedNotification
+                                               object:nil];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AppUserNewMessageReceivedNotification
+                                                  object:nil];
+}
+
+
+- (void) newMessageReceived:(NSNotification*)notification
+{
+    // SUPPOSED TO BE USER CHANNEL
+    //
+    // 1. Message From ME           TO ME.      POSSIBLE FOR TESTING BUT CANNOT SINCE I CANNOT BE FOUND FROM SEARCH
+    //                              TO USER     NOT DO ANYTHING
+    //                              TO UNKNOWN  BY PASS IN THIS VC (CHAT SCREEN) AND LET INBOX HANDLE (ACTUALLY NOT POSSIBLE)
+    // 2. Message From USER         TO ME.      HANDLE BY RESETING ISREAD TO YES AND RELOADING TABLE
+    //                              TO USER     BY PASS IN THIS VC (CHAT SCREEN) AND LET INBOX HANDLE OR NOT
+    //                              TO UNKNOWN  BY PASS IN THIS VC (CHAT SCREEN) AND LET INBOX HANDLE OR NOT
+    // 3. Message From UNKNOWN      TO ME.      BY PASS IN THIS VC (CHAT SCREEN) AND LET INBOX HANDLE OR NOT
+    //                              TO USER     BY PASS IN THIS VC (CHAT SCREEN) AND LET INBOX HANDLE OR NOT
+    //                              TO UNKNOWN  BY PASS IN THIS VC (CHAT SCREEN) AND LET INBOX HANDLE OR NOT
+    //
+    // WHAT AM I HANDLING
+    //
+    id message = notification.object;
+    id fromUser = message[AppKeyFromUserField];
+    id toUser = message[AppKeyToUserField];
+    
+    if ([fromUser isEqualToString:meId] && [toUser isEqualToString:userId]) {
+        if ([userId isEqualToString:meId]) {
+            [AppEngine appEngineSetReadAllMyMessagesWithUserId:fromUser]; // ME = FROM = TO %% SPECIAL CASE
+        }
+        [self.tableView reloadData];
+    }
+    else if ([fromUser isEqualToString:userId] && [toUser isEqualToString:meId]) {
+        [AppEngine appEngineSetReadAllMyMessagesWithUserId:fromUser];
+        [self.tableView reloadData];
+    }
+    else {
+        return;
+    }
+    [self scrollToBottomAnimated:YES];
+}
+
+// From MessageBarDelegate. A message was sent from the messageBar.
+
+- (void)sendMessage:(id)barMessage
+{
+    PFObject *message = [PFObject objectWithClassName:AppMessagesCollection];
+    message[AppKeyFromUserField] = self.me;
+    message[AppKeyToUserField] = self.user;
+    message[AppMessageType] = barMessage[AppMessageType];
+    message[AppMessageContent] = barMessage[AppMessageContent];
+    message[AppKeyIsReadKey] = @(NO);
+    message[AppKeyIsSyncFromUserField] = @(YES);
+    
+    if ([self.me.objectId isEqualToString:self.user.objectId]) {
+        message[AppKeyIsSyncToUserField] = @(YES);
+    }
+
+    [AppEngine appEngineSendMessage:message toUser:self.user];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -122,14 +133,13 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return self.messages.count;
+    return [AppEngine appEngineMessagesWithUserId:userId].count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"MessageCell" forIndexPath:indexPath];
-    
-    PFObject *message = self.messages[indexPath.row];
+    id message = [AppEngine appEngineMessagesWithUserId:userId][indexPath.row];
     
     if ([message[AppMessageType] isEqualToString:AppMessageTypeMessage]) {
         cell.textLabel.text = message[AppMessageContent];
@@ -172,19 +182,6 @@
     } completion:^(BOOL finished) {
 //        [self scrollToBottomAnimated:YES];
     }];
-}
-
-
-- (PFObject*) messageToObject:(id)message
-{
-    PFObject *obj = [PFObject objectWithClassName:AppMessagesCollection];
-    obj[@"fromUser"] = self.me;
-    obj[@"toUser"] = self.chatUser;
-    obj[AppMessageType] = message[AppMessageType];
-    obj[AppMessageContent] = message[AppMessageContent];
-    obj[@"isRead"] = @(NO);
-
-    return obj;
 }
 
 - (void) scrollToBottomAnimated:(BOOL) animated

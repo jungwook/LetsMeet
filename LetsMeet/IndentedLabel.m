@@ -19,6 +19,15 @@
     return self;
 }
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.textInsets = UIEdgeInsetsMake(0, 5, 0, 5);
+    }
+    return self;
+}
+
 - (CGRect)textRectForBounds:(CGRect)bounds limitedToNumberOfLines:(NSInteger)numberOfLines
 {
     UIEdgeInsets insets = self.textInsets;

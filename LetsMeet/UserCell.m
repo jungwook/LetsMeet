@@ -75,25 +75,29 @@
 
 - (NSString*) unreadString:(NSUInteger)count forUser:(PFUser*) user
 {
-    return [NSString stringWithFormat:@"%ld", count];
+    return [NSString stringWithFormat:@"%ld", (unsigned long)count];
 }
 
 - (void)setUser:(PFUser *)user andMessages:(NSArray *)messages
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"fromUser.objectId == %@ AND isRead == false", user.objectId];
-    NSUInteger unreadCount = [[messages filteredArrayUsingPredicate:predicate] count];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"fromUser == %@ AND isRead != true", user.objectId];
     
-    int sex = [[user valueForKey:@"sex"] boolValue];
-    PFObject* lastMessage = [messages lastObject];
+    NSArray *unreadMessages = [messages filteredArrayUsingPredicate:predicate];
+    NSUInteger unreadCount = [unreadMessages count];
+    
+    NSLog(@"UNREAD MESSAGES(%ld)", (unsigned long)unreadMessages.count);
+    
+    int sex = [[user valueForKey:AppKeySexKey] boolValue];
+    id lastMessage = [messages lastObject];
     
     UIColor *sexColor = (sex == AppMaleUser) ? AppMaleUserColor : AppFemaleUserColor;
     
-    PFGeoPoint *location = user[@"location"];
+    PFGeoPoint *location = user[AppKeyLocationKey];
     PFGeoPoint *here = [[AppEngine engine] currentLocation];
     
     double distance = [here distanceInKilometersTo:location];
     self.distance.text = [self distanceString:distance];
-    self.nickname.text = user[@"nickname"];
+    self.nickname.text = user[AppKeyNicknameKey];
     self.nickname.textColor = sexColor;
     
     [self circleizeView:self.unread by:0.5f];
@@ -105,7 +109,7 @@
     [self.lastMessage setLineBreakMode:NSLineBreakByWordWrapping];
     self.lastMessage.text = [lastMessage[@"msgContent"] stringByAppendingString:@"\n\n"];
     
-    NSDate *lastMessageDate = [lastMessage updatedAt];
+    NSDate *lastMessageDate = lastMessage[AppKeyUpdatedAtKey];
     
     NSTimeInterval since = [[NSDate date] timeIntervalSinceDate:lastMessageDate];
     self.when.text = messages ? [self sinceString:since] : @"시작하세요!";

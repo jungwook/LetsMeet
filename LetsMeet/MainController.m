@@ -9,6 +9,7 @@
 #import "MainController.h"
 #import "FloatingDrawerSpringAnimator.h"
 #import "AppEngine.h"
+#import "CachedFile.h"
 
 @interface MainController ()
 @end
@@ -29,21 +30,25 @@
                                     @"title"   : @"보드",
                                     @"menu"    : @"보드",
                                     @"icon"    : @"488-github",
+                                    @"badge"   : @(NO)
                                     },
                       @"Search" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Search"],
                                      @"title"   : @"주변",
                                      @"menu"    : @"주변",
                                      @"icon"    : @"488-github",
+                                     @"badge"   : @(NO)
                                      },
                       @"InBox" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"InBox"],
                                     @"title"   : @"쪽지함",
                                     @"menu"    : @"쪽지",
                                     @"icon"    : @"488-github",
+                                    @"badge"   : @(YES)
                                     },
                       @"Account" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Account"],
                                       @"title"   : @"사용자",
                                       @"menu"    : @"사용자 설정",
                                       @"icon"    : @"488-github",
+                                      @"badge"   : @(NO)
                                       }};
     
     static BOOL init = true;
@@ -72,7 +77,6 @@
             if (succeeded) {
                 [PFUser logInWithUsernameInBackground:user.username password:user.password block:^(PFUser * _Nullable user, NSError * _Nullable error) {
                     [[AppEngine engine] initLocationServices];
-                    [[NSNotificationCenter defaultCenter] postNotificationName:AppUserLoggedInNotification object:nil];
                     [self subscribeToChannelCurrentUser];
                     UITableViewController *signup = [[self storyboard] instantiateViewControllerWithIdentifier:@"SignUp"];
                     [self presentViewController:signup animated:YES completion:^{
@@ -88,7 +92,9 @@
     else {
         if (firstTime) {
             firstTime = NO;
-            [[NSNotificationCenter defaultCenter] postNotificationName:AppUserLoggedInNotification object:nil];
+            // Load all personall pictures into Cache
+            [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
+            } fromFile:user[AppProfilePhotoField]];
         }
     }
 }
@@ -116,8 +122,12 @@
 - (void) selectScreenWithID:(NSString *)screen
 {
     UINavigationController *nav = self.screens[screen][@"screen"];
+    NSString* title = self.screens[screen][@"title"];
+    
+    NSLog(@"TITLE:%@", title);
     if (nav) {
         self.centerViewController = nav;
+        [self.centerViewController setTitle:title];
         [AppDelegate toggleMenu];
     }
 }

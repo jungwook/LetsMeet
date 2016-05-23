@@ -10,13 +10,15 @@
 #import "Chat.h"
 #import "AppEngine.h"
 #import "UserCell.h"
+#import "UIBarButtonItem+Badge.h"
 
 @interface InBox ()
 @property (nonatomic, strong, readonly) PFUser* me;
-@property (nonatomic, strong) NSArray* chatUsers;
-@property (nonatomic, strong) NSDictionary *messages;
 @property (nonatomic, weak, readonly) AppEngine *engine;
 @property (nonatomic, strong) UIRefreshControl *refresh;
+
+@property (nonatomic, strong) NSMutableArray* users;
+
 @end
 
 @implementation InBox
@@ -30,57 +32,65 @@
     }
     return self;
 }
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    self.refresh = [[UIRefreshControl alloc] init];
-    [self setRefreshControl:self.refresh];
-    [self.refresh addTarget:self action:@selector(updateChatUsers) forControlEvents:UIControlEventValueChanged];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(newMessageReceived:)
                                                  name:AppUserNewMessageReceivedNotification
                                                object:nil];
-    [self updateChatUsers];
+    [self.tableView reloadData];
+    SENDNOTIFICATION(AppUserRefreshBadgeNotificaiton, nil);
 }
 
-- (void)dealloc
+- (void)viewWillDisappear:(BOOL)animated
 {
+    [super viewWillDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:AppUserNewMessageReceivedNotification
                                                   object:nil];
 }
 
-- (void) newMessageReceived:(NSNotification*)msg
-{
-    PFObject *message = msg.object;
-    PFUser* fromUser = message[@"fromUser"];
+- (void)viewDidLoad {
+    [super viewDidLoad];
     
-    if (!self.messages[fromUser.objectId]) {
-        // CHAT FROM NEW USER
-        [self updateChatUsers];
-    }
-    
-    [self.messages[fromUser.objectId] addObject:message];
-    [self.tableView reloadData];
+    self.refresh = [[UIRefreshControl alloc] init];
+    [self setRefreshControl:self.refresh];
+    [self.refresh addTarget:self action:@selector(refreshPage) forControlEvents:UIControlEventValueChanged];
+
+    [self refreshUsers];
 }
 
-
-- (void)updateChatUsers
+- (void) refreshUsers
 {
-    NSLog(@"UPDATE CHAT USERS");
-    [AppEngine appEngineLoadMyDictionaryOfUsersAndMessagesInBackground:^(NSDictionary *messages, NSArray *users) {
-        self.chatUsers = users;
-        self.messages = messages;
-        
-        if ([self.refresh isRefreshing])
-            [self.refresh endRefreshing];
-        
+    [AppEngine appEngineInboxUsers:^(NSArray *objects) {
+        self.users = [NSMutableArray arrayWithArray:objects];
         [self.tableView reloadData];
     }];
+}
+
+- (void) refreshPage
+{
+    NSLog(@"PAGE REFRESH");
+    [AppEngine appEngineInboxUsers:^(NSArray *objects) {
+        self.users = [NSMutableArray arrayWithArray:objects];
+        if ([self.refresh isRefreshing]) {
+            [self.tableView reloadData];
+            [self.refresh endRefreshing];
+        }
+    }];
+}
+
+- (void) newMessageReceived:(NSNotification*)notification
+{
+    id message = notification.object;
+    id fromUser = message[AppKeyFromUserField];
+    id toUser = message[AppKeyToUserField];
+    
+    if ([fromUser isEqualToString:self.me.objectId] || [toUser isEqualToString:self.me.objectId]) {
+        [self refreshUsers];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -95,18 +105,14 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return self.chatUsers.count;
-}
-
-- (IBAction)toggleMenu:(id)sender {
-    [AppDelegate toggleMenu];
+    return self.users.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *CellIdentifier = @"InboxCell";
-    PFUser *user = self.chatUsers[indexPath.row];
+    PFUser *user = self.users[indexPath.row];
     UserCell *cell = (UserCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
-    [cell setUser:user andMessages:self.messages[user.objectId]];
+    [cell setUser:user andMessages:[AppEngine appEngineMessagesWithUserId:user.objectId]];
     return cell;
 }
 
@@ -115,9 +121,31 @@
     if ([[segue identifier] isEqualToString:@"GotoChat"])
     {
         NSUInteger row = [self.tableView indexPathForSelectedRow].row;
-        PFUser *selectedUser = self.chatUsers[row];
+        PFUser *selectedUser = self.users[row];
         Chat *vc = [segue destinationViewController];
-        [vc setChatUser:selectedUser withMessages:self.messages[selectedUser.objectId]];
+        [vc setChatUser:selectedUser];
+    }
+}
+
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return UITableViewCellEditingStyleDelete;
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        PFUser *user = self.users[indexPath.row];
+        
+        if ([AppEngine appEngineRemoveAllMessagesFromUserId:user.objectId]) {
+            [tableView beginUpdates];
+            [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+            [AppEngine appEngineInboxUsers:^(NSArray *objects) {
+                self.users = [NSMutableArray arrayWithArray:objects];
+                [tableView endUpdates];
+            }];
+        }
+//        [self.tableView reloadData];
     }
 }
 

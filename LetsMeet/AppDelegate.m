@@ -54,7 +54,10 @@
     
     // Extract the notification data
     NSDictionary *payload = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
-    NSLog(@"PAYLOAD:%@", payload);
+    
+    if (payload) {
+        NSLog(@"PAYLOAD:%@", payload);
+    }
     
     _engine = [AppEngine engine];
     
@@ -75,6 +78,7 @@
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
     NSLog(@"Foreground");
+    [[AppEngine engine] AppEngineFetchLastObjects];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -94,6 +98,7 @@
     [PFPush subscribeToChannelInBackground:@"" block:^(BOOL succeeded, NSError *error) {
         if (succeeded) {
             NSLog(@"ParseStarterProject successfully subscribed to push notifications on the broadcast channel.");
+            [[AppEngine engine] AppEngineFetchLastObjects];
         } else {
             NSLog(@"ParseStarterProject failed to subscribe to push notifications on the broadcast channel.");
         }
@@ -103,6 +108,7 @@
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
     if (error.code == 3010) {
         NSLog(@"Push notifications are not supported in the iOS Simulator.");
+        [[AppEngine engine] startTimeKeeperIfSimulator];
     } else {
         // show some alert or otherwise handle the failure to register.
         NSLog(@"application:didFailToRegisterForRemoteNotificationsWithError: %@", error);
@@ -112,22 +118,12 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
 //    [PFPush handlePush:userInfo];
     NSLog(@"userInfo:%@", userInfo);
-    
-    [AppEngine appEngineLoadMessageWithId:userInfo[@"messageId"] fromUserId:userInfo[@"senderId"]];
+    [AppEngine appEngineLoadMessageWithId:userInfo[AppKeyMessageIdKey] fromUserId:userInfo[AppKeySenderId]];
     
     if (application.applicationState == UIApplicationStateInactive) {
         [PFAnalytics trackAppOpenedWithRemoteNotificationPayload:userInfo];
     }
 }
-
-///////////////////////////////////////////////////////////
-// Uncomment this method if you want to use Push Notifications with Background App Refresh
-///////////////////////////////////////////////////////////
-//- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-//    if (application.applicationState == UIApplicationStateInactive) {
-//        [PFAnalytics trackAppOpenedWithRemoteNotificationPayload:userInfo];
-//    }
-//}
 
 + (AppDelegate *)globalDelegate {
     return (AppDelegate *)[UIApplication sharedApplication].delegate;

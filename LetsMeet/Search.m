@@ -10,11 +10,11 @@
 #import "AppEngine.h"
 #import "Chat.h"
 #import "UserCell.h"
+#import "RefreshControl.h"
 
 @interface Search : UITableViewController
-@property (nonatomic, weak, readonly) NSArray *users;
+@property (nonatomic, strong, readonly) NSArray *users;
 @property (nonatomic, weak, readonly) AppEngine *engine;
-@property (nonatomic, strong) UIRefreshControl *refresh;
 @end
 
 @implementation Search
@@ -24,13 +24,11 @@
     self = [super initWithCoder:aDecoder];
     if (self) {
         _engine = [AppEngine engine];
-        _users = self.engine.usersNearMe;
     }
     return self;
 }
 
 - (void)didReceiveMemoryWarning {
-    // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
 }
 
@@ -40,54 +38,56 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.refresh = [[UIRefreshControl alloc] init];
-    [self setRefreshControl:self.refresh];
-    [self.refresh addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(usersReloaded:)
-                                                 name:AppUsersNearMeReloadedNotification
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(usersReloaded:)
-                                                 name:AppUserMessagesReloadedNotification
-                                               object:nil];
-    
+    [self setRefreshControl:[RefreshControl initWithCompletionBlock:^(UIRefreshControl *refreshControl) {
+        PFQuery *query = [PFUser query];
+        [query whereKey:AppKeyLocationKey nearGeoPoint:[self.engine currentLocation]];
+        
+        [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
+            if (error) {
+                NSLog(@"ERROR LOADING USERS NEAR ME:%@", error.localizedDescription);
+            }
+            else {
+                _users = [NSArray arrayWithArray:users];
+                NSLog(@"THERE ARE USERS NEAR ME:%@", _users);
+                [refreshControl endRefreshing];
+                [self.tableView reloadData];
+            }
+        }];
+    }]];
 }
+
+- (void) reloadNearByUsersInBackground:(ArrayResultBlock)block
+{
+}
+
 
 - (void)refresh:(id)sender
 {
-    [[AppEngine engine] reloadNearUsers];
+//    [[AppEngine engine] reloadNearUsers];
 }
 
-- (void)dealloc
+- (void)viewWillAppear:(BOOL)animated
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:AppUsersNearMeReloadedNotification
-                                                  object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:AppUserMessagesReloadedNotification
-                                                  object:nil];
-}
-
-- (void) usersReloaded:(id)sender
-{
-    // End Refreshing
-    [(UIRefreshControl *)self.refresh endRefreshing];
-    [self.tableView reloadData];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(newMessageReceived:)
+                                                 name:AppUserNewMessageReceivedNotification
+                                               object:nil];
     [self.tableView reloadData];
+    SENDNOTIFICATION(AppUserRefreshBadgeNotificaiton, nil);
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated
+{
     [super viewWillDisappear:animated];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AppUserNewMessageReceivedNotification
+                                                  object:nil];
+}
+
+- (void) newMessageReceived:(id)sender
+{
+    [self.tableView reloadData];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -119,21 +119,21 @@
     static NSString *CellIdentifier = @"SearchCell";
     PFUser *user = self.users[indexPath.row];
     UserCell *cell = (UserCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
-    [cell setUser:user andMessages:[self.engine messagesWithUser:user]];
+    [cell setUser:user andMessages:[AppEngine appEngineMessagesWithUserId:user.objectId]];
     return cell;
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    // Make sure your segue name in storyboard is the same as this line
-    
     if ([[segue identifier] isEqualToString:@"GotoChat"])
     {
-        PFUser *selectedUser = self.users[[self.tableView indexPathForSelectedRow].row];
+        NSUInteger row = [self.tableView indexPathForSelectedRow].row;
+        PFUser *selectedUser = self.users[row];
         Chat *vc = [segue destinationViewController];
-//        [vc setChatUser:selectedUser];
+        [vc setChatUser:selectedUser];
     }
 }
+
 
 - (IBAction)toggleMenu:(id)sender {
     [AppDelegate toggleMenu];
