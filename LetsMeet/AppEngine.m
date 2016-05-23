@@ -143,7 +143,7 @@ NSString* fileNamed(id userId)
     if (![PFUser currentUser]) {
         virgin = YES;
         NSLog(@"NO USER LOGGED IN SO TRY AGAIN IN 5 SECS");
-        self.timeKeeper = [NSTimer scheduledTimerWithTimeInterval:5.0
+        self.timeKeeper = [NSTimer scheduledTimerWithTimeInterval:AppEngineTimeKeeperTime
                                                            target:self
                                                          selector:@selector(timeKeep)
                                                          userInfo:nil
@@ -156,7 +156,7 @@ NSString* fileNamed(id userId)
     }
     [self AppEngineFetchLastObjects];
     [self logDicStatus];
-    self.timeKeeper = [NSTimer scheduledTimerWithTimeInterval:5.0
+    self.timeKeeper = [NSTimer scheduledTimerWithTimeInterval:AppEngineTimeKeeperTime
                                                        target:self
                                                      selector:@selector(timeKeep)
                                                      userInfo:nil

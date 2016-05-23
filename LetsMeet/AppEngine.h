@@ -13,7 +13,7 @@
 #define AppUserRefreshBadgeNotificaiton @"AppUserRefreshBadgeNotificaiton"
 
 #define AppMessagesCollection @"Messages"
-
+#define AppEngineTimeKeeperTime 60
 #define AppMessageType @"msgType"
 #define AppMessageContent @"msgContent"
 #define AppMessageTypeMessage @"MSG"

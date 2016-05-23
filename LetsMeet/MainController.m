@@ -32,6 +32,12 @@
                                     @"icon"    : @"488-github",
                                     @"badge"   : @(NO)
                                     },
+                      @"Search2" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"SearchV2"],
+                                     @"title"   : @"SEARCH",
+                                     @"menu"    : @"SEARCH",
+                                     @"icon"    : @"488-github",
+                                     @"badge"   : @(NO)
+                                     },
                       @"Search" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Search"],
                                      @"title"   : @"주변",
                                      @"menu"    : @"주변",
@@ -137,7 +143,8 @@
         NSLog(@"All systems go...");
         
         self.leftViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"LeftMenu"];
-        self.centerViewController = self.screens[@"Board"][@"screen"];
+//        self.centerViewController = self.screens[@"Board"][@"screen"];
+        self.centerViewController = self.screens[@"Search2"][@"screen"];
         self.animator = [[FloatingDrawerSpringAnimator alloc] init];
         self.backgroundImage = [UIImage imageNamed:@"sky"];
 
