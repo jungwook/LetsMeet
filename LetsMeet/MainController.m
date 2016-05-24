@@ -18,9 +18,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
-    
-    [self initializeMainViewController];
 }
 
 - (BOOL)initializeViewControllers {
@@ -74,7 +71,7 @@
     NSString *username = [AppEngine uniqueDeviceID];
     PFUser *user = [PFUser currentUser];
     
-    if (!user || ![user.username isEqualToString:username]) {
+    if (!user) {
         user = [PFUser user];
         user.username = username;
         user.password = username;
@@ -100,8 +97,13 @@
             firstTime = NO;
             // Load all personall pictures into Cache
             [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
+                NSLog(@"PROFILE PHOTO LOADED IN CACHE");
             } fromFile:user[AppProfilePhotoField]];
+            [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
+                NSLog(@"ORIGINAL PHOTO LOADED IN CACHE");
+            } fromFile:user[AppProfileOriginalPhotoField]];
         }
+        [self initializeMainViewController];
     }
 }
 

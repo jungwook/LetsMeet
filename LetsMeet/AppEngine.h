@@ -86,7 +86,11 @@ CALayer* drawImageOnLayer(UIImage *image, CGSize size);
 UIImage* scaleImage(UIImage* image, CGSize size);
 void drawImage(UIImage *image, UIView* view);
 void circleizeView(UIView* view, CGFloat percent);
-
+float heading(PFGeoPoint* fromLoc, PFGeoPoint* toLoc);
+int Quad(PFGeoPoint* fromLoc, PFGeoPoint* toLoc);
+int prevQuad(int quad);
+int nextQuad(int quad);
+NSString* QUADRANT(PFGeoPoint* fromLoc, PFGeoPoint* toLoc);
 
 @interface AppEngine : NSObject <CLLocationManagerDelegate>
 - (void) initLocationServices;

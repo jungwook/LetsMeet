@@ -22,6 +22,7 @@
 		126AF4111CEEACA200E3ED67 /* ValueTrackingSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF40F1CEEACA200E3ED67 /* ValueTrackingSlider.m */; };
 		126AF4141CEEF04300E3ED67 /* Account.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF4131CEEF04300E3ED67 /* Account.m */; };
 		127EF37F1CF3343100312D1D /* Octagon.m in Sources */ = {isa = PBXBuildFile; fileRef = 127EF37E1CF3343100312D1D /* Octagon.m */; };
+		12C5C9E51CF419EF00315C79 /* Hive.m in Sources */ = {isa = PBXBuildFile; fileRef = 12C5C9E41CF419EF00315C79 /* Hive.m */; };
 		12F7418C1CE4B97100E8267A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418B1CE4B97100E8267A /* main.m */; };
 		12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418E1CE4B97100E8267A /* AppDelegate.m */; };
 		12F741951CE4B97100E8267A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12F741931CE4B97100E8267A /* Main.storyboard */; };
@@ -87,6 +88,8 @@
 		126AF4131CEEF04300E3ED67 /* Account.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Account.m; sourceTree = "<group>"; };
 		127EF37D1CF3343100312D1D /* Octagon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Octagon.h; sourceTree = "<group>"; };
 		127EF37E1CF3343100312D1D /* Octagon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Octagon.m; sourceTree = "<group>"; };
+		12C5C9E31CF419EF00315C79 /* Hive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Hive.h; sourceTree = "<group>"; };
+		12C5C9E41CF419EF00315C79 /* Hive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Hive.m; sourceTree = "<group>"; };
 		12F741871CE4B97000E8267A /* LetsMeet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LetsMeet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12F7418B1CE4B97100E8267A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		12F7418D1CE4B97100E8267A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -201,6 +204,8 @@
 				124928AE1CF2CD370038A2F3 /* RefreshControl.m */,
 				124928B01CF2E65A0038A2F3 /* ToggleButton.h */,
 				124928B11CF2E65A0038A2F3 /* ToggleButton.m */,
+				12C5C9E31CF419EF00315C79 /* Hive.h */,
+				12C5C9E41CF419EF00315C79 /* Hive.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -289,6 +294,8 @@
 		12F741D31CE56DD400E8267A /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				127EF37D1CF3343100312D1D /* Octagon.h */,
+				127EF37E1CF3343100312D1D /* Octagon.m */,
 				12F741D81CE56F4300E8267A /* MainController.h */,
 				12F741D91CE56F4300E8267A /* MainController.m */,
 				12F741DB1CE5851800E8267A /* Board.h */,
@@ -305,8 +312,6 @@
 				12F741FF1CE6CE4000E8267A /* SignUp.m */,
 				126AF3F11CEA966B00E3ED67 /* Chat.h */,
 				126AF3F21CEA966B00E3ED67 /* Chat.m */,
-				127EF37D1CF3343100312D1D /* Octagon.h */,
-				127EF37E1CF3343100312D1D /* Octagon.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -408,6 +413,7 @@
 				12F742001CE6CE4000E8267A /* SignUp.m in Sources */,
 				12F741EF1CE593A500E8267A /* Menu.m in Sources */,
 				126AF3F31CEA966B00E3ED67 /* Chat.m in Sources */,
+				12C5C9E51CF419EF00315C79 /* Hive.m in Sources */,
 				124928B21CF2E65A0038A2F3 /* ToggleButton.m in Sources */,
 				12F741D11CE56B3400E8267A /* FloatingDrawerView.m in Sources */,
 				12F7418C1CE4B97100E8267A /* main.m in Sources */,

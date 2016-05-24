@@ -45,7 +45,7 @@
             self.appEngineUserMessages[key] = [NSMutableArray arrayWithArray:[self loadFile:[defUrl([NSString stringWithFormat:AppKeyUserMessagesFileKey, key]) path]]];
             
         }];
-        
+        [self initLocationServices];
 //        _appEngineUserMessages = [NSMutableDictionary dictionary];
 
     }
@@ -387,11 +387,11 @@ NSDictionary* objectFromMessage(id object)
     CLLocation* location = [locations lastObject];
     self.curLoc = location;
 
-    PFGeoPoint *geo = [PFGeoPoint geoPointWithLocation:location];
+//    PFGeoPoint *geo = [PFGeoPoint geoPointWithLocation:location];
     
-    [[PFUser currentUser] setObject:geo forKey:AppKeyLocationKey];
-    [[PFUser currentUser] setObject:location.timestamp forKey:AppKeyLocationUpdatedKey];
-    [[PFUser currentUser] saveInBackground];
+//    [[PFUser currentUser] setObject:geo forKey:AppKeyLocationKey];
+//    [[PFUser currentUser] setObject:location.timestamp forKey:AppKeyLocationUpdatedKey];
+//    [[PFUser currentUser] saveInBackground];
 }
 
 
@@ -611,6 +611,50 @@ void circleizeView(UIView* view, CGFloat percent)
 {
     view.layer.cornerRadius = view.frame.size.height * percent;
     view.layer.masksToBounds = YES;
+}
+
+#define degreesToRadians(x) (M_PI * x / 180.0)
+#define radiansToDegrees(x) (x * 180.0 / M_PI)
+
+NSString* QUADRANT(PFGeoPoint* fromLoc, PFGeoPoint* toLoc)
+{
+    return [NSString stringWithFormat:@"Q%d", Quad(fromLoc, toLoc)];
+}
+
+int Quad(PFGeoPoint* fromLoc, PFGeoPoint* toLoc)
+{
+    return (int) (heading(fromLoc, toLoc)/60.0f);
+}
+
+int prevQuad(int quad)
+{
+    return (quad+6-1) % 6;
+}
+
+int antiQuad(int quad)
+{
+    return (quad+3) % 6;
+}
+
+int nextQuad(int quad)
+{
+    return (quad+1) %6;
+}
+
+float heading(PFGeoPoint* fromLoc, PFGeoPoint* toLoc)
+{
+    float fLat = degreesToRadians(fromLoc.latitude);
+    float fLng = degreesToRadians(fromLoc.longitude);
+    float tLat = degreesToRadians(toLoc.latitude);
+    float tLng = degreesToRadians(toLoc.longitude);
+    
+    float degree = radiansToDegrees(atan2(sin(tLng-fLng)*cos(tLat), cos(fLat)*sin(tLat)-sin(fLat)*cos(tLat)*cos(tLng-fLng)));
+    
+    if (degree >= 0) {
+        return degree;
+    } else {
+        return 360+degree;
+    }
 }
 
 /*

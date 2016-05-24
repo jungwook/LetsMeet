@@ -18,6 +18,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *lastMessage;
 @property (weak, nonatomic) IBOutlet IndentedLabel *distance;
 @property (weak, nonatomic) IBOutlet IndentedLabel *when;
+@property (weak, nonatomic) IBOutlet IndentedLabel *quadrant;
 @end
 
 
@@ -85,8 +86,6 @@
     NSArray *unreadMessages = [messages filteredArrayUsingPredicate:predicate];
     NSUInteger unreadCount = [unreadMessages count];
     
-    NSLog(@"UNREAD MESSAGES(%ld)", (unsigned long)unreadMessages.count);
-    
     int sex = [[user valueForKey:AppKeySexKey] boolValue];
     id lastMessage = [messages lastObject];
     
@@ -95,6 +94,9 @@
     PFGeoPoint *location = user[AppKeyLocationKey];
     PFGeoPoint *here = [[AppEngine engine] currentLocation];
     
+    NSLog(@"HERE:%@ AND THERE:%@", here, location);
+    
+    self.quadrant.text = [NSString stringWithFormat:@"%d", Quad(here, location)];
     double distance = [here distanceInKilometersTo:location];
     self.distance.text = [self distanceString:distance];
     self.nickname.text = user[AppKeyNicknameKey];
@@ -117,10 +119,16 @@
     self.unread.text = [self unreadString:unreadCount forUser:user];
     self.unread.alpha = unreadCount > 0 ? 1.0 : 0.0f;
     
+    drawImage([UIImage imageNamed:sex ? @"guy" : @"girl"], self.photoView); //SET DEFAULT PICTURE FOR NOW...
     [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
         UIImage *profilePhoto = [UIImage imageWithData:data];
-        drawImage(profilePhoto, self.photoView);
+        if ([user[AppKeyNicknameKey] isEqualToString:self.nickname.text]) {
+            drawImage(profilePhoto, self.photoView);
+        }
     } fromFile:user[AppProfilePhotoField]];
+    
+    /*
+ */
 }
 
 - (void) circleizeView:(UIView*) view by:(CGFloat)percent
