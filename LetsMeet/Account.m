@@ -194,7 +194,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *CellIdentifier = @"InboxCell";
-    PFUser *user = self.users[indexPath.row];
+//    PFUser *user = self.users[indexPath.row];
     UserCell *cell = (UserCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
 //    [cell setUser:user andMessages:[self.engine messagesWithUser:user]];
     return cell;
@@ -206,9 +206,9 @@
     
     if ([[segue identifier] isEqualToString:@"GotoChat"])
     {
-        NSUInteger row = [self.tableView indexPathForSelectedRow].row;
-        PFUser *selectedUser = self.users[row];
-        Chat *vc = [segue destinationViewController];
+//        NSUInteger row = [self.tableView indexPathForSelectedRow].row;
+//        PFUser *selectedUser = self.users[row];
+//        Chat *vc = [segue destinationViewController];
 //        [vc setChatUser:selectedUser];
     }
 }

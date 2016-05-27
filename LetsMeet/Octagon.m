@@ -97,11 +97,23 @@
     [self.scrollView addSubview:hive];
 }
 
+NSString *coordString(CGPoint point)
+{
+    return NSStringFromCGPoint(point);
+}
+
+float distance(PFUser *u1, PFUser* u2)
+{
+    return [u1.location distanceInKilometersTo:u2.location];
+}
+
 - (IBAction)setNextUser:(id)sender {
-    static NSMutableArray *sortedUsers;
+    static NSMutableArray *sortedUsers = nil;
+    static NSMutableDictionary *history = nil;
     if (!sortedUsers) {
         sortedUsers = [NSMutableArray array];
         [sortedUsers addObject:self.me];
+        history = [NSMutableDictionary dictionary];
     }
     
     static int idx = 1;
@@ -118,22 +130,23 @@
     bool condition = NO;
     CGPoint coords = CGPointZero;
     do {
+        condition = NO;
         BOOL left = isLeft(self.me, user);
         BOOL above = isAbove(self.me, user);
         
         CGPoint n1 = first.coords;
         CGPoint n2 = second.coords;
+        
         int x = 0, y = 0;
         
         if (n1.y == n2.y) { // 0 & 3
-            printf("AB SETTING %s %s %s AND %s\n", user.desc, above ? "ABOVE" : "BELOW", first.desc, second.desc);
             if (n1.x == n2.x) {
                 x = n1.x + (left ? -1 : 1);
             }
             else {
                 x = n1.x + ((n1.x < n2.x) ? 1 : -1);
             }
-            y = n1.y + (above ? -1 : +1);
+            y = n1.y + (above ? +1 : -1);
         }
         else {
             if (left) { // 4 & 5
@@ -144,7 +157,6 @@
                     x = n1.x - 2;
                     y = n1.y;
                 }
-                printf("LF SETTING %s %s %s AND %s\n", user.desc, "LEFT", first.desc, second.desc);
             }
             else { // 1 & 2
                 if (n1.x < n2.x) {
@@ -154,13 +166,26 @@
                     x = n2.x + 2;
                     y = n2.y;
                 }
-                printf("RT SETTING %s %s %s AND %s\n", user.desc, "RIGHT", first.desc, second.desc);
             }
         }
         coords = CGPointMake(x,y);
+        int o1 = (int) (Heading(first, user)/90.f);
+        int o2 = (int) (Heading(second, user)/90.f);
+        int oo = (int)(Heading(self.me, user)/90.f);
+        printf("[%3d/%.4f] %s SET WITH FIRST:%s(%d) SECOND:%s(%d)\n", oo, distance(self.me, user), user.desc, first.desc, o1, second.desc, o2);
+        
+        if (history[coordString(coords)]) {
+            PFUser *hist = history[coordString(coords)];
+            printf("%s COLLISION WITH %s ... REDO FIRST:%s(%d/%.4f) SECOND:%s(%d/%.4f)\n", user.desc, hist.desc, first.desc, o1, distance(user, first), second.desc, o2, distance(user, second));
+            second = hist;
+            condition = NO;
+        } else {
+            condition = NO;
+        }
     } while (condition);
     
     user.coords = coords;
+    history[coordString(coords)] = user;
     
     [sortedUsers addObject:user];
     
@@ -209,7 +234,6 @@
 {
     [super viewWillLayoutSubviews];
     [[self scrollView] setNeedsLayout];
-    NSLog(@"WILL LAYOUT SUBVIEWS" );
 }
 
 - (void) loadUsersNearMeInBackground:(ArrayResultBlock)block

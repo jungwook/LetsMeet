@@ -56,6 +56,7 @@
     CGFloat dx = w/1000;
     CGFloat dy = h/1154;
     
+/*
     const CGPoint points2[] = {
         PT(436,36),
         PT(563,36),
@@ -72,6 +73,8 @@
         PT(436,36),
         PT(563,36),
         };
+ */
+    
     const CGPoint points[] = {
         PT(390,63),
         PT(609,63),
