@@ -10,13 +10,15 @@
 #import "AppEngine.h"
 #import "CachedFile.h"
 #import "Hive.h"
+#import "PFUser+Attributes.h"
 
 @interface Octagon ()
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) AppEngine *engine;
+@property (weak, nonatomic) PFUser *me;
+
 @property (strong, nonatomic) NSMutableArray *hives;
 @property (strong, nonatomic) id origin;
-@property (strong, nonatomic) NSMutableArray *coords;
 @end
 
 @implementation Octagon
@@ -27,31 +29,9 @@
     if (self) {
         self.hives = nil;
         self.engine = [AppEngine engine];
-        self.coords = [NSMutableArray array];
+        self.me = [PFUser currentUser];
     }
     return self;
-}
-
-- (void) incrementQuad:(NSString*) quad withX:(CGFloat*)x withY:(CGFloat*)y
-{
-    if ([quad isEqualToString:@"Q0"]) { *x += 1, *y -= 1.5;}
-    else if ([quad isEqualToString:@"Q1"]) { *x += 2, *y += 0;}
-    else if ([quad isEqualToString:@"Q2"]) { *x += 1, *y += 1.5;}
-    else if ([quad isEqualToString:@"Q3"]) { *x -= 1, *y += 1.5;}
-    else if ([quad isEqualToString:@"Q4"]) { *x -= 2, *y +=  0;}
-    else if ([quad isEqualToString:@"Q5"]) { *x -= 1, *y -= 1.5;}
-}
-- (NSString*) antiQuad:(NSString *) quad
-{
-    NSString *anti;
-    if ([quad isEqualToString:@"Q0"]) { anti = @"Q3"; }
-    else if ([quad isEqualToString:@"Q1"]) { anti = @"Q4"; }
-    else if ([quad isEqualToString:@"Q2"]) { anti = @"Q5"; }
-    else if ([quad isEqualToString:@"Q3"]) { anti = @"Q0"; }
-    else if ([quad isEqualToString:@"Q4"]) { anti = @"Q1"; }
-    else if ([quad isEqualToString:@"Q5"]) { anti = @"Q2"; }
-
-    return anti;
 }
 
 #define CSTR(XXX) ((NSString*)XXX).UTF8String
@@ -60,29 +40,122 @@
 #define NQ(XXX) ((XXX+1) %6)
 #define AQ(XXX) ((quad+3) % 6)
 
-- (int) nextAvailQuad:(PFUser *)user
+- (CGPoint) newCoords:(int)q origin:(CGPoint) origin
 {
-    for (int i=0; i<6; i++) {
-        if (!user[Q(i)]) {
-            return i;
-        }
+    int x=origin.x, y=origin.y;
+//    NSLog(@">>>>NC(%d) X:%d Y:%d", q, x, y);
+    switch (q) {
+        case 0:
+            x = x+1;
+            y = y-1;
+            break;
+        case 1:
+            x = x+2;
+            y = y;
+            break;
+        case 2:
+            x = x+1;
+            y = y+1;
+            break;
+        case 3:
+            x = x-1;
+            y = y+1;
+            break;
+        case 4:
+            x = x-2;
+            y = y;
+            break;
+        case 5:
+        default:
+            x = x-1;
+            y = y-1;
+            break;
     }
-    return -1;
+//    NSLog(@"    NC(%d) X:%d Y:%d", q, x, y);
+    return CGPointMake(x, y);
 }
 
-- (NSString*) seekSpaceForUser:(PFUser*)user from:(PFUser*)from quad:(int)quad incx:(CGFloat)x incy:(CGFloat)y
+
+
+
+#define CS(__x) [NSString stringWithFormat:@"X%dY%d", (int)__x.x, (int)__x.x]
+
+- (void) addHiveToView:(Hive*)hive
 {
-    int aq = AQ(quad);
+    PFUser *user = hive.user;
+    CGPoint coord = [self coord:user];
+    const CGFloat f = 1.8;
+    const CGFloat f2 = f*1.154;
+
+    CGFloat radius = 30;
+    CGPoint centerPoint = CGPointMake(1000, 1000);
+    CGFloat cx = centerPoint.x, cy = centerPoint.y;
+    CGFloat x = cx+(coord.x-0.5f)*radius;
+    CGFloat y = cy+(coord.y-0.5f)*radius*1.5*1.154;
+    hive.frame = CGRectMake(x, y, f*radius, f2*radius);
     
-    int nextQ = Quand(
-    if ([self.coords containsObject:Q(quad)]) {
-        
-        
+    [self.scrollView addSubview:hive];
+}
+
+- (IBAction)setNextUser:(id)sender {
+    static NSMutableArray *sortedUsers;
+    if (!sortedUsers) {
+        sortedUsers = [NSMutableArray array];
+        [sortedUsers addObject:self.me];
     }
-    else {
-        [self.coords addObject:Q(quad)];
-        return Q(quad);
-    }
+    
+    static int idx = 1;
+    
+    PFUser *user = self.hives[idx++];
+    
+    if ([user.objectId isEqualToString:self.me.objectId])
+        return;
+    
+    NSArray *closestUsers = [self closestTwoUsersFromUser:user inUsers:sortedUsers];
+    PFUser* first = [self first:closestUsers];
+    PFUser* second = [self second:closestUsers];
+    
+    bool condition = NO;
+    do {
+        BOOL left = isLeft(self.me, user);
+        BOOL above = isAbove(self.me, user);
+        
+        CGPoint n1 = first.coords;
+        CGPoint n2 = second.coords;
+        int x = 0, y = 0;
+        
+        if (n1.y == n2.y) { // 0 & 3
+            printf("AB SETTING %s %s %s AND %s\n", user.desc, above ? "ABOVE" : "BELOW", first.desc, second.desc);
+            if (n1.x == n2.x) {
+                x = n1.x + (left ? -1 : 1);
+            }
+            else {
+                x = n1.x + ((n1.x < n2.x) ? 1 : -1);
+            }
+            y = n1.y + (above ? -1 : +1);
+        }
+        else {
+            int min = MIN(n1.x, n2.x);
+            if (left) { // 4 & 5
+                printf("LF SETTING %s %s %s AND %s\n", user.desc, "LEFT", first.desc, second.desc);
+                x = min - 2;
+                y = (n1.x == min) ? n2.y : n1.y;
+            }
+            else { // 1 & 2
+                printf("RT SETTING %s %s %s AND %s\n", user.desc, "RIGHT", first.desc, second.desc);
+                x = min + 2;
+                y = (n1.x == min) ? n1.y : n2.y;
+            }
+        }
+        user.coords = CGPointMake(x,y);
+    } while (condition);
+    
+    [sortedUsers addObject:user];
+    
+    Hive *hive = [Hive new];
+    hive.user = user;
+    [self addHiveToView:hive];
+    [self.view setNeedsLayout];
 }
 
 - (void)viewDidLoad {
@@ -95,53 +168,35 @@
 //    [self createHives]; // CREATING NEW USERS... DO NOT USE...
     
     [self loadUsersNearMeInBackground:^(NSArray *users) {
-        self.hives = [NSMutableArray arrayWithArray:users];
+        
         PFUser* root = [PFUser currentUser];
-        root[@"QROOT"] = root;
-        root[@"xInc"] = @(0);
-        root[@"yInc"] = @(0);
         
         Hive *hive = [Hive new];
-        hive.user = root;
-        hive.centerPoint = CGPointMake(1000, 1000);
-        CGFloat radius = 30;
-        CGPoint centerPoint = CGPointMake(1000, 1000);
-        CGFloat cx = centerPoint.x, cy = centerPoint.y;
-        CGFloat x = cx+(-0.5f)*radius;
-        CGFloat y = cy+(-0.5f)*radius;
-        hive.frame = CGRectMake(x, y, 1.7*radius, 1.7*radius);
+        hive.user = self.me;
         hive.backgroundColor = [UIColor colorWithRed:0.2 green:0.2 blue:1.0 alpha:0.4];
-
-        [self.scrollView addSubview:hive];
-        [[self scrollView] setNeedsLayout];
-        [hive setNeedsLayout];
+        hive.borderColor = [UIColor colorWithRed:0.5 green:0.1 blue:1.0 alpha:1.0];
         
+        [self addHiveToView:hive];
+        printf("\nROOT IS [%s]\n", CSTR(root.nickname));
+        
+        self.hives = [NSMutableArray arrayWithArray:users];
+
+//      [self spartialSort:users usingRoot:root];
+        /*
         for (PFUser* user in self.hives) {
-            int quad = Quad(root[AppKeyLocationKey], user[AppKeyLocationKey]);
-            printf("\nWORKING WITH [%s/%s] %s\n", CSTR(user[AppKeyNicknameKey]), CSTR(user.objectId), CSTR(Q(quad)));
-            
-            [self seekSpaceForUser:user from:root quad:quad incx:0 incy:0];
-            CGFloat incX = [user[@"xInc"] floatValue], incY = [user[@"yInc"] floatValue];
-            
             Hive *hive = [Hive new];
             hive.user = user;
-            hive.centerPoint = CGPointMake(1000, 1000);
-            CGFloat radius = 30;
-            CGPoint centerPoint = CGPointMake(1000, 1000);
-            CGFloat cx = centerPoint.x, cy = centerPoint.y;
-            CGFloat x = cx+(incX-0.5f)*radius;
-            CGFloat y = cy+(incY-0.5f)*radius;
-            hive.frame = CGRectMake(x, y, 1.7*radius, 1.7*radius);
-            [self.scrollView addSubview:hive];
-            [[self scrollView] setNeedsLayout];
+            [self addHiveToView:hive];
         }
         NSLog(@"NOW WILL LAYOUT SUBVIEWS");
+        */
     }];
 }
 
 - (void) viewWillLayoutSubviews
 {
     [super viewWillLayoutSubviews];
+    [[self scrollView] setNeedsLayout];
     NSLog(@"WILL LAYOUT SUBVIEWS" );
 }
 
@@ -149,21 +204,248 @@
 {
     PFQuery *query = [PFUser query];
     [query whereKey:AppKeyLocationKey nearGeoPoint:[self.engine currentLocation]];
-    [query whereKey:AppKeyObjectId notEqualTo:[PFUser currentUser].objectId];
-    
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
         if (error) {
             NSLog(@"ERROR LOADING USERS NEAR ME:%@", error.localizedDescription);
         }
         else {
+            NSLog(@"LOADED:%ld USERS NEAR ME", users.count);
+            
+            NSArray * arr = [users sortedArrayUsingComparator:^NSComparisonResult(PFUser*  _Nonnull user1, PFUser* _Nonnull user2) {
+                PFGeoPoint *p1 = [user1 objectForKey:AppKeyLocationKey];
+                PFGeoPoint *p2 = [user2 objectForKey:AppKeyLocationKey];
+                PFGeoPoint *m = self.me.location;
+                
+                float distanceFromObj1 = [p1 distanceInKilometersTo:m];
+                float distanceFromObj2 = [p2 distanceInKilometersTo:m];
+                
+                if (distanceFromObj1 > distanceFromObj2) {
+                    return NSOrderedDescending;
+                }
+                
+                if (distanceFromObj1 < distanceFromObj2) {
+                    return NSOrderedAscending;
+                }
+                return NSOrderedSame;
+            }];
             if (block) {
-                block(users);
+                block(arr);
             }
             else {
                 self.hives = [NSMutableArray arrayWithArray:users];
             }
         }
     }];
+}
+
+- (PFUser*) first:(NSArray*)users
+{
+    return [users firstObject];
+}
+
+- (PFUser*) second:(NSArray*)users
+{
+    return [users objectAtIndex:1];
+}
+
+- (NSArray*) closestTwoUsersFromUser:(PFUser*)user inUsers:(NSArray*)users
+{
+    NSComparisonResult (^c)(PFUser*, PFUser*) = ^NSComparisonResult(PFUser*user1,PFUser*user2){
+        PFGeoPoint *p1 = user1.location;
+        PFGeoPoint *p2 = user2.location;
+        PFGeoPoint *m = user.location;
+        
+        float distanceFromObj1 = [p1 distanceInKilometersTo:m];
+        float distanceFromObj2 = [p2 distanceInKilometersTo:m];
+        
+        if (distanceFromObj1 > distanceFromObj2) {
+            return NSOrderedDescending;
+        }
+        
+        if (distanceFromObj1 < distanceFromObj2) {
+            return NSOrderedAscending;
+        }
+        return NSOrderedSame;
+    };
+    NSArray *ret = [users sortedArrayUsingComparator:c];
+    
+    if (ret.count == 0)
+    {
+        return nil;
+    }
+    else if (ret.count == 1)
+    {
+        return @[[ret firstObject], [ret firstObject]];
+    }
+    else
+    {
+        return @[[ret objectAtIndex:0], [ret objectAtIndex:1]];
+    }
+}
+
+- (float) metersBetween:(PFUser*)u1 and:(PFUser*)u2
+{
+    PFGeoPoint *l1 = u1.location;
+    PFGeoPoint *l2 = u2.location;
+    
+    return [l1 distanceInKilometersTo:l2] * 1000.0f;
+}
+
+- (CGPoint) coord:(PFUser*)user
+{
+    int x = [user[@"hive-x"] intValue];
+    int y = [user[@"hive-y"] intValue];
+    
+    return CGPointMake(x, y);
+}
+
+- (void) setCoord:(CGPoint)coord user:(PFUser*)user
+{
+    [user setObject:@(coord.x) forKey:@"hive-x"];
+    [user setObject:@(coord.y) forKey:@"hive-y"];
+//    printf("setting coordinates (%d, %d) for user %s\n", (int) coord.x, (int) coord.y, CSTR(user.nickname));
+}
+
+CGPoint Offset(PFUser* one, PFUser* two)
+{
+    int q = (int) (Heading(one, two)/90.f);
+    
+    switch (q) {
+        case 0:
+            return CGPointMake(1, -1);
+        case 1:
+            return CGPointMake(1, 1);
+        case 2:
+            return CGPointMake(-1, 1);
+        case 3:
+            return CGPointMake(-1, -1);
+        default:
+            return CGPointZero;
+    }
+}
+
+BOOL isAbove(PFUser* root, PFUser* user)
+{
+    int offset = (int) (Heading(root, user)/90.f);
+    switch (offset) {
+        case 0:
+        case 3:
+            return YES;
+        default:
+            return NO;
+    }
+}
+
+BOOL isLeft(PFUser* root, PFUser* user)
+{
+    int offset = (int) (Heading(root, user)/90.f);
+    switch (offset) {
+        case 0:
+        case 1:
+            return NO;
+        default:
+            return YES;
+    }
+}
+
+NSString* Direction(PFUser* one, PFUser* two)
+{
+    int offset = (int) (Heading(one, two)/90.f);
+    
+    switch (offset) {
+        case 0:
+            return @"RA";
+        case 1:
+            return @"RB";
+        case 2:
+            return @"LB";
+        case 3:
+        default:
+            return @"LA";
+    }
+}
+
+CGPoint coords(PFUser*user)
+{
+    int x = [user[@"hive-x"] intValue];
+    int y = [user[@"hive-y"] intValue];
+    
+    return CGPointMake(x, y);
+}
+
+void setCoords(CGPoint coord, PFUser* user)
+{
+    [user setObject:@(coord.x) forKey:@"hive-x"];
+    [user setObject:@(coord.y) forKey:@"hive-y"];
+}
+
+- (void) spartialSort:(NSArray*)users usingRoot:(PFUser*)root
+{
+    NSMutableArray *sortedUsers = [NSMutableArray array];
+    [sortedUsers addObject:root];
+    [users enumerateObjectsUsingBlock:^(PFUser* _Nonnull user, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (![user.objectId isEqualToString: root.objectId]) {
+            NSArray *closestUsers = [self closestTwoUsersFromUser:user inUsers:sortedUsers];
+            PFUser* first = [self first:closestUsers];
+            PFUser* second = [self second:closestUsers];
+            
+            bool condition = NO;
+            do {
+                BOOL left = isLeft(root, user);
+                BOOL above = isAbove(root, user);
+                
+                CGPoint n1 = first.coords;
+                CGPoint n2 = second.coords;
+                int x = 0, y = 0;
+                
+                if (n1.y == n2.y) { // 0 & 3
+                    printf("AB SETTING %s %s %s AND %s\n", user.desc, above ? "ABOVE" : "BELOW", first.desc, second.desc);
+                    if (n1.x == n2.x) {
+                        x = n1.x + (left ? -1 : 1);
+                    }
+                    else {
+                        x = n1.x + ((n1.x < n2.x) ? 1 : -1);
+                    }
+                    y = n1.y + (above ? -1 : +1);
+                }
+                else {
+                    int min = MIN(n1.x, n2.x);
+                    if (left) { // 4 & 5
+                        printf("LF SETTING %s %s %s AND %s\n", user.desc, "LEFT", first.desc, second.desc);
+                        x = min - 1;
+                        y = (n1.x == min) ? n2.y : n1.y;
+                    }
+                    else { // 1 & 2
+                        printf("RT SETTING %s %s %s AND %s\n", user.desc, "RIGHT", first.desc, second.desc);
+                        x = min + 1;
+                        y = (n1.x == min) ? n1.y : n2.y;
+                    }
+                }
+                
+                
+                user.coords = CGPointMake(x,y);
+            } while (condition);
+            
+            [sortedUsers addObject:user];
+            
+            //        PFGeoPoint *g = user.location;
+            //        g.latitude += (((int) (arc4random()%10000-5000)) / 10000000.0f);
+            //        g.longitude += (((int) (arc4random()%10000-5000)) / 10000000.0f);
+        }
+    }];
+}
+
+- (NSArray*) usersWithQuad:(int)quad from:(PFUser*)start users:(NSArray*)users
+{
+    NSMutableArray *res = [NSMutableArray array];
+    
+    [users enumerateObjectsUsingBlock:^(PFUser* _Nonnull user, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (start != user && Quad(start, user) == quad) {
+            [res addObject:user];
+        }
+    }];
+    
+    return res;
 }
 
 
@@ -199,8 +481,8 @@
     user.username = username;
     user.password = username;
     
-    user[AppKeyNicknameKey] = name;
-    user[AppKeyLocationKey] = geoLocation;
+    user.nickname = name;
+    user.location = geoLocation;
     user[@"isSimulated"] = @(YES);
     user[AppKeyAgeKey] = [NSString stringWithFormat:@"%ld살", age];
     user[AppKeyIntroKey] = AppProfileIntroductions[arc4random()%(AppProfileIntroductions.count)];
@@ -244,8 +526,8 @@
             BOOL os = [orig save];
             
             NSLog(@"FILES %@SUCCESSFULLY SAVED", fs & os ? @"" : @"UN");
-            loggedIn[AppProfilePhotoField] = file;
-            loggedIn[AppProfileOriginalPhotoField] = orig;
+            loggedIn.profilePhoto = file;
+            loggedIn.originalPhoto = orig;
             BOOL userSaved = [loggedIn save];
             NSLog(@"USER %@SUCCESSFULLY SAVED", userSaved ? @"" : @"UN");
         }
@@ -282,3 +564,4 @@
 */
 
 @end
+

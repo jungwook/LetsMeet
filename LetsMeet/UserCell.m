@@ -96,7 +96,6 @@
     
     NSLog(@"HERE:%@ AND THERE:%@", here, location);
     
-    self.quadrant.text = [NSString stringWithFormat:@"%d", Quad(here, location)];
     double distance = [here distanceInKilometersTo:location];
     self.distance.text = [self distanceString:distance];
     self.nickname.text = user[AppKeyNicknameKey];
@@ -126,9 +125,6 @@
             drawImage(profilePhoto, self.photoView);
         }
     } fromFile:user[AppProfilePhotoField]];
-    
-    /*
- */
 }
 
 - (void) circleizeView:(UIView*) view by:(CGFloat)percent

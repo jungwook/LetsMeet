@@ -10,9 +10,5 @@
 
 @interface Hive : UIView
 @property (nonatomic, strong) PFUser*user;
-@property (nonatomic) CGPoint centerPoint;
-@property (nonatomic) CGFloat radius;
-
-- (void) setIncrementsForX:(CGFloat)x andY:(CGFloat) y;
-
+@property (nonatomic, strong) UIColor *borderColor;
 @end

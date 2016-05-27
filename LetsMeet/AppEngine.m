@@ -616,14 +616,11 @@ void circleizeView(UIView* view, CGFloat percent)
 #define degreesToRadians(x) (M_PI * x / 180.0)
 #define radiansToDegrees(x) (x * 180.0 / M_PI)
 
-NSString* QUADRANT(PFGeoPoint* fromLoc, PFGeoPoint* toLoc)
+int Quad(PFUser* fromUser, PFUser* toUser)
 {
-    return [NSString stringWithFormat:@"Q%d", Quad(fromLoc, toLoc)];
-}
-
-int Quad(PFGeoPoint* fromLoc, PFGeoPoint* toLoc)
-{
-    return (int) (heading(fromLoc, toLoc)/60.0f);
+    float head = Heading(fromUser, toUser);
+    int quad = (int) head / 60.0f;
+    return quad;
 }
 
 int prevQuad(int quad)
@@ -639,6 +636,16 @@ int antiQuad(int quad)
 int nextQuad(int quad)
 {
     return (quad+1) %6;
+}
+
+float Heading(PFUser* from, PFUser* to)
+{
+    PFGeoPoint *fromLoc = from[AppKeyLocationKey];
+    PFGeoPoint *toLoc = to[AppKeyLocationKey];
+    if (from != to && (fromLoc.latitude == toLoc.latitude && fromLoc.longitude == toLoc.longitude)) {
+        printf("SAME LOCATION FOR:%s - %s\n", [from[AppKeyNicknameKey] UTF8String], [to[AppKeyNicknameKey] UTF8String]);
+    }
+    return heading(fromLoc, toLoc);
 }
 
 float heading(PFGeoPoint* fromLoc, PFGeoPoint* toLoc)

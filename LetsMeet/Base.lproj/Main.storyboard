@@ -325,8 +325,8 @@ Hello</string>
                                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="1" textAlignment="center" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jwN-Va-4Ov" customClass="IndentedLabel">
-                                            <rect key="frame" x="233" y="17" width="26" height="21"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1" textAlignment="center" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jwN-Va-4Ov" customClass="IndentedLabel">
+                                            <rect key="frame" x="239" y="17" width="20" height="21"/>
                                             <color key="backgroundColor" red="0.37254902719999999" green="0.6549019814" blue="0.89803922179999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="20" id="7sy-8h-XAr"/>
@@ -865,30 +865,21 @@ Hello</string>
                         <viewControllerLayoutGuide type="top" id="FKA-04-utO"/>
                         <viewControllerLayoutGuide type="bottom" id="9Vm-Y2-vwM"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="Jy7-HJ-9bn">
+                    <view key="view" contentMode="scaleToFill" id="Jy7-HJ-9bn" customClass="UIScrollView">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" indicatorStyle="black" translatesAutoresizingMaskIntoConstraints="NO" id="jbH-2I-hbb">
-                                <rect key="frame" x="-4" y="64" width="328" height="504"/>
-                                <connections>
-                                    <outlet property="delegate" destination="RR0-5b-e0g" id="FGp-dW-BTG"/>
-                                </connections>
-                            </scrollView>
-                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstItem="jbH-2I-hbb" firstAttribute="leading" secondItem="Jy7-HJ-9bn" secondAttribute="leadingMargin" constant="-20" id="LeE-kK-YpY"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="jbH-2I-hbb" secondAttribute="trailing" constant="-20" id="qho-hS-4u1"/>
-                            <constraint firstItem="9Vm-Y2-vwM" firstAttribute="top" secondItem="jbH-2I-hbb" secondAttribute="bottom" id="s4r-da-Vtq"/>
-                            <constraint firstItem="jbH-2I-hbb" firstAttribute="top" secondItem="FKA-04-utO" secondAttribute="bottom" id="sWO-Oh-qkg"/>
-                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Search" id="4aY-4y-Dkl">
                         <barButtonItem key="leftBarButtonItem" image="399-list1" id="oQ8-Pl-pUe" customClass="ToggleButton"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="play" id="7co-Qx-ai9">
+                            <connections>
+                                <action selector="setNextUser:" destination="RR0-5b-e0g" id="jsM-bz-F7a"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="scrollView" destination="jbH-2I-hbb" id="thC-Fz-GzF"/>
+                        <outlet property="scrollView" destination="Jy7-HJ-9bn" id="h5S-FX-VkR"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tqQ-SK-Ezc" userLabel="First Responder" sceneMemberID="firstResponder"/>

@@ -23,6 +23,7 @@
 		126AF4141CEEF04300E3ED67 /* Account.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF4131CEEF04300E3ED67 /* Account.m */; };
 		127EF37F1CF3343100312D1D /* Octagon.m in Sources */ = {isa = PBXBuildFile; fileRef = 127EF37E1CF3343100312D1D /* Octagon.m */; };
 		12C5C9E51CF419EF00315C79 /* Hive.m in Sources */ = {isa = PBXBuildFile; fileRef = 12C5C9E41CF419EF00315C79 /* Hive.m */; };
+		12DE5F691CF814EC009B315F /* PFUser+Attributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5F681CF814EC009B315F /* PFUser+Attributes.m */; };
 		12F7418C1CE4B97100E8267A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418B1CE4B97100E8267A /* main.m */; };
 		12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418E1CE4B97100E8267A /* AppDelegate.m */; };
 		12F741951CE4B97100E8267A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12F741931CE4B97100E8267A /* Main.storyboard */; };
@@ -90,6 +91,8 @@
 		127EF37E1CF3343100312D1D /* Octagon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Octagon.m; sourceTree = "<group>"; };
 		12C5C9E31CF419EF00315C79 /* Hive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Hive.h; sourceTree = "<group>"; };
 		12C5C9E41CF419EF00315C79 /* Hive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Hive.m; sourceTree = "<group>"; };
+		12DE5F671CF814EC009B315F /* PFUser+Attributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "PFUser+Attributes.h"; sourceTree = "<group>"; };
+		12DE5F681CF814EC009B315F /* PFUser+Attributes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "PFUser+Attributes.m"; sourceTree = "<group>"; };
 		12F741871CE4B97000E8267A /* LetsMeet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LetsMeet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12F7418B1CE4B97100E8267A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		12F7418D1CE4B97100E8267A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -174,6 +177,8 @@
 				124928B51CF2ED810038A2F3 /* UIBarButtonItem+Badge.m */,
 				124928B61CF2ED810038A2F3 /* UIButton+Badge.h */,
 				124928B71CF2ED810038A2F3 /* UIButton+Badge.m */,
+				12DE5F671CF814EC009B315F /* PFUser+Attributes.h */,
+				12DE5F681CF814EC009B315F /* PFUser+Attributes.m */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -433,6 +438,7 @@
 				12F741D01CE56B3400E8267A /* FloatingDrawerSpringAnimator.m in Sources */,
 				1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */,
 				124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */,
+				12DE5F691CF814EC009B315F /* PFUser+Attributes.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

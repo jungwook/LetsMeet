@@ -39,7 +39,7 @@
 - (void) getDataInBackgroundWithBlock:(PFDataResultBlock)block fromFile:(PFFile*)file
 {
     if (!file) {
-        NSLog(@"ERROR: CANNOT GET DATA FROM A NULL FILE");
+//        NSLog(@"ERROR: CANNOT GET DATA FROM A NULL FILE");
         return;
     }
     
