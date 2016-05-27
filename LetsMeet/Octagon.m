@@ -116,6 +116,7 @@
     PFUser* second = [self second:closestUsers];
     
     bool condition = NO;
+    CGPoint coords = CGPointZero;
     do {
         BOOL left = isLeft(self.me, user);
         BOOL above = isAbove(self.me, user);
@@ -135,20 +136,31 @@
             y = n1.y + (above ? -1 : +1);
         }
         else {
-            int min = MIN(n1.x, n2.x);
             if (left) { // 4 & 5
+                if (n1.x < n2.x) {
+                    x = n2.x - 2;
+                    y = n2.y;
+                } else {
+                    x = n1.x - 2;
+                    y = n1.y;
+                }
                 printf("LF SETTING %s %s %s AND %s\n", user.desc, "LEFT", first.desc, second.desc);
-                x = min - 2;
-                y = (n1.x == min) ? n2.y : n1.y;
             }
             else { // 1 & 2
+                if (n1.x < n2.x) {
+                    x = n1.x + 2;
+                    y = n1.y;
+                } else {
+                    x = n2.x + 2;
+                    y = n2.y;
+                }
                 printf("RT SETTING %s %s %s AND %s\n", user.desc, "RIGHT", first.desc, second.desc);
-                x = min + 2;
-                y = (n1.x == min) ? n1.y : n2.y;
             }
         }
-        user.coords = CGPointMake(x,y);
+        coords = CGPointMake(x,y);
     } while (condition);
+    
+    user.coords = coords;
     
     [sortedUsers addObject:user];
     
