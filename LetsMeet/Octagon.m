@@ -76,6 +76,27 @@
 }
 
 
+CGPoint hiveToCoord(CGPoint hive)
+{
+    const int offx[] = { 1, -1, -2, -1, 1, 2};
+    const int offy[] = { 1, 1, 0, -1, -1, 0};
+    
+    int level = hive.x;
+    int quad = hive.y;
+    
+    int sx = level, sy = -level;
+    
+    for (int i=0; i<quad; i++) {
+        int side = (int) i / (level);
+        int ox = offx[side];
+        int oy = offy[side];
+        
+        sx += ox;
+        sy += oy;
+    }
+
+    return CGPointMake(sx, sy);
+}
 
 
 #define CS(__x) [NSString stringWithFormat:@"X%dY%d", (int)__x.x, (int)__x.x]
@@ -83,15 +104,16 @@
 - (void) addHiveToView:(Hive*)view
 {
     PFUser *user = view.user;
-    CGPoint coord = user.coords;
-    CGPoint hive = user.hive;
-    
-    
-    
+    CGPoint coord = hiveToCoord(user.hive);
+
+    if (user.hive.x == 7 && user.hive.y == 38) {
+        NSLog(@"%@/%@/%@", user.nickname, user.objectId, user.location);
+    }
+
     const CGFloat f = 1.8;
     const CGFloat f2 = f*1.154;
 
-    CGFloat radius = 30;
+    CGFloat radius = 20;
     CGPoint centerPoint = CGPointMake(1000, 1000);
     CGFloat cx = centerPoint.x, cy = centerPoint.y;
     CGFloat x = cx+(coord.x-0.5f)*radius;
@@ -214,24 +236,17 @@ float distance(PFUser *u1, PFUser* u2)
         
         PFUser* root = [PFUser currentUser];
         
-        Hive *hive = [Hive new];
-        hive.user = self.me;
-        hive.backgroundColor = [UIColor colorWithRed:0.2 green:0.2 blue:1.0 alpha:0.4];
-        hive.borderColor = [UIColor colorWithRed:0.5 green:0.1 blue:1.0 alpha:1.0];
-        
-        [self addHiveToView:hive];
         printf("\nROOT IS [%s]\n", CSTR(root.nickname));
-        
         self.hives = [NSMutableArray arrayWithArray:users];
-        [self arrange:users];
-
-//      [self spartialSort:users usingRoot:root];
-        /*
+        [self arrange:users fromLocation:[PFGeoPoint geoPointWithLatitude:37.520884 longitude:127.028360]];
         for (PFUser* user in self.hives) {
             Hive *hive = [Hive new];
             hive.user = user;
             [self addHiveToView:hive];
         }
+
+//      [self spartialSort:users usingRoot:root];
+        /*
         NSLog(@"NOW WILL LAYOUT SUBVIEWS");
         */
     }];
@@ -260,10 +275,6 @@ float distance(PFUser *u1, PFUser* u2)
     return [NSMutableArray arrayWithArray:[users sortedArrayUsingComparator:c]];
 }
 
-int numQuads(int level)
-{
-    return (level+1)*6;
-}
 
 - (NSArray*) usersWithQuad:(int)quad from:(PFUser*)start users:(NSArray*)users
 {
@@ -278,17 +289,28 @@ int numQuads(int level)
     return res;
 }
 
+float HeadingFromLocation(PFGeoPoint* fromLoc, PFUser* to)
+{
+    PFGeoPoint *toLoc = to[AppKeyLocationKey];
+    return heading(fromLoc, toLoc);
+}
+
+int QuadForLevelFromLocation(int level, PFGeoPoint* fromLoc, PFUser* toUser)
+{
+    return (int) ( (float) HeadingFromLocation(fromLoc, toUser) / (360.0f / (float) numQuads(level)));
+}
+
 int QuadForLevel(int level, PFUser* fromUser, PFUser* toUser)
 {
     return (int) ( (float) Heading(fromUser, toUser) / (360.0f / (float) numQuads(level)));
 }
 
-- (NSArray*) usersInQuad:(int)quad level:(int)level user:(PFUser*)start users:(NSArray*)users
+- (NSArray*) usersInQuad:(int)quad level:(int)level location:(PFGeoPoint*)location users:(NSArray*)users
 {
     NSMutableArray *res = [NSMutableArray array];
     
     [users enumerateObjectsUsingBlock:^(PFUser* _Nonnull user, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (start != user && QuadForLevel(level, start, user) == quad) {
+        if (QuadForLevelFromLocation(level, location, user) == quad) {
             [res addObject:user];
         }
     }];
@@ -296,26 +318,29 @@ int QuadForLevel(int level, PFUser* fromUser, PFUser* toUser)
     return res;
 }
 
-- (void) arrange:(NSArray*) users
+int numQuads(int level)
 {
-    PFUser* root = self.me;
+    return level ? (level)*6 : 1;
+}
 
-    NSMutableArray *processed = [NSMutableArray array];
+
+- (void) arrange:(NSArray*)users fromLocation:(PFGeoPoint*)location
+{
     NSMutableArray *remaining = [NSMutableArray arrayWithArray:[self usersClosestToRoot:users]];
     
     for (int level=0; remaining.count;level++) {
+        printf("doing level %d\n", level);
         for (int quad=0; quad<numQuads(level) && remaining.count; quad++) {
-            PFUser *first = [remaining firstObject];
-            [remaining removeObject:first];
-
-            PFUser *userInQuad = [[self usersInQuad:quad level:level user:root users:remaining] firstObject];
+            printf("\tquad %d\n", quad);
+            PFUser *userInQuad = [[self usersInQuad:quad level:level location:location users:remaining] firstObject];
             if (userInQuad) {
-                [userInQuad setHive:CGPointMake(level, quad)];
+                CGPoint hive = CGPointMake(level, quad);
+                [userInQuad setHive:hive];
+                [remaining removeObject:userInQuad];
             }
             else {
                 
             }
-            [processed addObject:first];
         }
     }
 }

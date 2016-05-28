@@ -9,6 +9,7 @@
 #import "Hive.h"
 #import "AppEngine.h"
 #import "CachedFile.h"
+#import "PFUser+Attributes.h"
 
 @interface Hive()
 @property (nonatomic,strong) UILabel *nickname;
@@ -22,7 +23,7 @@
     if (self) {
         _nickname = [UILabel new];
         [_nickname setTextAlignment:NSTextAlignmentCenter];
-        [_nickname setFont:[UIFont systemFontOfSize:12 weight:UIFontWeightSemibold]];
+        [_nickname setFont:[UIFont systemFontOfSize:8 weight:UIFontWeightSemibold]];
         
         [self addSubview:self.nickname];
         self.backgroundColor = [UIColor colorWithRed:1.0 green:0.2 blue:0.3 alpha:0.4];
@@ -138,13 +139,17 @@
     _user = user;
     self.nickname.text = user[AppKeyNicknameKey];
     
-    bool sex = [self.user[AppKeySexKey] boolValue];
+//    self.nickname.text = NSStringFromCGPoint(user.hive);
+    
+     bool sex = [self.user[AppKeySexKey] boolValue];
     drawImage([UIImage imageNamed:sex ? @"guy" : @"girl"], self); //SET DEFAULT PICTURE FOR NOW...
     [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
         UIImage *profilePhoto = [UIImage imageWithData:data];
         [self drawImage:profilePhoto];
         [self setNeedsLayout];
     } fromFile:user[AppProfilePhotoField]];
+    /*
+     */
     [self setNeedsLayout];
 }
 
