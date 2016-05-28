@@ -14,7 +14,6 @@
 
 @property (nonatomic) BOOL sex;
 @property (nonatomic) CGPoint coords;
-@property (nonatomic) CGPoint hive;
 @property (nonatomic, strong) NSString* age;
 @property (nonatomic, strong) NSString* intro;
 @property (nonatomic, strong) PFFile* profilePhoto;

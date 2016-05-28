@@ -81,7 +81,7 @@
     [self setObject:originalPhoto forKey:AppProfileOriginalPhotoField];
 }
 
-- (CGPoint) hive
+- (CGPoint) coords
 {
     int x = [self[@"hive-x"] intValue];
     int y = [self[@"hive-y"] intValue];
@@ -89,24 +89,10 @@
     return CGPointMake(x, y);
 }
 
-- (void) setHive:(CGPoint)coords
+- (void) setCoords:(CGPoint)coords
 {
     [self setObject:@(coords.x) forKey:@"hive-x"];
     [self setObject:@(coords.y) forKey:@"hive-y"];
-}
-
-- (CGPoint) coords
-{
-    int x = [self[@"coords-x"] intValue];
-    int y = [self[@"coords-y"] intValue];
-    
-    return CGPointMake(x, y);
-}
-
-- (void) setCoords:(CGPoint)coords
-{
-    [self setObject:@(coords.x) forKey:@"coords-x"];
-    [self setObject:@(coords.y) forKey:@"coords-y"];
 }
 
 - (char*) desc

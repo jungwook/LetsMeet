@@ -12,10 +12,26 @@
 #import "PFUser+Attributes.h"
 
 @interface Hive()
-@property (nonatomic,strong) UILabel *nickname;
+@property (nonatomic, strong) PFUser* user;
+@property (nonatomic, strong) UILabel* nickname;
+@property (nonatomic, weak) UIScrollView* view;
 @end
 
 @implementation Hive
+
++ hiveWithRadius:(CGFloat)radius
+{
+    return [[Hive alloc] initWithRadius:radius];
+}
+
+- (instancetype) initWithRadius:(CGFloat)radius
+{
+    self = [self init];
+    if (self) {
+        _radius = radius;
+    }
+    return self;
+}
 
 - (instancetype) init
 {
@@ -30,8 +46,6 @@
     }
     return self;
 }
-
-#define PT(__x,__y) CGPointMake(__x, __y)
 
 - (void)setBorderColor:(UIColor *)borderColor
 {
@@ -59,47 +73,47 @@
     
 /*
     const CGPoint points2[] = {
-        PT(436,36),
-        PT(563,36),
-        PT(936,252),
-        PT(1000,361),
-        PT(1000,792),
-        PT(936,902),
-        PT(563,1118),
-        PT(436,1118),
-        PT(63,902),
-        PT(0,792),
-        PT(0,361),
-        PT(63, 252),
-        PT(436,36),
-        PT(563,36),
+        CGPointMake(436,36),
+        CGPointMake(563,36),
+        CGPointMake(936,252),
+        CGPointMake(1000,361),
+        CGPointMake(1000,792),
+        CGPointMake(936,902),
+        CGPointMake(563,1118),
+        CGPointMake(436,1118),
+        CGPointMake(63,902),
+        CGPointMake(0,792),
+        CGPointMake(0,361),
+        CGPointMake(63, 252),
+        CGPointMake(436,36),
+        CGPointMake(563,36),
         };
  */
     
     const CGPoint points[] = {
-        PT(390,63),
-        PT(609,63),
-        PT(890,225),
-        PT(1000,415),
-        PT(1000,739),
-        PT(890,929),
-        PT(609,1091),
-        PT(390,1091),
-        PT(109,929),
-        PT(0,739),
-        PT(0,415),
-        PT(109, 225),
-        PT(390,63),
-        PT(609,63),
+        CGPointMake(390,63),
+        CGPointMake(609,63),
+        CGPointMake(890,225),
+        CGPointMake(1000,415),
+        CGPointMake(1000,739),
+        CGPointMake(890,929),
+        CGPointMake(609,1091),
+        CGPointMake(390,1091),
+        CGPointMake(109,929),
+        CGPointMake(0,739),
+        CGPointMake(0,415),
+        CGPointMake(109, 225),
+        CGPointMake(390,63),
+        CGPointMake(609,63),
     };
     const CGPoint anchor[] = {
-        PT(500,0),
-        PT(1000,288),
-        PT(1000,866),
-        PT(500,1154),
-        PT(0,866),
-        PT(0,288),
-        PT(500,0),
+        CGPointMake(500,0),
+        CGPointMake(1000,288),
+        CGPointMake(1000,866),
+        CGPointMake(500,1154),
+        CGPointMake(0,866),
+        CGPointMake(0,288),
+        CGPointMake(500,0),
     };
     
     for (int i=0; i<sizeof(points)/sizeof(CGPoint); i=i+2) {
@@ -124,7 +138,6 @@
 
 - (void) layoutSubviews
 {
-//    NSLog(@"LAYOUT");
     [super layoutSubviews];
     [self setMask];
 }
@@ -134,12 +147,53 @@
     [self.layer setContents:(id)image.CGImage];
 }
 
-- (void) setUser:(PFUser*)user
+CGPoint hiveToCoord(CGPoint hive)
+{
+    const int offx[] = { 1, -1, -2, -1, 1, 2};
+    const int offy[] = { 1, 1, 0, -1, -1, 0};
+    
+    int level = hive.x;
+    int quad = hive.y;
+    
+    int sx = level, sy = -level;
+    
+    for (int i=0; i<quad; i++) {
+        int side = (int) i / (level);
+        int ox = offx[side];
+        int oy = offy[side];
+        
+        sx += ox;
+        sy += oy;
+    }
+    
+    return CGPointMake(sx, sy);
+}
+
+- (void) addHiveToView:(Hive*)hive
+{
+    PFUser *user = hive.user;
+    CGPoint coord = hiveToCoord(user.coords);
+    
+    const CGFloat f = 1.8;
+    const CGFloat f2 = f*1.154;
+    CGSize size = self.view.contentSize;
+    
+    CGFloat radius = self.radius;
+    CGPoint centerPoint = CGPointMake(size.width/2, size.height/2);
+    CGFloat cx = centerPoint.x, cy = centerPoint.y;
+    CGFloat x = cx+(coord.x-0.5f)*radius;
+    CGFloat y = cy+(coord.y-0.5f)*radius*1.5*1.154;
+    hive.frame = CGRectMake(x, y, f*radius, f2*radius);
+    
+    [self.view addSubview:hive];
+}
+
+- (void) setUser:(PFUser*)user superview:(UIScrollView*)view
 {
     _user = user;
-    self.nickname.text = user[AppKeyNicknameKey];
+    _view = view;
     
-//    self.nickname.text = NSStringFromCGPoint(user.hive);
+    self.nickname.text = user[AppKeyNicknameKey];
     
      bool sex = [self.user[AppKeySexKey] boolValue];
     drawImage([UIImage imageNamed:sex ? @"guy" : @"girl"], self); //SET DEFAULT PICTURE FOR NOW...
@@ -148,9 +202,8 @@
         [self drawImage:profilePhoto];
         [self setNeedsLayout];
     } fromFile:user[AppProfilePhotoField]];
-    /*
-     */
-    [self setNeedsLayout];
+    
+    [self addHiveToView:self];
 }
 
 @end

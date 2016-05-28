@@ -74,6 +74,7 @@
 
 typedef void (^FileBooleanResultBlock)(PFFile *file, BOOL succeeded, NSError * error);
 typedef void (^ArrayResultBlock)(NSArray *objects);
+typedef void (^ArrayIntResultBlock)(NSArray *objects, int levels);
 typedef void (^UserResultBlock)(PFUser *user);
 typedef void (^voidBlock)(void);
 typedef void (^RefreshControlBlock)(UIRefreshControl* refreshControl);

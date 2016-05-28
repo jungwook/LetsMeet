@@ -872,11 +872,6 @@ Hello</string>
                     </view>
                     <navigationItem key="navigationItem" title="Search" id="4aY-4y-Dkl">
                         <barButtonItem key="leftBarButtonItem" image="399-list1" id="oQ8-Pl-pUe" customClass="ToggleButton"/>
-                        <barButtonItem key="rightBarButtonItem" systemItem="play" id="7co-Qx-ai9">
-                            <connections>
-                                <action selector="setNextUser:" destination="RR0-5b-e0g" id="jsM-bz-F7a"/>
-                            </connections>
-                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="scrollView" destination="Jy7-HJ-9bn" id="h5S-FX-VkR"/>
