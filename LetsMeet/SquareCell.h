@@ -9,5 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface SquareCell : UICollectionViewCell
-- (void)setUser:(PFUser *)user andMessages:(NSArray *)messages collectionView:(UICollectionView*)collectionView;
+- (void)setUser:(PFUser *)user andMessages:(NSArray *)messages location:(PFGeoPoint*)location collectionView:(UICollectionView*)collectionView
+;
 @end

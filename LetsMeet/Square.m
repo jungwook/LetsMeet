@@ -11,9 +11,11 @@
 #import "AppEngine.h"
 #import "PFUser+Attributes.h"
 #import "RefreshControl.h"
+#import "IndentedLabel.h"
 
 
 @interface Square ()
+@property (nonatomic, strong) PFGeoPoint* location;
 @property (nonatomic, strong, readonly) NSArray *users;
 @property (nonatomic, weak, readonly) AppEngine *engine;
 @end
@@ -33,19 +35,13 @@ static NSString * const reuseIdentifier = @"Square";
     CGFloat availableWidthForCells = CGRectGetWidth(self.collectionView.frame) - flowLayout.sectionInset.left - flowLayout.sectionInset.right - 1.0 * (kCellsPerRow - 1);
     
     CGFloat cellWidth = availableWidthForCells / kCellsPerRow;
-//    flowLayout.itemSize = CGSizeMake(cellWidth, flowLayout.itemSize.height);
     flowLayout.itemSize = CGSizeMake(cellWidth, cellWidth);
-    
-    // Uncomment the following line to preserve selection between presentations
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Register cell classes
-    [self.collectionView registerClass:[SquareCell class] forCellWithReuseIdentifier:reuseIdentifier];
+
+    self.location = [PFGeoPoint geoPointWithLatitude:37.520884 longitude:127.028360];
     
     RefreshControl *refresh = [RefreshControl initWithCompletionBlock:^(UIRefreshControl *refreshControl) {
         PFQuery *query = [PFUser query];
-        PFGeoPoint *location = [PFGeoPoint geoPointWithLatitude:37.520884 longitude:127.028360];
-        [query whereKey:AppKeyLocationKey nearGeoPoint:location];
+        [query whereKey:AppKeyLocationKey nearGeoPoint:self.location];
         
         [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
             if (error) {
@@ -53,7 +49,6 @@ static NSString * const reuseIdentifier = @"Square";
             }
             else {
                 _users = [NSArray arrayWithArray:users];
-                NSLog(@"THERE ARE USERS NEAR ME:%@", _users);
                 [refreshControl endRefreshing];
                 [self.collectionView reloadData];
             }
@@ -117,7 +112,7 @@ static NSString * const reuseIdentifier = @"Square";
     PFUser *user = self.users[indexPath.row];
     SquareCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:reuseIdentifier forIndexPath:indexPath];
     
-    [cell setUser:user andMessages:[AppEngine appEngineMessagesWithUserId:user.objectId] collectionView:self.collectionView];
+    [cell setUser:user andMessages:[AppEngine appEngineMessagesWithUserId:user.objectId] location:self.location collectionView:self.collectionView];
     
     return cell;
 }

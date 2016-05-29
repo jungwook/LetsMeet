@@ -603,7 +603,7 @@ UIImage* scaleImage(UIImage* image, CGSize size) {
 void drawImage(UIImage *image, UIView* view)
 {
     [view.layer setContents:(id)image.CGImage];
-    [view.layer setContentsGravity:kCAGravityResizeAspect];
+    [view.layer setContentsGravity:kCAGravityResizeAspectFill];
     [view.layer setMasksToBounds:YES];
 }
 

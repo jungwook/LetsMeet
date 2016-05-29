@@ -10,14 +10,26 @@
 #import "PFUser+Attributes.h"
 #import "AppEngine.h"   
 #import "CachedFile.h"
+#import "IndentedLabel.h"
 
 @interface SquareCell()
+@property (weak, nonatomic) IBOutlet IndentedLabel *when;
+@property (weak, nonatomic) IBOutlet IndentedLabel *distance;
 @property (weak, nonatomic) IBOutlet UIView *photo;
-
 @end
 
 
 @implementation SquareCell
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        self.backgroundColor = [UIColor redColor];
+    }
+    return self;
+}
+
 - (void)dealloc
 {
     NSLog(@"DEALLOC CELL");
@@ -64,59 +76,57 @@
     return [NSString stringWithFormat:@"%ld", (unsigned long)count];
 }
 
-- (void)setUser:(PFUser *)user andMessages:(NSArray *)messages collectionView:(UICollectionView*)collectionView
+- (void)setUser:(PFUser *)user andMessages:(NSArray *)messages location:(PFGeoPoint*)location collectionView:(UICollectionView*)collectionView
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"fromUser == %@ AND isRead != true", user.objectId];
     
     NSArray *unreadMessages = [messages filteredArrayUsingPredicate:predicate];
     NSUInteger unreadCount = [unreadMessages count];
     
-    int sex = [[user valueForKey:AppKeySexKey] boolValue];
+//    int sex = [[user valueForKey:AppKeySexKey] boolValue];
     id lastMessage = [messages lastObject];
     
-    UIColor *sexColor = (sex == AppMaleUser) ? AppMaleUserColor : AppFemaleUserColor;
-    
-    PFGeoPoint *location = user[AppKeyLocationKey];
-    PFGeoPoint *here = [[AppEngine engine] currentLocation];
+//    UIColor *sexColor = (sex == AppMaleUser) ? AppMaleUserColor : AppFemaleUserColor;
     
 //    NSLog(@"HERE:%@ AND THERE:%@", here, location);
     
-    double distance = [here distanceInKilometersTo:location];
-    /*
+    double distance = [location distanceInKilometersTo:user.location];
+//    drawImage([UIImage imageNamed:sex ? @"guy" : @"girl"], self); //SET DEFAULT PICTURE FOR NOW...
     self.distance.text = [self distanceString:distance];
-    self.nickname.text = user[AppKeyNicknameKey];
-    self.nickname.textColor = sexColor;
-    
-    [self circleizeView:self.unread by:0.5f];
-    [self circleizeView:self.photoView by:0.5f];
+    NSDate *lastMessageDate = lastMessage[AppKeyUpdatedAtKey];
+    NSTimeInterval since = [[NSDate date] timeIntervalSinceDate:lastMessageDate];
+    self.when.text = messages ? [self sinceString:since] : @"시작하세요!";
     [self circleizeView:self.distance by:0.2f];
     [self circleizeView:self.when by:0.2f];
+    
+    /*
+    [self circleizeView:self.unread by:0.5f];
+    [self circleizeView:self.photoView by:0.5f];
     
     [self.lastMessage setTextAlignment:NSTextAlignmentLeft];
     [self.lastMessage setLineBreakMode:NSLineBreakByWordWrapping];
     self.lastMessage.text = [lastMessage[@"msgContent"] stringByAppendingString:@"\n\n"];
     
-    NSDate *lastMessageDate = lastMessage[AppKeyUpdatedAtKey];
     
-    NSTimeInterval since = [[NSDate date] timeIntervalSinceDate:lastMessageDate];
-    self.when.text = messages ? [self sinceString:since] : @"시작하세요!";
     
     self.unread.text = [self unreadString:unreadCount forUser:user];
     self.unread.alpha = unreadCount > 0 ? 1.0 : 0.0f;
     
-    drawImage([UIImage imageNamed:sex ? @"guy" : @"girl"], self.photoView); //SET DEFAULT PICTURE FOR NOW...
      */
-    self.alpha = 0.0;
+    
     [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
         UIImage *profilePhoto = [UIImage imageWithData:data];
         if ([[collectionView visibleCells] containsObject:self]) {
-            drawImage(profilePhoto, self);
+            self.alpha = 0.0;
+            [UIView animateWithDuration:0.25 animations:^{
+                drawImage(profilePhoto, self);
+                self.alpha = 1.0;
+            }];
         }
         
-        [UIView animateWithDuration:0.5 animations:^{
-            self.alpha = 1.0;
-        }];
     } fromFile:user.profilePhoto];
+    /*
+*/
 }
 
 - (void) circleizeView:(UIView*) view by:(CGFloat)percent
