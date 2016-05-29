@@ -25,6 +25,8 @@
 		127EF37F1CF3343100312D1D /* Octagon.m in Sources */ = {isa = PBXBuildFile; fileRef = 127EF37E1CF3343100312D1D /* Octagon.m */; };
 		12C5C9E51CF419EF00315C79 /* Hive.m in Sources */ = {isa = PBXBuildFile; fileRef = 12C5C9E41CF419EF00315C79 /* Hive.m */; };
 		12DE5F691CF814EC009B315F /* PFUser+Attributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5F681CF814EC009B315F /* PFUser+Attributes.m */; };
+		12DE5F6C1CFAFD84009B315F /* Square.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5F6B1CFAFD84009B315F /* Square.m */; };
+		12DE5F6F1CFB0028009B315F /* SquareCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5F6E1CFB0028009B315F /* SquareCell.m */; };
 		12F7418C1CE4B97100E8267A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418B1CE4B97100E8267A /* main.m */; };
 		12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418E1CE4B97100E8267A /* AppDelegate.m */; };
 		12F741951CE4B97100E8267A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12F741931CE4B97100E8267A /* Main.storyboard */; };
@@ -96,6 +98,10 @@
 		12C5C9E41CF419EF00315C79 /* Hive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Hive.m; sourceTree = "<group>"; };
 		12DE5F671CF814EC009B315F /* PFUser+Attributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "PFUser+Attributes.h"; sourceTree = "<group>"; };
 		12DE5F681CF814EC009B315F /* PFUser+Attributes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "PFUser+Attributes.m"; sourceTree = "<group>"; };
+		12DE5F6A1CFAFD84009B315F /* Square.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Square.h; sourceTree = "<group>"; };
+		12DE5F6B1CFAFD84009B315F /* Square.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Square.m; sourceTree = "<group>"; };
+		12DE5F6D1CFB0028009B315F /* SquareCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SquareCell.h; sourceTree = "<group>"; };
+		12DE5F6E1CFB0028009B315F /* SquareCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SquareCell.m; sourceTree = "<group>"; };
 		12F741871CE4B97000E8267A /* LetsMeet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LetsMeet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12F7418B1CE4B97100E8267A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		12F7418D1CE4B97100E8267A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -196,6 +202,8 @@
 				12F741F41CE59C7F00E8267A /* MenuCell.m */,
 				126AF3FD1CED625C00E3ED67 /* UserCell.h */,
 				126AF3FE1CED625C00E3ED67 /* UserCell.m */,
+				12DE5F6D1CFB0028009B315F /* SquareCell.h */,
+				12DE5F6E1CFB0028009B315F /* SquareCell.m */,
 				126AF4091CEDAE0E00E3ED67 /* IndentedLabel.h */,
 				126AF40A1CEDAE0E00E3ED67 /* IndentedLabel.m */,
 				126AF40C1CEEACA200E3ED67 /* ValuePopUpView.h */,
@@ -320,6 +328,8 @@
 				12F741FF1CE6CE4000E8267A /* SignUp.m */,
 				126AF3F11CEA966B00E3ED67 /* Chat.h */,
 				126AF3F21CEA966B00E3ED67 /* Chat.m */,
+				12DE5F6A1CFAFD84009B315F /* Square.h */,
+				12DE5F6B1CFAFD84009B315F /* Square.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -429,11 +439,13 @@
 				12F7418C1CE4B97100E8267A /* main.m in Sources */,
 				124928AF1CF2CD370038A2F3 /* RefreshControl.m in Sources */,
 				126AF3F61CEA983800E3ED67 /* MessageBar.m in Sources */,
+				12DE5F6F1CFB0028009B315F /* SquareCell.m in Sources */,
 				12F741FA1CE5B13D00E8267A /* AppEngine.m in Sources */,
 				12F741D21CE56B3400E8267A /* FloatingDrawerViewController.m in Sources */,
 				124928B91CF2ED810038A2F3 /* UIButton+Badge.m in Sources */,
 				126AF4141CEEF04300E3ED67 /* Account.m in Sources */,
 				12F741E91CE5854700E8267A /* InBox.m in Sources */,
+				12DE5F6C1CFAFD84009B315F /* Square.m in Sources */,
 				127EF37F1CF3343100312D1D /* Octagon.m in Sources */,
 				124928B81CF2ED810038A2F3 /* UIBarButtonItem+Badge.m in Sources */,
 				126AF3FF1CED625C00E3ED67 /* UserCell.m in Sources */,

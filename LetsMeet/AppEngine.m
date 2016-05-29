@@ -616,28 +616,6 @@ void circleizeView(UIView* view, CGFloat percent)
 #define degreesToRadians(x) (M_PI * x / 180.0)
 #define radiansToDegrees(x) (x * 180.0 / M_PI)
 
-int Quad(PFUser* fromUser, PFUser* toUser)
-{
-    float head = Heading(fromUser, toUser);
-    int quad = (int) head / 60.0f;
-    return quad;
-}
-
-int prevQuad(int quad)
-{
-    return (quad+6-1) % 6;
-}
-
-int antiQuad(int quad)
-{
-    return (quad+3) % 6;
-}
-
-int nextQuad(int quad)
-{
-    return (quad+1) %6;
-}
-
 float Heading(PFUser* from, PFUser* to)
 {
     PFGeoPoint *fromLoc = from[AppKeyLocationKey];
@@ -647,6 +625,35 @@ float Heading(PFUser* from, PFUser* to)
     }
     return heading(fromLoc, toLoc);
 }
+
+CGRect hiveToFrame(CGPoint hive, CGFloat radius, CGFloat inset, CGPoint center)
+{
+    const int offx[] = { 1, -1, -2, -1, 1, 2};
+    const int offy[] = { 1, 1, 0, -1, -1, 0};
+    
+    int level = hive.x;
+    int quad = hive.y;
+    
+    int sx = level, sy = -level;
+    
+    for (int i=0; i<quad; i++) {
+        int side = (int) i / (level);
+        int ox = offx[side];
+        int oy = offy[side];
+        
+        sx += ox;
+        sy += oy;
+    }
+    
+    const CGFloat f = 2-inset/radius;
+    const CGFloat f2 = f*1.154;
+    
+    CGFloat x = center.x+(sx-0.5f)*radius;
+    CGFloat y = center.y+(sy-0.5f)*radius*1.5*1.154;
+    
+    return CGRectMake(x, y, f*radius, f2*radius);
+}
+
 
 float heading(PFGeoPoint* fromLoc, PFGeoPoint* toLoc)
 {

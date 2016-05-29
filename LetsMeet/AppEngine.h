@@ -89,9 +89,7 @@ void drawImage(UIImage *image, UIView* view);
 void circleizeView(UIView* view, CGFloat percent);
 float heading(PFGeoPoint* fromLoc, PFGeoPoint* toLoc);
 float Heading(PFUser* from, PFUser* to);
-int Quad(PFUser* fromUser, PFUser* toUser);
-int prevQuad(int quad);
-int nextQuad(int quad);
+CGRect hiveToFrame(CGPoint hive, CGFloat radius, CGFloat inset, CGPoint center);
 NSString* QUADRANT(PFGeoPoint* fromLoc, PFGeoPoint* toLoc);
 
 @interface AppEngine : NSObject <CLLocationManagerDelegate>
