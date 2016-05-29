@@ -860,24 +860,109 @@ Hello</string>
         <!--Search-->
         <scene sceneID="S2g-lu-HtM">
             <objects>
-                <viewController id="RR0-5b-e0g" customClass="Octagon" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="SEARCHV2" id="RR0-5b-e0g" customClass="Octagon" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="FKA-04-utO"/>
                         <viewControllerLayoutGuide type="bottom" id="9Vm-Y2-vwM"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="Jy7-HJ-9bn" customClass="UIScrollView">
+                    <view key="view" contentMode="scaleToFill" id="Jy7-HJ-9bn">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" minimumZoomScale="0.10000000000000001" translatesAutoresizingMaskIntoConstraints="NO" id="NnI-Q9-b8P">
+                                <rect key="frame" x="-4" y="20" width="328" height="548"/>
+                                <subviews>
+                                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kRn-uE-oMT">
+                                        <rect key="frame" x="0.0" y="0.0" width="328" height="504"/>
+                                        <color key="backgroundColor" red="1" green="0.44705882670000002" blue="0.1921568662" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="504" id="9Xs-3f-vyY"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <color key="backgroundColor" red="0.99607843159999998" green="0.68235296010000002" blue="0.35686275360000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstItem="kRn-uE-oMT" firstAttribute="centerX" secondItem="NnI-Q9-b8P" secondAttribute="centerX" id="8sZ-6C-Efm"/>
+                                    <constraint firstItem="kRn-uE-oMT" firstAttribute="top" secondItem="NnI-Q9-b8P" secondAttribute="top" id="ADv-Ba-s0n"/>
+                                    <constraint firstItem="kRn-uE-oMT" firstAttribute="leading" secondItem="NnI-Q9-b8P" secondAttribute="leading" id="EyW-Re-7wu"/>
+                                    <constraint firstAttribute="trailing" secondItem="kRn-uE-oMT" secondAttribute="trailing" id="FtA-HK-8gY"/>
+                                    <constraint firstAttribute="bottom" secondItem="kRn-uE-oMT" secondAttribute="bottom" id="JQa-ZO-zn9"/>
+                                </constraints>
+                                <connections>
+                                    <outlet property="delegate" destination="RR0-5b-e0g" id="LRT-fE-ZgH"/>
+                                </connections>
+                            </scrollView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="NnI-Q9-b8P" firstAttribute="leading" secondItem="Jy7-HJ-9bn" secondAttribute="leadingMargin" constant="-20" id="1Dd-ut-YN5"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="NnI-Q9-b8P" secondAttribute="trailing" constant="-20" id="LcC-UV-shY"/>
+                            <constraint firstItem="NnI-Q9-b8P" firstAttribute="top" secondItem="FKA-04-utO" secondAttribute="bottom" id="YCF-gL-V0H"/>
+                            <constraint firstItem="9Vm-Y2-vwM" firstAttribute="top" secondItem="NnI-Q9-b8P" secondAttribute="bottom" id="iwW-cd-HSx"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Search" id="4aY-4y-Dkl">
                         <barButtonItem key="leftBarButtonItem" image="399-list1" id="oQ8-Pl-pUe" customClass="ToggleButton"/>
                     </navigationItem>
                     <connections>
-                        <outlet property="scrollView" destination="Jy7-HJ-9bn" id="h5S-FX-VkR"/>
+                        <outlet property="map" destination="kRn-uE-oMT" id="tMT-Ck-cl2"/>
+                        <outlet property="scrollView" destination="NnI-Q9-b8P" id="VIl-zy-fkh"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tqQ-SK-Ezc" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2436" y="2891"/>
+        </scene>
+        <!--주변 사람들-->
+        <scene sceneID="QgU-qw-uCd">
+            <objects>
+                <collectionViewController id="Enq-TN-9oU" customClass="Square" sceneMemberID="viewController">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" indicatorStyle="black" dataMode="prototypes" id="Nun-BU-cLW">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="1" minimumInteritemSpacing="1" id="j7y-z9-x5M">
+                            <size key="itemSize" width="70" height="80"/>
+                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                            <inset key="sectionInset" minX="1" minY="1" maxX="1" maxY="1"/>
+                        </collectionViewFlowLayout>
+                        <cells>
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="Square" id="Tzd-zK-zck" customClass="SquareCell">
+                                <rect key="frame" x="1" y="65" width="70" height="80"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                    <rect key="frame" x="0.0" y="0.0" width="70" height="80"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pxC-Lf-j7a">
+                                            <rect key="frame" x="0.0" y="0.0" width="70" height="80"/>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </view>
+                                    </subviews>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                </view>
+                                <color key="backgroundColor" red="0.94117647410000005" green="0.32156863810000003" blue="0.17254902420000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstItem="pxC-Lf-j7a" firstAttribute="width" secondItem="Tzd-zK-zck" secondAttribute="width" id="2Bz-Ko-eDO"/>
+                                    <constraint firstItem="pxC-Lf-j7a" firstAttribute="leading" secondItem="Tzd-zK-zck" secondAttribute="leadingMargin" constant="-8" id="AKs-OH-NLF"/>
+                                    <constraint firstItem="pxC-Lf-j7a" firstAttribute="top" secondItem="Tzd-zK-zck" secondAttribute="topMargin" constant="-8" id="GYF-a9-ro1"/>
+                                    <constraint firstItem="pxC-Lf-j7a" firstAttribute="height" secondItem="Tzd-zK-zck" secondAttribute="height" id="mQr-vE-8YL"/>
+                                </constraints>
+                                <connections>
+                                    <outlet property="photo" destination="pxC-Lf-j7a" id="LUv-pX-hiS"/>
+                                </connections>
+                            </collectionViewCell>
+                        </cells>
+                        <connections>
+                            <outlet property="dataSource" destination="Enq-TN-9oU" id="XPf-RM-jT6"/>
+                            <outlet property="delegate" destination="Enq-TN-9oU" id="upW-ty-21w"/>
+                        </connections>
+                    </collectionView>
+                    <navigationItem key="navigationItem" title="주변 사람들" id="IFr-xP-euy">
+                        <barButtonItem key="leftBarButtonItem" image="399-list1" id="4f8-am-Vvg" customClass="ToggleButton"/>
+                    </navigationItem>
+                </collectionViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="qQ9-Ag-hqL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2062" y="2891"/>
         </scene>
@@ -890,7 +975,7 @@ Hello</string>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="RR0-5b-e0g" kind="relationship" relationship="rootViewController" id="4xJ-D5-HJM"/>
+                        <segue destination="Enq-TN-9oU" kind="relationship" relationship="rootViewController" id="WdF-eI-uKr"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nKv-8G-6X9" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -949,6 +1034,6 @@ Hello</string>
         <image name="guy white" width="100" height="125"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="DTT-zt-rVV"/>
+        <segue reference="UNJ-3R-hqU"/>
     </inferredMetricsTieBreakers>
 </document>

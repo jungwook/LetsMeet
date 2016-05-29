@@ -135,10 +135,6 @@
 }
 
 
-- (IBAction)toggleMenu:(id)sender {
-    [AppDelegate toggleMenu];
-}
-
 /*
  */
 

@@ -14,23 +14,25 @@
 @interface Hive()
 @property (nonatomic, strong) PFUser* user;
 @property (nonatomic, strong) UILabel* nickname;
-@property (nonatomic, weak) UIScrollView* view;
+@property (nonatomic, weak) UIView* view;
 @property (nonatomic) CGFloat inset;
+@property (nonatomic) CGPoint hiveCenter;
 @end
 
 @implementation Hive
 
-+ hiveWithRadius:(CGFloat)radius inset:(CGFloat)inset
++ hiveWithRadius:(CGFloat)radius inset:(CGFloat)inset center:(CGPoint)center
 {
-    return [[Hive alloc] initWithRadius:radius inset:inset];
+    return [[Hive alloc] initWithRadius:radius inset:inset center:center];
 }
 
-- (instancetype) initWithRadius:(CGFloat)radius inset:(CGFloat)inset
+- (instancetype) initWithRadius:(CGFloat)radius inset:(CGFloat)inset center:(CGPoint)center
 {
     self = [self init];
     if (self) {
         _inset = inset;
         _radius = radius;
+        _hiveCenter = center;
     }
     return self;
 }
@@ -152,37 +154,7 @@
     [self.layer setContents:(id)image.CGImage];
 }
 
-- (CGRect) coordsToFrame:(CGPoint) hive
-{
-    const int offx[] = { 1, -1, -2, -1, 1, 2};
-    const int offy[] = { 1, 1, 0, -1, -1, 0};
-    
-    int level = hive.x;
-    int quad = hive.y;
-    
-    int sx = level, sy = -level;
-    
-    for (int i=0; i<quad; i++) {
-        int side = (int) i / (level);
-        int ox = offx[side];
-        int oy = offy[side];
-        
-        sx += ox;
-        sy += oy;
-    }
-    
-    const CGFloat f = 2-self.inset/self.radius;
-    const CGFloat f2 = f*1.154;
-
-    CGSize size = self.view.contentSize;
-    CGFloat radius = self.radius;
-    CGFloat x = size.width/2+(sx-0.5f)*radius;
-    CGFloat y = size.height/2+(sy-0.5f)*radius*1.5*1.154;
-    
-    return CGRectMake(x, y, f*radius, f2*radius);
-}
-
-- (void) setUser:(PFUser*)user superview:(UIScrollView*)view
+- (void) setUser:(PFUser*)user superview:(UIView*)view
 {
     _user = user;
     _view = view;
@@ -195,9 +167,9 @@
         UIImage *profilePhoto = [UIImage imageWithData:data];
         [self drawImage:profilePhoto];
         [self setNeedsLayout];
-    } fromFile:user[AppProfilePhotoField]];
+    } fromFile:user.profilePhoto];
     
-    self.frame = [self coordsToFrame:self.user.coords];
+    self.frame = hiveToFrame(self.user.coords, self.radius, self.inset, self.hiveCenter);
     [self.view addSubview:self];
 }
 

@@ -15,9 +15,12 @@
 
 @interface Octagon ()
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (weak, nonatomic) IBOutlet UIView *map;
 @property (weak, nonatomic) AppEngine *engine;
 @property (weak, nonatomic) PFUser *me;
-@property (strong, nonatomic) id origin;
+@property (nonatomic) CGFloat radius, inset;
+@property (nonatomic) CGRect hiveFrame;
+@property (nonatomic) CGPoint hiveCenter;
 @end
 
 @implementation Octagon
@@ -28,7 +31,8 @@
     if (self) {
         self.engine = [AppEngine engine];
         self.me = [PFUser currentUser];
-        self.scrollView.delegate = self;
+        self.radius = 30;
+        self.inset = 3;
     }
     return self;
 }
@@ -41,6 +45,11 @@ NSString *coordString(CGPoint point)
 float distance(PFUser *u1, PFUser* u2)
 {
     return [u1.location distanceInKilometersTo:u2.location];
+}
+
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
+{
+    return self.map;
 }
 
 
@@ -56,17 +65,24 @@ float distance(PFUser *u1, PFUser* u2)
 - (void)viewDidLoad {
     [super viewDidLoad];
 //    [SimulatedUsers createHives]; // FOR CREATING NEW SIMULATED USERS
+    
+    self.scrollView.frame = self.view.bounds;
+    self.map.frame = self.view.bounds;
 
     PFGeoPoint *location = [PFGeoPoint geoPointWithLatitude:37.520884 longitude:127.028360];
+    
     [self loadUsersNearLocation:location completionBlock:^(NSArray *users, int levels) {
-        CGFloat radius = 40;
-        CGFloat size = radius * levels * 2 * 2;
-        self.scrollView.contentSize = CGSizeMake(size, size);
+        NSLog(@"BOUNDS:%@", NSStringFromCGRect(self.hiveFrame));
+    
+        self.scrollView.contentSize = self.hiveFrame.size;
         self.scrollView.scrollEnabled = YES;
-        self.scrollView.contentOffset = [self centerViewPort];
+//        self.scrollView.contentOffset = [self centerViewPort];
+        self.map.frame = CGRectMake(0, 0, self.hiveFrame.size.width, self.hiveFrame.size.height);
+        
+        CGPoint center = CGPointMake(-self.hiveFrame.origin.x, -self.hiveFrame.origin.y);
         
         for (PFUser* user in users) {
-            Hive *hive = [Hive hiveWithRadius:radius inset:radius*0.2f];
+            Hive *hive = [Hive hiveWithRadius:self.radius inset:self.inset center:center];
             [hive setUser:user superview:self.scrollView];
         }
     }];
@@ -123,6 +139,22 @@ int numQuads(int level)
     return level ? (level)*6 : 1;
 }
 
+- (CGRect) minMaxBoundsForUsers:(NSArray*)users
+{
+    __block CGFloat minHeight = MAXFLOAT, maxHeight = -MAXFLOAT, minWidth = MAXFLOAT, maxWidth = -MAXFLOAT;
+    [users enumerateObjectsUsingBlock:^(PFUser* _Nonnull user, NSUInteger idx, BOOL * _Nonnull stop) {
+        CGRect rect = hiveToFrame(user.coords, self.radius, self.inset, CGPointZero);
+        CGFloat w = rect.origin.x, W = rect.origin.x + rect.size.width;
+        CGFloat h = rect.origin.y, H = rect.origin.y + rect.size.height;
+        
+        minHeight = minHeight > h ? h : minHeight;
+        maxHeight = maxHeight < H ? H : maxHeight;
+        minWidth = minWidth > w ? w : minWidth;
+        maxWidth = maxWidth < W ? W :maxWidth;
+    }];
+    return CGRectMake(minWidth, minHeight, maxWidth-minWidth, maxHeight-minHeight);
+}
+
 - (int) arrange:(NSArray*)users fromLocation:(PFGeoPoint*)location
 {
     NSMutableArray *remaining = [NSMutableArray arrayWithArray:[self usersClosestToLocation:location users:users]];
@@ -146,7 +178,37 @@ int numQuads(int level)
     [[self scrollView] setNeedsLayout];
 }
 
-- (void) loadUsersNearLocation:(PFGeoPoint*)location completionBlock:(ArrayIntResultBlock)block
+- (CGRect) hiveToFrame:(CGPoint)hive radius:(CGFloat)radius inset:(CGFloat)inset center:(CGPoint)center;
+{
+    const int offx[] = { 1, -1, -2, -1, 1, 2};
+    const int offy[] = { 1, 1, 0, -1, -1, 0};
+    
+    int level = hive.x;
+    int quad = hive.y;
+    
+    int sx = level, sy = -level;
+    
+    for (int i=0; i<quad; i++) {
+        int side = (int) i / (level);
+        int ox = offx[side];
+        int oy = offy[side];
+        
+        sx += ox;
+        sy += oy;
+    }
+    
+    const CGFloat f = 2-inset/radius;
+    const CGFloat f2 = f*1.154;
+    
+    CGFloat x = center.x+(sx-0.5f)*radius;
+    CGFloat y = center.y+(sy-0.5f)*radius*1.5*1.154;
+    
+    return CGRectMake(x, y, f*radius, f2*radius);
+}
+
+typedef void (^LoadUsersNearLocationTypeBlock)(NSArray *objects, int levels);
+
+- (void) loadUsersNearLocation:(PFGeoPoint*)location completionBlock:(LoadUsersNearLocationTypeBlock)block
 {
     PFQuery *query = [PFUser query];
     [query whereKey:AppKeyLocationKey nearGeoPoint:location];
@@ -156,6 +218,7 @@ int numQuads(int level)
         }
         else {
             int levels = [self arrange:users fromLocation:location];
+            self.hiveFrame = [self minMaxBoundsForUsers:users];
             
             if (block) {
                 block(users, levels);
@@ -169,7 +232,13 @@ int numQuads(int level)
     // Dispose of any resources that can be recreated.
 }
 
+- (void)viewDidLayoutSubviews
+{
+    self.scrollView.frame = self.view.bounds;
+    self.map.frame = self.scrollView.frame;
 
+    NSLog(@"%s %@ %ld", __FUNCTION__, NSStringFromCGPoint(self.scrollView.contentOffset), [self.scrollView.subviews count]);
+}
 /*
 #pragma mark - Navigation
 
