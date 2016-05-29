@@ -28,6 +28,7 @@
     if (self) {
         self.engine = [AppEngine engine];
         self.me = [PFUser currentUser];
+        self.scrollView.delegate = self;
     }
     return self;
 }
@@ -162,10 +163,12 @@ int numQuads(int level)
         }
     }];
 }
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 
 /*
 #pragma mark - Navigation
