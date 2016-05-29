@@ -106,12 +106,16 @@
     
     drawImage([UIImage imageNamed:sex ? @"guy" : @"girl"], self.photoView); //SET DEFAULT PICTURE FOR NOW...
      */
-    
+    self.alpha = 0.0;
     [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
         UIImage *profilePhoto = [UIImage imageWithData:data];
         if ([[collectionView visibleCells] containsObject:self]) {
             drawImage(profilePhoto, self);
         }
+        
+        [UIView animateWithDuration:0.5 animations:^{
+            self.alpha = 1.0;
+        }];
     } fromFile:user.profilePhoto];
 }
 
