@@ -58,14 +58,14 @@ float distance(PFUser *u1, PFUser* u2)
 
     PFGeoPoint *location = [PFGeoPoint geoPointWithLatitude:37.520884 longitude:127.028360];
     [self loadUsersNearLocation:location completionBlock:^(NSArray *users, int levels) {
-        CGFloat radius = 30;
+        CGFloat radius = 40;
         CGFloat size = radius * levels * 2 * 2;
         self.scrollView.contentSize = CGSizeMake(size, size);
         self.scrollView.scrollEnabled = YES;
         self.scrollView.contentOffset = [self centerViewPort];
         
         for (PFUser* user in users) {
-            Hive *hive = [Hive hiveWithRadius:30];
+            Hive *hive = [Hive hiveWithRadius:radius inset:radius*0.2f];
             [hive setUser:user superview:self.scrollView];
         }
     }];

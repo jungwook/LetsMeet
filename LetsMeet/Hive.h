@@ -13,6 +13,6 @@
 @property (nonatomic) CGFloat radius;
 
 
-+ hiveWithRadius:(CGFloat)radius;
++ hiveWithRadius:(CGFloat)radius inset:(CGFloat)inset;
 - (void) setUser:(PFUser*)user superview:(UIScrollView*)view;
 @end

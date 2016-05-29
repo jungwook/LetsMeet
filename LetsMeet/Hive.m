@@ -15,19 +15,21 @@
 @property (nonatomic, strong) PFUser* user;
 @property (nonatomic, strong) UILabel* nickname;
 @property (nonatomic, weak) UIScrollView* view;
+@property (nonatomic) CGFloat inset;
 @end
 
 @implementation Hive
 
-+ hiveWithRadius:(CGFloat)radius
++ hiveWithRadius:(CGFloat)radius inset:(CGFloat)inset
 {
-    return [[Hive alloc] initWithRadius:radius];
+    return [[Hive alloc] initWithRadius:radius inset:inset];
 }
 
-- (instancetype) initWithRadius:(CGFloat)radius
+- (instancetype) initWithRadius:(CGFloat)radius inset:(CGFloat)inset
 {
     self = [self init];
     if (self) {
+        _inset = inset;
         _radius = radius;
     }
     return self;
@@ -37,6 +39,8 @@
 {
     self = [super init];
     if (self) {
+        _radius = 30;
+        _inset = 5;
         _nickname = [UILabel new];
         [_nickname setTextAlignment:NSTextAlignmentCenter];
         [_nickname setFont:[UIFont systemFontOfSize:8 weight:UIFontWeightSemibold]];
@@ -90,29 +94,30 @@
         };
  */
     
+    CGFloat o = 0, o2 = o*0.0;
     const CGPoint points[] = {
-        CGPointMake(390,63),
-        CGPointMake(609,63),
-        CGPointMake(890,225),
-        CGPointMake(1000,415),
-        CGPointMake(1000,739),
-        CGPointMake(890,929),
-        CGPointMake(609,1091),
-        CGPointMake(390,1091),
-        CGPointMake(109,929),
-        CGPointMake(0,739),
-        CGPointMake(0,415),
-        CGPointMake(109, 225),
-        CGPointMake(390,63),
-        CGPointMake(609,63),
+        CGPointMake(390-o,63),
+        CGPointMake(609+o,63),
+        CGPointMake(890,225+o),
+        CGPointMake(1000,415+o),
+        CGPointMake(1000,739-o),
+        CGPointMake(890,929-o),
+        CGPointMake(609+o,1091),
+        CGPointMake(390-o,1091),
+        CGPointMake(109,929-o),
+        CGPointMake(0,739-o),
+        CGPointMake(0,415+o),
+        CGPointMake(109, 225+o),
+        CGPointMake(390-o,63),
+        CGPointMake(609+o,63),
     };
     const CGPoint anchor[] = {
         CGPointMake(500,0),
-        CGPointMake(1000,288),
-        CGPointMake(1000,866),
+        CGPointMake(1000-o2,288+o),
+        CGPointMake(1000-o2,866-o),
         CGPointMake(500,1154),
-        CGPointMake(0,866),
-        CGPointMake(0,288),
+        CGPointMake(0+o2,866-o),
+        CGPointMake(0+o2,288+o),
         CGPointMake(500,0),
     };
     
@@ -138,7 +143,7 @@
 
 - (void) layoutSubviews
 {
-    [super layoutSubviews];
+    printf(".");
     [self setMask];
 }
 
@@ -147,7 +152,7 @@
     [self.layer setContents:(id)image.CGImage];
 }
 
-CGPoint hiveToCoord(CGPoint hive)
+- (CGRect) coordsToFrame:(CGPoint) hive
 {
     const int offx[] = { 1, -1, -2, -1, 1, 2};
     const int offy[] = { 1, 1, 0, -1, -1, 0};
@@ -166,26 +171,15 @@ CGPoint hiveToCoord(CGPoint hive)
         sy += oy;
     }
     
-    return CGPointMake(sx, sy);
-}
-
-- (void) addHiveToView:(Hive*)hive
-{
-    PFUser *user = hive.user;
-    CGPoint coord = hiveToCoord(user.coords);
-    
-    const CGFloat f = 1.8;
+    const CGFloat f = 2-self.inset/self.radius;
     const CGFloat f2 = f*1.154;
+
     CGSize size = self.view.contentSize;
-    
     CGFloat radius = self.radius;
-    CGPoint centerPoint = CGPointMake(size.width/2, size.height/2);
-    CGFloat cx = centerPoint.x, cy = centerPoint.y;
-    CGFloat x = cx+(coord.x-0.5f)*radius;
-    CGFloat y = cy+(coord.y-0.5f)*radius*1.5*1.154;
-    hive.frame = CGRectMake(x, y, f*radius, f2*radius);
+    CGFloat x = size.width/2+(sx-0.5f)*radius;
+    CGFloat y = size.height/2+(sy-0.5f)*radius*1.5*1.154;
     
-    [self.view addSubview:hive];
+    return CGRectMake(x, y, f*radius, f2*radius);
 }
 
 - (void) setUser:(PFUser*)user superview:(UIScrollView*)view
@@ -203,7 +197,8 @@ CGPoint hiveToCoord(CGPoint hive)
         [self setNeedsLayout];
     } fromFile:user[AppProfilePhotoField]];
     
-    [self addHiveToView:self];
+    self.frame = [self coordsToFrame:self.user.coords];
+    [self.view addSubview:self];
 }
 
 @end
