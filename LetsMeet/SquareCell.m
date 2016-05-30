@@ -19,7 +19,6 @@
 @property (weak, nonatomic) IBOutlet IndentedLabel *broadcast;
 @property (weak, nonatomic) IBOutlet UIView *photo;
 @property (weak, nonatomic) UICollectionView *parent;
-@property (strong, nonatomic) NSString* broadcastMessage;
 @end
 
 
@@ -85,7 +84,7 @@
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"fromUser == %@ AND isRead != true", self.user.objectId];
     NSUInteger count = [[messages filteredArrayUsingPredicate:predicate] count];
     self.unread.text = [NSString stringWithFormat:@"%ld", count];
-//    self.unread.alpha = count > 0 ? 1.0 : 0.0f;
+    self.unread.alpha = count > 0 ? 1.0 : 0.0f;
     [self circleizeView:self.unread by:0.5f];
 }
 
@@ -110,7 +109,11 @@
     [self setUserNickname];
     
     self.parent = collectionView;
-    self.broadcast.alpha = 0;
+    
+    NSDate *lastBroadcast = user.broadcastMessageAt;
+    
+    NSTimeInterval secs = fabs([lastBroadcast timeIntervalSinceNow]);
+    self.broadcast.alpha = lastBroadcast ? (secs < [user.broadcastDuration floatValue] ? 1 : 0) : 0;
 
     self.backgroundColor = self.user.sex ? AppMaleUserColor : AppFemaleUserColor;
 }
@@ -125,11 +128,66 @@
 
 }
 
-- (void)setBroadcastMessage:(NSString *)message
+- (void)openBroadcastMessage
 {
-    _broadcastMessage = message;
+    UIView *view = self.broadcast;
+    
+    [UIView animateWithDuration:0.3/1.5 animations:^{
+        view.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.1, 1.1);
+        self.broadcast.alpha = 5.0;
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:0.3/2 animations:^{
+            view.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.9, 0.9);
+            self.broadcast.alpha = 7.0;
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:0.3/2 animations:^{
+                view.transform = CGAffineTransformIdentity;
+                self.broadcast.alpha = 1.0;
+            }];
+        }];
+    }];
+}
+
+- (void)closeBroadcastMessage
+{
+    UIView *view = self.broadcast;
+    
+    [UIView animateWithDuration:0.3/1.5 animations:^{
+        view.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.1, 1.1);
+        self.broadcast.alpha = 7.0;
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:0.3/2 animations:^{
+            view.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.9, 0.9);
+            self.broadcast.alpha = 5.0;
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:0.3/2 animations:^{
+                view.transform = CGAffineTransformIdentity;
+                self.broadcast.alpha = 0.0;
+            } completion:^(BOOL finished) {
+            }];
+        }];
+    }];
+
+}
+
+- (void)setBroadcastMessage:(NSString *)message duration:(NSNumber *)duration
+{
+    self.user.broadcastMessage = message;
+    self.user.broadcastMessageAt = [NSDate date];
+    self.user.broadcastDuration = duration;
     self.broadcast.text = message;
-    self.broadcast.alpha = 1.0;
+    [self openBroadcastMessage];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)([duration floatValue] * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSArray * cells = [self.parent visibleCells];
+        [cells enumerateObjectsUsingBlock:^(SquareCell* cell, NSUInteger idx, BOOL * _Nonnull stop) {
+            if ([cell.user.objectId isEqualToString:self.user.objectId]) {
+                [cell closeBroadcastMessage];
+                *stop = YES;
+            }
+        }];
+    });
+    
 }
 
 - (void) circleizeView:(UIView*) view by:(CGFloat)percent

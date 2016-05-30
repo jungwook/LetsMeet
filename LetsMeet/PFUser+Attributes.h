@@ -16,6 +16,7 @@
 @property (nonatomic) CGPoint coords;
 @property (nonatomic, strong) NSString* broadcastMessage;
 @property (nonatomic, strong) NSDate* broadcastMessageAt;
+@property (nonatomic, strong) NSNumber* broadcastDuration;
 @property (nonatomic, strong) NSString* age;
 @property (nonatomic, strong) NSString* intro;
 @property (nonatomic, strong) PFFile* profilePhoto;

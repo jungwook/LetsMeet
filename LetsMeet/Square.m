@@ -118,23 +118,14 @@ static NSString * const reuseIdentifier = @"Square";
     
     id senderId = notif[@"senderId"];
     NSString*message = notif[@"message"];
+    NSNumber *duration = notif[@"duration"];
 
-    [self.users enumerateObjectsUsingBlock:^(PFUser* _Nonnull user, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([user.objectId isEqualToString:senderId]) {
-            user.broadcastMessage = message;
-            user.broadcastMessageAt = [NSDate date];
-            *stop = YES;
-        }
-    }];
-    /*
     NSArray *visible = [self.collectionView visibleCells];
     [visible enumerateObjectsUsingBlock:^(SquareCell* cell, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([cell.user.objectId isEqualToString:senderId]) {
-            [cell setBroadcastMessage:message];
-            *stop = YES;
+            [cell setBroadcastMessage:message duration:duration];
         }
     }];
-     */
 }
 
 - (void) newMessageReceived:(id)sender
@@ -196,13 +187,19 @@ static NSString * const reuseIdentifier = @"Square";
         textField.tag = 0;
     }];
     
-    UIAlertAction *message = [UIAlertAction actionWithTitle:@"등록" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action)
+    UIAlertAction *message = [UIAlertAction actionWithTitle:@"5초간" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action)
     {
         NSLog(@"%@",[[alert textFields] firstObject].text);
-        [AppEngine appEngineBroadcastPush:[[alert textFields] firstObject].text];
+        [AppEngine appEngineBroadcastPush:[[alert textFields] firstObject].text duration:@(5)];
     }];
+    UIAlertAction *longer = [UIAlertAction actionWithTitle:@"10초간" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action)
+                              {
+                                  NSLog(@"%@",[[alert textFields] firstObject].text);
+                                  [AppEngine appEngineBroadcastPush:[[alert textFields] firstObject].text duration:@(10)];
+                              }];
     UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"취소" style:UIAlertActionStyleCancel handler:nil];
     [alert addAction:message];
+    [alert addAction:longer];
     [alert addAction:cancel];
     [self presentViewController:alert animated:YES completion:nil];
 }

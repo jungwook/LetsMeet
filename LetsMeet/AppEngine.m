@@ -433,7 +433,7 @@ NSDictionary* objectFromMessage(id object)
 }
 
 
-+ (void) appEngineBroadcastPush:(NSString*)message
++ (void) appEngineBroadcastPush:(NSString*)message duration:(NSNumber*)duration
 {
     PFUser *me = [PFUser currentUser];
     
@@ -441,6 +441,7 @@ NSDictionary* objectFromMessage(id object)
                        withParameters:@{
                                         AppPushSenderIdField: me.objectId,
                                         AppPushMessageField: message,
+                                        AppPushBroadcastDurationKey: duration,
                                         AppPushType: AppPushTypeBroadcast
                                         }
                                 block:^(NSString *success, NSError *error) {

@@ -12,6 +12,8 @@
 - (void)setUser:(PFUser *)user andMessages:(NSArray *)messages location:(PFGeoPoint*)location collectionView:(UICollectionView*)collectionView
 ;
 - (void)setProfilePhoto:(UIImage*)photo;
-- (void)setBroadcastMessage:(NSString*)message;
+- (void)setBroadcastMessage:(NSString*)message duration:(NSNumber*)duration;
+- (void)openBroadcastMessage;
+- (void)closeBroadcastMessage;
 @property (weak, nonatomic) PFUser* user;
 @end

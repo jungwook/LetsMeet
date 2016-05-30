@@ -29,6 +29,8 @@
 #define AppPushObjectIdField AppKeyMessageIdKey
 #define AppPushCloudAppPush @"sendPushToUser"
 #define AppPushCloudAppBroadcast @"broadcastMessage"
+#define AppPushBroadcastDurationKey @"duration"
+
 
 #define AppPushType @"pushType"
 #define AppPushTypeMessage @"pushTypeMessage"
@@ -115,7 +117,7 @@ NSString* QUADRANT(PFGeoPoint* fromLoc, PFGeoPoint* toLoc);
 //+ (void) appEngineReloadAllMessages;
 + (void) appEngineLoadMessageWithId:(id)messageId fromUserId:(id)userId;
 + (void) appEngineSendMessage:(PFObject *)message toUser:(PFUser *)user;
-+ (void) appEngineBroadcastPush:(NSString*)message;
++ (void) appEngineBroadcastPush:(NSString*)message duration:(NSNumber*)duration;
 + (void) appEngineUsersFromUserIds:(NSArray*)userIds completed:(ArrayResultBlock)block;
 + (void) appEngineInboxUsers:(ArrayResultBlock)block;
 + (void) appEngineUserFromUserId:(id)userId completed:(UserResultBlock)block;

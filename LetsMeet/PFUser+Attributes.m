@@ -115,6 +115,16 @@
     [self setObject:@(coords.y) forKey:@"hive-y"];
 }
 
+- (NSNumber *)broadcastDuration
+{
+    return [self objectForKey:@"broadcastDuration"];
+}
+
+- (void)setBroadcastDuration:(NSNumber *)broadcastDuration
+{
+    [self setObject:broadcastDuration forKey:@"broadcastDuration"];
+}
+
 - (char*) desc
 {
     return (char*) [self.nickname UTF8String];
