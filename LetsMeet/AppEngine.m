@@ -432,6 +432,29 @@ NSDictionary* objectFromMessage(id object)
     }];
 }
 
+
++ (void) appEngineBroadcastPush:(NSString*)message
+{
+    PFUser *me = [PFUser currentUser];
+    
+    [PFCloud callFunctionInBackground:AppPushCloudAppBroadcast
+                       withParameters:@{
+                                        AppPushSenderIdField: me.objectId,
+                                        AppPushMessageField: message,
+                                        AppPushType: AppPushTypeBroadcast
+                                        }
+                                block:^(NSString *success, NSError *error) {
+                                    if (!error) {
+                                        NSLog(@"MESSAGE SENT SUCCESSFULLY:%@", message);
+                                    }
+                                    else {
+                                        NSLog(@"ERROR SENDING PUSH:%@", error.localizedDescription);
+                                    }
+                                }];
+}
+
+
+
 + (void) appEngineSendPush:(PFObject*)message toUser:(PFUser*) user
 {
     PFUser *me = [PFUser currentUser];
@@ -441,7 +464,8 @@ NSDictionary* objectFromMessage(id object)
                                         AppPushRecipientIdField: user.objectId,
                                         AppPushSenderIdField: me.objectId,
                                         AppPushMessageField: message[AppMessageContent],
-                                        AppPushObjectIdFieldk: message.objectId
+                                        AppPushObjectIdField: message.objectId,
+                                        AppPushType: AppPushTypeMessage
                                         }
                                 block:^(NSString *success, NSError *error) {
                                     if (!error) {

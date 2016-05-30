@@ -934,42 +934,80 @@ Hello</string>
                                     <rect key="frame" x="0.0" y="0.0" width="120" height="120"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4By-kR-3O3">
+                                            <rect key="frame" x="0.0" y="0.0" width="120" height="120"/>
+                                            <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                        </view>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="정욱이" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ydY-Y1-N4g" customClass="IndentedLabel">
+                                            <rect key="frame" x="16" y="91" width="89" height="21"/>
+                                            <color key="backgroundColor" white="1" alpha="0.85187922297297303" colorSpace="calibratedWhite"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="21" id="FCH-ni-tBD"/>
+                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="750" constant="45" id="tnn-Ji-iVC"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="12"/>
+                                            <color key="textColor" red="0.25098039220000001" green="0.50196078430000002" blue="0.83529411760000005" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&lt;1km" textAlignment="center" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SVa-UY-PES" customClass="IndentedLabel">
-                                            <rect key="frame" x="67" y="66" width="45" height="21"/>
+                                            <rect key="frame" x="8" y="8" width="27.5" height="20"/>
                                             <color key="backgroundColor" red="0.37254902719999999" green="0.6549019814" blue="0.89803922179999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <constraints>
-                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="45" id="Cxo-8s-1iG"/>
-                                                <constraint firstAttribute="height" constant="21" id="jbT-qV-eNW"/>
+                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="20" id="Cxo-8s-1iG"/>
+                                                <constraint firstAttribute="height" constant="20" id="jbT-qV-eNW"/>
                                             </constraints>
                                             <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="10"/>
                                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100h" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ydY-Y1-N4g" customClass="IndentedLabel">
-                                            <rect key="frame" x="67" y="91" width="45" height="21"/>
-                                            <color key="backgroundColor" red="0.4313725531" green="0.78431373829999995" blue="0.16078431900000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zGZ-KH-3O9" customClass="IndentedLabel">
+                                            <rect key="frame" x="15" y="36" width="90" height="47"/>
+                                            <color key="backgroundColor" red="0.4313725531" green="0.78431373829999995" blue="0.16078431900000001" alpha="0.80043813344594594" colorSpace="custom" customColorSpace="sRGB"/>
                                             <constraints>
-                                                <constraint firstAttribute="height" constant="21" id="FCH-ni-tBD"/>
-                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="750" constant="45" id="tnn-Ji-iVC"/>
+                                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="20" id="sPT-n5-44T"/>
                                             </constraints>
-                                            <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="10"/>
+                                            <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="14"/>
+                                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rtX-i6-Flb" customClass="IndentedLabel">
+                                            <rect key="frame" x="94" y="77" width="21" height="21"/>
+                                            <color key="backgroundColor" red="0.94117647410000005" green="0.32156863810000003" blue="0.17254902420000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="21" id="d22-y9-579"/>
+                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="21" id="p7S-JV-mEB"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="12"/>
                                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
-                                <color key="backgroundColor" red="0.94117647410000005" green="0.32156863810000003" blue="0.17254902420000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="0.98039215800000001" green="0.5411764979" blue="0.2274509817" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="trailingMargin" secondItem="SVa-UY-PES" secondAttribute="trailing" id="2L4-Ll-iFc"/>
-                                    <constraint firstAttribute="bottomMargin" secondItem="ydY-Y1-N4g" secondAttribute="bottom" id="3Ig-UI-aYF"/>
-                                    <constraint firstAttribute="trailingMargin" secondItem="ydY-Y1-N4g" secondAttribute="trailing" id="QXb-MS-2oA"/>
-                                    <constraint firstItem="ydY-Y1-N4g" firstAttribute="trailing" secondItem="SVa-UY-PES" secondAttribute="trailing" id="VYI-bd-Reo"/>
-                                    <constraint firstItem="ydY-Y1-N4g" firstAttribute="top" secondItem="SVa-UY-PES" secondAttribute="bottom" constant="4" id="bMz-P8-hrI"/>
+                                    <constraint firstItem="4By-kR-3O3" firstAttribute="top" secondItem="Tzd-zK-zck" secondAttribute="topMargin" constant="-8" id="1M0-96-rRQ"/>
+                                    <constraint firstItem="zGZ-KH-3O9" firstAttribute="top" secondItem="Tzd-zK-zck" secondAttribute="topMargin" constant="28" id="3Oo-rE-oni"/>
+                                    <constraint firstAttribute="trailingMargin" secondItem="4By-kR-3O3" secondAttribute="trailing" constant="-8" id="5Yv-HK-dJr"/>
+                                    <constraint firstAttribute="trailingMargin" secondItem="zGZ-KH-3O9" secondAttribute="trailing" constant="7" id="BcD-Qn-MP5"/>
+                                    <constraint firstAttribute="topMargin" secondItem="SVa-UY-PES" secondAttribute="top" id="QaO-Ss-yLP"/>
+                                    <constraint firstAttribute="bottomMargin" secondItem="zGZ-KH-3O9" secondAttribute="bottom" constant="29" id="VbH-6c-tEY"/>
+                                    <constraint firstAttribute="leadingMargin" secondItem="SVa-UY-PES" secondAttribute="leading" id="ZsB-ur-RLR"/>
+                                    <constraint firstAttribute="bottomMargin" secondItem="rtX-i6-Flb" secondAttribute="bottom" constant="14" id="bnA-if-tk1"/>
+                                    <constraint firstAttribute="bottomMargin" secondItem="ydY-Y1-N4g" secondAttribute="bottom" id="grE-Zg-RhI"/>
+                                    <constraint firstItem="zGZ-KH-3O9" firstAttribute="leading" secondItem="Tzd-zK-zck" secondAttribute="leadingMargin" constant="7" id="jx7-RX-UX8"/>
+                                    <constraint firstAttribute="bottomMargin" secondItem="4By-kR-3O3" secondAttribute="bottom" constant="-8" id="n7H-ze-vPf"/>
+                                    <constraint firstAttribute="trailingMargin" secondItem="rtX-i6-Flb" secondAttribute="trailing" constant="-3" id="pEK-f9-pVd"/>
+                                    <constraint firstItem="ydY-Y1-N4g" firstAttribute="leading" secondItem="Tzd-zK-zck" secondAttribute="leadingMargin" constant="8" id="pJA-Bl-ye8"/>
+                                    <constraint firstItem="4By-kR-3O3" firstAttribute="leading" secondItem="Tzd-zK-zck" secondAttribute="leadingMargin" constant="-8" id="uCc-4p-gFN"/>
+                                    <constraint firstAttribute="trailingMargin" secondItem="ydY-Y1-N4g" secondAttribute="trailing" constant="7" id="z0a-Is-IxE"/>
                                 </constraints>
                                 <connections>
+                                    <outlet property="broadcast" destination="zGZ-KH-3O9" id="lOd-lx-Yut"/>
                                     <outlet property="distance" destination="SVa-UY-PES" id="Hsk-Zr-Lzh"/>
-                                    <outlet property="when" destination="ydY-Y1-N4g" id="UFg-d4-Rud"/>
+                                    <outlet property="nickname" destination="ydY-Y1-N4g" id="y7V-SP-73Z"/>
+                                    <outlet property="photo" destination="4By-kR-3O3" id="lvy-l9-ljy"/>
+                                    <outlet property="unread" destination="rtX-i6-Flb" id="Lfc-r6-d7F"/>
                                 </connections>
                             </collectionViewCell>
                         </cells>
@@ -980,6 +1018,11 @@ Hello</string>
                     </collectionView>
                     <navigationItem key="navigationItem" title="주변 사람들" id="IFr-xP-euy">
                         <barButtonItem key="leftBarButtonItem" image="399-list1" id="4f8-am-Vvg" customClass="ToggleButton"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="MxB-RV-7wg">
+                            <connections>
+                                <action selector="sendMessage:" destination="Enq-TN-9oU" id="Nic-UA-cJH"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qQ9-Ag-hqL" userLabel="First Responder" sceneMemberID="firstResponder"/>

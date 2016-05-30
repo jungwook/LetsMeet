@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface Square : UICollectionViewController
+@interface Square : UICollectionViewController <UIAlertViewDelegate>
 
 @end

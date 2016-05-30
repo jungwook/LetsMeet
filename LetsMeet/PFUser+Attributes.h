@@ -14,6 +14,8 @@
 
 @property (nonatomic) BOOL sex;
 @property (nonatomic) CGPoint coords;
+@property (nonatomic, strong) NSString* broadcastMessage;
+@property (nonatomic, strong) NSDate* broadcastMessageAt;
 @property (nonatomic, strong) NSString* age;
 @property (nonatomic, strong) NSString* intro;
 @property (nonatomic, strong) PFFile* profilePhoto;

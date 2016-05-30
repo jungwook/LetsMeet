@@ -89,6 +89,26 @@
     return CGPointMake(x, y);
 }
 
+- (NSString *)broadcastMessage
+{
+    return [self objectForKey:AppKeyBroadcastMessageKey];
+}
+
+- (void)setBroadcastMessage:(NSString *)broadcastMessage
+{
+    [self setObject:broadcastMessage forKey:AppKeyBroadcastMessageKey];
+}
+
+- (NSDate *)broadcastMessageAt
+{
+    return [self objectForKey:AppKeyBroadcastMessageAtKey];
+}
+
+- (void)setBroadcastMessageAt:(NSDate *)date
+{
+    [self setObject:date forKey:AppKeyBroadcastMessageAtKey];
+}
+
 - (void) setCoords:(CGPoint)coords
 {
     [self setObject:@(coords.x) forKey:@"hive-x"];

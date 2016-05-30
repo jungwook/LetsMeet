@@ -78,7 +78,7 @@
     
     self.age.text = [NSString stringWithFormat:@"%@", self.me[AppKeyAgeKey]];
     
-    [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
+    [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error, BOOL fromCache) {
         UIImage *profilePhoto = [UIImage imageWithData:data];
         drawImage(profilePhoto, self.photoView);
     } fromFile:self.me[AppProfilePhotoField]];

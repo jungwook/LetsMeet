@@ -11,6 +11,7 @@
 
 #define AppUserNewMessageReceivedNotification @"AppUserNewMessageReceivedNotificaiton"
 #define AppUserRefreshBadgeNotificaiton @"AppUserRefreshBadgeNotificaiton"
+#define AppUserBroadcastNotification @"AppUserBroadcastNotification"
 
 #define AppMessagesCollection @"Messages"
 #define AppEngineTimeKeeperTime 60
@@ -23,10 +24,16 @@
 #define AppMessageTypeURL AppKeyURLKey
 
 #define AppPushRecipientIdField @"recipientId"
-#define AppPushSenderIdField AppKeySenderId
+#define AppPushSenderIdField @"senderId"
 #define AppPushMessageField @"message"
-#define AppPushObjectIdFieldk AppKeyMessageIdKey
+#define AppPushObjectIdField AppKeyMessageIdKey
 #define AppPushCloudAppPush @"sendPushToUser"
+#define AppPushCloudAppBroadcast @"broadcastMessage"
+
+#define AppPushType @"pushType"
+#define AppPushTypeMessage @"pushTypeMessage"
+#define AppPushTypeBroadcast @"pushTypeBroadcast"
+#define AppPushBroadcastField @"pushBroadcast"
 
 #define AppFemaleUserColor [UIColor colorWithRed:255.f/255.0f green:111.f/255.0f blue:207.f/255.0f alpha:1]
 #define AppMaleUserColor [UIColor colorWithRed:42.f/255.0f green:111.f/255.0f blue:207.f/255.0f alpha:1]
@@ -66,6 +73,9 @@
 #define AppKeyDataKey @"data"
 #define AppKeyLatitudeKey @"latitude"
 #define AppKeyLongitudeKey @"longitude"
+#define AppKeyBroadcastMessageKey @"broadcastMessage"
+#define AppKeyBroadcastMessageAtKey @"broadcastMessageAt"
+
 
 #define AppProfilePhotoField @"photo"
 #define AppProfileOriginalPhotoField @"originalPhoto"
@@ -81,6 +91,7 @@ typedef void (^RefreshControlBlock)(UIRefreshControl* refreshControl);
 typedef void (^CountResultBlock)(NSUInteger count);
 typedef void (^DictionaryResultBlock)(NSDictionary *messages);
 typedef void (^DictionaryArrayResultBlock)(NSDictionary *messages, NSArray *users);
+typedef void (^CachedFileBlock)(NSData * data, NSError * error, BOOL fromCache);
 
 
 CALayer* drawImageOnLayer(UIImage *image, CGSize size);
@@ -104,6 +115,7 @@ NSString* QUADRANT(PFGeoPoint* fromLoc, PFGeoPoint* toLoc);
 //+ (void) appEngineReloadAllMessages;
 + (void) appEngineLoadMessageWithId:(id)messageId fromUserId:(id)userId;
 + (void) appEngineSendMessage:(PFObject *)message toUser:(PFUser *)user;
++ (void) appEngineBroadcastPush:(NSString*)message;
 + (void) appEngineUsersFromUserIds:(NSArray*)userIds completed:(ArrayResultBlock)block;
 + (void) appEngineInboxUsers:(ArrayResultBlock)block;
 + (void) appEngineUserFromUserId:(id)userId completed:(UserResultBlock)block;

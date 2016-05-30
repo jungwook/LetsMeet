@@ -119,7 +119,7 @@
     self.unread.alpha = unreadCount > 0 ? 1.0 : 0.0f;
     
     drawImage([UIImage imageNamed:sex ? @"guy" : @"girl"], self.photoView); //SET DEFAULT PICTURE FOR NOW...
-    [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
+    [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error, BOOL fromCache) {
         UIImage *profilePhoto = [UIImage imageWithData:data];
         if ([user[AppKeyNicknameKey] isEqualToString:self.nickname.text]) {
             drawImage(profilePhoto, self.photoView);

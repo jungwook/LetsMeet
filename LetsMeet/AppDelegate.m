@@ -118,8 +118,14 @@
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
 //    [PFPush handlePush:userInfo];
-    NSLog(@"userInfo:%@", userInfo);
-    [AppEngine appEngineLoadMessageWithId:userInfo[AppKeyMessageIdKey] fromUserId:userInfo[AppKeySenderId]];
+    if ([userInfo[AppPushType] isEqualToString:AppPushTypeMessage]) {
+        NSLog(@"userInfo:%@", userInfo);
+        [AppEngine appEngineLoadMessageWithId:userInfo[AppKeyMessageIdKey] fromUserId:userInfo[AppKeySenderId]];
+    }
+    else if ([userInfo[AppPushType] isEqualToString:AppPushTypeBroadcast]) {
+        NSLog(@"userInfo:%@", userInfo);
+        SENDNOTIFICATION(AppUserBroadcastNotification, userInfo);
+    }
     
     if (application.applicationState == UIApplicationStateInactive) {
         [PFAnalytics trackAppOpenedWithRemoteNotificationPayload:userInfo];

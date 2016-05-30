@@ -7,10 +7,12 @@
 //
 
 #import <Parse/Parse.h>
+#import "AppEngine.h"
 
 typedef void (^FileBooleanResultBlock)(PFFile *file, BOOL succeeded, NSError * error);
 
 @interface CachedFile : NSCache
-+ (void) getDataInBackgroundWithBlock:(PFDataResultBlock)block fromFile:(PFFile*)file;
++ (void) getDataInBackgroundWithBlock:(CachedFileBlock)block fromFile:(PFFile*)file;
 + (void) saveData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(FileBooleanResultBlock)block progressBlock:(PFProgressBlock)progressBlock;
++ (id)objectForKey:(id)key;
 @end

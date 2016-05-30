@@ -7,6 +7,8 @@
 //
 
 #import "CachedFile.h"
+
+
 @interface CachedFile()
 @end
 
@@ -31,16 +33,22 @@
     return self;
 }
 
-+ (void) getDataInBackgroundWithBlock:(PFDataResultBlock)block fromFile:(PFFile*)file
++ (id)objectForKey:(id)key
+{
+    return [[CachedFile file] objectForKey:key];
+}
+
++ (void) getDataInBackgroundWithBlock:(CachedFileBlock)block fromFile:(PFFile*)file
 {
     [[CachedFile file] getDataInBackgroundWithBlock:block fromFile:file];
 }
 
-- (void) getDataInBackgroundWithBlock:(PFDataResultBlock)block fromFile:(PFFile*)file
+- (void) getDataInBackgroundWithBlock:(CachedFileBlock)block fromFile:(PFFile*)file
 {
     if (!file) {
-//        NSLog(@"ERROR: CANNOT GET DATA FROM A NULL FILE");
-        return;
+        if (block) {
+            block(nil, nil, YES);
+        }
     }
     
     NSData *data = [self objectForKey:file.name];
@@ -48,7 +56,7 @@
 //        NSLog(@"CACHED DATA EXISTS");
         if (block) {
 //            NSLog(@"CALLING BLOCK WITH CACHED DATA");
-            block(data, nil);
+            block(data, nil, YES);
         }
     }
     else {
@@ -61,7 +69,7 @@
             }
             if (block) {
 //                NSLog(@"CALLING BLOCK WITH NETWORK DATA");
-                block(data, error);
+                block(data, error, NO);
             }
         }];
     }

@@ -12,7 +12,7 @@
 #import "PFUser+Attributes.h"
 #import "RefreshControl.h"
 #import "IndentedLabel.h"
-
+#import "CachedFile.h"
 
 @interface Square ()
 @property (nonatomic, strong) PFGeoPoint* location;
@@ -21,6 +21,15 @@
 @end
 
 @implementation Square
+
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+    }
+    return self;
+}
 
 static NSString * const reuseIdentifier = @"Square";
 
@@ -40,21 +49,35 @@ static NSString * const reuseIdentifier = @"Square";
     self.location = [PFGeoPoint geoPointWithLatitude:37.520884 longitude:127.028360];
     
     RefreshControl *refresh = [RefreshControl initWithCompletionBlock:^(UIRefreshControl *refreshControl) {
-        PFQuery *query = [PFUser query];
-        [query whereKey:AppKeyLocationKey nearGeoPoint:self.location];
-        
-        [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
-            if (error) {
-                NSLog(@"ERROR LOADING USERS NEAR ME:%@", error.localizedDescription);
-            }
-            else {
-                _users = [NSArray arrayWithArray:users];
-                [refreshControl endRefreshing];
-                [self.collectionView reloadData];
-            }
+        [self loadUsersInBackground:^(NSArray *users) {
+            _users = [NSArray arrayWithArray:users];
+            [refreshControl endRefreshing];
+            [self.collectionView reloadData];
         }];
     }];
     [self.collectionView addSubview:refresh];
+    
+    [self loadUsersInBackground:^(NSArray *users) {
+        _users = [NSArray arrayWithArray:users];
+        [self.collectionView reloadData];
+    }];
+}
+
+- (void)loadUsersInBackground:(ArrayResultBlock)block
+{
+    PFQuery *query = [PFUser query];
+    [query whereKey:AppKeyLocationKey nearGeoPoint:self.location];
+    
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"ERROR LOADING USERS NEAR ME:%@", error.localizedDescription);
+        }
+        else {
+            if (block) {
+                block(users);
+            }
+        }
+    }];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -69,6 +92,10 @@ static NSString * const reuseIdentifier = @"Square";
                                              selector:@selector(newMessageReceived:)
                                                  name:AppUserNewMessageReceivedNotification
                                                object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(broadcastMessageReceived:)
+                                                 name:AppUserBroadcastNotification
+                                               object:nil];
     [self.collectionView reloadData];
     SENDNOTIFICATION(AppUserRefreshBadgeNotificaiton, nil);
 }
@@ -79,6 +106,35 @@ static NSString * const reuseIdentifier = @"Square";
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:AppUserNewMessageReceivedNotification
                                                   object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AppUserBroadcastNotification
+                                                  object:nil];
+}
+
+- (void) broadcastMessageReceived:(NSNotification*)userInfo
+{
+    NSLog(@"USERNOTIF:%@", userInfo);
+    id notif = userInfo.object;
+    
+    id senderId = notif[@"senderId"];
+    NSString*message = notif[@"message"];
+
+    [self.users enumerateObjectsUsingBlock:^(PFUser* _Nonnull user, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([user.objectId isEqualToString:senderId]) {
+            user.broadcastMessage = message;
+            user.broadcastMessageAt = [NSDate date];
+            *stop = YES;
+        }
+    }];
+    /*
+    NSArray *visible = [self.collectionView visibleCells];
+    [visible enumerateObjectsUsingBlock:^(SquareCell* cell, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([cell.user.objectId isEqualToString:senderId]) {
+            [cell setBroadcastMessage:message];
+            *stop = YES;
+        }
+    }];
+     */
 }
 
 - (void) newMessageReceived:(id)sender
@@ -113,8 +169,42 @@ static NSString * const reuseIdentifier = @"Square";
     SquareCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:reuseIdentifier forIndexPath:indexPath];
     
     [cell setUser:user andMessages:[AppEngine appEngineMessagesWithUserId:user.objectId] location:self.location collectionView:self.collectionView];
+
+    [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error, BOOL fromCache) {
+        if (fromCache) {
+            [cell setProfilePhoto:data ? [UIImage imageWithData:data] : [UIImage imageNamed:(user.sex == AppMaleUser) ? @"guy" : @"girl"]];
+        }
+        else {
+            NSArray *visible = [self.collectionView visibleCells];
+            [visible enumerateObjectsUsingBlock:^(SquareCell* cell, NSUInteger idx, BOOL * _Nonnull stop) {
+                if ([cell.user.objectId isEqualToString:user.objectId]) {
+                    [cell setProfilePhoto:[UIImage imageWithData:data]];
+                    *stop = YES;
+                }
+            }];
+        }
+    } fromFile:user.profilePhoto];
     
     return cell;
+}
+
+- (IBAction)sendMessage:(id)sender {
+    
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"공개 메시지" message:@"공유하고자 하는 메시지를 입력하세요!" preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.tag = 0;
+    }];
+    
+    UIAlertAction *message = [UIAlertAction actionWithTitle:@"등록" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action)
+    {
+        NSLog(@"%@",[[alert textFields] firstObject].text);
+        [AppEngine appEngineBroadcastPush:[[alert textFields] firstObject].text];
+    }];
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"취소" style:UIAlertActionStyleCancel handler:nil];
+    [alert addAction:message];
+    [alert addAction:cancel];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 #pragma mark <UICollectionViewDelegate>

@@ -11,4 +11,7 @@
 @interface SquareCell : UICollectionViewCell
 - (void)setUser:(PFUser *)user andMessages:(NSArray *)messages location:(PFGeoPoint*)location collectionView:(UICollectionView*)collectionView
 ;
+- (void)setProfilePhoto:(UIImage*)photo;
+- (void)setBroadcastMessage:(NSString*)message;
+@property (weak, nonatomic) PFUser* user;
 @end

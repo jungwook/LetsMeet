@@ -96,10 +96,10 @@
         if (firstTime) {
             firstTime = NO;
             // Load all personall pictures into Cache
-            [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
+            [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error, BOOL fromCache) {
                 NSLog(@"PROFILE PHOTO LOADED IN CACHE");
             } fromFile:user[AppProfilePhotoField]];
-            [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
+            [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error, BOOL fromCache) {
                 NSLog(@"ORIGINAL PHOTO LOADED IN CACHE");
             } fromFile:user[AppProfileOriginalPhotoField]];
         }

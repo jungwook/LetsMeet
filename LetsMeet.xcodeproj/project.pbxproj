@@ -226,6 +226,13 @@
 			name = "Views etc";
 			sourceTree = "<group>";
 		};
+		12DE5F701CFC08E3009B315F /* AFNetworking */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = AFNetworking;
+			sourceTree = "<group>";
+		};
 		12F7417E1CE4B97000E8267A = {
 			isa = PBXGroup;
 			children = (
@@ -246,6 +253,7 @@
 		12F741891CE4B97100E8267A /* LetsMeet */ = {
 			isa = PBXGroup;
 			children = (
+				12DE5F701CFC08E3009B315F /* AFNetworking */,
 				124928B31CF2ED790038A2F3 /* Extensions */,
 				126AF4081CEDADE800E3ED67 /* Views etc */,
 				12F741F71CE5B11000E8267A /* Engine */,

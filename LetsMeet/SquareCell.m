@@ -13,9 +13,13 @@
 #import "IndentedLabel.h"
 
 @interface SquareCell()
-@property (weak, nonatomic) IBOutlet IndentedLabel *when;
 @property (weak, nonatomic) IBOutlet IndentedLabel *distance;
+@property (weak, nonatomic) IBOutlet IndentedLabel *unread;
+@property (weak, nonatomic) IBOutlet IndentedLabel *nickname;
+@property (weak, nonatomic) IBOutlet IndentedLabel *broadcast;
 @property (weak, nonatomic) IBOutlet UIView *photo;
+@property (weak, nonatomic) UICollectionView *parent;
+@property (strong, nonatomic) NSString* broadcastMessage;
 @end
 
 
@@ -41,10 +45,10 @@
         return [NSString stringWithFormat:@"TOO FAR!"];
     }
     else if (distance < 1.0f) {
-        return [NSString stringWithFormat:@"%.0f m", distance*1000];
+        return [NSString stringWithFormat:@"%.0fm", distance*1000];
     }
     else {
-        return [NSString stringWithFormat:@"%.0f km", distance];
+        return [NSString stringWithFormat:@"%.0fkm", distance];
     }
     
 }
@@ -71,62 +75,61 @@
     }
 }
 
-- (NSString*) unreadString:(NSUInteger)count forUser:(PFUser*) user
+- (NSString*) unreadString:(NSUInteger)count
 {
     return [NSString stringWithFormat:@"%ld", (unsigned long)count];
 }
 
+- (void)setUnreadCount:(NSArray *)messages
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"fromUser == %@ AND isRead != true", self.user.objectId];
+    NSUInteger count = [[messages filteredArrayUsingPredicate:predicate] count];
+    self.unread.text = [NSString stringWithFormat:@"%ld", count];
+//    self.unread.alpha = count > 0 ? 1.0 : 0.0f;
+    [self circleizeView:self.unread by:0.5f];
+}
+
+- (void)setDistanceMessage:(PFGeoPoint*)location
+{
+    double distance = [location distanceInKilometersTo:self.user.location];
+    self.distance.text = [self distanceString:distance];
+    [self circleizeView:self.distance by:0.2f];
+}
+
+- (void)setUserNickname
+{
+    self.nickname.text = self.user.nickname;
+    [self circleizeView:self.nickname by:0.1f];
+}
+
 - (void)setUser:(PFUser *)user andMessages:(NSArray *)messages location:(PFGeoPoint*)location collectionView:(UICollectionView*)collectionView
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"fromUser == %@ AND isRead != true", user.objectId];
+    _user = user;
+    [self setUnreadCount:messages];
+    [self setDistanceMessage:location];
+    [self setUserNickname];
     
-    NSArray *unreadMessages = [messages filteredArrayUsingPredicate:predicate];
-    NSUInteger unreadCount = [unreadMessages count];
-    
-//    int sex = [[user valueForKey:AppKeySexKey] boolValue];
-    id lastMessage = [messages lastObject];
-    
-//    UIColor *sexColor = (sex == AppMaleUser) ? AppMaleUserColor : AppFemaleUserColor;
-    
-//    NSLog(@"HERE:%@ AND THERE:%@", here, location);
-    
-    double distance = [location distanceInKilometersTo:user.location];
-//    drawImage([UIImage imageNamed:sex ? @"guy" : @"girl"], self); //SET DEFAULT PICTURE FOR NOW...
-    self.distance.text = [self distanceString:distance];
-    NSDate *lastMessageDate = lastMessage[AppKeyUpdatedAtKey];
-    NSTimeInterval since = [[NSDate date] timeIntervalSinceDate:lastMessageDate];
-    self.when.text = messages ? [self sinceString:since] : @"시작하세요!";
-    [self circleizeView:self.distance by:0.2f];
-    [self circleizeView:self.when by:0.2f];
-    
-    /*
-    [self circleizeView:self.unread by:0.5f];
-    [self circleizeView:self.photoView by:0.5f];
-    
-    [self.lastMessage setTextAlignment:NSTextAlignmentLeft];
-    [self.lastMessage setLineBreakMode:NSLineBreakByWordWrapping];
-    self.lastMessage.text = [lastMessage[@"msgContent"] stringByAppendingString:@"\n\n"];
-    
-    
-    
-    self.unread.text = [self unreadString:unreadCount forUser:user];
-    self.unread.alpha = unreadCount > 0 ? 1.0 : 0.0f;
-    
-     */
-    
-    [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
-        UIImage *profilePhoto = [UIImage imageWithData:data];
-        if ([[collectionView visibleCells] containsObject:self]) {
-            self.alpha = 0.0;
-            [UIView animateWithDuration:0.25 animations:^{
-                drawImage(profilePhoto, self);
-                self.alpha = 1.0;
-            }];
-        }
-        
-    } fromFile:user.profilePhoto];
-    /*
-*/
+    self.parent = collectionView;
+    self.broadcast.alpha = 0;
+
+    self.backgroundColor = self.user.sex ? AppMaleUserColor : AppFemaleUserColor;
+}
+
+- (void)setProfilePhoto:(UIImage*)photo
+{
+    self.photo.alpha = 0.0;
+    drawImage(photo, self.photo);
+    [UIView animateWithDuration:0.2 animations:^{
+        self.photo.alpha = 1.0;
+    }];
+
+}
+
+- (void)setBroadcastMessage:(NSString *)message
+{
+    _broadcastMessage = message;
+    self.broadcast.text = message;
+    self.broadcast.alpha = 1.0;
 }
 
 - (void) circleizeView:(UIView*) view by:(CGFloat)percent

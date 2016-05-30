@@ -163,7 +163,7 @@
     
      bool sex = [self.user[AppKeySexKey] boolValue];
     drawImage([UIImage imageNamed:sex ? @"guy" : @"girl"], self); //SET DEFAULT PICTURE FOR NOW...
-    [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
+    [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error, BOOL fromCache) {
         UIImage *profilePhoto = [UIImage imageWithData:data];
         [self drawImage:profilePhoto];
         [self setNeedsLayout];
