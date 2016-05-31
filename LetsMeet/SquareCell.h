@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface SquareCell : UICollectionViewCell
-- (void)setUser:(PFUser *)user andMessages:(NSArray *)messages location:(PFGeoPoint*)location collectionView:(UICollectionView*)collectionView
+- (void)setUser:(PFUser *)user location:(PFGeoPoint*)location collectionView:(UICollectionView*)collectionView
 ;
 - (void)setProfilePhoto:(UIImage*)photo;
 - (void)setBroadcastMessage:(NSString*)message duration:(NSNumber*)duration;

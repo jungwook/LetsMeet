@@ -68,7 +68,6 @@ static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCur
 
 - (void)doEndEditingEvent:(NSString *)string
 {
-    NSLog(@"END EDITING");
 }
 
 - (void)doKeyBoardEvent:(NSNotification *)notification
@@ -90,11 +89,12 @@ static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCur
 - (void) addMediaBut
 {
     CGSize size = self.frame.size;
-    self.mediaBut = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, LEFTBUTSIZE, size.height)];
+    const CGFloat offset = 4;
+    self.mediaBut = [[UIButton alloc] initWithFrame:CGRectMake(offset, offset, size.height-2*offset, size.height-2*offset)];
     self.mediaBut.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin;
     [self.mediaBut setShowsTouchWhenHighlighted:YES];
     [self.mediaBut setReversesTitleShadowWhenHighlighted:YES];
-    [self.mediaBut setImage:[UIImage imageNamed:@"665-gear"] forState:UIControlStateNormal];
+    [self.mediaBut setImage:[UIImage imageNamed:@"plus"] forState:UIControlStateNormal];
     [self.mediaBut addTarget:self action:@selector(mediaButPressed:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.mediaBut];
 }
@@ -106,6 +106,7 @@ static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCur
     [self.textView setScrollEnabled:NO];
     
     self.textView.delegate = self;
+    self.textView.font = [UIFont systemFontOfSize:17 weight:UIFontWeightRegular];
     self.textView.backgroundColor = [UIColor whiteColor];
     
     //textView.autocapitalizationType = UITextAutocapitalizationTypeSentences;

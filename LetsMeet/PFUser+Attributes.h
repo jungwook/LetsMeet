@@ -24,3 +24,21 @@
 
 - (char*) desc;
 @end
+
+@interface Message : PFObject<PFSubclassing>
++ (NSString *)parseClassName;
+@property (retain) PFUser *fromUser;
+@property (retain) PFUser *toUser;
+@property (retain) NSString *msgContent;
+@property (retain) NSString *msgType;
+@property BOOL isSyncFromUser;
+@property BOOL isSyncToUser;
+@property BOOL isRead;
+
+- (BOOL) isTextMessage;
+- (BOOL) isPhotoMessage;
+- (BOOL) isVideoMessage;
+- (BOOL) isAudioMessage;
+- (BOOL) isURLMessage;
+- (BOOL) isFromMe;
+@end

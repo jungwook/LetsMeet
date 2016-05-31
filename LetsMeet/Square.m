@@ -13,6 +13,7 @@
 #import "RefreshControl.h"
 #import "IndentedLabel.h"
 #import "CachedFile.h"
+#import "Chat.h"
 
 @interface Square ()
 @property (nonatomic, strong) PFGeoPoint* location;
@@ -33,9 +34,8 @@
 
 static NSString * const reuseIdentifier = @"Square";
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
+- (void)setCellSpacing
+{
     const CGFloat kCellsPerRow = 3;
     UICollectionViewFlowLayout *flowLayout = (UICollectionViewFlowLayout*)self.collectionView.collectionViewLayout;
     flowLayout.minimumLineSpacing = 1;
@@ -45,21 +45,24 @@ static NSString * const reuseIdentifier = @"Square";
     
     CGFloat cellWidth = availableWidthForCells / kCellsPerRow;
     flowLayout.itemSize = CGSizeMake(cellWidth, cellWidth);
+}
 
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    [self setCellSpacing];
     self.location = [PFGeoPoint geoPointWithLatitude:37.520884 longitude:127.028360];
     
     RefreshControl *refresh = [RefreshControl initWithCompletionBlock:^(UIRefreshControl *refreshControl) {
         [self loadUsersInBackground:^(NSArray *users) {
             _users = [NSArray arrayWithArray:users];
             [refreshControl endRefreshing];
-            [self.collectionView reloadData];
         }];
     }];
     [self.collectionView addSubview:refresh];
     
     [self loadUsersInBackground:^(NSArray *users) {
         _users = [NSArray arrayWithArray:users];
-        [self.collectionView reloadData];
     }];
 }
 
@@ -76,6 +79,7 @@ static NSString * const reuseIdentifier = @"Square";
             if (block) {
                 block(users);
             }
+            [self.collectionView reloadData];
         }
     }];
 }
@@ -117,20 +121,46 @@ static NSString * const reuseIdentifier = @"Square";
     id notif = userInfo.object;
     
     id senderId = notif[@"senderId"];
-    NSString*message = notif[@"message"];
-    NSNumber *duration = notif[@"duration"];
+    NSString* message = notif[@"message"];
+    NSNumber* duration = notif[@"duration"];
 
+    [self updateCellForUserId:senderId block:^(SquareCell *cell) {
+        [cell setBroadcastMessage:message duration:duration];
+    }];
+}
+
+typedef void (^SquareCellBlock)(SquareCell *cell);
+
+- (void)updateCellForUserId:(id)userId block:(SquareCellBlock)block
+{
     NSArray *visible = [self.collectionView visibleCells];
     [visible enumerateObjectsUsingBlock:^(SquareCell* cell, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([cell.user.objectId isEqualToString:senderId]) {
-            [cell setBroadcastMessage:message duration:duration];
+        if ([cell.user.objectId isEqualToString:userId]) {
+            if (block)
+                block(cell);
+            *stop = YES;
         }
     }];
 }
 
-- (void) newMessageReceived:(id)sender
+- (void) newMessageReceived:(NSNotification*)userInfo
 {
-    [self.collectionView reloadData];
+    PFUser *user = [self userFromUserId:userInfo.object[@"fromUser"]];
+    [self updateCellForUserId:user.objectId block:^(SquareCell *cell) {
+        [cell setUser:user location:self.location collectionView:self.collectionView];
+    }];
+}
+
+- (PFUser*)userFromUserId:(id)userId
+{
+    __block PFUser *ret = nil;
+    [self.users enumerateObjectsUsingBlock:^(PFUser* _Nonnull user, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([user.objectId isEqualToString:userId]) {
+            ret = user;
+            *stop = YES;
+        }
+    }];
+    return ret;
 }
 
 /*
@@ -159,19 +189,14 @@ static NSString * const reuseIdentifier = @"Square";
     PFUser *user = self.users[indexPath.row];
     SquareCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:reuseIdentifier forIndexPath:indexPath];
     
-    [cell setUser:user andMessages:[AppEngine appEngineMessagesWithUserId:user.objectId] location:self.location collectionView:self.collectionView];
-
+    [cell setUser:user location:self.location collectionView:self.collectionView];
     [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error, BOOL fromCache) {
         if (fromCache) {
             [cell setProfilePhoto:data ? [UIImage imageWithData:data] : [UIImage imageNamed:(user.sex == AppMaleUser) ? @"guy" : @"girl"]];
         }
         else {
-            NSArray *visible = [self.collectionView visibleCells];
-            [visible enumerateObjectsUsingBlock:^(SquareCell* cell, NSUInteger idx, BOOL * _Nonnull stop) {
-                if ([cell.user.objectId isEqualToString:user.objectId]) {
-                    [cell setProfilePhoto:[UIImage imageWithData:data]];
-                    *stop = YES;
-                }
+            [self updateCellForUserId:user.objectId block:^(SquareCell *cell) {
+                [cell setProfilePhoto:[UIImage imageWithData:data]];
             }];
         }
     } fromFile:user.profilePhoto];
@@ -203,6 +228,18 @@ static NSString * const reuseIdentifier = @"Square";
     [alert addAction:cancel];
     [self presentViewController:alert animated:YES completion:nil];
 }
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([[segue identifier] isEqualToString:@"GotoChat"])
+    {
+        NSIndexPath *indexPath = [[self.collectionView indexPathsForSelectedItems] firstObject];
+        PFUser *selectedUser = self.users[indexPath.row];
+        Chat *vc = [segue destinationViewController];
+        [vc setChatUser:selectedUser];
+    }
+}
+
 
 #pragma mark <UICollectionViewDelegate>
 

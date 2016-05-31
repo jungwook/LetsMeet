@@ -103,6 +103,7 @@ void circleizeView(UIView* view, CGFloat percent);
 float heading(PFGeoPoint* fromLoc, PFGeoPoint* toLoc);
 float Heading(PFUser* from, PFUser* to);
 CGRect hiveToFrame(CGPoint hive, CGFloat radius, CGFloat inset, CGPoint center);
+CGRect rectForString(NSString *string, UIFont *font, CGFloat maxWidth);
 NSString* QUADRANT(PFGeoPoint* fromLoc, PFGeoPoint* toLoc);
 
 @interface AppEngine : NSObject <CLLocationManagerDelegate>
@@ -127,6 +128,7 @@ NSString* QUADRANT(PFGeoPoint* fromLoc, PFGeoPoint* toLoc);
 + (void) appEngineSetReadAllMyMessagesWithUserId:(id)userId;
 + (BOOL) appEngineRemoveAllMessagesFromUserId:(id)userId;
 + (NSUInteger) appEngineUnreadCount;
++ (void) appEngineTreatPushUserInfo:(NSDictionary*)userInfo;
 
 - (void) startTimeKeeperIfSimulator;
 - (void) AppEngineFetchLastObjects;

@@ -9,6 +9,7 @@
 #import <Parse/Parse.h>
 #import "AppDelegate.h"
 #import "AppEngine.h"
+#import "PFUser+Attributes.h"
 
 @interface AppDelegate ()
 @property (nonatomic, weak, readonly) AppEngine *engine;
@@ -21,6 +22,7 @@
     // Override point for customization after application launch.
     
     [Parse enableLocalDatastore];
+    [Message registerSubclass];
     
     [Parse initializeWithConfiguration:[ParseClientConfiguration configurationWithBlock:^(id<ParseMutableClientConfiguration> configuration) {
         configuration.applicationId = @"appLetsMeet";
@@ -118,14 +120,8 @@
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
 //    [PFPush handlePush:userInfo];
-    if ([userInfo[AppPushType] isEqualToString:AppPushTypeMessage]) {
-        NSLog(@"userInfo:%@", userInfo);
-        [AppEngine appEngineLoadMessageWithId:userInfo[AppKeyMessageIdKey] fromUserId:userInfo[AppKeySenderId]];
-    }
-    else if ([userInfo[AppPushType] isEqualToString:AppPushTypeBroadcast]) {
-        NSLog(@"userInfo:%@", userInfo);
-        SENDNOTIFICATION(AppUserBroadcastNotification, userInfo);
-    }
+    
+    [AppEngine appEngineTreatPushUserInfo:userInfo];
     
     if (application.applicationState == UIApplicationStateInactive) {
         [PFAnalytics trackAppOpenedWithRemoteNotificationPayload:userInfo];

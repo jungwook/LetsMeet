@@ -131,3 +131,46 @@
 }
 
 @end
+
+
+@implementation Message
+@dynamic fromUser;
+@dynamic toUser;
+@dynamic msgType;
+@dynamic msgContent;
+@dynamic isSyncToUser, isSyncFromUser, isRead;
+
++ (NSString *)parseClassName {
+    return @"Messages";
+}
+
+- (BOOL)isFromMe
+{
+    return [self.fromUser.objectId isEqualToString:[PFUser currentUser].objectId];
+}
+
+- (BOOL)isTextMessage
+{
+    return [self.msgType isEqualToString:AppMessageTypeMessage];
+}
+
+- (BOOL)isPhotoMessage
+{
+    return [self.msgType isEqualToString:AppMessageTypePhoto];
+}
+
+- (BOOL)isAudioMessage
+{
+    return [self.msgType isEqualToString:AppMessageTypeAudio];
+}
+
+-(BOOL)isVideoMessage
+{
+    return [self.msgType isEqualToString:AppMessageTypeVideo];
+}
+
+-(BOOL)isURLMessage
+{
+    return [self.msgType isEqualToString:AppMessageTypeURL];
+}
+@end

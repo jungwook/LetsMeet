@@ -101,9 +101,10 @@
     [self circleizeView:self.nickname by:0.1f];
 }
 
-- (void)setUser:(PFUser *)user andMessages:(NSArray *)messages location:(PFGeoPoint*)location collectionView:(UICollectionView*)collectionView
+- (void)setUser:(PFUser *)user location:(PFGeoPoint*)location collectionView:(UICollectionView*)collectionView
 {
     _user = user;
+    NSArray *messages = [AppEngine appEngineMessagesWithUserId:user.objectId];
     [self setUnreadCount:messages];
     [self setDistanceMessage:location];
     [self setUserNickname];
@@ -132,20 +133,20 @@
 {
     UIView *view = self.broadcast;
     
-    [UIView animateWithDuration:0.3/1.5 animations:^{
-        view.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.1, 1.1);
-        self.broadcast.alpha = 5.0;
-    } completion:^(BOOL finished) {
-        [UIView animateWithDuration:0.3/2 animations:^{
-            view.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.9, 0.9);
-            self.broadcast.alpha = 7.0;
-        } completion:^(BOOL finished) {
-            [UIView animateWithDuration:0.3/2 animations:^{
-                view.transform = CGAffineTransformIdentity;
-                self.broadcast.alpha = 1.0;
-            }];
-        }];
-    }];
+    view.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.1, 0.1);
+    self.broadcast.alpha = 0.0;
+    
+    [UIView animateWithDuration:0.5
+                          delay:0
+         usingSpringWithDamping:0.5
+          initialSpringVelocity:2.5
+                        options:UIViewAnimationOptionCurveEaseIn animations:^{
+                            view.transform = CGAffineTransformIdentity;
+                            self.broadcast.alpha = 1.0;
+                        }
+                     completion:^(BOOL finished) {
+                         //Completion Block
+                     }];
 }
 
 - (void)closeBroadcastMessage

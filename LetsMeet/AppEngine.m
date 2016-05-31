@@ -454,7 +454,17 @@ NSDictionary* objectFromMessage(id object)
                                 }];
 }
 
-
++ (void)appEngineTreatPushUserInfo:(NSDictionary *)userInfo
+{
+    if ([userInfo[AppPushType] isEqualToString:AppPushTypeMessage]) {
+        NSLog(@"userInfo:%@", userInfo);
+        [AppEngine appEngineLoadMessageWithId:userInfo[AppKeyMessageIdKey] fromUserId:userInfo[AppKeySenderId]];
+    }
+    else if ([userInfo[AppPushType] isEqualToString:AppPushTypeBroadcast]) {
+        NSLog(@"userInfo:%@", userInfo);
+        SENDNOTIFICATION(AppUserBroadcastNotification, userInfo);
+    }
+}
 
 + (void) appEngineSendPush:(PFObject*)message toUser:(PFUser*) user
 {
@@ -694,6 +704,17 @@ float heading(PFGeoPoint* fromLoc, PFGeoPoint* toLoc)
     } else {
         return 360+degree;
     }
+}
+
+CGRect rectForString(NSString *string, UIFont *font, CGFloat maxWidth)
+{
+    string = [string stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    CGRect rect = CGRectIntegral([string boundingRectWithSize:CGSizeMake(maxWidth, MAXFLOAT)
+                                                        options:NSStringDrawingUsesLineFragmentOrigin
+                                                     attributes:@{
+                                                                  NSFontAttributeName: font,
+                                                                  } context:nil]);
+    return rect;
 }
 
 /*

@@ -94,8 +94,6 @@
     PFGeoPoint *location = user[AppKeyLocationKey];
     PFGeoPoint *here = [[AppEngine engine] currentLocation];
     
-    NSLog(@"HERE:%@ AND THERE:%@", here, location);
-    
     double distance = [here distanceInKilometersTo:location];
     self.distance.text = [self distanceString:distance];
     self.nickname.text = user[AppKeyNicknameKey];
