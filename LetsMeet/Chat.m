@@ -155,7 +155,7 @@
     MessageCell *cell = [tableView dequeueReusableCellWithIdentifier:@"MessageCell" forIndexPath:indexPath];
 
     id message = [AppEngine appEngineMessagesWithUserId:userId][indexPath.row];
-    [cell setMessage:message myPhoto:self.myPhoto userPhoto:self.userPhoto];
+    [cell setMessage:message myPhoto:self.myPhoto userPhoto:self.userPhoto userName:self.user.nickname myName:self.me.nickname];
 
     return cell;
 }
@@ -166,7 +166,7 @@
     CGFloat width = [[[UIApplication sharedApplication] keyWindow] bounds].size.width * 0.7f;
     NSString *string = [message[AppMessageContent] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 
-    UIFont *font = [UIFont systemFontOfSize:14 weight:UIFontWeightRegular];
+    UIFont *font = [UIFont systemFontOfSize:17 weight:UIFontWeightRegular];
     
     CGRect frame = rectForString(string, font, width);
     return frame.size.height+inset*4;

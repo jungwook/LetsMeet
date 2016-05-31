@@ -187,12 +187,15 @@ typedef void (^SquareCellBlock)(SquareCell *cell);
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     PFUser *user = self.users[indexPath.row];
+    UIImage *sexImage = [UIImage imageNamed:(user.sex == AppMaleUser) ? @"guy" : @"girl"];
+
     SquareCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:reuseIdentifier forIndexPath:indexPath];
     
     [cell setUser:user location:self.location collectionView:self.collectionView];
+    [cell setProfilePhoto:sexImage];
     [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error, BOOL fromCache) {
         if (fromCache) {
-            [cell setProfilePhoto:data ? [UIImage imageWithData:data] : [UIImage imageNamed:(user.sex == AppMaleUser) ? @"guy" : @"girl"]];
+            [cell setProfilePhoto:data ? [UIImage imageWithData:data] : sexImage];
         }
         else {
             [self updateCellForUserId:user.objectId block:^(SquareCell *cell) {

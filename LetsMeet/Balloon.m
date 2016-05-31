@@ -35,6 +35,10 @@
 - (void)setIsMine:(BOOL)isMine
 {
     _isMine = isMine;
+    
+    self.backgroundColor = isMine ?
+    [UIColor colorWithRed:100/255.f green:167/255.f blue:229/255.f alpha:1] :
+    [UIColor colorWithRed:110/255.f green:200/255.f blue:41/255.f alpha:1];
 }
 
 - (void)layoutSubviews
@@ -51,38 +55,23 @@
     CGFloat w = rect.size.width, h=rect.size.height;
     
     const CGPoint points[] = {
-        self.isMine ? CGPointMake(0, is) : CGPointMake(self.isMine ? 0 : inset,is),
-        self.isMine ? CGPointMake(is, 0) : CGPointMake(self.isMine ? 0 : inset,is),
-        self.isMine ? CGPointMake(w-is, 0) : CGPointMake(self.isMine ? 0 : inset,is),
-        self.isMine ? CGPointMake(0, is) : CGPointMake(self.isMine ? 0 : inset,is),
-        self.isMine ? CGPointMake(0, is) : CGPointMake(self.isMine ? 0 : inset,is),
-        self.isMine ? CGPointMake(0, is) : CGPointMake(self.isMine ? 0 : inset,is),
-        self.isMine ? CGPointMake(0, is) : CGPointMake(self.isMine ? 0 : inset,is),
-        self.isMine ? CGPointMake(0, is) : CGPointMake(self.isMine ? 0 : inset,is),
-        self.isMine ? CGPointMake(0, is) : CGPointMake(self.isMine ? 0 : inset,is),
-        self.isMine ? CGPointMake(0, is) : CGPointMake(self.isMine ? 0 : inset,is),
-        self.isMine ? CGPointMake(0, is) : CGPointMake(self.isMine ? 0 : inset,is),
-        self.isMine ? CGPointMake(0, is) : CGPointMake(self.isMine ? 0 : inset,is),
-        self.isMine ? CGPointMake(0, is) : CGPointMake(self.isMine ? 0 : inset,is),
-        self.isMine ? CGPointMake(0, is) : CGPointMake(self.isMine ? 0 : inset,is),
-        self.isMine ? CGPointMake(0, is) : CGPointMake(self.isMine ? 0 : inset,is),
-        CGPointMake(self.isMine ? 0 : inset,is),
-        CGPointMake(self.isMine ? inset : is,0),
-        CGPointMake(self.isMine ? w-is-inset : w-is,0),
-        CGPointMake(self.isMine ? w-inset : w,is),
-        CGPointMake(self.isMine ? w-inset : w,h-is),
-        CGPointMake(self.isMine ? w : w-is-inset,h),
-        CGPointMake(self.isMine ? 0 : is+inset ,h),
-        CGPointMake(self.isMine ? 0 : inset,h-is),
-        CGPointMake(self.isMine ? 0 : inset,is),
-        CGPointMake(self.isMine ? inset : is,0)
+        self.isMine ? CGPointMake(0, is) :          CGPointMake(inset, is),
+        self.isMine ? CGPointMake(is, 0) :          CGPointMake(inset+is, 0),
+        self.isMine ? CGPointMake(w-is-inset, 0) :  CGPointMake(w-is, 0),
+        self.isMine ? CGPointMake(w-inset, is) :    CGPointMake(w, is),
+        self.isMine ? CGPointMake(w-inset, h-is) :  CGPointMake(w, h-is),
+        self.isMine ? CGPointMake(w, h) :           CGPointMake(w-is, h),
+        self.isMine ? CGPointMake(is, h) :          CGPointMake(0, h),
+        self.isMine ? CGPointMake(0, h-is) :        CGPointMake(inset, h-is),
+        self.isMine ? CGPointMake(0, is) :          CGPointMake(inset, is),
+        self.isMine ? CGPointMake(is, 0) :          CGPointMake(inset+is,0),
     };
     const CGPoint anchor[] = {
-        CGPointMake(0,0),
-        CGPointMake(w,0),
-        CGPointMake(w,h),
-        CGPointMake(0,h),
-        CGPointMake(0,0),
+        self.isMine ? CGPointMake(0, 0) :           CGPointMake(inset, 0),
+        self.isMine ? CGPointMake(w-inset, 0) :     CGPointMake(w, 0),
+        self.isMine ? CGPointMake(w-inset, h) :     CGPointMake(w, h),
+        self.isMine ? CGPointMake(0, h) :           CGPointMake(inset, h),
+        self.isMine ? CGPointMake(0, 0) :           CGPointMake(inset, 0),
     };
     
     for (int i=0; i<sizeof(points)/sizeof(CGPoint); i=i+2) {

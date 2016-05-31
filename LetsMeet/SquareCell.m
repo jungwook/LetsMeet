@@ -28,7 +28,6 @@
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        self.backgroundColor = [UIColor redColor];
     }
     return self;
 }
@@ -115,8 +114,6 @@
     
     NSTimeInterval secs = fabs([lastBroadcast timeIntervalSinceNow]);
     self.broadcast.alpha = lastBroadcast ? (secs < [user.broadcastDuration floatValue] ? 1 : 0) : 0;
-
-    self.backgroundColor = self.user.sex ? AppMaleUserColor : AppFemaleUserColor;
 }
 
 - (void)setProfilePhoto:(UIImage*)photo
