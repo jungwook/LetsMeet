@@ -218,14 +218,24 @@
 
 - (CGFloat) appropriateLineHeightForMessage:(NSDictionary*)message
 {
-    const CGFloat inset = 8;
     CGFloat width = [[[UIApplication sharedApplication] keyWindow] bounds].size.width * 0.7f;
-    NSString *string = [message[AppMessageContent] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-
-    UIFont *font = [UIFont systemFontOfSize:17 weight:UIFontWeightRegular];
     
-    CGRect frame = rectForString(string, font, width);
-    return frame.size.height+inset*4;
+    if ([message[AppMessageType] isEqualToString:AppMessageTypeMessage]) {
+        const CGFloat inset = 8;
+        NSString *string = [message[AppMessageContent] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+        
+        UIFont *font = [UIFont systemFontOfSize:17 weight:UIFontWeightRegular];
+        
+        CGRect frame = rectForString(string, font, width);
+        return frame.size.height+inset*4;
+    }
+    else if ([message[AppMessageType] isEqualToString:AppMessageTypePhoto]) {
+        UIImage *image = [UIImage imageWithData:message[@"file"][@"data"]];
+        return width * image.size.height / image.size.width;
+    }
+    else {
+        return 40;
+    }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath

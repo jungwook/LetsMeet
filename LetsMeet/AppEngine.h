@@ -86,6 +86,15 @@
 #define AppEngineDictionaryFile [defUrl(@"dictionary") path]
 #define AppEngineUsersFile [defUrl(@"users") path]
 
+typedef NS_OPTIONS(NSUInteger, AppMessageTypes) {
+    kAppMessageTypeNone = 0,
+    kAppMessageTypeText,
+    kAppMessageTypePhoto,
+    kAppMessageTypeVideo,
+    kAppMessageTypeURL,
+    kAppMessageTypeAudio
+};
+
 typedef NS_OPTIONS(NSUInteger, ImagePickerSourceTypes) {
     kImagePickerSourceNone                  = 0,
     kImagePickerSourceCamera                = 1 << 0,

@@ -57,7 +57,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WsO-dx-2zl">
-                                                            <rect key="frame" x="8" y="8" width="204" height="22.5"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="220" height="38.5"/>
                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                         </view>
                                                     </subviews>
@@ -65,12 +65,12 @@
                                                     <constraints>
                                                         <constraint firstItem="0Uq-qF-vaq" firstAttribute="leading" secondItem="3ZB-2h-qHJ" secondAttribute="leading" constant="8" id="5AU-AS-si3"/>
                                                         <constraint firstItem="0Uq-qF-vaq" firstAttribute="top" secondItem="3ZB-2h-qHJ" secondAttribute="top" id="67c-v8-d1T"/>
-                                                        <constraint firstAttribute="trailing" secondItem="WsO-dx-2zl" secondAttribute="trailing" constant="8" id="DVb-sM-YEe"/>
-                                                        <constraint firstItem="WsO-dx-2zl" firstAttribute="leading" secondItem="3ZB-2h-qHJ" secondAttribute="leading" constant="8" id="Ucn-HP-r5o"/>
+                                                        <constraint firstAttribute="trailing" secondItem="WsO-dx-2zl" secondAttribute="trailing" id="DVb-sM-YEe"/>
+                                                        <constraint firstItem="WsO-dx-2zl" firstAttribute="leading" secondItem="3ZB-2h-qHJ" secondAttribute="leading" id="Ucn-HP-r5o"/>
                                                         <constraint firstAttribute="trailing" secondItem="0Uq-qF-vaq" secondAttribute="trailing" constant="8" id="Wrc-YW-mq2"/>
                                                         <constraint firstAttribute="bottom" secondItem="0Uq-qF-vaq" secondAttribute="bottom" constant="1" id="eTj-Uf-siU"/>
-                                                        <constraint firstItem="WsO-dx-2zl" firstAttribute="top" secondItem="3ZB-2h-qHJ" secondAttribute="top" constant="8" id="nyh-W7-9js"/>
-                                                        <constraint firstAttribute="bottom" secondItem="WsO-dx-2zl" secondAttribute="bottom" constant="8" id="sKK-pc-Zbh"/>
+                                                        <constraint firstItem="WsO-dx-2zl" firstAttribute="top" secondItem="3ZB-2h-qHJ" secondAttribute="top" id="nyh-W7-9js"/>
+                                                        <constraint firstAttribute="bottom" secondItem="WsO-dx-2zl" secondAttribute="bottom" id="sKK-pc-Zbh"/>
                                                     </constraints>
                                                 </view>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1y9-fW-gYb">
