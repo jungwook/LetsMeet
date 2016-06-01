@@ -31,6 +31,8 @@
         self.parent = parent;
         self.pickerBlock = actionBlock;
         self.types = types;
+        self.videoQuality = UIImagePickerControllerQualityType640x480;
+        
         self.alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
         
         if (types >> kImagePickerSourceCamera) {
@@ -53,7 +55,7 @@
                                                                 self.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
                                                                 [self.parent presentViewController:self animated:YES completion:nil];
                                                             }];
-            
+
             if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
                 [self.alert addAction:library];
             }
@@ -100,7 +102,6 @@
     
     // Handle a movie capture
     if (CFStringCompare ((CFStringRef) mediaType, kUTTypeMovie, 0)== kCFCompareEqualTo) {
-        
         NSString *moviePath = [((NSURL*)[info objectForKey:UIImagePickerControllerMediaURL]) path];
         
         if (UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(moviePath)) {

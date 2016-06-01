@@ -9,9 +9,9 @@
 #import "Chat.h"
 #import "AppEngine.h"
 #import "PFUser+Attributes.h"
-#import "MessageCell.h"
 #import "CachedFile.h"
 #import "ImagePicker.h"
+#import "PhotoDetail.h"
 
 #define meId self.me.objectId
 #define userId self.user.objectId
@@ -131,11 +131,7 @@
         switch (type) {
             case kImagePickerMediaPhoto: {
                 [CachedFile saveData:data named:@"ChatImage.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                    [self.me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-                        if (succeeded) {
-                            [self sendMessageOfType:AppMessageTypePhoto contentFile:file];
-                        }
-                    }];
+                    [self sendMessageOfType:AppMessageTypePhoto contentFile:file];
                 } progressBlock:^(int percentDone) {
                     NSLog(@"SAVING IN PROGRESS:%d", percentDone);
                 }];
@@ -143,11 +139,7 @@
                 break;
             case kImagePickerMediaMovie: {
                 [CachedFile saveData:data named:@"ChatMovie.mov" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                    [self.me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-                        if (succeeded) {
-                            [self sendMessageOfType:AppMessageTypeVideo contentFile:file];
-                        }
-                    }];
+                    [self sendMessageOfType:AppMessageTypeVideo contentFile:file];
                 } progressBlock:^(int percentDone) {
                     NSLog(@"SAVING IN PROGRESS:%d", percentDone);
                 }];
@@ -216,7 +208,8 @@
            userPhoto:self.userPhoto
             userName:self.user.nickname
               myName:self.me.nickname];
-
+    
+    cell.delegate = self;
     return cell;
 }
 
@@ -230,13 +223,13 @@
     CGFloat width = [[[UIApplication sharedApplication] keyWindow] bounds].size.width * 0.7f;
     
     if ([message[AppMessageType] isEqualToString:AppMessageTypeMessage]) {
-        const CGFloat inset = 8;
+        const CGFloat inset = 10;
         NSString *string = [message[AppMessageContent] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
         
         UIFont *font = [UIFont systemFontOfSize:17 weight:UIFontWeightRegular];
         
         CGRect frame = rectForString(string, font, width);
-        return frame.size.height+inset*4;
+        return frame.size.height+inset*2.5;
     }
     else if ([message[AppMessageType] isEqualToString:AppMessageTypePhoto]) {
         UIImage *image = [UIImage imageWithData:message[@"file"][@"data"]];
@@ -278,6 +271,21 @@
 
     if (count) {
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:count ? count-1 : 0 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:animated];
+    }
+}
+
+- (void)tappedPhoto:(NSDictionary *)message image:(UIImage *)image view:(UIView *)view
+{
+    NSLog(@"TAPPED BY DELEGATE");
+    [self performSegueWithIdentifier:@"Preview" sender:message];
+}
+
+-(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([segue.identifier isEqualToString:@"Preview"]) {
+        NSLog(@"MESSAGE:%@", sender[@"fromUser"]);
+        PhotoDetail *vc = segue.destinationViewController;
+        vc.message = sender;
     }
 }
 

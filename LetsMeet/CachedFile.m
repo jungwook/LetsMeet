@@ -53,22 +53,16 @@
     
     NSData *data = [self objectForKey:file.name];
     if (data) {
-//        NSLog(@"CACHED DATA EXISTS");
         if (block) {
-//            NSLog(@"CALLING BLOCK WITH CACHED DATA");
             block(data, nil, YES);
         }
     }
     else {
-//        NSLog(@"NO CACHED DATA - LOADING FROM NETWORK");
         [file getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
-//            NSLog(@"LOADED DATA FROM NETWORK");
             if (!error) {
-//                NSLog(@"SETTING CACHED DATA:%@", file.name);
                 [self setObject:data forKey:file.name];
             }
             if (block) {
-//                NSLog(@"CALLING BLOCK WITH NETWORK DATA");
                 block(data, error, NO);
             }
         }];
@@ -83,12 +77,9 @@
 - (void) saveData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(FileBooleanResultBlock)block progressBlock:(PFProgressBlock)progressBlock
 {
     PFFile *file = [PFFile fileWithName:name data:data];
-//    NSLog(@"SAVING FILE NETWORK DATA:%@", file.name);
     [file saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-//        NSLog(@"SAVING TO CACHE:%@", file.name);
         [self setObject:data forKey:file.name];
         if (block) {
-//            NSLog(@"CALLING BLOCK WITH SAVED NETWORK DATA:%@", file.name);
             block(file, succeeded, error);
         }
     } progressBlock:progressBlock];

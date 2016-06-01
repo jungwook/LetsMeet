@@ -8,7 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import "MessageBar.h"
+#import "MessageCell.h"
 
-@interface Chat : UIViewController <MessageBarDelegate, UITableViewDelegate, UITableViewDataSource>
+@interface Chat : UIViewController <MessageBarDelegate, UITableViewDelegate, UITableViewDataSource, MessageCellDelegate>
 - (void)setChatUser:(PFUser *)user;
 @end
