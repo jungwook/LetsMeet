@@ -211,9 +211,18 @@
     MessageCell *cell = [tableView dequeueReusableCellWithIdentifier:@"MessageCell" forIndexPath:indexPath];
 
     id message = [AppEngine appEngineMessagesWithUserId:userId][indexPath.row];
-    [cell setMessage:message myPhoto:self.myPhoto userPhoto:self.userPhoto userName:self.user.nickname myName:self.me.nickname];
+    [cell setMessage:message
+             myPhoto:self.myPhoto
+           userPhoto:self.userPhoto
+            userName:self.user.nickname
+              myName:self.me.nickname];
 
     return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSLog(@"SELECTED ROW");
 }
 
 - (CGFloat) appropriateLineHeightForMessage:(NSDictionary*)message
@@ -250,16 +259,16 @@
 
 - (void)keyBoardEvent:(CGRect)kbFrame duration:(double)duration animationType:(UIViewAnimationOptions)animation
 {
-    float w = self.view.frame.size.width;
     float m = self.messageBar.frame.size.height;
     float h = kbFrame.origin.y-m;
     [UIView animateWithDuration:duration animations:^{
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.001 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self.tableView setFrame:CGRectMake(0, 0, w, h)];
-            [self.messageBar setFrame:CGRectMake(0, h, w, m)];
-        });
+        [self.messageBar setFrame:CGRectMake(self.messageBar.frame.origin.x, h, self.messageBar.frame.size.width, m)];
+        [self.tableView setFrame:CGRectMake(self.tableView.frame.origin.x, 0, self.tableView.frame.size.width, h)];
     } completion:^(BOOL finished) {
+        [self.messageBar setFrame:CGRectMake(self.messageBar.frame.origin.x, h, self.messageBar.frame.size.width, m)];
+        [self.tableView setFrame:CGRectMake(self.tableView.frame.origin.x, 0, self.tableView.frame.size.width, h)];
         [self scrollToBottomAnimated:NO];
+//        [self scrollToBottomAnimated:YES];
     }];
 }
 

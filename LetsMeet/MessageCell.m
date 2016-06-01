@@ -58,8 +58,10 @@
         CGRect frame = rectForString(string, self.messageLabel.font, width);
         CGFloat w = frame.size.width+2*inset;
         
-        self.leading.constant = self.isMine ? self.bounds.size.width-w-(offset+2*inset) -10 : offset;
-        self.trailing.constant = self.isMine ? offset : self.bounds.size.width-w-(offset+2*inset) -10;
+        
+        
+        self.leading.constant = self.isMine ? self.bounds.size.width-w-(offset+2*inset)-10 : offset;
+        self.trailing.constant = self.isMine ? offset : self.bounds.size.width-w-(offset+2*inset)-10;
         self.messageLabel.text = string;
         self.messagePhotoView.alpha = NO;
         self.messageLabel.alpha = YES;
@@ -75,12 +77,14 @@
         else {
             
         }
-        self.leading.constant = self.isMine ? self.bounds.size.width-w-offset+2*inset -10 : offset;
-        self.trailing.constant = self.isMine ? offset : self.bounds.size.width-w-offset+2*inset -10;
+        self.leading.constant = self.isMine ? self.bounds.size.width-w-(offset+2*inset): offset;
+        self.trailing.constant = self.isMine ? offset : self.bounds.size.width-w-(offset+2*inset);
+        self.messagePhotoView.alpha = YES;
+        self.messageLabel.alpha = NO;
     }
     
     self.leadingLabel.constant = self.isMine ? 10 : 15;
-    self.trailingLabel.constant = self.isMine ? 15 : 10;
+//    self.trailingLabel.constant = self.isMine ? 15 : 10;
 }
 
 - (void)setupUserName:(NSString*)userName date:(NSDate*)date
@@ -90,7 +94,11 @@
     self.name.textAlignment = self.isMine ? NSTextAlignmentRight : NSTextAlignmentLeft;
 }
 
-- (void)setMessage:(NSDictionary *)message myPhoto:(UIImage*)myPhoto userPhoto:(UIImage*)userPhoto userName:(NSString*)userName myName:(NSString*) myName
+- (void)setMessage:(NSDictionary *)message
+           myPhoto:(UIImage*)myPhoto
+         userPhoto:(UIImage*)userPhoto
+          userName:(NSString*)userName
+            myName:(NSString*) myName
 {
     _message = message;
     _isMine = [message[@"fromUser"] isEqualToString:[PFUser currentUser].objectId];

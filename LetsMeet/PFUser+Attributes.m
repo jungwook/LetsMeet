@@ -9,11 +9,6 @@
 #import "PFUser+Attributes.h"
 #import "AppEngine.h"
 
-@implementation NSDictionary(Messages)
-
-
-@end
-
 @implementation PFUser(Attributes)
 - (void) setNickname:(NSString *)nickname
 {

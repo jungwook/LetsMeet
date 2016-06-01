@@ -13,5 +13,9 @@
 @interface MessageCell : UITableViewCell
 @property (nonatomic, weak) NSDictionary * message;
 - (CGFloat) appropriateHeight;
-- (void)setMessage:(NSDictionary *)message myPhoto:(UIImage*)myPhoto userPhoto:(UIImage*)userPhoto userName:(NSString*)userName myName:(NSString*) myName;
+- (void)setMessage:(NSDictionary *)message
+           myPhoto:(UIImage*)   myPhoto
+         userPhoto:(UIImage*)   userPhoto
+          userName:(NSString*)  userName
+            myName:(NSString*)  myName;
 @end

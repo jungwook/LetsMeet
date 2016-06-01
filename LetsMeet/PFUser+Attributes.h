@@ -25,10 +25,6 @@
 - (char*) desc;
 @end
 
-@interface NSDictionary(Messages)
-
-@end
-
 @interface Message : PFObject<PFSubclassing>
 + (NSString *)parseClassName;
 @property (retain) PFUser *fromUser;
