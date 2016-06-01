@@ -35,20 +35,32 @@
     return self;
 }
 
+- (void)setupMyPhoto:(UIImage *)myPhoto userPhoto:(UIImage*) userPhoto
+{
+    drawImage(myPhoto, self.myPhoto);
+    drawImage(userPhoto, self.photo);
+    
+    circleizeView(self.photo, 0.5);
+    circleizeView(self.myPhoto, 0.5);
+}
+
 - (void)setMessage:(NSDictionary *)message myPhoto:(UIImage*)myPhoto userPhoto:(UIImage*)userPhoto userName:(NSString*)userName myName:(NSString*) myName
 {
-    const CGFloat offset = 45;
-    
-    CGFloat width = [[[UIApplication sharedApplication] keyWindow] bounds].size.width * 0.7f;
     _message = message;
 
+    [self setupMyPhoto:myPhoto userPhoto:userPhoto];
+    
+    const CGFloat offset = 45;
     const CGFloat inset = 8;
+    CGFloat width = [[[UIApplication sharedApplication] keyWindow] bounds].size.width * 0.7f;
+    
     NSString *string = [self.message[AppMessageContent] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-
     CGRect frame = rectForString(string, self.messageLabel.font, width);
     CGFloat w = frame.size.width+2*inset;
     
     BOOL isMine = [message[@"fromUser"] isEqualToString:[PFUser currentUser].objectId];
+    self.myPhoto.alpha = isMine;
+    self.photo.alpha = !isMine;
     [self.balloon setIsMine:isMine];
     
     self.leading.constant = isMine ? self.bounds.size.width-w-(offset+2*inset) -10 : offset;
@@ -61,20 +73,15 @@
     self.name.text = [NSString stringWithFormat:@"%@ %@", isMine ? @"" : userName, dateString];
     self.name.textAlignment = isMine ? NSTextAlignmentRight : NSTextAlignmentLeft;
     
-    self.myPhoto.alpha = isMine;
-    self.photo.alpha = !isMine;
-    
-    drawImage(myPhoto, self.myPhoto);
-    drawImage(userPhoto, self.photo);
-    
-    circleizeView(self.photo, 0.5);
-    circleizeView(self.myPhoto, 0.5);    
 
     if ([message[AppMessageType] isEqualToString:AppMessageTypeMessage]) {
         self.messageLabel.text = string;
     }
     else if ([message[AppMessageType] isEqualToString:AppMessageTypeVideo]) {
         // NSLog VIDEO
+    }
+    else if ([message[AppMessageType] isEqualToString:AppMessageTypePhoto]) {
+        // NSLog PHOTO
     }
 }
 

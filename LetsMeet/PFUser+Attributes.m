@@ -130,6 +130,7 @@
     return (char*) [self.nickname UTF8String];
 }
 
+
 @end
 
 
@@ -138,6 +139,7 @@
 @dynamic toUser;
 @dynamic msgType;
 @dynamic msgContent;
+@dynamic file;
 @dynamic isSyncToUser, isSyncFromUser, isRead;
 
 + (NSString *)parseClassName {
@@ -173,4 +175,21 @@
 {
     return [self.msgType isEqualToString:AppMessageTypeURL];
 }
+
+- (NSString*) info
+{
+    NSString* ret = [NSString stringWithFormat:@"ID:%@ CREATED:%@ UPDATED:%@ FROM:%@ TO:%@ TYPE:%@ MESSAGE:%@ HAS DATA:%@",
+                     self.objectId,
+                     self.createdAt,
+                     self.updatedAt,
+                     self.fromUser.nickname,
+                     self.toUser.nickname,
+                     self.msgType,
+                     self.msgContent,
+                     self.file ? @"YES" : @"NO"];
+    
+    return ret;
+}
+
+
 @end

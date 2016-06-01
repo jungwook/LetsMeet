@@ -11,6 +11,7 @@
 #import "PFUser+Attributes.h"
 #import "MessageCell.h"
 #import "CachedFile.h"
+#import "ImagePicker.h"
 
 #define meId self.me.objectId
 #define userId self.user.objectId
@@ -123,19 +124,74 @@
 
 // From MessageBarDelegate. A message was sent from the messageBar.
 
-- (void)sendMessage:(id)barMessage
+
+- (void)sendMedia
+{
+    [ImagePicker proceedWithParentViewController:self withPhotoSelectedBlock:^(id data, ImagePickerMediaType type) {
+        switch (type) {
+            case kImagePickerMediaPhoto: {
+                [CachedFile saveData:data named:@"ChatImage.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
+                    [self.me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+                        if (succeeded) {
+                            [self sendMessageOfType:AppMessageTypePhoto contentFile:file];
+                        }
+                    }];
+                } progressBlock:^(int percentDone) {
+                    NSLog(@"SAVING IN PROGRESS:%d", percentDone);
+                }];
+            }
+                break;
+            case kImagePickerMediaMovie: {
+                [CachedFile saveData:data named:@"ChatMovie.mov" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
+                    [self.me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+                        if (succeeded) {
+                            [self sendMessageOfType:AppMessageTypeVideo contentFile:file];
+                        }
+                    }];
+                } progressBlock:^(int percentDone) {
+                    NSLog(@"SAVING IN PROGRESS:%d", percentDone);
+                }];
+            }
+                break;
+            case kImagePickerMediaVoice:
+            case kImagePickerMediaNone:
+            default:
+                break;
+        }
+        
+    } featuring:kImagePickerSourceCamera | kImagePickerSourceLibrary | kImagePickerSourceVoice | kImagePickerSourceURL ];
+}
+
+- (Message*) message
 {
     Message *message = [Message new];
     message.fromUser = self.me;
     message.toUser = self.user;
-    message.msgType = barMessage[AppMessageType];
-    message.msgContent = barMessage[AppMessageContent];
     message.isRead = @(NO);
     message.isSyncFromUser = @(YES);
-
+    
     if ([self.me.objectId isEqualToString:self.user.objectId]) {
         message.isSyncToUser = @(YES);
     }
+    
+    return message;
+}
+
+- (void)sendMessageOfType:(NSString*)type contentFile:(PFFile*)content
+{
+    Message *message = [self message];
+    message.msgType = type;
+    message.msgContent = @"Media Content";
+    message.file = content;
+
+    [AppEngine appEngineSendMessage:message toUser:self.user];
+}
+
+- (void)sendMessage:(id)barMessage
+{
+    Message *message = [self message];
+    message.msgType = barMessage[AppMessageType];
+    message.msgContent = barMessage[AppMessageContent];
     
     [AppEngine appEngineSendMessage:message toUser:self.user];
 }

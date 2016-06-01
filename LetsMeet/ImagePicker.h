@@ -7,8 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "AppEngine.h"
+#import <MobileCoreServices/MobileCoreServices.h>
 
 @interface ImagePicker : UIImagePickerController <UIImagePickerControllerDelegate, UIAlertViewDelegate, UINavigationControllerDelegate>
-- (instancetype)initWithParentViewController:(UIViewController*)parent withPhotoSelectedBlock:(void(^)(UIImage *photo))actionBlock;
-+ (void) proceedWithParentViewController:(UIViewController*)parent withPhotoSelectedBlock:(void(^)(UIImage *photo))actionBlock;
+- (instancetype)initWithParentViewController:(UIViewController*)parent
+                      withPhotoSelectedBlock:(ImagePickerBlock)actionBlock
+                                   featuring:(ImagePickerSourceTypes)types;
++ (void) proceedWithParentViewController:(UIViewController*)parent
+                  withPhotoSelectedBlock:(ImagePickerBlock)actionBlock
+                               featuring:(ImagePickerSourceTypes)types;
 @end

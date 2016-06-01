@@ -8,6 +8,7 @@
 
 #import "MessageBar.h"
 #import "AppEngine.h"
+#import "ImagePicker.h"
 
 @interface MessageBar()
 {
@@ -125,7 +126,9 @@ static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCur
 
 - (void) mediaButPressed:(id)sender
 {
-    NSLog(@"PRESSED");
+    if ([self.messageBarDelegate respondsToSelector:@selector(sendMedia)]) {
+        [self.messageBarDelegate sendMedia];
+    }
 }
 
 - (void) pullDownKeyBoard
@@ -135,8 +138,9 @@ static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCur
 
 - (void) sendText
 {
+    NSString *textToSend = [self.textView.text stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     if ([self.messageBarDelegate respondsToSelector:@selector(sendMessage:)]) {
-        [self.messageBarDelegate sendMessage:@{ AppMessageType: AppMessageTypeMessage, AppMessageContent : self.textView.text}];
+        [self.messageBarDelegate sendMessage:@{ AppMessageType: AppMessageTypeMessage, AppMessageContent : textToSend}];
     }
     
     self.textView.text = @"";

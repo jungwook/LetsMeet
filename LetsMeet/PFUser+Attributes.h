@@ -30,6 +30,7 @@
 @property (retain) PFUser *fromUser;
 @property (retain) PFUser *toUser;
 @property (retain) NSString *msgContent;
+@property (retain) PFFile* file;
 @property (retain) NSString *msgType;
 @property BOOL isSyncFromUser;
 @property BOOL isSyncToUser;
@@ -41,4 +42,5 @@
 - (BOOL) isAudioMessage;
 - (BOOL) isURLMessage;
 - (BOOL) isFromMe;
+- (NSString*) info;
 @end

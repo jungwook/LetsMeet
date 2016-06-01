@@ -19,4 +19,5 @@
 @protocol MessageBarDelegate <NSObject>
 - (void) keyBoardEvent:(CGRect)kbFrame duration:(double)duration animationType:(UIViewAnimationOptions)animation;
 - (void) sendMessage:(id)message;
+- (void) sendMedia;
 @end

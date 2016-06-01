@@ -7,6 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "PFUser+Attributes.h"
+
 #define SENDNOTIFICATION(NOTIF,OBJECT) [[NSNotificationCenter defaultCenter] postNotificationName:NOTIF object:OBJECT]
 
 #define AppUserNewMessageReceivedNotification @"AppUserNewMessageReceivedNotificaiton"
@@ -84,6 +86,21 @@
 #define AppEngineDictionaryFile [defUrl(@"dictionary") path]
 #define AppEngineUsersFile [defUrl(@"users") path]
 
+typedef NS_OPTIONS(NSUInteger, ImagePickerSourceTypes) {
+    kImagePickerSourceNone                  = 0,
+    kImagePickerSourceCamera                = 1 << 0,
+    kImagePickerSourceLibrary               = 1 << 1,
+    kImagePickerSourceVoice                 = 1 << 2,
+    kImagePickerSourceURL                   = 1 << 3,
+};
+
+typedef NS_OPTIONS(NSUInteger, ImagePickerMediaType) {
+    kImagePickerMediaNone                   = 0,
+    kImagePickerMediaPhoto                  = 1 << 0,
+    kImagePickerMediaMovie                  = 1 << 1,
+    kImagePickerMediaVoice                  = 1 << 2,
+};
+
 typedef void (^FileBooleanResultBlock)(PFFile *file, BOOL succeeded, NSError * error);
 typedef void (^ArrayResultBlock)(NSArray *objects);
 typedef void (^ArrayIntResultBlock)(NSArray *objects, int levels);
@@ -94,6 +111,7 @@ typedef void (^CountResultBlock)(NSUInteger count);
 typedef void (^DictionaryResultBlock)(NSDictionary *messages);
 typedef void (^DictionaryArrayResultBlock)(NSDictionary *messages, NSArray *users);
 typedef void (^CachedFileBlock)(NSData * data, NSError * error, BOOL fromCache);
+typedef void (^ImagePickerBlock)(id data, ImagePickerMediaType type);
 
 
 CALayer* drawImageOnLayer(UIImage *image, CGSize size);
@@ -117,7 +135,7 @@ NSString* QUADRANT(PFGeoPoint* fromLoc, PFGeoPoint* toLoc);
 ////////////////////////// NEW GLOBAL APIS ////////////////////////
 //+ (void) appEngineReloadAllMessages;
 + (void) appEngineLoadMessageWithId:(id)messageId fromUserId:(id)userId;
-+ (void) appEngineSendMessage:(PFObject *)message toUser:(PFUser *)user;
++ (void) appEngineSendMessage:(Message *)message toUser:(PFUser *)user;
 + (void) appEngineBroadcastPush:(NSString*)message duration:(NSNumber*)duration;
 + (void) appEngineUsersFromUserIds:(NSArray*)userIds completed:(ArrayResultBlock)block;
 + (void) appEngineInboxUsers:(ArrayResultBlock)block;

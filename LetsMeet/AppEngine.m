@@ -7,6 +7,7 @@
 //
 
 #import "AppEngine.h"
+
 @interface AppEngine()
 @property (nonatomic, strong) CLLocationManager *locMgr;
 @property (nonatomic, strong) CLLocation* curLoc;
@@ -58,7 +59,7 @@
 }
 
 
-PFUser* otherUserFromMessage(PFObject*message)
+PFUser* otherUserFromMessage(Message*message)
 {
     PFUser *fromUser = message[AppKeyFromUserField];
     PFUser *toUser = message[AppKeyToUserField];
@@ -227,11 +228,11 @@ NSDictionary* objectFromMessage(id object)
     return dic;
 }
 
-- (BOOL) appEngineAddMessage:(PFObject *)message
+- (BOOL) appEngineAddMessage:(Message*)message
 {
     PFUser *other = otherUserFromMessage(message);
     id m = objectFromMessage(message);
-    NSLog(@"ADDING NEW MESSAGE:%@", m);
+    NSLog(@"ADDING NEW MESSAGE:%@", message.info);
     
     if (!self.appEngineUserMessages[other.objectId]) {
         self.appEngineUserMessages[other.objectId] = [NSMutableArray array];
@@ -271,7 +272,7 @@ NSDictionary* objectFromMessage(id object)
 
 + (void) appEngineLoadMessageWithId:(id)messageId fromUserId:(id)userId
 {
-    PFObject *message = [PFObject objectWithClassName:AppMessagesCollection];
+    Message *message = [Message new];
     message.objectId = messageId;
     [message fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
         PFUser *toUser = message[AppKeyToUserField];
@@ -298,7 +299,7 @@ NSDictionary* objectFromMessage(id object)
     PFQuery *query = [PFQuery queryWithClassName:AppMessagesCollection predicate:predicate];
     [query setLimit:1000];
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable messages, NSError * _Nullable error) {
-        [messages enumerateObjectsUsingBlock:^(PFObject*  _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
+        [messages enumerateObjectsUsingBlock:^(Message*  _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
             if ([self appEngineAddMessage:message]) {
                 PFUser *fromUser = message[AppKeyFromUserField];
                 PFUser *toUser = message[AppKeyToUserField];
@@ -420,7 +421,7 @@ NSDictionary* objectFromMessage(id object)
     }
 }
 
-+ (void) appEngineSendMessage:(PFObject *)message toUser:(PFUser *)user
++ (void) appEngineSendMessage:(Message *)message toUser:(PFUser *)user
 {
     [message saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
         if (succeeded) {
@@ -466,7 +467,7 @@ NSDictionary* objectFromMessage(id object)
     }
 }
 
-+ (void) appEngineSendPush:(PFObject*)message toUser:(PFUser*) user
++ (void) appEngineSendPush:(Message*)message toUser:(PFUser*) user
 {
     PFUser *me = [PFUser currentUser];
     

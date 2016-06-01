@@ -139,12 +139,9 @@
     [picker dismissViewControllerAnimated:YES completion:NULL];
 }
 
-- (IBAction)toggleMenu:(id)sender {
-    [AppDelegate toggleMenu];
-}
-
 - (IBAction)editPhoto:(id)sender {
-    [ImagePicker proceedWithParentViewController:self withPhotoSelectedBlock:^(UIImage *photo) {
+    [ImagePicker proceedWithParentViewController:self withPhotoSelectedBlock:^(id data, ImagePickerMediaType type) {
+        UIImage *photo = [UIImage imageWithData:data];
         UIImage *small = scaleImage(photo, AppProfilePhotoSize);
         NSData *smallData = UIImageJPEGRepresentation(small, AppProfilePhotoCompression);
         NSData *largeData = UIImageJPEGRepresentation(photo, AppProfilePhotoCompression);
@@ -174,8 +171,7 @@
         } progressBlock:^(int percentDone) {
             NSLog(@"SAVING IN PROGRESS:%d", percentDone);
         }];
-
-    }];
+    } featuring:kImagePickerSourceCamera | kImagePickerSourceLibrary];
 }
 
 - (IBAction)chargePoints:(id)sender {
