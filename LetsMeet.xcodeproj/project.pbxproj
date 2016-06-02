@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		124176741D007747008D24F5 /* FXBlurView.m in Sources */ = {isa = PBXBuildFile; fileRef = 124176731D007747008D24F5 /* FXBlurView.m */; };
 		124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928831CEFF7F70038A2F3 /* ImagePicker.m */; };
 		124928871CF003420038A2F3 /* CachedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928861CF003420038A2F3 /* CachedFile.m */; };
 		1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928891CF0176C0038A2F3 /* ListPicker.m */; };
@@ -67,6 +68,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		124176721D007747008D24F5 /* FXBlurView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FXBlurView.h; sourceTree = "<group>"; };
+		124176731D007747008D24F5 /* FXBlurView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FXBlurView.m; sourceTree = "<group>"; };
 		124928821CEFF7F70038A2F3 /* ImagePicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePicker.h; sourceTree = "<group>"; };
 		124928831CEFF7F70038A2F3 /* ImagePicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImagePicker.m; sourceTree = "<group>"; };
 		124928851CF003420038A2F3 /* CachedFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CachedFile.h; sourceTree = "<group>"; };
@@ -249,13 +252,6 @@
 			name = "Views etc";
 			sourceTree = "<group>";
 		};
-		12DE5F701CFC08E3009B315F /* AFNetworking */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = AFNetworking;
-			sourceTree = "<group>";
-		};
 		12F7417E1CE4B97000E8267A = {
 			isa = PBXGroup;
 			children = (
@@ -276,7 +272,6 @@
 		12F741891CE4B97100E8267A /* LetsMeet */ = {
 			isa = PBXGroup;
 			children = (
-				12DE5F701CFC08E3009B315F /* AFNetworking */,
 				124928B31CF2ED790038A2F3 /* Extensions */,
 				126AF4081CEDADE800E3ED67 /* Views etc */,
 				12F741F71CE5B11000E8267A /* Engine */,
@@ -369,6 +364,8 @@
 		12F741F71CE5B11000E8267A /* Engine */ = {
 			isa = PBXGroup;
 			children = (
+				124176721D007747008D24F5 /* FXBlurView.h */,
+				124176731D007747008D24F5 /* FXBlurView.m */,
 				12F741F81CE5B13D00E8267A /* AppEngine.h */,
 				12F741F91CE5B13D00E8267A /* AppEngine.m */,
 				125AEF3A1CF9F08300553475 /* SimulatedUsers.h */,
@@ -477,6 +474,7 @@
 				12DE5F6F1CFB0028009B315F /* SquareCell.m in Sources */,
 				12F741FA1CE5B13D00E8267A /* AppEngine.m in Sources */,
 				12F741D21CE56B3400E8267A /* FloatingDrawerViewController.m in Sources */,
+				124176741D007747008D24F5 /* FXBlurView.m in Sources */,
 				124928B91CF2ED810038A2F3 /* UIButton+Badge.m in Sources */,
 				126AF4141CEEF04300E3ED67 /* Account.m in Sources */,
 				12F741E91CE5854700E8267A /* InBox.m in Sources */,

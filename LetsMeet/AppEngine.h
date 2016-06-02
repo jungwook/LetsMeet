@@ -97,6 +97,7 @@ typedef NS_OPTIONS(NSUInteger, ImagePickerMediaType) {
 
 typedef void (^FileBooleanResultBlock)(PFFile *file, BOOL succeeded, NSError * error);
 typedef void (^ArrayResultBlock)(NSArray *objects);
+typedef void (^DataBlock)(NSData *data);
 typedef void (^ArrayIntResultBlock)(NSArray *objects, int levels);
 typedef void (^UserResultBlock)(PFUser *user);
 typedef void (^voidBlock)(void);
@@ -106,7 +107,6 @@ typedef void (^DictionaryResultBlock)(NSDictionary *messages);
 typedef void (^DictionaryArrayResultBlock)(NSDictionary *messages, NSArray *users);
 typedef void (^CachedFileBlock)(NSData * data, NSError * error, BOOL fromCache);
 typedef void (^ImagePickerBlock)(id data, ImagePickerMediaType type, NSString* sizeString, NSURL *url);
-
 
 CALayer* drawImageOnLayer(UIImage *image, CGSize size);
 UIImage* scaleImage(UIImage* image, CGSize size);

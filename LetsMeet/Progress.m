@@ -82,22 +82,20 @@
 
 - (void)setProgress:(CGFloat)newProgress
 {
-    if( newProgress - self.progress >= 0.01 || newProgress >= 100.0) {
-        _progress = MIN(MAX(0, newProgress),1);
-        self.progressLayer.strokeEnd = _progress;
-        if (self.status == Loading) {
-            [self.progressLayer removeAllAnimations];
-        }
-        else if (self.status == Completed) {
-            self.shapeLayer.strokeStart = 0;
-            self.shapeLayer.strokeEnd = 0;
-            [_shapeLayer removeAllAnimations];
-        }
-        self.status = Progressing;
-        
-        self.progressLabel.hidden = NO;
-        self.progressLabel.text = [NSString stringWithFormat:@"%.0f", self.progress];
+    _progress = MIN(MAX(0, newProgress),1);
+    self.progressLayer.strokeEnd = _progress;
+    if (self.status == Loading) {
+        [self.progressLayer removeAllAnimations];
     }
+    else if (self.status == Completed) {
+        self.shapeLayer.strokeStart = 0;
+        self.shapeLayer.strokeEnd = 0;
+        [_shapeLayer removeAllAnimations];
+    }
+    self.status = Progressing;
+    
+    self.progressLabel.hidden = NO;
+    self.progressLabel.text = [NSString stringWithFormat:@"%.0f%%", self.progress * 100];
 }
 
 - (void)layoutSubviews

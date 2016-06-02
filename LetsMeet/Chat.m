@@ -13,6 +13,7 @@
 #import "ImagePicker.h"
 #import "Preview.h"
 #import "Progress.h"
+#import "FXBlurView.h"
 
 #define meId self.me.objectId
 #define userId self.user.objectId
@@ -136,36 +137,36 @@
 
 - (void)sendMedia
 {
-    [ImagePicker proceedWithParentViewController:self withPhotoSelectedBlock:^(id data, ImagePickerMediaType type, NSString* stringSize, NSURL* url) {
+    [ImagePicker proceedWithParentViewController:self withPhotoSelectedBlock:^(NSData* data, ImagePickerMediaType type, NSString* stringSize, NSURL* url) {
         switch (type) {
             case kImagePickerMediaPhoto: {
-                CGRect frame = [[UIApplication sharedApplication] keyWindow].bounds;
-                UIView *black = [UIView new];
-                [black setFrame:frame];
-                [black setBackgroundColor:[UIColor blackColor]];
-                black.alpha = 0;
-                [[[UIApplication sharedApplication] keyWindow] addSubview:black];
-                
-                Progress *progress = [[Progress alloc] initWithFrame:frame];
-                [black addSubview:progress];
-                
-                [UIView animateWithDuration:1 animations:^{
-                    black.alpha = 1;
-                    [progress startLoading];
-                } completion:^(BOOL finished) {
-                
-                }];
-                
-                [CachedFile saveData:data named:@"ChatImage.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                    [self sendMessageOfType:[NSMutableDictionary typeStringForType:kMessageTypePhoto] contentFile:file info:stringSize];
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                NSLog(@"data of size:%ld", data.length);
+                [self pickerWithRootViewController:self title:@"CHOOSE SIZE" message:@"Please select appropriate size to send" data:data handler:^(NSData *data) {
+                    CGRect frame = [[UIApplication sharedApplication] keyWindow].bounds;
+                    
+                    FXBlurView *black = [[FXBlurView alloc] initWithFrame:frame];
+//                    UIVisualEffectView *black = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleDark]];
+                    [black setFrame:frame];
+                    [[[UIApplication sharedApplication] keyWindow] addSubview:black];
+                    
+                    Progress *progress = [[Progress alloc] initWithFrame:CGRectMake((frame.size.width-100)/2, (frame.size.height-100)/2, 100, 100)];
+                    [black addSubview:progress];
+                    
+                    [UIView animateWithDuration:1 animations:^{
+                        black.alpha = 1;
+                        [progress startLoading];
+                    } completion:^(BOOL finished) {
+                        
+                    }];
+                    
+                    [CachedFile saveData:data named:@"ChatImage.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
+                        [self sendMessageOfType:[NSMutableDictionary typeStringForType:kMessageTypePhoto] contentFile:file info:stringSize];
                         [progress completeLoading:YES block:^{
                             [black removeFromSuperview];
                         }];
-                    });
-                } progressBlock:^(int percentDone) {
-                    progress.progress = percentDone / 100.0f;
-//                    NSLog(@"SAVING IN PROGRESS:%d", percentDone);
+                    } progressBlock:^(int percentDone) {
+                        progress.progress = percentDone / 100.0f;
+                    }];
                 }];
             }
                 break;
@@ -355,5 +356,39 @@ typedef void (^MessageCellBlock)(MessageCell *cell);
     }
 }
 
+- (void) pickerWithRootViewController:(UIViewController*)parent
+                                title:(NSString*)title
+                              message:(NSString*)message
+                                data:(NSData*)data
+                              handler:(DataBlock)block
+{
+    if (!data || !parent || !block)
+        return;
+    
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIImage *image = [UIImage imageWithData:data];
+    CGSize size = image.size;
+    
+    NSString* titles[] = { @"SMALL ", @"MEDIUM ", @"LARGE ", @"ORIGINAL "};
+    
+    CGFloat start = size.width > 200 ? 200 : size.width / 10.0f;
+    
+    CGFloat increment = (image.size.width - start) / 3;
+    for (int i=0; i<4; i++ ) {
+        CGFloat width = start+i*increment;
+        UIImage *scaledImage = scaleImage(image, CGSizeMake(width, width*size.height/size.width));
+        NSData* data = UIImageJPEGRepresentation(scaledImage, AppProfilePhotoCompression);
+        NSString *title = [[titles[i] stringByAppendingString:
+                            [NSNumberFormatter localizedStringFromNumber:@(((int)(data.length / 10000.0f))/100.0) numberStyle:NSNumberFormatterDecimalStyle]]
+                           stringByAppendingString:@" MB"];
+        UIAlertAction *action = [UIAlertAction actionWithTitle:title style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            block(data);
+        }];
+        [alert addAction:action];
+    }
+    
+    [parent presentViewController:alert animated:YES completion:nil];
+}
 
 @end
