@@ -11,7 +11,7 @@
 #import "PFUser+Attributes.h"
 #import "CachedFile.h"
 #import "ImagePicker.h"
-#import "PhotoDetail.h"
+#import "Preview.h"
 
 #define meId self.me.objectId
 #define userId self.user.objectId
@@ -154,9 +154,9 @@
     } featuring:kImagePickerSourceCamera | kImagePickerSourceLibrary | kImagePickerSourceVoice | kImagePickerSourceURL ];
 }
 
-- (Message*) message
+- (MessageObject*) message
 {
-    Message *message = [Message new];
+    MessageObject *message = [MessageObject new];
     message.fromUser = self.me;
     message.toUser = self.user;
     message.isRead = @(NO);
@@ -169,9 +169,13 @@
     return message;
 }
 
+////////////////////////////////////
+// SEND MEDIA CONTENT PHOTO + VIDEO
+////////////////////////////////////
+
 - (void)sendMessageOfType:(NSString*)type contentFile:(PFFile*)content
 {
-    Message *message = [self message];
+    MessageObject *message = [self message];
     message.msgType = type;
     message.msgContent = @"Media Content";
     message.file = content;
@@ -179,9 +183,13 @@
     [AppEngine appEngineSendMessage:message toUser:self.user];
 }
 
+////////////////////////////////////
+// SEND STRING CONTENT
+////////////////////////////////////
+
 - (void)sendMessage:(id)barMessage
 {
-    Message *message = [self message];
+    MessageObject *message = [self message];
     message.msgType = barMessage[AppMessageType];
     message.msgContent = barMessage[AppMessageContent];
     
@@ -233,7 +241,8 @@
     }
     else if ([message[AppMessageType] isEqualToString:AppMessageTypePhoto]) {
         UIImage *image = [UIImage imageWithData:message[@"file"][@"data"]];
-        return width * image.size.height / image.size.width;
+        
+        return image ? width * image.size.height / image.size.width : 200;
     }
     else {
         return 40;
@@ -284,8 +293,8 @@
 {
     if ([segue.identifier isEqualToString:@"Preview"]) {
         NSLog(@"MESSAGE:%@", sender[@"fromUser"]);
-        PhotoDetail *vc = segue.destinationViewController;
-        vc.message = sender;
+//        PhotoDetail *vc = segue.destinationViewController;
+//        vc.message = sender;
     }
 }
 

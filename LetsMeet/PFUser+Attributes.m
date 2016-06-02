@@ -9,6 +9,7 @@
 #import "PFUser+Attributes.h"
 #import "AppEngine.h"
 
+
 @implementation PFUser(Attributes)
 - (void) setNickname:(NSString *)nickname
 {
@@ -128,12 +129,9 @@
 {
     return (char*) [self.nickname UTF8String];
 }
-
-
 @end
 
-
-@implementation Message
+@implementation MessageObject
 @dynamic fromUser;
 @dynamic toUser;
 @dynamic msgType;
@@ -152,27 +150,27 @@
 
 - (BOOL)isTextMessage
 {
-    return [self.msgType isEqualToString:AppMessageTypeMessage];
+    return [self.msgType isEqualToString:@"MSG"];
 }
 
 - (BOOL)isPhotoMessage
 {
-    return [self.msgType isEqualToString:AppMessageTypePhoto];
+    return [self.msgType isEqualToString:@"PHOTO"];
 }
 
 - (BOOL)isAudioMessage
 {
-    return [self.msgType isEqualToString:AppMessageTypeAudio];
+    return [self.msgType isEqualToString:@"AUDIO"];
 }
 
 -(BOOL)isVideoMessage
 {
-    return [self.msgType isEqualToString:AppMessageTypeVideo];
+    return [self.msgType isEqualToString:@"VIDEO"];
 }
 
 -(BOOL)isURLMessage
 {
-    return [self.msgType isEqualToString:AppMessageTypeURL];
+    return [self.msgType isEqualToString:@"URL"];
 }
 
 - (NSString*) info
@@ -189,6 +187,166 @@
     
     return ret;
 }
+@end
 
+
+@interface Message()
+
+@end
+
+@implementation Message
+- (NSString *)fromUserId
+{
+    return [self objectForKey:@"fromUser"];
+}
+
+- (void)setFromUserId:(NSString *)fromUserId
+{
+    [self setObject:fromUserId forKey:@"fromUser"];
+}
+
+- (NSString *)toUserId
+{
+    return [self objectForKey:@"toUser"];
+}
+
+- (void)setToUserId:(NSString *)toUserId
+{
+    [self setObject:toUserId forKey:@"toUser"];
+}
+
+- (MessageTypes)type
+{
+    if ([[self objectForKey:@"msgType"] isEqualToString:@"MSG"]) {
+        return kMessageTypeText;
+    }
+    else if ([[self objectForKey:@"msgType"] isEqualToString:@"PHOTO"]) {
+        return kMessageTypePhoto;
+    }
+    else if ([[self objectForKey:@"msgType"] isEqualToString:@"VIDEO"]) {
+        return kMessageTypeVideo;
+    }
+    else if ([[self objectForKey:@"msgType"] isEqualToString:@"AUDIO"]) {
+        return kMessageTypeAudio;
+    }
+    else if ([[self objectForKey:@"msgType"] isEqualToString:@"URL"]) {
+        return kMessageTypeURL;
+    }
+    else
+        return kMessageTypeNone;
+}
+
+- (void)setType:(MessageTypes)type
+{
+    switch (type) {
+        case kMessageTypeText:
+            [self setObject:@"MSG" forKey:@"msgType"];
+            break;
+        case kMessageTypePhoto:
+            [self setObject:@"PHOTO" forKey:@"msgType"];
+            break;
+        case kMessageTypeVideo:
+            [self setObject:@"VIDEO" forKey:@"msgType"];
+            break;
+        case kMessageTypeAudio:
+            [self setObject:@"AUDIO" forKey:@"msgType"];
+            break;
+        case kMessageTypeURL:
+            [self setObject:@"URL" forKey:@"msgType"];
+            break;
+        case kMessageTypeNone:
+        default:
+            break;
+    }
+}
+
+-(NSString *)text
+{
+    return [self objectForKey:@"msgContent"];
+}
+
+- (void)setText:(NSString *)text
+{
+    [self setObject:text forKey:@"msgContent"];
+}
+
+- (NSString *)fileName
+{
+    return [self objectForKey:@"file"][@"name"];
+}
+
+- (void)setFileName:(NSString *)fileName
+{
+    NSMutableDictionary *file = [self objectForKey:@"file"] ? [self objectForKey:@"file"] : [NSMutableDictionary dictionary];
+    [file setObject:fileName forKey:@"name"];
+    [self setObject:file forKey:@"file"];
+}
+
+- (NSString *)fileURL
+{
+    return [self objectForKey:@"file"][@"url"];
+}
+
+- (void)setFileURL:(NSString *)fileURL
+{
+    NSMutableDictionary *file = [self objectForKey:@"file"] ? [self objectForKey:@"file"] : [NSMutableDictionary dictionary];
+    [file setObject:fileURL forKey:@"url"];
+    [self setObject:file forKey:@"file"];
+}
+
+- (NSDate *)createdAt
+{
+    return [self objectForKey:@"createdAt"];
+}
+
+- (void)setCreatedAt:(NSDate *)createdAt
+{
+    [self setObject:createdAt forKey:@"createdAt"];
+}
+
+- (NSDate *)updatedAt
+{
+    return [self objectForKey:@"updatedAt"];
+}
+
+- (void)setUpdatedAt:(NSDate *)updatedAt
+{
+    [self setObject:updatedAt forKey:@"updatedAt"];
+}
+
+- (BOOL)isSyncToUser
+{
+    return [[self objectForKey:@"isSyncToUser"] boolValue];
+}
+
+- (void)setIsSyncToUser:(BOOL)isSyncToUser
+{
+    [self setObject:@(isSyncToUser) forKey:@"isSyncToUser"];
+}
+
+- (BOOL)isSyncFromUser
+{
+    return [[self objectForKey:@"isSyncFromUser"] boolValue];
+}
+
+- (void)setIsSyncFromUser:(BOOL)isSyncFromUser
+{
+    [self setObject:@(isSyncFromUser) forKey:@"isSyncFromUser"];
+}
+
+- (BOOL)isRead
+{
+    return [[self objectForKey:@"isRead"] boolValue];
+}
+
+- (void)setIsRead:(BOOL)isRead
+{
+    [self setObject:@(isRead) forKey:@"isRead"];
+}
+
+- (BOOL)isFromMe
+{
+    return [[self fromUserId] isEqualToString:[PFUser currentUser].objectId];
+}
 
 @end

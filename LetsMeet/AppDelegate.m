@@ -22,7 +22,7 @@
     // Override point for customization after application launch.
     
     [Parse enableLocalDatastore];
-    [Message registerSubclass];
+    [MessageObject registerSubclass];
     
     [Parse initializeWithConfiguration:[ParseClientConfiguration configurationWithBlock:^(id<ParseMutableClientConfiguration> configuration) {
         configuration.applicationId = @"appLetsMeet";

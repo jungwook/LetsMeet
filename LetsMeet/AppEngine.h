@@ -17,13 +17,6 @@
 
 #define AppMessagesCollection @"Messages"
 #define AppEngineTimeKeeperTime 60
-#define AppMessageType @"msgType"
-#define AppMessageContent @"msgContent"
-#define AppMessageTypeMessage @"MSG"
-#define AppMessageTypePhoto @"PHOTO"
-#define AppMessageTypeVideo @"VIDEO"
-#define AppMessageTypeAudio @"AUDIO"
-#define AppMessageTypeURL AppKeyURLKey
 
 #define AppPushRecipientIdField @"recipientId"
 #define AppPushSenderIdField @"senderId"
@@ -134,7 +127,7 @@ NSString* QUADRANT(PFGeoPoint* fromLoc, PFGeoPoint* toLoc);
 ////////////////////////// NEW GLOBAL APIS ////////////////////////
 //+ (void) appEngineReloadAllMessages;
 + (void) appEngineLoadMessageWithId:(id)messageId fromUserId:(id)userId;
-+ (void) appEngineSendMessage:(Message *)message toUser:(PFUser *)user;
++ (void) appEngineSendMessage:(MessageObject *)message toUser:(PFUser *)user;
 + (void) appEngineBroadcastPush:(NSString*)message duration:(NSNumber*)duration;
 + (void) appEngineUsersFromUserIds:(NSArray*)userIds completed:(ArrayResultBlock)block;
 + (void) appEngineInboxUsers:(ArrayResultBlock)block;

@@ -29,8 +29,8 @@
 		12DE5F6F1CFB0028009B315F /* SquareCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5F6E1CFB0028009B315F /* SquareCell.m */; };
 		12DE5FA61CFD40DD009B315F /* MessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FA51CFD40DD009B315F /* MessageCell.m */; };
 		12DE5FA91CFD43A7009B315F /* Balloon.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FA81CFD43A7009B315F /* Balloon.m */; };
-		12DE5FAC1CFEDCCE009B315F /* PhotoDetail.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FAB1CFEDCCE009B315F /* PhotoDetail.m */; };
 		12DE5FB31CFEF58A009B315F /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12DE5FB21CFEF58A009B315F /* Photos.framework */; };
+		12DE5FB81CFFB1A2009B315F /* Preview.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FB71CFFB1A2009B315F /* Preview.m */; };
 		12F7418C1CE4B97100E8267A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418B1CE4B97100E8267A /* main.m */; };
 		12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418E1CE4B97100E8267A /* AppDelegate.m */; };
 		12F741951CE4B97100E8267A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12F741931CE4B97100E8267A /* Main.storyboard */; };
@@ -110,9 +110,9 @@
 		12DE5FA51CFD40DD009B315F /* MessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageCell.m; sourceTree = "<group>"; };
 		12DE5FA71CFD43A7009B315F /* Balloon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Balloon.h; sourceTree = "<group>"; };
 		12DE5FA81CFD43A7009B315F /* Balloon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Balloon.m; sourceTree = "<group>"; };
-		12DE5FAA1CFEDCCE009B315F /* PhotoDetail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoDetail.h; sourceTree = "<group>"; };
-		12DE5FAB1CFEDCCE009B315F /* PhotoDetail.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoDetail.m; sourceTree = "<group>"; };
 		12DE5FB21CFEF58A009B315F /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
+		12DE5FB61CFFB1A2009B315F /* Preview.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preview.h; sourceTree = "<group>"; };
+		12DE5FB71CFFB1A2009B315F /* Preview.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preview.m; sourceTree = "<group>"; };
 		12F741871CE4B97000E8267A /* LetsMeet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LetsMeet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12F7418B1CE4B97100E8267A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		12F7418D1CE4B97100E8267A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -207,6 +207,8 @@
 		126AF4081CEDADE800E3ED67 /* Views etc */ = {
 			isa = PBXGroup;
 			children = (
+				12DE5FB61CFFB1A2009B315F /* Preview.h */,
+				12DE5FB71CFFB1A2009B315F /* Preview.m */,
 				12F741931CE4B97100E8267A /* Main.storyboard */,
 				126AF3F41CEA983800E3ED67 /* MessageBar.h */,
 				126AF3F51CEA983800E3ED67 /* MessageBar.m */,
@@ -355,8 +357,6 @@
 				12F741FF1CE6CE4000E8267A /* SignUp.m */,
 				12DE5F6A1CFAFD84009B315F /* Square.h */,
 				12DE5F6B1CFAFD84009B315F /* Square.m */,
-				12DE5FAA1CFEDCCE009B315F /* PhotoDetail.h */,
-				12DE5FAB1CFEDCCE009B315F /* PhotoDetail.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -460,6 +460,7 @@
 				126AF4101CEEACA200E3ED67 /* ValuePopUpView.m in Sources */,
 				12F742001CE6CE4000E8267A /* SignUp.m in Sources */,
 				12F741EF1CE593A500E8267A /* Menu.m in Sources */,
+				12DE5FB81CFFB1A2009B315F /* Preview.m in Sources */,
 				126AF3F31CEA966B00E3ED67 /* Chat.m in Sources */,
 				12C5C9E51CF419EF00315C79 /* Hive.m in Sources */,
 				124928B21CF2E65A0038A2F3 /* ToggleButton.m in Sources */,
@@ -484,7 +485,6 @@
 				12F741DA1CE56F4300E8267A /* MainController.m in Sources */,
 				12F741D01CE56B3400E8267A /* FloatingDrawerSpringAnimator.m in Sources */,
 				1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */,
-				12DE5FAC1CFEDCCE009B315F /* PhotoDetail.m in Sources */,
 				124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */,
 				12DE5F691CF814EC009B315F /* PFUser+Attributes.m in Sources */,
 			);

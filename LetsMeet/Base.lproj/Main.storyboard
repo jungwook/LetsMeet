@@ -172,10 +172,10 @@
             </objects>
             <point key="canvasLocation" x="1178" y="3717"/>
         </scene>
-        <!--Photo Detail-->
+        <!--Preview-->
         <scene sceneID="qW3-SL-ckA">
             <objects>
-                <viewController id="Cwk-eH-Mvc" customClass="PhotoDetail" sceneMemberID="viewController">
+                <viewController id="Cwk-eH-Mvc" customClass="Preview" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="ypj-pa-kun"/>
                         <viewControllerLayoutGuide type="bottom" id="PnV-cn-l5q"/>

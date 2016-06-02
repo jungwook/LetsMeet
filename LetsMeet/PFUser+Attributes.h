@@ -25,7 +25,7 @@
 - (char*) desc;
 @end
 
-@interface Message : PFObject<PFSubclassing>
+@interface MessageObject : PFObject<PFSubclassing>
 + (NSString *)parseClassName;
 @property (retain) PFUser *fromUser;
 @property (retain) PFUser *toUser;
@@ -43,4 +43,28 @@
 - (BOOL) isURLMessage;
 - (BOOL) isFromMe;
 - (NSString*) info;
+@end
+
+typedef NS_OPTIONS(NSUInteger, MessageTypes) {
+    kMessageTypeNone = 0,
+    kMessageTypeText,
+    kMessageTypePhoto,
+    kMessageTypeVideo,
+    kMessageTypeAudio,
+    kMessageTypeURL
+};
+
+@interface Message : NSMutableDictionary
+@property (nonatomic, strong) NSString* fromUserId;
+@property (nonatomic, strong) NSString* toUserId;
+@property (nonatomic) MessageTypes type;
+@property (nonatomic, strong) NSString* text;
+@property (nonatomic, strong) NSString* fileName;
+@property (nonatomic, strong) NSString* fileURL;
+@property (nonatomic, strong) NSDate* createdAt;
+@property (nonatomic, strong) NSDate* updatedAt;
+@property (nonatomic) BOOL isSyncFromUser;
+@property (nonatomic) BOOL isSyncToUser;
+@property (nonatomic) BOOL isRead;
+@property (nonatomic, readonly) BOOL isFromMe;
 @end
