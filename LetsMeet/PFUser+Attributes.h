@@ -54,7 +54,8 @@ typedef NS_OPTIONS(NSUInteger, MessageTypes) {
     kMessageTypeURL
 };
 
-@interface Message : NSMutableDictionary
+@interface NSMutableDictionary (Message)
+@property (nonatomic, strong) NSString* objectId;
 @property (nonatomic, strong) NSString* fromUserId;
 @property (nonatomic, strong) NSString* toUserId;
 @property (nonatomic) MessageTypes type;
@@ -67,4 +68,12 @@ typedef NS_OPTIONS(NSUInteger, MessageTypes) {
 @property (nonatomic) BOOL isSyncToUser;
 @property (nonatomic) BOOL isRead;
 @property (nonatomic, readonly) BOOL isFromMe;
+
+- (NSString*) typeString;
++ (NSString*) typeStringForType:(MessageTypes)type;
+
++ (instancetype) messageWithText:(NSString*)text;
++ (instancetype) messageWithPhoto:(PFFile*)file;
++ (instancetype) messageWithVideo:(PFFile*)file;
++ (instancetype) messageWithAudio:(PFFile*)file;
 @end

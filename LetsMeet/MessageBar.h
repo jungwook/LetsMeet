@@ -7,17 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "PFUser+Attributes.h"
 
 @protocol MessageBarDelegate;
 
 @interface MessageBar : UIToolbar <UITextViewDelegate>
-@property (nonatomic, strong) id<MessageBarDelegate> messageBarDelegate;
+@property (nonatomic, strong) id<MessageBarDelegate> barDelegate;
 - (void) pullDownKeyBoard;
 
 @end
 
 @protocol MessageBarDelegate <NSObject>
 - (void) keyBoardEvent:(CGRect)kbFrame duration:(double)duration animationType:(UIViewAnimationOptions)animation;
-- (void) sendMessage:(id)message;
+- (void) sendMessage:(NSMutableDictionary*)message;
 - (void) sendMedia;
 @end

@@ -159,7 +159,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="oBS-WM-V1E"/>
                     <connections>
-                        <outlet property="messageBar" destination="q02-kM-GHd" id="Eud-TV-yCw"/>
+                        <outlet property="bar" destination="q02-kM-GHd" id="9IP-pM-GSj"/>
                         <outlet property="tableView" destination="Oeg-Gb-WPp" id="M1U-JR-qES"/>
                     </connections>
                 </viewController>

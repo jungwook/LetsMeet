@@ -48,15 +48,15 @@
     circleizeView(self.myPhoto, 0.5);
 }
 
-- (void)setupMessage:(NSDictionary *)message
+- (void)setupMessage:(NSMutableDictionary *)message
 {
     const CGFloat offset = 45;
     const CGFloat inset = 10;
     
     CGFloat width = [[[UIApplication sharedApplication] keyWindow] bounds].size.width * 0.7f;
     
-    if ([message[AppMessageType] isEqualToString:AppMessageTypeMessage]) {
-        NSString *string = [self.message[AppMessageContent] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    if (message.type == kMessageTypeText) {
+        NSString *string = [message.text stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
         CGRect frame = rectForString(string, self.messageLabel.font, width);
         CGFloat w = frame.size.width+2.5*inset;
         
@@ -66,7 +66,7 @@
         self.messagePhotoView.alpha = NO;
         self.messageLabel.alpha = YES;
     }
-    else if ([message[AppMessageType] isEqualToString:AppMessageTypePhoto]) {
+    else if (message.type == kMessageTypePhoto) {
         self.image = [UIImage imageWithData:message[@"file"][@"data"]];
         CGFloat w = width;
         if (!self.image) {
@@ -101,19 +101,19 @@
     self.name.textAlignment = self.isMine ? NSTextAlignmentRight : NSTextAlignmentLeft;
 }
 
-- (void)setMessage:(NSDictionary *)message
+- (void)setMessage:(NSMutableDictionary *)message
            myPhoto:(UIImage*)myPhoto
          userPhoto:(UIImage*)userPhoto
           userName:(NSString*)userName
             myName:(NSString*) myName
 {
     _message = message;
-    _isMine = [message[@"fromUser"] isEqualToString:[PFUser currentUser].objectId];
+    _isMine = message.isFromMe;
     [self.balloon setIsMine:self.isMine];
     self.myPhoto.alpha = self.isMine;
     self.photo.alpha = !self.isMine;
 
-    [self setupUserName:userName date:message[@"updatedAt"]];
+    [self setupUserName:userName date:message.updatedAt];
     [self setupMyPhoto:myPhoto userPhoto:userPhoto];
     [self setupMessage:message];
 }

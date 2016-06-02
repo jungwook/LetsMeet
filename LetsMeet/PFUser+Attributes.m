@@ -9,10 +9,14 @@
 #import "PFUser+Attributes.h"
 #import "AppEngine.h"
 
+#define ASSERTNOTNULL(__A__) NSAssert(__A__, @"__A__ cannot be nil")
+
 
 @implementation PFUser(Attributes)
+
 - (void) setNickname:(NSString *)nickname
 {
+    ASSERTNOTNULL(nickname);
     [self setObject:nickname forKey:AppKeyNicknameKey];
 }
 
@@ -28,6 +32,7 @@
 
 - (void)setLocation:(PFGeoPoint *)location
 {
+    ASSERTNOTNULL(location);
     [self setObject:location forKeyedSubscript:AppKeyLocationKey];
 }
 
@@ -48,11 +53,13 @@
 
 - (void)setAge:(NSString *)age
 {
+    ASSERTNOTNULL(age);
     [self setObject:age forKeyedSubscript:AppKeyAgeKey];
 }
 
 -(void)setIntro:(NSString *)intro
 {
+    ASSERTNOTNULL(intro);
     [self setObject:intro forKey:AppKeyIntroKey];
 }
 
@@ -68,6 +75,7 @@
 
 - (void)setProfilePhoto:(PFFile *)profilePhoto
 {
+    ASSERTNOTNULL(profilePhoto);
     [self setObject:profilePhoto forKey:AppProfilePhotoField];
 }
 
@@ -78,6 +86,7 @@
 
 - (void)setOriginalPhoto:(PFFile *)originalPhoto
 {
+    ASSERTNOTNULL(originalPhoto);
     [self setObject:originalPhoto forKey:AppProfileOriginalPhotoField];
 }
 
@@ -96,6 +105,7 @@
 
 - (void)setBroadcastMessage:(NSString *)broadcastMessage
 {
+    ASSERTNOTNULL(broadcastMessage);
     [self setObject:broadcastMessage forKey:AppKeyBroadcastMessageKey];
 }
 
@@ -106,6 +116,7 @@
 
 - (void)setBroadcastMessageAt:(NSDate *)date
 {
+    ASSERTNOTNULL(date);
     [self setObject:date forKey:AppKeyBroadcastMessageAtKey];
 }
 
@@ -122,6 +133,7 @@
 
 - (void)setBroadcastDuration:(NSNumber *)broadcastDuration
 {
+    ASSERTNOTNULL(broadcastDuration);
     [self setObject:broadcastDuration forKey:@"broadcastDuration"];
 }
 
@@ -179,8 +191,8 @@
                      self.objectId,
                      self.createdAt,
                      self.updatedAt,
-                     self.fromUser.nickname,
-                     self.toUser.nickname,
+                     self.fromUser,
+                     self.toUser,
                      self.msgType,
                      self.msgContent,
                      self.file ? @"YES" : @"NO"];
@@ -190,11 +202,54 @@
 @end
 
 
-@interface Message()
+@implementation NSMutableDictionary(Message)
 
-@end
++ (instancetype)messageWithText:(NSString *)text
+{
+    NSMutableDictionary *message = [NSMutableDictionary new];
+    message.type = kMessageTypeText;
+    message.text = text;
+    return message;
+}
 
-@implementation Message
++ (instancetype)messageWithPhoto:(PFFile*)file
+{
+    NSMutableDictionary *message = [NSMutableDictionary new];
+    message.type = kMessageTypePhoto;
+    message.fileName = file.name;
+    message.fileURL = file.url;
+    return message;
+}
+
++ (instancetype)messageWithVideo:(PFFile*)file
+{
+    NSMutableDictionary *message = [NSMutableDictionary new];
+    message.type = kMessageTypeVideo;
+    message.fileName = file.name;
+    message.fileURL = file.url;
+    return message;
+}
+
++ (instancetype)messageWithAudio:(PFFile*)file
+{
+    NSMutableDictionary *message = [NSMutableDictionary new];
+    message.type = kMessageTypeAudio;
+    message.fileName = file.name;
+    message.fileURL = file.url;
+    return message;
+}
+
+- (NSString *)objectId
+{
+    return [self objectForKey:@"objectId"];
+}
+
+- (void)setObjectId:(NSString *)objectId
+{
+    ASSERTNOTNULL(objectId);
+    [self setObject:objectId forKey:@"objectId"];
+}
+
 - (NSString *)fromUserId
 {
     return [self objectForKey:@"fromUser"];
@@ -202,6 +257,7 @@
 
 - (void)setFromUserId:(NSString *)fromUserId
 {
+    ASSERTNOTNULL(fromUserId);
     [self setObject:fromUserId forKey:@"fromUser"];
 }
 
@@ -212,6 +268,7 @@
 
 - (void)setToUserId:(NSString *)toUserId
 {
+    ASSERTNOTNULL(toUserId);
     [self setObject:toUserId forKey:@"toUser"];
 }
 
@@ -235,6 +292,31 @@
     else
         return kMessageTypeNone;
 }
+
+- (NSString*)typeString
+{
+    return [self objectForKey:@"msgType"];
+}
+
++ (NSString*)typeStringForType:(MessageTypes)type
+{
+    switch (type) {
+        case kMessageTypeText:
+            return @"MSG";
+        case kMessageTypePhoto:
+            return @"PHOTO";
+        case kMessageTypeVideo:
+            return @"VIDEO";
+        case kMessageTypeAudio:
+            return @"AUDIO";
+        case kMessageTypeURL:
+            return @"URL";
+        case kMessageTypeNone:
+        default:
+            return @"NONE";
+    }
+}
+
 
 - (void)setType:(MessageTypes)type
 {
@@ -267,6 +349,7 @@
 
 - (void)setText:(NSString *)text
 {
+    ASSERTNOTNULL(text);
     [self setObject:text forKey:@"msgContent"];
 }
 
@@ -277,6 +360,7 @@
 
 - (void)setFileName:(NSString *)fileName
 {
+    ASSERTNOTNULL(fileName);
     NSMutableDictionary *file = [self objectForKey:@"file"] ? [self objectForKey:@"file"] : [NSMutableDictionary dictionary];
     [file setObject:fileName forKey:@"name"];
     [self setObject:file forKey:@"file"];
@@ -289,6 +373,7 @@
 
 - (void)setFileURL:(NSString *)fileURL
 {
+    ASSERTNOTNULL(fileURL);
     NSMutableDictionary *file = [self objectForKey:@"file"] ? [self objectForKey:@"file"] : [NSMutableDictionary dictionary];
     [file setObject:fileURL forKey:@"url"];
     [self setObject:file forKey:@"file"];
@@ -301,6 +386,7 @@
 
 - (void)setCreatedAt:(NSDate *)createdAt
 {
+    ASSERTNOTNULL(createdAt);
     [self setObject:createdAt forKey:@"createdAt"];
 }
 
@@ -311,6 +397,7 @@
 
 - (void)setUpdatedAt:(NSDate *)updatedAt
 {
+    ASSERTNOTNULL(updatedAt);
     [self setObject:updatedAt forKey:@"updatedAt"];
 }
 

@@ -58,7 +58,7 @@
     [self timeKeep];
 }
 
-id otherUserId(MessageObject* message) {
+NSString* otherUserId(MessageObject* message) {
     id fromUserId = message.fromUser.objectId;
     id toUserId = message.toUser.objectId;
     return [fromUserId isEqualToString:[PFUser currentUser].objectId] ? toUserId : fromUserId;
@@ -226,32 +226,32 @@ NSDictionary* objectFromMessage(id object)
 
 - (BOOL) appEngineAddMessage:(MessageObject *)message
 {
-    PFUser *other = otherUserId(message);
-    id document = objectFromMessage(message);
+    NSString *otherId = otherUserId(message);
+    NSMutableDictionary* document = (NSMutableDictionary*) objectFromMessage(message);
     NSLog(@"ADDING NEW MESSAGE:%@", message.info);
     
-    if (!self.appEngineUserMessages[other.objectId]) {
-        self.appEngineUserMessages[other.objectId] = [NSMutableArray array];
+    if (!self.appEngineUserMessages[otherId]) {
+        self.appEngineUserMessages[otherId] = [NSMutableArray array];
     }
     
-    NSPredicate *contains = [NSPredicate predicateWithFormat:@"objectId == %@", document[AppKeyObjectId]];
-    NSUInteger c = [self.appEngineUserMessages[other.objectId] filteredArrayUsingPredicate:contains].count;
+    NSPredicate *contains = [NSPredicate predicateWithFormat:@"objectId == %@", document.objectId];
+    NSUInteger c = [self.appEngineUserMessages[otherId] filteredArrayUsingPredicate:contains].count;
     if (c<1) {
-        [self.appEngineUserMessages[other.objectId] addObject:document];
+        [self.appEngineUserMessages[otherId] addObject:document];
     } else {
         NSLog(@"ALREADY CONTAINS OBJECT");
     }
     
     // SORT ARRAY AND INTO MUTABLE ARRAY
     NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:AppKeyCreatedAtKey ascending:YES];
-    self.appEngineUserMessages[other.objectId] = [NSMutableArray arrayWithArray:[self.appEngineUserMessages[other.objectId] sortedArrayUsingDescriptors:@[sort]]];
+    self.appEngineUserMessages[otherId] = [NSMutableArray arrayWithArray:[self.appEngineUserMessages[otherId] sortedArrayUsingDescriptors:@[sort]]];
     
     SENDNOTIFICATION(AppUserNewMessageReceivedNotification, document);
 
     NSLog(@"UPDATING FILESYSTEM");
     [AppEngine appEngineResetBadge];
     BOOL ret = [self updateFile:AppEngineUsersFile with:[self.appEngineUserMessages allKeys]];
-    ret = ret | [self appEngineUpdateFileForUserId:other.objectId];
+    ret = ret | [self appEngineUpdateFileForUserId:otherId];
     
     return ret;
 }
@@ -266,15 +266,29 @@ NSDictionary* objectFromMessage(id object)
     return [self updateFile:[defUrl([NSString stringWithFormat:AppKeyUserMessagesFileKey, userId]) path] with:self.appEngineUserMessages[userId]];
 }
 
+
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+
 + (void) appEngineLoadMessageWithId:(id)messageId fromUserId:(id)userId
 {
     MessageObject *message = [MessageObject new];
     message.objectId = messageId;
     [message fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
-        PFUser *toUser = message[AppKeyToUserField];
+        NSLog(@"MESSAGE LOADED:%@", message);
+        PFUser *toUser = message.toUser;
         PFUser *me = [PFUser currentUser];
         if ([toUser.objectId isEqualToString:me.objectId]) {
-            message[AppKeyIsSyncToUserField] = @(YES);
+            message.isSyncToUser = YES;
             [message saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
                 if (succeeded) {
                     [[AppEngine engine] appEngineAddMessage:message];
@@ -283,6 +297,17 @@ NSDictionary* objectFromMessage(id object)
         }
     }];
 }
+
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
 
 - (void) AppEngineFetchLastObjects
 {
@@ -297,16 +322,16 @@ NSDictionary* objectFromMessage(id object)
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable messages, NSError * _Nullable error) {
         [messages enumerateObjectsUsingBlock:^(MessageObject*  _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
             if ([self appEngineAddMessage:message]) {
-                PFUser *fromUser = message[AppKeyFromUserField];
-                PFUser *toUser = message[AppKeyToUserField];
+                PFUser *fromUser = message.fromUser;
+                PFUser *toUser = message.toUser;
                 
                 BOOL conditionMet = NO;
                 if (SEQ(fromUser.objectId, self.me.objectId)) {
-                    message[AppKeyIsSyncFromUserField] = @(YES);
+                    message.isSyncFromUser = YES;
                     conditionMet = YES;
                 }
                 if (SEQ(toUser.objectId, self.me.objectId)) {
-                    message[AppKeyIsSyncToUserField] = @(YES);
+                    message.isSyncToUser = YES;
                     conditionMet = YES;
                 }
                 
@@ -421,6 +446,7 @@ NSDictionary* objectFromMessage(id object)
 {
     [message saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
         if (succeeded) {
+            NSLog(@"MESSAGE SAVED:%@", message);
             [self appEngineSendPush:message toUser:user];
         }
         else {
@@ -451,6 +477,16 @@ NSDictionary* objectFromMessage(id object)
                                 }];
 }
 
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+// FROM APPLICATION DELEGATE (PUSH CAME IN)
+///////////////////////////////////////////////////////////
+
 + (void)appEngineTreatPushUserInfo:(NSDictionary *)userInfo
 {
     if ([userInfo[AppPushType] isEqualToString:AppPushTypeMessage]) {
@@ -463,6 +499,14 @@ NSDictionary* objectFromMessage(id object)
     }
 }
 
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+
 + (void) appEngineSendPush:(MessageObject *)message toUser:(PFUser*) user
 {
     PFUser *me = [PFUser currentUser];
@@ -471,13 +515,13 @@ NSDictionary* objectFromMessage(id object)
                        withParameters:@{
                                         AppPushRecipientIdField: user.objectId,
                                         AppPushSenderIdField: me.objectId,
-                                        AppPushMessageField: message[AppMessageContent],
+                                        AppPushMessageField: message.msgContent,
                                         AppPushObjectIdField: message.objectId,
                                         AppPushType: AppPushTypeMessage
                                         }
                                 block:^(NSString *success, NSError *error) {
                                     if (!error) {
-                                        NSLog(@"MESSAGE SENT SUCCESSFULLY:%@", message[AppMessageContent]);
+                                        NSLog(@"MESSAGE SENT SUCCESSFULLY:%@", message.msgContent);
                                         [[AppEngine engine] appEngineAddMessage:message];
                                     }
                                     else {
@@ -548,9 +592,9 @@ NSDictionary* objectFromMessage(id object)
 - (void) appEngineSetReadAllMyMessagesWithUserId:(id)userId
 {
     __block NSUInteger count = 0;
-    [self.appEngineUserMessages[userId] enumerateObjectsUsingBlock:^(id  _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([message[AppKeyToUserField] isEqualToString:self.me.objectId] && ![message[AppKeyIsReadKey] boolValue]) {
-            message[AppKeyIsReadKey] = @(YES);
+    [self.appEngineUserMessages[userId] enumerateObjectsUsingBlock:^(NSMutableDictionary* _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([message.toUserId isEqualToString:self.me.objectId] && !message.isRead) {
+            message.isRead = YES;
             count++;
         }
     }];
@@ -565,8 +609,8 @@ NSDictionary* objectFromMessage(id object)
 {
     __block NSUInteger count = 0;
     [[self.appEngineUserMessages allKeys] enumerateObjectsUsingBlock:^(id  _Nonnull userId, NSUInteger idx, BOOL * _Nonnull stop) {
-        [self.appEngineUserMessages[userId] enumerateObjectsUsingBlock:^(id  _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
-            if ([message[AppKeyToUserField] isEqualToString:self.me.objectId] && [message[AppKeyIsReadKey] boolValue] == NO) {
+        [self.appEngineUserMessages[userId] enumerateObjectsUsingBlock:^(NSMutableDictionary* _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
+            if ([message.toUserId isEqualToString:self.me.objectId] && message.isRead == NO) {
                 count++;
             }
         }];
@@ -650,10 +694,10 @@ void circleizeView(UIView* view, CGFloat percent)
 
 float Heading(PFUser* from, PFUser* to)
 {
-    PFGeoPoint *fromLoc = from[AppKeyLocationKey];
-    PFGeoPoint *toLoc = to[AppKeyLocationKey];
+    PFGeoPoint *fromLoc = from.location;
+    PFGeoPoint *toLoc = to.location;
     if (from != to && (fromLoc.latitude == toLoc.latitude && fromLoc.longitude == toLoc.longitude)) {
-        printf("SAME LOCATION FOR:%s - %s\n", [from[AppKeyNicknameKey] UTF8String], [to[AppKeyNicknameKey] UTF8String]);
+        printf("SAME LOCATION FOR:%s - %s\n", [from.nickname UTF8String], [to.nickname UTF8String]);
     }
     return heading(fromLoc, toLoc);
 }

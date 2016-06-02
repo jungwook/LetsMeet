@@ -82,8 +82,8 @@ static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCur
     UIViewAnimationCurve keyboardTransitionAnimationCurve;
     [[notification.userInfo valueForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&keyboardTransitionAnimationCurve];
     
-    if ([self.messageBarDelegate respondsToSelector:@selector(keyBoardEvent:duration:animationType:)]) {
-        [self.messageBarDelegate keyBoardEvent:keyboardEndFrameWindow duration:keyboardTransitionDuration animationType:AnimationOptionsForCurve(keyboardTransitionAnimationCurve)];
+    if ([self.barDelegate respondsToSelector:@selector(keyBoardEvent:duration:animationType:)]) {
+        [self.barDelegate keyBoardEvent:keyboardEndFrameWindow duration:keyboardTransitionDuration animationType:AnimationOptionsForCurve(keyboardTransitionAnimationCurve)];
     }
 }
 
@@ -124,23 +124,23 @@ static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCur
     [self addSubview:_textView];
 }
 
-- (void) mediaButPressed:(id)sender
-{
-    if ([self.messageBarDelegate respondsToSelector:@selector(sendMedia)]) {
-        [self.messageBarDelegate sendMedia];
-    }
-}
-
 - (void) pullDownKeyBoard
 {
     [self.textView resignFirstResponder];
 }
 
+- (void) mediaButPressed:(id)sender
+{
+    if ([self.barDelegate respondsToSelector:@selector(sendMedia)]) {
+        [self.barDelegate sendMedia];
+    }
+}
+
 - (void) sendText
 {
     NSString *textToSend = [self.textView.text stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-    if ([self.messageBarDelegate respondsToSelector:@selector(sendMessage:)]) {
-        [self.messageBarDelegate sendMessage:@{ AppMessageType: AppMessageTypeMessage, AppMessageContent : textToSend}];
+    if ([self.barDelegate respondsToSelector:@selector(sendMessage:)]) {
+        [self.barDelegate sendMessage:[NSMutableDictionary messageWithText:textToSend]];
     }
     
     self.textView.text = @"";

@@ -18,7 +18,7 @@
 
 @interface Chat()
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (weak, nonatomic) IBOutlet MessageBar *messageBar;
+@property (weak, nonatomic) IBOutlet MessageBar *bar;
 @property (nonatomic, strong, readonly) PFUser *me;
 @property (nonatomic, weak, readonly) AppEngine *engine;
 @property (nonatomic, strong) PFUser* user;
@@ -41,7 +41,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.messageBar.messageBarDelegate = self;
+    self.bar.barDelegate = self;
 }
 
 - (void)dealloc
@@ -131,7 +131,7 @@
         switch (type) {
             case kImagePickerMediaPhoto: {
                 [CachedFile saveData:data named:@"ChatImage.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                    [self sendMessageOfType:AppMessageTypePhoto contentFile:file];
+                    [self sendMessageOfType:[NSMutableDictionary typeStringForType:kMessageTypePhoto] contentFile:file];
                 } progressBlock:^(int percentDone) {
                     NSLog(@"SAVING IN PROGRESS:%d", percentDone);
                 }];
@@ -139,7 +139,7 @@
                 break;
             case kImagePickerMediaMovie: {
                 [CachedFile saveData:data named:@"ChatMovie.mov" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                    [self sendMessageOfType:AppMessageTypeVideo contentFile:file];
+                    [self sendMessageOfType:[NSMutableDictionary typeStringForType:kMessageTypeVideo] contentFile:file];
                 } progressBlock:^(int percentDone) {
                     NSLog(@"SAVING IN PROGRESS:%d", percentDone);
                 }];
@@ -159,12 +159,14 @@
     MessageObject *message = [MessageObject new];
     message.fromUser = self.me;
     message.toUser = self.user;
-    message.isRead = @(NO);
-    message.isSyncFromUser = @(YES);
+    message.isRead = NO;
+    message.isSyncFromUser = YES;
     
     if ([self.me.objectId isEqualToString:self.user.objectId]) {
-        message.isSyncToUser = @(YES);
+        message.isSyncToUser = YES;
     }
+
+    NSLog(@"NEW message CREATED:%@", message);
     
     return message;
 }
@@ -187,11 +189,13 @@
 // SEND STRING CONTENT
 ////////////////////////////////////
 
-- (void)sendMessage:(id)barMessage
+- (void)sendMessage:(NSMutableDictionary*)barMessage
 {
     MessageObject *message = [self message];
-    message.msgType = barMessage[AppMessageType];
-    message.msgContent = barMessage[AppMessageContent];
+    message.msgType = barMessage.typeString;
+    message.msgContent = barMessage.text;
+    
+    NSLog(@"message to SEND:%@", message);
     
     [AppEngine appEngineSendMessage:message toUser:self.user];
 }
@@ -226,20 +230,20 @@
     NSLog(@"SELECTED ROW");
 }
 
-- (CGFloat) appropriateLineHeightForMessage:(NSDictionary*)message
+- (CGFloat) appropriateLineHeightForMessage:(NSMutableDictionary*)message
 {
     CGFloat width = [[[UIApplication sharedApplication] keyWindow] bounds].size.width * 0.7f;
     
-    if ([message[AppMessageType] isEqualToString:AppMessageTypeMessage]) {
+    if (message.type == kMessageTypeText) {
         const CGFloat inset = 10;
-        NSString *string = [message[AppMessageContent] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+        NSString *string = [message.text stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
         
         UIFont *font = [UIFont systemFontOfSize:17 weight:UIFontWeightRegular];
         
         CGRect frame = rectForString(string, font, width);
         return frame.size.height+inset*2.5;
     }
-    else if ([message[AppMessageType] isEqualToString:AppMessageTypePhoto]) {
+    else if (message.type == kMessageTypePhoto) {
         UIImage *image = [UIImage imageWithData:message[@"file"][@"data"]];
         
         return image ? width * image.size.height / image.size.width : 200;
@@ -256,18 +260,18 @@
 }
 
 - (IBAction)tappedOutside:(id)sender {
-    [self.messageBar pullDownKeyBoard];
+    [self.bar pullDownKeyBoard];
 }
 
 - (void)keyBoardEvent:(CGRect)kbFrame duration:(double)duration animationType:(UIViewAnimationOptions)animation
 {
-    float m = self.messageBar.frame.size.height;
+    float m = self.bar.frame.size.height;
     float h = kbFrame.origin.y-m;
     [UIView animateWithDuration:duration animations:^{
-        [self.messageBar setFrame:CGRectMake(self.messageBar.frame.origin.x, h, self.messageBar.frame.size.width, m)];
+        [self.bar setFrame:CGRectMake(self.bar.frame.origin.x, h, self.bar.frame.size.width, m)];
         [self.tableView setFrame:CGRectMake(self.tableView.frame.origin.x, 0, self.tableView.frame.size.width, h)];
     } completion:^(BOOL finished) {
-        [self.messageBar setFrame:CGRectMake(self.messageBar.frame.origin.x, h, self.messageBar.frame.size.width, m)];
+        [self.bar setFrame:CGRectMake(self.bar.frame.origin.x, h, self.bar.frame.size.width, m)];
         [self.tableView setFrame:CGRectMake(self.tableView.frame.origin.x, 0, self.tableView.frame.size.width, h)];
         [self scrollToBottomAnimated:NO];
 //        [self scrollToBottomAnimated:YES];
@@ -283,7 +287,7 @@
     }
 }
 
-- (void)tappedPhoto:(NSDictionary *)message image:(UIImage *)image view:(UIView *)view
+- (void)tappedPhoto:(NSMutableDictionary *)message image:(UIImage *)image view:(UIView *)view
 {
     NSLog(@"TAPPED BY DELEGATE");
     [self performSegueWithIdentifier:@"Preview" sender:message];

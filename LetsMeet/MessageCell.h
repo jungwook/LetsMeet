@@ -13,9 +13,9 @@
 @protocol MessageCellDelegate;
 
 @interface MessageCell : UITableViewCell
-@property (nonatomic, weak) NSDictionary * message;
+@property (nonatomic, weak) NSMutableDictionary* message;
 @property (nonatomic, weak) id<MessageCellDelegate> delegate;
-- (void)setMessage:(NSDictionary *)message
+- (void)setMessage:(NSMutableDictionary *)message
            myPhoto:(UIImage*)   myPhoto
          userPhoto:(UIImage*)   userPhoto
           userName:(NSString*)  userName
@@ -23,5 +23,5 @@
 @end
 
 @protocol MessageCellDelegate <NSObject>
-- (void) tappedPhoto:(NSDictionary*)message image:(UIImage*)image view:(UIView*)view;
+- (void) tappedPhoto:(NSMutableDictionary*)message image:(UIImage*)image view:(UIView*)view;
 @end

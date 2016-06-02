@@ -145,7 +145,9 @@ typedef void (^SquareCellBlock)(SquareCell *cell);
 
 - (void) newMessageReceived:(NSNotification*)userInfo
 {
+    NSLog(@"NEW MESSAGE:%@", userInfo);
     PFUser *user = [self userFromUserId:userInfo.object[@"fromUser"]];
+    NSLog(@"USERINFO:%@", user);
     [self updateCellForUserId:user.objectId block:^(SquareCell *cell) {
         [cell setUser:user location:self.location collectionView:self.collectionView];
     }];
