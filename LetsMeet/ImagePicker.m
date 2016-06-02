@@ -10,7 +10,7 @@
 
 @interface ImagePicker ()
 @property (nonatomic, strong) UIAlertController* alert;
-@property (nonatomic, weak) UIViewController* parent;
+@property (nonatomic, weak) UINavigationController  * parent;
 @property (strong, nonatomic) ImagePickerBlock pickerBlock;
 @property (nonatomic) ImagePickerSourceTypes types;
 @end
@@ -28,10 +28,13 @@
     if (self) {
         self.delegate = self;
         self.allowsEditing = NO;
-        self.parent = parent;
+        self.parent = parent.navigationController;
         self.pickerBlock = actionBlock;
         self.types = types;
         self.videoQuality = UIImagePickerControllerQualityType640x480;
+        self.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+        self.videoMaximumDuration = 10;
+        [self.parent setNavigationBarHidden:YES animated:YES];
         
         self.alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
         
@@ -40,8 +43,7 @@
                                                            handler:^(UIAlertAction * action) {
                                                                self.sourceType = UIImagePickerControllerSourceTypeCamera;
                                                                self.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypeCamera];
-                                                               
-                                                               [self.parent presentViewController:self animated:YES completion:nil];
+                                                               [parent presentViewController:self animated:YES completion:nil];
                                                            }];
             if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
                 [self.alert addAction:camera];
@@ -53,7 +55,7 @@
                                                             handler:^(UIAlertAction * action) {
                                                                 self.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
                                                                 self.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
-                                                                [self.parent presentViewController:self animated:YES completion:nil];
+                                                                [parent presentViewController:self animated:YES completion:nil];
                                                             }];
 
             if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
@@ -74,34 +76,133 @@
         }
         
         [self.alert addAction:[UIAlertAction actionWithTitle:@"취소" style:UIAlertActionStyleCancel handler:nil]];
-        [self.parent presentViewController:self.alert animated:YES completion:nil];
+        [parent presentViewController:self.alert animated:YES completion:nil];
     }
     return self;
 }
 
+- (void) dismissPicker:(UIImagePickerController *)picker
+{
+    [self.parent setNavigationBarHidden:NO animated:YES];
+    
+    [self dismissViewControllerAnimated:YES completion:NULL];
+}
+
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
-    [self dismissViewControllerAnimated:YES completion:NULL];
+    [self dismissPicker:picker];
+}
+
+- (UIImage *)fixOrientation:(UIImage*) image
+{
+    if (image.imageOrientation == UIImageOrientationUp)
+        return image;
+
+    CGAffineTransform transform = CGAffineTransformIdentity;
+    
+    switch (image.imageOrientation)
+    {
+        case UIImageOrientationDown:
+        case UIImageOrientationDownMirrored:
+            transform = CGAffineTransformTranslate(transform, image.size.width, image.size.height);
+            transform = CGAffineTransformRotate(transform, M_PI);
+            break;
+            
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+            transform = CGAffineTransformTranslate(transform, image.size.width, 0);
+            transform = CGAffineTransformRotate(transform, M_PI_2);
+            break;
+            
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            transform = CGAffineTransformTranslate(transform, 0, image.size.height);
+            transform = CGAffineTransformRotate(transform, -M_PI_2);
+            break;
+            
+        case UIImageOrientationUp:
+        case UIImageOrientationUpMirrored:
+            break;
+    }
+    
+    switch (image.imageOrientation) {
+        case UIImageOrientationUpMirrored:
+        case UIImageOrientationDownMirrored:
+            transform = CGAffineTransformTranslate(transform, image.size.width, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+            
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRightMirrored:
+            transform = CGAffineTransformTranslate(transform, image.size.height, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+            
+        case UIImageOrientationUp:
+        case UIImageOrientationDown:
+        case UIImageOrientationLeft:
+        case UIImageOrientationRight:
+            break;
+    }
+    
+    // Now we draw the underlying CGImage into a new context, applying the transform
+    // calculated above.
+    CGContextRef ctx = CGBitmapContextCreate(NULL, image.size.width, image.size.height,
+                                             CGImageGetBitsPerComponent(image.CGImage), 0,
+                                             CGImageGetColorSpace(image.CGImage),
+                                             CGImageGetBitmapInfo(image.CGImage));
+    CGContextConcatCTM(ctx, transform);
+    switch (image.imageOrientation) {
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            // Grr...
+            CGContextDrawImage(ctx, CGRectMake(0,0,image.size.height,image.size.width), image.CGImage);
+            break;
+            
+        default:
+            CGContextDrawImage(ctx, CGRectMake(0,0,image.size.width,image.size.height), image.CGImage);
+            break;
+    }
+    
+    // And now we just create a new UIImage from the drawing context
+    CGImageRef cgimg = CGBitmapContextCreateImage(ctx);
+    UIImage *img = [UIImage imageWithCGImage:cgimg];
+    CGContextRelease(ctx);
+    CGImageRelease(cgimg);
+    return img;
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info
 {
     NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
-    UIImage *imageToSave;
+    NSURL *url = (NSURL*)[info objectForKey:UIImagePickerControllerMediaURL];
     
     // Handle a still image capture
     if (CFStringCompare ((CFStringRef) mediaType, kUTTypeImage, 0) == kCFCompareEqualTo) {
-        imageToSave = (UIImage *) [info objectForKey:UIImagePickerControllerOriginalImage];
-        UIImageWriteToSavedPhotosAlbum (imageToSave, nil, nil , nil);
-        NSData *data = UIImageJPEGRepresentation(imageToSave, 1.0);
+        UIImage *image = (UIImage *) [info objectForKey:UIImagePickerControllerOriginalImage];
+        CGSize imageSize = image.size;
+        
+        UIImageWriteToSavedPhotosAlbum (image, nil, nil , nil);
+
+        image = [self fixOrientation:image];
+        NSData *data = UIImageJPEGRepresentation(image, 1.0);
         
         if (self.pickerBlock) {
-            self.pickerBlock(data, kImagePickerMediaPhoto);
+            self.pickerBlock(data, kImagePickerMediaPhoto, NSStringFromCGSize(imageSize), url);
         }
     }
     
     // Handle a movie capture
     if (CFStringCompare ((CFStringRef) mediaType, kUTTypeMovie, 0)== kCFCompareEqualTo) {
+        AVAsset *asset = [AVAsset assetWithURL:url];
+        
+        AVAssetTrack *track = [[asset tracksWithMediaType:AVMediaTypeVideo] firstObject];
+        CGSize dimensions = track ? CGSizeApplyAffineTransform(track.naturalSize, track.preferredTransform) : CGSizeMake(400, 300);
+        dimensions.width = fabs(dimensions.width);
+        dimensions.height = fabs(dimensions.height);
+        
         NSString *moviePath = [((NSURL*)[info objectForKey:UIImagePickerControllerMediaURL]) path];
         
         if (UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(moviePath)) {
@@ -109,11 +210,11 @@
         }
         
         if (self.pickerBlock) {
-            self.pickerBlock(moviePath, kImagePickerMediaMovie);
+            self.pickerBlock(moviePath, kImagePickerMediaMovie, NSStringFromCGSize(dimensions), url);
         }
     }
     
-    [self dismissViewControllerAnimated:YES completion:NULL];
+    [self dismissPicker:picker];
 }
 
 @end

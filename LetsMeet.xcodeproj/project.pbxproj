@@ -31,6 +31,7 @@
 		12DE5FA91CFD43A7009B315F /* Balloon.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FA81CFD43A7009B315F /* Balloon.m */; };
 		12DE5FB31CFEF58A009B315F /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12DE5FB21CFEF58A009B315F /* Photos.framework */; };
 		12DE5FB81CFFB1A2009B315F /* Preview.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FB71CFFB1A2009B315F /* Preview.m */; };
+		12DE5FBB1D004443009B315F /* Progress.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FBA1D004443009B315F /* Progress.m */; };
 		12F7418C1CE4B97100E8267A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418B1CE4B97100E8267A /* main.m */; };
 		12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418E1CE4B97100E8267A /* AppDelegate.m */; };
 		12F741951CE4B97100E8267A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12F741931CE4B97100E8267A /* Main.storyboard */; };
@@ -113,6 +114,8 @@
 		12DE5FB21CFEF58A009B315F /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 		12DE5FB61CFFB1A2009B315F /* Preview.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preview.h; sourceTree = "<group>"; };
 		12DE5FB71CFFB1A2009B315F /* Preview.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preview.m; sourceTree = "<group>"; };
+		12DE5FB91D004443009B315F /* Progress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Progress.h; sourceTree = "<group>"; };
+		12DE5FBA1D004443009B315F /* Progress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Progress.m; sourceTree = "<group>"; };
 		12F741871CE4B97000E8267A /* LetsMeet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LetsMeet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12F7418B1CE4B97100E8267A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		12F7418D1CE4B97100E8267A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -240,6 +243,8 @@
 				12DE5FA81CFD43A7009B315F /* Balloon.m */,
 				12DE5FA41CFD40DD009B315F /* MessageCell.h */,
 				12DE5FA51CFD40DD009B315F /* MessageCell.m */,
+				12DE5FB91D004443009B315F /* Progress.h */,
+				12DE5FBA1D004443009B315F /* Progress.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -467,6 +472,7 @@
 				12F741D11CE56B3400E8267A /* FloatingDrawerView.m in Sources */,
 				12F7418C1CE4B97100E8267A /* main.m in Sources */,
 				124928AF1CF2CD370038A2F3 /* RefreshControl.m in Sources */,
+				12DE5FBB1D004443009B315F /* Progress.m in Sources */,
 				126AF3F61CEA983800E3ED67 /* MessageBar.m in Sources */,
 				12DE5F6F1CFB0028009B315F /* SquareCell.m in Sources */,
 				12F741FA1CE5B13D00E8267A /* AppEngine.m in Sources */,

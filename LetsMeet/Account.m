@@ -140,7 +140,7 @@
 }
 
 - (IBAction)editPhoto:(id)sender {
-    [ImagePicker proceedWithParentViewController:self withPhotoSelectedBlock:^(id data, ImagePickerMediaType type) {
+    [ImagePicker proceedWithParentViewController:self withPhotoSelectedBlock:^(id data, ImagePickerMediaType type, NSString* info, NSURL* url) {
         UIImage *photo = [UIImage imageWithData:data];
         UIImage *small = scaleImage(photo, AppProfilePhotoSize);
         NSData *smallData = UIImageJPEGRepresentation(small, AppProfilePhotoCompression);

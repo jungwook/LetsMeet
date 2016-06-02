@@ -48,6 +48,8 @@
     circleizeView(self.myPhoto, 0.5);
 }
 
+
+
 - (void)setupMessage:(NSMutableDictionary *)message
 {
     const CGFloat offset = 45;
@@ -67,21 +69,39 @@
         self.messageLabel.alpha = YES;
     }
     else if (message.type == kMessageTypePhoto) {
-        self.image = [UIImage imageWithData:message[@"file"][@"data"]];
+        NSData *data = message.data ? message.data : [CachedFile getDataInBackgroundWithBlock:^(NSData *data, NSError *error, BOOL fromCache) {
+            if (!error) {
+                message.data = data;
+                data = message.data;
+                [message save];
+                if ([self.delegate respondsToSelector:@selector(redrawCell:)]) {
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.001 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                        [self.delegate redrawCell:message];
+                    });
+                }
+            }
+            else {
+                NSLog(@"ERROR GETTING DATA:%@", error.localizedDescription);
+            }
+        } name:message.fileName andURL:[NSURL URLWithString:message.fileURL]];
+        
+        self.image = [UIImage imageWithData:data];
+        
         CGFloat w = width;
         if (!self.image) {
-            self.image = [UIImage imageNamed:@"guy"];
+            self.image = [UIImage imageNamed:@"guy"]; //Loading Image...
         }
+        
         CGFloat h = w * self.image.size.height / self.image.size.width;
         UIImage *image = scaleImage(self.image, CGSizeMake(w, h));
+        
         drawImage(image, self.messagePhotoView);
         self.leading.constant = self.isMine ? self.bounds.size.width-w-offset-20 : offset;
         self.trailing.constant = self.isMine ? offset : self.bounds.size.width-w-offset-20;
         self.messagePhotoView.alpha = YES;
         self.messageLabel.alpha = NO;
-        [[self.balloon gestureRecognizers] enumerateObjectsUsingBlock:^(__kindof UIGestureRecognizer * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [self.balloon removeGestureRecognizer:obj];
-        }];
+
+        self.balloon.gestureRecognizers = nil;
         [self.balloon addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(imageTapped:)]];
     }
     self.leadingLabel.constant = self.isMine ? 10 : 15;

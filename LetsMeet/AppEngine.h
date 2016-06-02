@@ -41,6 +41,8 @@
 
 #define AppProfilePhotoSize CGSizeMake(60, 60)
 #define AppProfilePhotoCompression 0.6
+#define AppProfilePhotoCompressionLow 0.2
+
 #define AppProfilePhotoFileName @"profile.jpg"
 #define AppProfileOriginalPhotoFileName @"original.jpg"
 
@@ -103,7 +105,7 @@ typedef void (^CountResultBlock)(NSUInteger count);
 typedef void (^DictionaryResultBlock)(NSDictionary *messages);
 typedef void (^DictionaryArrayResultBlock)(NSDictionary *messages, NSArray *users);
 typedef void (^CachedFileBlock)(NSData * data, NSError * error, BOOL fromCache);
-typedef void (^ImagePickerBlock)(id data, ImagePickerMediaType type);
+typedef void (^ImagePickerBlock)(id data, ImagePickerMediaType type, NSString* sizeString, NSURL *url);
 
 
 CALayer* drawImageOnLayer(UIImage *image, CGSize size);
@@ -115,6 +117,7 @@ float Heading(PFUser* from, PFUser* to);
 CGRect hiveToFrame(CGPoint hive, CGFloat radius, CGFloat inset, CGPoint center);
 CGRect rectForString(NSString *string, UIFont *font, CGFloat maxWidth);
 NSString* QUADRANT(PFGeoPoint* fromLoc, PFGeoPoint* toLoc);
+NSData* compressedImageData(NSData* data, CGFloat width);
 
 @interface AppEngine : NSObject <CLLocationManagerDelegate>
 - (void) initLocationServices;
@@ -139,6 +142,8 @@ NSString* QUADRANT(PFGeoPoint* fromLoc, PFGeoPoint* toLoc);
 + (BOOL) appEngineRemoveAllMessagesFromUserId:(id)userId;
 + (NSUInteger) appEngineUnreadCount;
 + (void) appEngineTreatPushUserInfo:(NSDictionary*)userInfo;
++ (BOOL) appEngineUpdateFileForUserId:(id)userId;
++ (BOOL) appEnginePreAddMessage:(MessageObject *)message;
 
 - (void) startTimeKeeperIfSimulator;
 - (void) AppEngineFetchLastObjects;

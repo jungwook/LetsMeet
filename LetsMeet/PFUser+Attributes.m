@@ -149,6 +149,7 @@
 @dynamic msgType;
 @dynamic msgContent;
 @dynamic file;
+@dynamic mediaInfo;
 @dynamic isSyncToUser, isSyncFromUser, isRead;
 
 + (NSString *)parseClassName {
@@ -353,6 +354,17 @@
     [self setObject:text forKey:@"msgContent"];
 }
 
+- (NSString *)mediaInfo
+{
+    return [self objectForKey:@"mediaInfo"];
+}
+
+- (void)setMediaInfo:(NSString *)mediaInfo
+{
+    ASSERTNOTNULL(mediaInfo);
+    [self setObject:mediaInfo forKey:@"mediaInfo"];
+}
+
 - (NSString *)fileName
 {
     return [self objectForKey:@"file"][@"name"];
@@ -434,6 +446,39 @@
 - (BOOL)isFromMe
 {
     return [[self fromUserId] isEqualToString:[PFUser currentUser].objectId];
+}
+
+- (NSData *)data
+{
+    return [self objectForKey:@"file"][@"data"];
+}
+
+- (void)setData:(NSData *)data
+{
+    if (data) {
+        data = compressedImageData(data, 230.0f);
+        NSMutableDictionary *file = [self objectForKey:@"file"] ? [self objectForKey:@"file"] : [NSMutableDictionary dictionary];
+        [file setObject:data forKey:@"data"];
+        [self setObject:file forKey:@"file"];
+    }
+    else {
+        if (self.isDataAvailable) {
+            NSMutableDictionary *file = [self objectForKey:@"file"];
+            [file removeObjectForKey:@"data"];
+            [self setObject:file forKey:@"file"];
+        }
+    }
+}
+
+- (BOOL)isDataAvailable
+{
+    return [self objectForKey:@"file"][@"data"] ? YES : NO;
+}
+
+- (BOOL)save
+{
+    id otherId = [self.fromUserId isEqualToString:[PFUser currentUser].objectId] ? self.toUserId : self.fromUserId;
+    return [AppEngine appEngineUpdateFileForUserId:otherId];
 }
 
 @end

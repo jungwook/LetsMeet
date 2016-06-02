@@ -195,7 +195,21 @@ NSDictionary* objectFromMessage(id object)
         if (file.name) dic[AppKeyNameKey] = file.name;
         if (file.url) dic[AppKeyURLKey] = file.url;
         if (file.isDataAvailable) {
-//            dic[AppKeyDataKey] = [file getData];
+            ///////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////
+            
+            dic[AppKeyDataKey] = compressedImageData([file getData], 230.0f);
+            
+            ///////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////
         }
     }
     else if ([object isKindOfClass:[PFGeoPoint class]]) {
@@ -224,22 +238,32 @@ NSDictionary* objectFromMessage(id object)
     return dic;
 }
 
-- (BOOL) appEngineAddMessage:(MessageObject *)message
++ (BOOL) appEnginePreAddMessage:(MessageObject *)message
+{
+    return [[AppEngine engine] appEngineAddMessage:message save:NO];
+}
+
+- (BOOL) appEngineAddMessage:(MessageObject *)message save:(BOOL)save
 {
     NSString *otherId = otherUserId(message);
     NSMutableDictionary* document = (NSMutableDictionary*) objectFromMessage(message);
-    NSLog(@"ADDING NEW MESSAGE:%@", message.info);
     
     if (!self.appEngineUserMessages[otherId]) {
         self.appEngineUserMessages[otherId] = [NSMutableArray array];
     }
     
     NSPredicate *contains = [NSPredicate predicateWithFormat:@"objectId == %@", document.objectId];
-    NSUInteger c = [self.appEngineUserMessages[otherId] filteredArrayUsingPredicate:contains].count;
+    NSArray *duplicates = [self.appEngineUserMessages[otherId] filteredArrayUsingPredicate:contains];
+    
+    NSUInteger c = duplicates.count;
     if (c<1) {
         [self.appEngineUserMessages[otherId] addObject:document];
     } else {
-        NSLog(@"ALREADY CONTAINS OBJECT");
+        NSLog(@"ALREADY CONTAINS MESSAGE.... SO REPLACING TO NEW ONE");
+        NSPredicate *doesNotContain = [NSPredicate predicateWithFormat:@"objectId != %@", document.objectId];
+        NSArray *exclusives = [self.appEngineUserMessages[otherId] filteredArrayUsingPredicate:doesNotContain];
+        self.appEngineUserMessages[otherId] = [NSMutableArray arrayWithArray:exclusives];
+        [self.appEngineUserMessages[otherId] addObject:message];
     }
     
     // SORT ARRAY AND INTO MUTABLE ARRAY
@@ -249,11 +273,14 @@ NSDictionary* objectFromMessage(id object)
     SENDNOTIFICATION(AppUserNewMessageReceivedNotification, document);
 
     NSLog(@"UPDATING FILESYSTEM");
-    [AppEngine appEngineResetBadge];
-    BOOL ret = [self updateFile:AppEngineUsersFile with:[self.appEngineUserMessages allKeys]];
-    ret = ret | [self appEngineUpdateFileForUserId:otherId];
-    
-    return ret;
+    if (save) {
+        [AppEngine appEngineResetBadge];
+        BOOL ret = [self updateFile:AppEngineUsersFile with:[self.appEngineUserMessages allKeys]];
+        ret = ret | [self appEngineUpdateFileForUserId:otherId];
+        return ret;
+    } else {
+        return save;
+    }
 }
 
 - (BOOL) appEngineRemoveFileForUserId:(id)userId
@@ -261,9 +288,15 @@ NSDictionary* objectFromMessage(id object)
     return [self removeFile:[defUrl([NSString stringWithFormat:AppKeyUserMessagesFileKey, userId]) path]];
 }
 
++ (BOOL) appEngineUpdateFileForUserId:(id)userId
+{
+    return [[AppEngine engine] appEngineUpdateFileForUserId:userId];
+}
+
 - (BOOL) appEngineUpdateFileForUserId:(id)userId
 {
-    return [self updateFile:[defUrl([NSString stringWithFormat:AppKeyUserMessagesFileKey, userId]) path] with:self.appEngineUserMessages[userId]];
+    NSArray *userMessages = self.appEngineUserMessages[userId];
+    return [self updateFile:[defUrl([NSString stringWithFormat:AppKeyUserMessagesFileKey, userId]) path] with:userMessages];
 }
 
 
@@ -291,7 +324,7 @@ NSDictionary* objectFromMessage(id object)
             message.isSyncToUser = YES;
             [message saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
                 if (succeeded) {
-                    [[AppEngine engine] appEngineAddMessage:message];
+                    [[AppEngine engine] appEngineAddMessage:message save:YES];
                 }
             }];
         }
@@ -321,7 +354,7 @@ NSDictionary* objectFromMessage(id object)
     [query setLimit:1000];
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable messages, NSError * _Nullable error) {
         [messages enumerateObjectsUsingBlock:^(MessageObject*  _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
-            if ([self appEngineAddMessage:message]) {
+            if ([self appEngineAddMessage:message save:YES]) {
                 PFUser *fromUser = message.fromUser;
                 PFUser *toUser = message.toUser;
                 
@@ -446,7 +479,6 @@ NSDictionary* objectFromMessage(id object)
 {
     [message saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
         if (succeeded) {
-            NSLog(@"MESSAGE SAVED:%@", message);
             [self appEngineSendPush:message toUser:user];
         }
         else {
@@ -521,8 +553,7 @@ NSDictionary* objectFromMessage(id object)
                                         }
                                 block:^(NSString *success, NSError *error) {
                                     if (!error) {
-                                        NSLog(@"MESSAGE SENT SUCCESSFULLY:%@", message.msgContent);
-                                        [[AppEngine engine] appEngineAddMessage:message];
+                                        [[AppEngine engine] appEngineAddMessage:message save:YES];
                                     }
                                     else {
                                         NSLog(@"ERROR SENDING PUSH:%@", error.localizedDescription);
@@ -745,6 +776,16 @@ float heading(PFGeoPoint* fromLoc, PFGeoPoint* toLoc)
     } else {
         return 360+degree;
     }
+}
+
+NSData* compressedImageData(NSData* data, CGFloat width)
+{
+    NSLog(@"Loaded data of size:%ld", [data length]);
+    UIImage *image = [UIImage imageWithData:data];
+    const CGFloat thumbnailWidth = width;
+    CGFloat thumbnailHeight = image.size.width ? thumbnailWidth * image.size.height / image.size.width : 200;
+    image = scaleImage(image, CGSizeMake(thumbnailWidth, thumbnailHeight));
+    return UIImageJPEGRepresentation(image, AppProfilePhotoCompressionLow);
 }
 
 CGRect rectForString(NSString *string, UIFont *font, CGFloat maxWidth)

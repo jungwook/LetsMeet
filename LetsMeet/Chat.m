@@ -12,6 +12,7 @@
 #import "CachedFile.h"
 #import "ImagePicker.h"
 #import "Preview.h"
+#import "Progress.h"
 
 #define meId self.me.objectId
 #define userId self.user.objectId
@@ -32,6 +33,7 @@
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
+        self.definesPresentationContext = YES;
         _me = [PFUser currentUser];
         _engine = [AppEngine engine];
     }
@@ -42,6 +44,13 @@
 {
     [super viewDidLoad];
     self.bar.barDelegate = self;
+    
+    NSLog(@"INITIALIZING DATA");
+    [[AppEngine appEngineMessagesWithUserId:userId] enumerateObjectsUsingBlock:^(NSMutableDictionary* _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (message.isDataAvailable) {
+//            message.data = nil;
+        }
+    }];
 }
 
 - (void)dealloc
@@ -127,21 +136,44 @@
 
 - (void)sendMedia
 {
-    [ImagePicker proceedWithParentViewController:self withPhotoSelectedBlock:^(id data, ImagePickerMediaType type) {
+    [ImagePicker proceedWithParentViewController:self withPhotoSelectedBlock:^(id data, ImagePickerMediaType type, NSString* stringSize, NSURL* url) {
         switch (type) {
             case kImagePickerMediaPhoto: {
+                CGRect frame = [[UIApplication sharedApplication] keyWindow].bounds;
+                UIView *black = [UIView new];
+                [black setFrame:frame];
+                [black setBackgroundColor:[UIColor blackColor]];
+                black.alpha = 0;
+                [[[UIApplication sharedApplication] keyWindow] addSubview:black];
+                
+                Progress *progress = [[Progress alloc] initWithFrame:frame];
+                [black addSubview:progress];
+                
+                [UIView animateWithDuration:1 animations:^{
+                    black.alpha = 1;
+                    [progress startLoading];
+                } completion:^(BOOL finished) {
+                
+                }];
+                
                 [CachedFile saveData:data named:@"ChatImage.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                    [self sendMessageOfType:[NSMutableDictionary typeStringForType:kMessageTypePhoto] contentFile:file];
+                    [self sendMessageOfType:[NSMutableDictionary typeStringForType:kMessageTypePhoto] contentFile:file info:stringSize];
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                        [progress completeLoading:YES block:^{
+                            [black removeFromSuperview];
+                        }];
+                    });
                 } progressBlock:^(int percentDone) {
-                    NSLog(@"SAVING IN PROGRESS:%d", percentDone);
+                    progress.progress = percentDone / 100.0f;
+//                    NSLog(@"SAVING IN PROGRESS:%d", percentDone);
                 }];
             }
                 break;
             case kImagePickerMediaMovie: {
                 [CachedFile saveData:data named:@"ChatMovie.mov" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                    [self sendMessageOfType:[NSMutableDictionary typeStringForType:kMessageTypeVideo] contentFile:file];
+                    [self sendMessageOfType:[NSMutableDictionary typeStringForType:kMessageTypeVideo] contentFile:file info:stringSize];
                 } progressBlock:^(int percentDone) {
-                    NSLog(@"SAVING IN PROGRESS:%d", percentDone);
+//                    NSLog(@"SAVING IN PROGRESS:%d", percentDone);
                 }];
             }
                 break;
@@ -151,7 +183,7 @@
                 break;
         }
         
-    } featuring:kImagePickerSourceCamera | kImagePickerSourceLibrary | kImagePickerSourceVoice | kImagePickerSourceURL ];
+    } featuring:kImagePickerSourceCamera | kImagePickerSourceLibrary | kImagePickerSourceVoice | kImagePickerSourceURL];
 }
 
 - (MessageObject*) message
@@ -165,8 +197,6 @@
     if ([self.me.objectId isEqualToString:self.user.objectId]) {
         message.isSyncToUser = YES;
     }
-
-    NSLog(@"NEW message CREATED:%@", message);
     
     return message;
 }
@@ -175,12 +205,13 @@
 // SEND MEDIA CONTENT PHOTO + VIDEO
 ////////////////////////////////////
 
-- (void)sendMessageOfType:(NSString*)type contentFile:(PFFile*)content
+- (void)sendMessageOfType:(NSString*)type contentFile:(PFFile*)content info:(NSString*)sizeInfo
 {
     MessageObject *message = [self message];
     message.msgType = type;
     message.msgContent = @"Media Content";
     message.file = content;
+    message.mediaInfo = sizeInfo;
 
     [AppEngine appEngineSendMessage:message toUser:self.user];
 }
@@ -194,8 +225,6 @@
     MessageObject *message = [self message];
     message.msgType = barMessage.typeString;
     message.msgContent = barMessage.text;
-    
-    NSLog(@"message to SEND:%@", message);
     
     [AppEngine appEngineSendMessage:message toUser:self.user];
 }
@@ -225,6 +254,33 @@
     return cell;
 }
 
+typedef void (^MessageCellBlock)(MessageCell *cell);
+
+- (void)updateCellForMessageId:(id)messageId block:(MessageCellBlock)block
+{
+    NSArray *visible = [self.tableView visibleCells];
+    [visible enumerateObjectsUsingBlock:^(MessageCell* cell, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([cell.message.objectId isEqualToString:messageId]) {
+            if (block)
+                block(cell);
+            *stop = YES;
+        }
+    }];
+}
+
+- (void) redrawCell:(NSMutableDictionary*)message
+{
+    [self updateCellForMessageId:message.objectId block:^(MessageCell *cell) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [cell setMessage:message
+                     myPhoto:self.myPhoto
+                   userPhoto:self.userPhoto
+                    userName:self.user.nickname
+                      myName:self.me.nickname];
+        });
+    }];
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSLog(@"SELECTED ROW");
@@ -237,16 +293,13 @@
     if (message.type == kMessageTypeText) {
         const CGFloat inset = 10;
         NSString *string = [message.text stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-        
         UIFont *font = [UIFont systemFontOfSize:17 weight:UIFontWeightRegular];
-        
         CGRect frame = rectForString(string, font, width);
         return frame.size.height+inset*2.5;
     }
     else if (message.type == kMessageTypePhoto) {
-        UIImage *image = [UIImage imageWithData:message[@"file"][@"data"]];
-        
-        return image ? width * image.size.height / image.size.width : 200;
+        CGSize size = CGSizeFromString(message.mediaInfo);
+        return size.width ? width * size.height / size.width : 200;
     }
     else {
         return 40;
@@ -301,5 +354,6 @@
 //        vc.message = sender;
     }
 }
+
 
 @end

@@ -31,6 +31,7 @@
 @property (retain) PFUser *toUser;
 @property (retain) NSString *msgContent;
 @property (retain) PFFile* file;
+@property (retain) NSString *mediaInfo;
 @property (retain) NSString *msgType;
 @property BOOL isSyncFromUser;
 @property BOOL isSyncToUser;
@@ -55,20 +56,24 @@ typedef NS_OPTIONS(NSUInteger, MessageTypes) {
 };
 
 @interface NSMutableDictionary (Message)
-@property (nonatomic, strong) NSString* objectId;
-@property (nonatomic, strong) NSString* fromUserId;
-@property (nonatomic, strong) NSString* toUserId;
+@property (nonatomic, weak) NSString* objectId;
+@property (nonatomic, weak) NSString* fromUserId;
+@property (nonatomic, weak) NSString* toUserId;
 @property (nonatomic) MessageTypes type;
-@property (nonatomic, strong) NSString* text;
-@property (nonatomic, strong) NSString* fileName;
-@property (nonatomic, strong) NSString* fileURL;
-@property (nonatomic, strong) NSDate* createdAt;
-@property (nonatomic, strong) NSDate* updatedAt;
+@property (nonatomic, weak) NSString* text;
+@property (nonatomic, weak) NSString* fileName;
+@property (nonatomic, weak) NSString* fileURL;
+@property (nonatomic, weak) NSString* mediaInfo;
+@property (nonatomic, weak) NSDate* createdAt;
+@property (nonatomic, weak) NSDate* updatedAt;
 @property (nonatomic) BOOL isSyncFromUser;
 @property (nonatomic) BOOL isSyncToUser;
 @property (nonatomic) BOOL isRead;
 @property (nonatomic, readonly) BOOL isFromMe;
+@property (nonatomic, readonly) BOOL isDataAvailable;
+@property (nonatomic, weak) NSData* data;
 
+- (BOOL) save;
 - (NSString*) typeString;
 + (NSString*) typeStringForType:(MessageTypes)type;
 

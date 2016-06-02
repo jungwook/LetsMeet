@@ -13,6 +13,8 @@ typedef void (^FileBooleanResultBlock)(PFFile *file, BOOL succeeded, NSError * e
 
 @interface CachedFile : NSCache
 + (void) getDataInBackgroundWithBlock:(CachedFileBlock)block fromFile:(PFFile*)file;
-+ (void) saveData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(FileBooleanResultBlock)block progressBlock:(PFProgressBlock)progressBlock;
++ (NSData*) getDataInBackgroundWithBlock:(CachedFileBlock)block name:(NSString*)name andURL:(NSURL*)url;
++ (PFFile*) saveData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(FileBooleanResultBlock)block progressBlock:(PFProgressBlock)progressBlock;
 + (id)objectForKey:(id)key;
+
 @end

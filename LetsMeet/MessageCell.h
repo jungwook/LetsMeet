@@ -24,4 +24,5 @@
 
 @protocol MessageCellDelegate <NSObject>
 - (void) tappedPhoto:(NSMutableDictionary*)message image:(UIImage*)image view:(UIView*)view;
+- (void) redrawCell:(NSMutableDictionary*)message;
 @end
