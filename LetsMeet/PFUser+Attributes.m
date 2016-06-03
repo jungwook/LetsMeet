@@ -1,9 +1,9 @@
 //
-//  PFUser+Attributes.m
-//  LetsMeet
+// PFUser+Attributes.m
+// LetsMeet
 //
-//  Created by 한정욱 on 2016. 5. 27..
-//  Copyright © 2016년 SMARTLY CO. All rights reserved.
+// Created by 한정욱 on 2016. 5. 27..
+// Copyright © 2016년 SMARTLY CO. All rights reserved.
 //
 
 #import "PFUser+Attributes.h"
@@ -146,8 +146,8 @@
 @implementation MessageObject
 @dynamic fromUser;
 @dynamic toUser;
-@dynamic msgType;
-@dynamic msgContent;
+@dynamic type;
+@dynamic message;
 @dynamic file;
 @dynamic mediaInfo;
 @dynamic isSyncToUser, isSyncFromUser, isRead;
@@ -163,27 +163,27 @@
 
 - (BOOL)isTextMessage
 {
-    return [self.msgType isEqualToString:@"MSG"];
+    return (self.type == kMessageTypeText);
 }
 
 - (BOOL)isPhotoMessage
 {
-    return [self.msgType isEqualToString:@"PHOTO"];
+    return (self.type == kMessageTypePhoto);
 }
 
 - (BOOL)isAudioMessage
 {
-    return [self.msgType isEqualToString:@"AUDIO"];
+    return (self.type == kMessageTypeAudio);
 }
 
 -(BOOL)isVideoMessage
 {
-    return [self.msgType isEqualToString:@"VIDEO"];
+    return (self.type == kMessageTypeVideo);
 }
 
 -(BOOL)isURLMessage
 {
-    return [self.msgType isEqualToString:@"URL"];
+    return (self.type == kMessageTypeURL);
 }
 
 - (NSString*) info
@@ -194,8 +194,8 @@
                      self.updatedAt,
                      self.fromUser,
                      self.toUser,
-                     self.msgType,
-                     self.msgContent,
+                     [Message typeStringForType:self.type],
+                     self.message,
                      self.file ? @"YES" : @"NO"];
     
     return ret;
@@ -203,19 +203,20 @@
 @end
 
 
+
 @implementation NSMutableDictionary(Message)
 
 + (instancetype)messageWithText:(NSString *)text
 {
-    NSMutableDictionary *message = [NSMutableDictionary new];
+    Message* message = [Message new];
     message.type = kMessageTypeText;
-    message.text = text;
+    message.message = text;
     return message;
 }
 
 + (instancetype)messageWithPhoto:(PFFile*)file
 {
-    NSMutableDictionary *message = [NSMutableDictionary new];
+    Message* message = [Message new];
     message.type = kMessageTypePhoto;
     message.fileName = file.name;
     message.fileURL = file.url;
@@ -224,7 +225,7 @@
 
 + (instancetype)messageWithVideo:(PFFile*)file
 {
-    NSMutableDictionary *message = [NSMutableDictionary new];
+    Message* message = [Message new];
     message.type = kMessageTypeVideo;
     message.fileName = file.name;
     message.fileURL = file.url;
@@ -233,10 +234,24 @@
 
 + (instancetype)messageWithAudio:(PFFile*)file
 {
-    NSMutableDictionary *message = [NSMutableDictionary new];
+    Message* message = [Message new];
     message.type = kMessageTypeAudio;
     message.fileName = file.name;
     message.fileURL = file.url;
+    return message;
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+    }
+    return self;
+}
+
++ (instancetype) messageWithMessage:(NSDictionary*)newDic
+{
+    Message* message = [[Message alloc] initWithDictionary:newDic];
     return message;
 }
 
@@ -275,28 +290,26 @@
 
 - (MessageTypes)type
 {
-    if ([[self objectForKey:@"msgType"] isEqualToString:@"MSG"]) {
-        return kMessageTypeText;
-    }
-    else if ([[self objectForKey:@"msgType"] isEqualToString:@"PHOTO"]) {
-        return kMessageTypePhoto;
-    }
-    else if ([[self objectForKey:@"msgType"] isEqualToString:@"VIDEO"]) {
-        return kMessageTypeVideo;
-    }
-    else if ([[self objectForKey:@"msgType"] isEqualToString:@"AUDIO"]) {
-        return kMessageTypeAudio;
-    }
-    else if ([[self objectForKey:@"msgType"] isEqualToString:@"URL"]) {
-        return kMessageTypeURL;
-    }
-    else
-        return kMessageTypeNone;
+    return [[self objectForKey:@"type"] integerValue];
 }
 
 - (NSString*)typeString
 {
-    return [self objectForKey:@"msgType"];
+    switch (self.type) {
+        case kMessageTypeText:
+            return @"MSG";
+        case kMessageTypePhoto:
+            return @"PHOTO";
+        case kMessageTypeVideo:
+            return @"VIDEO";
+        case kMessageTypeAudio:
+            return @"AUDIO";
+        case kMessageTypeURL:
+            return @"URL";
+        case kMessageTypeNone:
+        default:
+            return @"NONE";
+    }
 }
 
 + (NSString*)typeStringForType:(MessageTypes)type
@@ -321,37 +334,18 @@
 
 - (void)setType:(MessageTypes)type
 {
-    switch (type) {
-        case kMessageTypeText:
-            [self setObject:@"MSG" forKey:@"msgType"];
-            break;
-        case kMessageTypePhoto:
-            [self setObject:@"PHOTO" forKey:@"msgType"];
-            break;
-        case kMessageTypeVideo:
-            [self setObject:@"VIDEO" forKey:@"msgType"];
-            break;
-        case kMessageTypeAudio:
-            [self setObject:@"AUDIO" forKey:@"msgType"];
-            break;
-        case kMessageTypeURL:
-            [self setObject:@"URL" forKey:@"msgType"];
-            break;
-        case kMessageTypeNone:
-        default:
-            break;
-    }
+    [self setObject:@(type) forKey:@"type"];
 }
 
--(NSString *)text
+-(NSString *)message
 {
-    return [self objectForKey:@"msgContent"];
+    return [self objectForKey:@"message"];
 }
 
-- (void)setText:(NSString *)text
+- (void)setMessage:(NSString *)message
 {
-    ASSERTNOTNULL(text);
-    [self setObject:text forKey:@"msgContent"];
+    ASSERTNOTNULL(message);
+    [self setObject:message forKey:@"message"];
 }
 
 - (NSString *)mediaInfo
@@ -367,28 +361,24 @@
 
 - (NSString *)fileName
 {
-    return [self objectForKey:@"file"][@"name"];
+    return [self objectForKey:@"fileName"];
 }
 
 - (void)setFileName:(NSString *)fileName
 {
     ASSERTNOTNULL(fileName);
-    NSMutableDictionary *file = [self objectForKey:@"file"] ? [self objectForKey:@"file"] : [NSMutableDictionary dictionary];
-    [file setObject:fileName forKey:@"name"];
-    [self setObject:file forKey:@"file"];
+    [self setObject:fileName forKey:@"fileName"];
 }
 
 - (NSString *)fileURL
 {
-    return [self objectForKey:@"file"][@"url"];
+    return [self objectForKey:@"fileURL"];
 }
 
 - (void)setFileURL:(NSString *)fileURL
 {
     ASSERTNOTNULL(fileURL);
-    NSMutableDictionary *file = [self objectForKey:@"file"] ? [self objectForKey:@"file"] : [NSMutableDictionary dictionary];
-    [file setObject:fileURL forKey:@"url"];
-    [self setObject:file forKey:@"file"];
+    [self setObject:fileURL forKey:@"fileURL"];
 }
 
 - (NSDate *)createdAt
@@ -450,29 +440,23 @@
 
 - (NSData *)data
 {
-    return [self objectForKey:@"file"][@"data"];
+    return [self objectForKey:@"data"];
 }
 
 - (void)setData:(NSData *)data
 {
     if (data) {
         data = compressedImageData(data, 230.0f);
-        NSMutableDictionary *file = [self objectForKey:@"file"] ? [self objectForKey:@"file"] : [NSMutableDictionary dictionary];
-        [file setObject:data forKey:@"data"];
-        [self setObject:file forKey:@"file"];
+        [self setObject:data forKey:@"data"];
     }
     else {
-        if (self.isDataAvailable) {
-            NSMutableDictionary *file = [self objectForKey:@"file"];
-            [file removeObjectForKey:@"data"];
-            [self setObject:file forKey:@"file"];
-        }
+        [self removeObjectForKey:@"data"];
     }
 }
 
 - (BOOL)isDataAvailable
 {
-    return [self objectForKey:@"file"][@"data"] ? YES : NO;
+    return [self objectForKey:@"data"] ? YES : NO;
 }
 
 - (BOOL)save

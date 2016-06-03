@@ -129,7 +129,7 @@ static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCur
     [self.textView resignFirstResponder];
 }
 
-- (void) mediaButPressed:(id)sender
+- (void) mediaButPressed:(Message*)sender
 {
     if ([self.barDelegate respondsToSelector:@selector(sendMedia)]) {
         [self.barDelegate sendMedia];
@@ -140,7 +140,7 @@ static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCur
 {
     NSString *textToSend = [self.textView.text stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     if ([self.barDelegate respondsToSelector:@selector(sendMessage:)]) {
-        [self.barDelegate sendMessage:[NSMutableDictionary messageWithText:textToSend]];
+        [self.barDelegate sendMessage:textToSend];
     }
     
     self.textView.text = @"";

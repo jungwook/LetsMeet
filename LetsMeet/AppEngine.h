@@ -110,6 +110,7 @@ typedef void (^DictionaryArrayResultBlock)(NSDictionary *messages, NSArray *user
 typedef void (^CachedFileBlock)(NSData * data, NSError * error, BOOL fromCache);
 typedef void (^ImagePickerBlock)(id data, ImagePickerMediaType type, NSString* sizeString, NSURL *url);
 typedef void (^ImageSizePickerBlock)(NSData *data, Progress* progress);
+typedef NSMutableDictionary Message;
 
 CALayer* drawImageOnLayer(UIImage *image, CGSize size);
 UIImage* scaleImage(UIImage* image, CGSize size);
@@ -132,23 +133,35 @@ NSData* compressedImageData(NSData* data, CGFloat width);
 
 ////////////////////////// NEW GLOBAL APIS ////////////////////////
 //+ (void) appEngineReloadAllMessages;
-+ (void) appEngineLoadMessageWithId:(id)messageId fromUserId:(id)userId;
-+ (void) appEngineSendMessage:(MessageObject *)message toUser:(PFUser *)user;
+
+//+ (void) appEngineLoadMessageWithId:(id)messageId fromUserId:(id)userId;
+//+ (void) appEngineUsersFromUserIds:(NSArray*)userIds completed:(ArrayResultBlock)block;
+//+ (void) appEngineUserFromUserId:(id)userId completed:(UserResultBlock)block;
+//+ (NSString*) appEngineLastMessageFromUser:(PFUser*)user;
+//+ (NSString*) appEngineLastMessageFromUserId:(id)userId;
+//+ (void) appEngineResetBadge;
+
+
++ (void) app2EngineSendMessage:(Message *)message file:(PFFile*)file toUser:(PFUser *)user;
++ (void) appEngineSendMessage:(NSString*)textToSend
+                         type:(MessageTypes)type
+                         data:(NSData*)thumbnail
+                     filename:(NSString*)filename
+                          url:(NSURL*)url
+                       toUser:(PFUser*)user;
+
 + (void) appEngineBroadcastPush:(NSString*)message duration:(NSNumber*)duration;
-+ (void) appEngineUsersFromUserIds:(NSArray*)userIds completed:(ArrayResultBlock)block;
 + (void) appEngineInboxUsers:(ArrayResultBlock)block;
-+ (void) appEngineUserFromUserId:(id)userId completed:(UserResultBlock)block;
-+ (NSString*) appEngineLastMessageFromUser:(PFUser*)user;
-+ (NSString*) appEngineLastMessageFromUserId:(id)userId;
-+ (NSArray*) appEngineMessagesWithUserId:(id)userId;
-+ (void) appEngineSetReadAllMyMessagesWithUserId:(id)userId;
-+ (BOOL) appEngineRemoveAllMessagesFromUserId:(id)userId;
+
 + (NSUInteger) appEngineUnreadCount;
 + (void) appEngineTreatPushUserInfo:(NSDictionary*)userInfo;
++ (NSArray*) appEngineMessagesWithUserId:(id)userId;
+
++ (void) appEngineSetReadAllMyMessagesWithUserId:(id)userId;
++ (BOOL) appEngineRemoveAllMessagesFromUserId:(id)userId;
 + (BOOL) appEngineUpdateFileForUserId:(id)userId;
-+ (BOOL) appEnginePreAddMessage:(MessageObject *)message;
 
 - (void) startTimeKeeperIfSimulator;
 - (void) AppEngineFetchLastObjects;
-+ (void) appEngineResetBadge;
+
 @end

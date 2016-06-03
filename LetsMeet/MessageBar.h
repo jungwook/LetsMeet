@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "PFUser+Attributes.h"
+#import "AppEngine.h"
 
 @protocol MessageBarDelegate;
 
@@ -19,6 +20,6 @@
 
 @protocol MessageBarDelegate <NSObject>
 - (void) keyBoardEvent:(CGRect)kbFrame duration:(double)duration animationType:(UIViewAnimationOptions)animation;
-- (void) sendMessage:(NSMutableDictionary*)message;
+- (void) sendMessage:(NSString*)message;
 - (void) sendMedia;
 @end

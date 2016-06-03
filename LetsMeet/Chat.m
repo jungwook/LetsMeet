@@ -49,7 +49,7 @@
     self.bar.barDelegate = self;
     
     NSLog(@"INITIALIZING DATA");
-    [[AppEngine appEngineMessagesWithUserId:userId] enumerateObjectsUsingBlock:^(NSMutableDictionary* _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
+    [[AppEngine appEngineMessagesWithUserId:userId] enumerateObjectsUsingBlock:^(Message* _Nonnull message, NSUInteger idx, BOOL * _Nonnull stop) {
         if (message.isDataAvailable) {
 //            message.data = nil;
         }
@@ -114,9 +114,9 @@
     //
     // WHAT AM I HANDLING
     //
-    id message = notification.object;
-    id fromUser = message[AppKeyFromUserField];
-    id toUser = message[AppKeyToUserField];
+    Message* message = notification.object;
+    id fromUser = message.fromUserId;
+    id toUser = message.toUserId;
     
     if ([fromUser isEqualToString:meId] && [toUser isEqualToString:userId]) {
         if ([userId isEqualToString:meId]) {
@@ -165,7 +165,7 @@
                                            handler:^(NSData *data)
                  {
                      [CachedFile saveData:data named:@"photo.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                         [self sendMessageOfType:[NSMutableDictionary typeStringForType:kMessageTypePhoto] contentFile:file info:stringSize];
+                         [self sendMessageOfType:kMessageTypePhoto contentFile:file info:stringSize];
                          [progress completeLoading:YES block:^{
                              [progress.superview removeFromSuperview];
                          }];
@@ -177,7 +177,7 @@
                 break;
             case kImagePickerMediaMovie: {
                 [CachedFile saveData:data named:@"movie.mov" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                    [self sendMessageOfType:[NSMutableDictionary typeStringForType:kMessageTypeVideo] contentFile:file info:stringSize];
+                    [self sendMessageOfType:kMessageTypeVideo contentFile:file info:stringSize];
                 } progressBlock:^(int percentDone) {
                 }];
             }
@@ -214,28 +214,26 @@
 // SEND MEDIA CONTENT PHOTO + VIDEO
 ////////////////////////////////////
 
-- (void)sendMessageOfType:(NSString*)type contentFile:(PFFile*)content info:(NSString*)sizeInfo
+- (void)sendMessageOfType:(MessageTypes)type contentFile:(PFFile*)content info:(NSString*)sizeInfo
 {
-    MessageObject *message = [self message];
-    message.msgType = type;
-    message.msgContent = @"Media Content";
-    message.file = content;
+    Message *message = [Message new];
+    message.type = type;
     message.mediaInfo = sizeInfo;
 
-    [AppEngine appEngineSendMessage:message toUser:self.user];
+    [AppEngine appEngineSendMessage:message file:content toUser:self.user];
 }
 
 ////////////////////////////////////
 // SEND STRING CONTENT
 ////////////////////////////////////
 
-- (void)sendMessage:(NSMutableDictionary*)barMessage
+-(void)sendMessage:(NSString *)textToSend
 {
-    MessageObject *message = [self message];
-    message.msgType = barMessage.typeString;
-    message.msgContent = barMessage.text;
-    
-    [AppEngine appEngineSendMessage:message toUser:self.user];
+    Message *message = [Message new];
+    message.type = kMessageTypeText;
+    message.message = textToSend;
+
+    [AppEngine appEngineSendMessage:message file:nil toUser:self.user];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -252,7 +250,7 @@
 {
     MessageCell *cell = [tableView dequeueReusableCellWithIdentifier:@"MessageCell" forIndexPath:indexPath];
 
-    id message = [AppEngine appEngineMessagesWithUserId:userId][indexPath.row];
+    Message* message = [AppEngine appEngineMessagesWithUserId:userId][indexPath.row];
     [cell setMessage:message
              myPhoto:self.myPhoto
            userPhoto:self.userPhoto
@@ -277,7 +275,7 @@ typedef void (^MessageCellBlock)(MessageCell *cell);
     }];
 }
 
-- (void) redrawCell:(NSMutableDictionary*)message
+- (void) redrawCell:(Message*)message
 {
     [self updateCellForMessageId:message.objectId block:^(MessageCell *cell) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -295,13 +293,13 @@ typedef void (^MessageCellBlock)(MessageCell *cell);
     NSLog(@"SELECTED ROW");
 }
 
-- (CGFloat) appropriateLineHeightForMessage:(NSMutableDictionary*)message
+- (CGFloat) appropriateLineHeightForMessage:(Message*)message
 {
     CGFloat width = [[[UIApplication sharedApplication] keyWindow] bounds].size.width * 0.7f;
     
     if (message.type == kMessageTypeText) {
         const CGFloat inset = 10;
-        NSString *string = [message.text stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+        NSString *string = [message.message stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
         UIFont *font = [UIFont systemFontOfSize:17 weight:UIFontWeightRegular];
         CGRect frame = rectForString(string, font, width);
         return frame.size.height+inset*2.5;
@@ -317,7 +315,7 @@ typedef void (^MessageCellBlock)(MessageCell *cell);
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    id message = [AppEngine appEngineMessagesWithUserId:userId][indexPath.row];
+    Message* message = [AppEngine appEngineMessagesWithUserId:userId][indexPath.row];
     return [self appropriateLineHeightForMessage:message];
 }
 

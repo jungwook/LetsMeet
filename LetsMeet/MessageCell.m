@@ -50,7 +50,7 @@
 
 
 
-- (void)setupMessage:(NSMutableDictionary *)message
+- (void)setupMessage:(NSMutableDictionary*)message
 {
     const CGFloat offset = 45;
     const CGFloat inset = 10;
@@ -58,7 +58,7 @@
     CGFloat width = [[[UIApplication sharedApplication] keyWindow] bounds].size.width * 0.7f;
     
     if (message.type == kMessageTypeText) {
-        NSString *string = [message.text stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+        NSString *string = [message.message stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
         CGRect frame = rectForString(string, self.messageLabel.font, width);
         CGFloat w = frame.size.width+2.5*inset;
         
@@ -121,7 +121,7 @@
     self.name.textAlignment = self.isMine ? NSTextAlignmentRight : NSTextAlignmentLeft;
 }
 
-- (void)setMessage:(NSMutableDictionary *)message
+- (void)setMessage:(NSMutableDictionary*)message
            myPhoto:(UIImage*)myPhoto
          userPhoto:(UIImage*)userPhoto
           userName:(NSString*)userName

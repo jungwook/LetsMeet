@@ -11,7 +11,6 @@
 @interface PFUser(Attributes)
 @property (nonatomic, strong) NSString* nickname;
 @property (nonatomic, strong) PFGeoPoint* location;
-
 @property (nonatomic) BOOL sex;
 @property (nonatomic) CGPoint coords;
 @property (nonatomic, strong) NSString* broadcastMessage;
@@ -25,14 +24,24 @@
 - (char*) desc;
 @end
 
+typedef NS_OPTIONS(NSUInteger, MessageTypes) {
+    kMessageTypeNone = 0,
+    kMessageTypeText,
+    kMessageTypePhoto,
+    kMessageTypeVideo,
+    kMessageTypeAudio,
+    kMessageTypeURL
+};
+
+
 @interface MessageObject : PFObject<PFSubclassing>
 + (NSString *)parseClassName;
 @property (retain) PFUser *fromUser;
 @property (retain) PFUser *toUser;
-@property (retain) NSString *msgContent;
 @property (retain) PFFile* file;
+@property (retain) NSString *message;
 @property (retain) NSString *mediaInfo;
-@property (retain) NSString *msgType;
+@property MessageTypes type;
 @property BOOL isSyncFromUser;
 @property BOOL isSyncToUser;
 @property BOOL isRead;
@@ -46,37 +55,30 @@
 - (NSString*) info;
 @end
 
-typedef NS_OPTIONS(NSUInteger, MessageTypes) {
-    kMessageTypeNone = 0,
-    kMessageTypeText,
-    kMessageTypePhoto,
-    kMessageTypeVideo,
-    kMessageTypeAudio,
-    kMessageTypeURL
-};
+@interface NSMutableDictionary(Message)
 
-@interface NSMutableDictionary (Message)
-@property (nonatomic, weak) NSString* objectId;
-@property (nonatomic, weak) NSString* fromUserId;
-@property (nonatomic, weak) NSString* toUserId;
+@property (nonatomic, assign) NSString* objectId;
+@property (nonatomic, assign) NSString* fromUserId;
+@property (nonatomic, assign) NSString* toUserId;
 @property (nonatomic) MessageTypes type;
-@property (nonatomic, weak) NSString* text;
-@property (nonatomic, weak) NSString* fileName;
-@property (nonatomic, weak) NSString* fileURL;
-@property (nonatomic, weak) NSString* mediaInfo;
-@property (nonatomic, weak) NSDate* createdAt;
-@property (nonatomic, weak) NSDate* updatedAt;
+@property (nonatomic, assign) NSString* message;
+@property (nonatomic, assign) NSString* fileName;
+@property (nonatomic, assign) NSString* fileURL;
+@property (nonatomic, assign) NSString* mediaInfo;
+@property (nonatomic, assign) NSDate* createdAt;
+@property (nonatomic, assign) NSDate* updatedAt;
 @property (nonatomic) BOOL isSyncFromUser;
 @property (nonatomic) BOOL isSyncToUser;
 @property (nonatomic) BOOL isRead;
 @property (nonatomic, readonly) BOOL isFromMe;
 @property (nonatomic, readonly) BOOL isDataAvailable;
-@property (nonatomic, weak) NSData* data;
+@property (nonatomic, assign) NSData* data;
 
 - (BOOL) save;
-- (NSString*) typeString;
 + (NSString*) typeStringForType:(MessageTypes)type;
+- (NSString*)typeString;
 
++ (instancetype) messageWithMessage:(NSDictionary*)newDic;
 + (instancetype) messageWithText:(NSString*)text;
 + (instancetype) messageWithPhoto:(PFFile*)file;
 + (instancetype) messageWithVideo:(PFFile*)file;

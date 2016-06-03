@@ -84,9 +84,9 @@
 
 - (void) newMessageReceived:(NSNotification*)notification
 {
-    id message = notification.object;
-    id fromUser = message[AppKeyFromUserField];
-    id toUser = message[AppKeyToUserField];
+    Message* message = notification.object;
+    id fromUser = message.fromUserId;
+    id toUser = message.toUserId;
     
     if ([fromUser isEqualToString:self.me.objectId] || [toUser isEqualToString:self.me.objectId]) {
         [self refreshUsers];
