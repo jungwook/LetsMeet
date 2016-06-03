@@ -14,6 +14,7 @@
 #define AppUserNewMessageReceivedNotification @"AppUserNewMessageReceivedNotificaiton"
 #define AppUserRefreshBadgeNotificaiton @"AppUserRefreshBadgeNotificaiton"
 #define AppUserBroadcastNotification @"AppUserBroadcastNotification"
+#define AppUserMessageUpdatedNotification @"AppUserMessageUpdatedNotification"
 
 #define AppMessagesCollection @"Messages"
 #define AppEngineTimeKeeperTime 60
@@ -80,6 +81,8 @@
 #define AppEngineDictionaryFile [defUrl(@"dictionary") path]
 #define AppEngineUsersFile [defUrl(@"users") path]
 
+#define AppEngineThumbnailWidth 240.0f
+
 typedef NS_OPTIONS(NSUInteger, ImagePickerSourceTypes) {
     kImagePickerSourceNone                  = 0,
     kImagePickerSourceCamera                = 1 << 0,
@@ -108,8 +111,9 @@ typedef void (^CountResultBlock)(NSUInteger count);
 typedef void (^DictionaryResultBlock)(NSDictionary *messages);
 typedef void (^DictionaryArrayResultBlock)(NSDictionary *messages, NSArray *users);
 typedef void (^CachedFileBlock)(NSData * data, NSError * error, BOOL fromCache);
-typedef void (^ImagePickerBlock)(id data, ImagePickerMediaType type, NSString* sizeString, NSURL *url);
+typedef void (^ImagePickerBlock)(id data, MessageTypes type, NSString* sizeString, NSURL *url);
 typedef void (^ImageSizePickerBlock)(NSData *data, Progress* progress);
+
 typedef NSMutableDictionary Message;
 
 CALayer* drawImageOnLayer(UIImage *image, CGSize size);
@@ -141,14 +145,12 @@ NSData* compressedImageData(NSData* data, CGFloat width);
 //+ (NSString*) appEngineLastMessageFromUserId:(id)userId;
 //+ (void) appEngineResetBadge;
 
-
-+ (void) app2EngineSendMessage:(Message *)message file:(PFFile*)file toUser:(PFUser *)user;
 + (void) appEngineSendMessage:(NSString*)textToSend
                          type:(MessageTypes)type
-                         data:(NSData*)thumbnail
-                     filename:(NSString*)filename
-                          url:(NSURL*)url
-                       toUser:(PFUser*)user;
+                         file:(PFFile*) file
+                         data:(NSData*) thumbnail
+                   resolution:(NSString*)info
+                       toUser:(PFUser*) user;
 
 + (void) appEngineBroadcastPush:(NSString*)message duration:(NSNumber*)duration;
 + (void) appEngineInboxUsers:(ArrayResultBlock)block;

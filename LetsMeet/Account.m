@@ -142,40 +142,43 @@
 - (IBAction)editPhoto:(id)sender {
     [ImagePicker proceedWithParentViewController:self
                                        featuring:kImagePickerSourceCamera | kImagePickerSourceLibrary
-                              photoSelectedBlock:^(id data, ImagePickerMediaType type, NSString *sizeString, NSURL *url) {
-        UIImage *photo = [UIImage imageWithData:data];
-        UIImage *small = scaleImage(photo, AppProfilePhotoSize);
-        NSData *smallData = UIImageJPEGRepresentation(small, AppProfilePhotoCompression);
-        NSData *largeData = UIImageJPEGRepresentation(photo, AppProfilePhotoCompression);
-        
-        drawImage(small, self.photoView);
-        
-        [CachedFile saveData:smallData named:AppProfilePhotoFileName inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-            self.me[AppProfilePhotoField] = file;
-            [self.me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-                if (!succeeded) {
-                    NSLog(@"ERROR UPDATING USER WITH PHOTO:%@", error.localizedDescription);
-                }
-            }];
-            
-        } progressBlock:^(int percentDone) {
-            NSLog(@"SAVING IN PROGRESS:%d", percentDone);
-        }];
-        
-        [CachedFile saveData:largeData named:AppProfileOriginalPhotoFileName inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-            self.me[AppProfileOriginalPhotoField] = file;
-            [self.me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-                if (!succeeded) {
-                    NSLog(@"ERROR UPDATING USER WITH PHOTO:%@", error.localizedDescription);
-                }
-            }];
-            
-        } progressBlock:^(int percentDone) {
-            NSLog(@"SAVING IN PROGRESS:%d", percentDone);
-        }];
+                              photoSelectedBlock:^(id data, MessageTypes type, NSString *sizeString, NSURL *url)
+     {
+         UIImage *photo = [UIImage imageWithData:data];
+         UIImage *small = scaleImage(photo, AppProfilePhotoSize);
+         NSData *smallData = UIImageJPEGRepresentation(small, AppProfilePhotoCompression);
+         NSData *largeData = UIImageJPEGRepresentation(photo, AppProfilePhotoCompression);
+         
+         drawImage(small, self.photoView);
+         
+         [CachedFile saveData:smallData named:AppProfilePhotoFileName inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
+             self.me[AppProfilePhotoField] = file;
+             [self.me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+                 if (!succeeded) {
+                     NSLog(@"ERROR UPDATING USER WITH PHOTO:%@", error.localizedDescription);
+                 }
+             }];
+             
+         } progressBlock:^(int percentDone) {
+             NSLog(@"SAVING IN PROGRESS:%d", percentDone);
+         }];
+         
+         [CachedFile saveData:largeData named:AppProfileOriginalPhotoFileName inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
+             self.me[AppProfileOriginalPhotoField] = file;
+             [self.me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+                 if (!succeeded) {
+                     NSLog(@"ERROR UPDATING USER WITH PHOTO:%@", error.localizedDescription);
+                 }
+             }];
+             
+         } progressBlock:^(int percentDone) {
+             NSLog(@"SAVING IN PROGRESS:%d", percentDone);
+         }];
      } cancelBlock:^{
+         
      }];
 }
+
 
 - (IBAction)chargePoints:(id)sender {
 }

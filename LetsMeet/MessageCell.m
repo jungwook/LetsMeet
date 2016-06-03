@@ -50,7 +50,7 @@
 
 
 
-- (void)setupMessage:(NSMutableDictionary*)message
+- (void)setupMessage:(Message*)message
 {
     const CGFloat offset = 45;
     const CGFloat inset = 10;
@@ -121,7 +121,7 @@
     self.name.textAlignment = self.isMine ? NSTextAlignmentRight : NSTextAlignmentLeft;
 }
 
-- (void)setMessage:(NSMutableDictionary*)message
+- (void)setMessage:(Message*)message
            myPhoto:(UIImage*)myPhoto
          userPhoto:(UIImage*)userPhoto
           userName:(NSString*)userName

@@ -86,6 +86,12 @@
                                              selector:@selector(newMessageReceived:)
                                                  name:AppUserNewMessageReceivedNotification
                                                object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(messageUpdated:)
+                                                 name:AppUserMessageUpdatedNotification
+                                               object:nil];
+
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -95,6 +101,15 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:AppUserNewMessageReceivedNotification
                                                   object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AppUserMessageUpdatedNotification
+                                                  object:nil];
+}
+
+- (void)messageUpdated:(NSNotification*)notification
+{
+    Message* message = notification.object;
+    NSLog(@"UPDATE MESSAGE:%@", message);
 }
 
 
@@ -155,17 +170,22 @@
     
     [ImagePicker proceedWithParentViewController:self
                                        featuring:kImagePickerSourceCamera | kImagePickerSourceLibrary | kImagePickerSourceVoice | kImagePickerSourceURL
-                              photoSelectedBlock:^(id data, ImagePickerMediaType type, NSString *stringSize, NSURL *url)
+                              photoSelectedBlock:^(id data, MessageTypes type, NSString *stringSize, NSURL *url)
     {
         switch (type) {
-            case kImagePickerMediaPhoto: {
+            case kMessageTypePhoto: {
                 [self pickerWithRootViewController:self
                                              title:@"CHOOSE SIZE" message:@"Please select appropriate size to send"
                                               data:data
                                            handler:^(NSData *data)
                  {
                      [CachedFile saveData:data named:@"photo.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                         [self sendMessageOfType:kMessageTypePhoto contentFile:file info:stringSize];
+                         
+                         NSData* thumbnail = compressedImageData(data, AppEngineThumbnailWidth);
+                         // This is the thumbnail ultimately saved to disk.
+                         
+                         [AppEngine appEngineSendMessage:nil type:type file:file data:thumbnail resolution:stringSize toUser:self.user];
+                         
                          [progress completeLoading:YES block:^{
                              [progress.superview removeFromSuperview];
                          }];
@@ -175,15 +195,20 @@
                  }];
             }
                 break;
-            case kImagePickerMediaMovie: {
+            case kMessageTypeVideo: {
                 [CachedFile saveData:data named:@"movie.mov" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                    [self sendMessageOfType:kMessageTypeVideo contentFile:file info:stringSize];
+                    
+                    NSData* thumbnail = nil;
+                    // This is the thumbnail ultimately saved to disk. Choose first image on movie.... TO CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    
+                    [AppEngine appEngineSendMessage:nil type:type file:file data:thumbnail resolution:stringSize toUser:self.user];
+                    
                 } progressBlock:^(int percentDone) {
                 }];
             }
                 break;
-            case kImagePickerMediaVoice:
-            case kImagePickerMediaNone:
+            case kMessageTypeAudio:
+            case kMessageTypeNone:
             default:
                 break;
         }
@@ -195,45 +220,13 @@
     }];
 }
 
-- (MessageObject*) message
-{
-    MessageObject *message = [MessageObject new];
-    message.fromUser = self.me;
-    message.toUser = self.user;
-    message.isRead = NO;
-    message.isSyncFromUser = YES;
-    
-    if ([self.me.objectId isEqualToString:self.user.objectId]) {
-        message.isSyncToUser = YES;
-    }
-    
-    return message;
-}
-
-////////////////////////////////////
-// SEND MEDIA CONTENT PHOTO + VIDEO
-////////////////////////////////////
-
-- (void)sendMessageOfType:(MessageTypes)type contentFile:(PFFile*)content info:(NSString*)sizeInfo
-{
-    Message *message = [Message new];
-    message.type = type;
-    message.mediaInfo = sizeInfo;
-
-    [AppEngine appEngineSendMessage:message file:content toUser:self.user];
-}
-
 ////////////////////////////////////
 // SEND STRING CONTENT
 ////////////////////////////////////
 
 -(void)sendMessage:(NSString *)textToSend
 {
-    Message *message = [Message new];
-    message.type = kMessageTypeText;
-    message.message = textToSend;
-
-    [AppEngine appEngineSendMessage:message file:nil toUser:self.user];
+    [AppEngine appEngineSendMessage:textToSend type:kMessageTypeText file:nil data:nil resolution:nil toUser:self.user];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView

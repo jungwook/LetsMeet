@@ -7,6 +7,7 @@
 //
 
 #import "AppEngine.h"
+#import "CachedFile.h"
 
 @interface AppEngine()
 @property (nonatomic, strong) CLLocationManager *locMgr;
@@ -47,7 +48,16 @@
             
         }];
         [self initLocationServices];
+        
+        
+        ////////////////////////////////////////////
+        
 //        _appEngineUserMessages = [NSMutableDictionary dictionary];
+//        [self appEngineRemoveAllUserFiles];
+        
+        ////////////////////////////////////////////
+        
+        
     }
     return self;
 }
@@ -187,30 +197,6 @@ NSDictionary* objectFromMessage(MessageObject* object)
         if (obj.updatedAt)
             dic.updatedAt = obj.updatedAt;
     }
-    else if ([object isKindOfClass:[PFFile class]]) {
-        PFFile *file = (PFFile*) object;
-        if (file.name)
-            dic.fileName = file.name;
-        if (file.url)
-            dic.fileURL = file.url;
-        if (file.isDataAvailable) {
-            ///////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////
-            
-            dic[AppKeyDataKey] = [file getDataInBackground];
-            
-            ///////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////
-        }
-    }
     else if ([object isKindOfClass:[PFGeoPoint class]]) {
         PFGeoPoint *geo = (PFGeoPoint*) object;
         dic[AppKeyLatitudeKey] = @(geo.latitude);
@@ -220,11 +206,44 @@ NSDictionary* objectFromMessage(MessageObject* object)
     if ([object respondsToSelector:@selector(allKeys)]) {
         for (NSString *key in [object allKeys]) {
             id o = object[key];
-            BOOL isObject = [o isKindOfClass:[PFObject class]] || [o isKindOfClass:[PFFile class]] || [o isKindOfClass:[PFACL class]] || [o isKindOfClass:[PFGeoPoint class]];
+            BOOL isObject = [o isKindOfClass:[PFObject class]] || [o isKindOfClass:[PFACL class]] || [o isKindOfClass:[PFGeoPoint class]];
             if ([o isKindOfClass:[PFUser class]])
             {
                 PFUser *u = o;
                 [dic setObject:u.objectId forKey:key];
+            }
+            else if ([o isKindOfClass:[PFFile class]]) {
+                PFFile *file = (PFFile*) o;
+                NSLog(@"FILE NAME: %@", file.name);
+                NSLog(@"FILE  URL: %@", file.url);
+                NSLog(@"FILE DATA: %@", file.isDataAvailable ? @"YES" : @"NO");
+                if (file.name)
+                    dic.fileName = file.name;
+                if (file.url)
+                    dic.fileURL = file.url;
+                if (!file.isDataAvailable) {
+                    ///////////////////////////////////////////////////////////
+                    ///////////////////////////////////////////////////////////
+                    ///////////////////////////////////////////////////////////
+                    ///////////////////////////////////////////////////////////
+                    ///////////////////////////////////////////////////////////
+                    ///////////////////////////////////////////////////////////
+                    
+                    NSLog(@"LOADING DATA FROM BACKGROUND");
+                    [CachedFile getDataInBackgroundWithBlock:^(NSData *data, NSError *error, BOOL fromCache) {
+                        NSLog(@"LOADED DATA IN THE BACKGROUND");
+                        dic.data = compressedImageData(data, AppEngineThumbnailWidth);
+                        SENDNOTIFICATION(AppUserMessageUpdatedNotification, dic);
+                        NSLog(@"NOTIFIED HANDLERS WIHT %@", dic);
+                    } fromFile:file];
+                    
+                    ///////////////////////////////////////////////////////////
+                    ///////////////////////////////////////////////////////////
+                    ///////////////////////////////////////////////////////////
+                    ///////////////////////////////////////////////////////////
+                    ///////////////////////////////////////////////////////////
+                    ///////////////////////////////////////////////////////////
+                }
             }
             else if (isObject) {
                 dic[key] = objectFromMessage(o);
@@ -281,6 +300,33 @@ id otherUserId(Message* message) {
     } else {
         return save;
     }
+}
+
+- (void) appEngineRemoveAllUserFiles
+{
+    NSLog(@"==============================================================================");
+    NSLog(@"==============================================================================");
+    NSLog(@"==============================================================================");
+    NSLog(@"==============================================================================");
+    NSLog(@"==============================================================================");
+    NSLog(@"==============================================================================");
+    NSLog(@"==============================================================================");
+    NSLog(@"==============================================================================");
+    PFQuery *query = [PFUser query];
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
+        [users enumerateObjectsUsingBlock:^(PFUser* _Nonnull user, NSUInteger idx, BOOL * _Nonnull stop) {
+            BOOL ret = [self appEngineRemoveFileForUserId:user.objectId];
+            NSLog(@"======DELETED FILE FOR:%@ %@SUCCESSFULLY",user.objectId, ret ? @"" : @"UN");
+        }];
+    }];
+    NSLog(@"==============================================================================");
+    NSLog(@"==============================================================================");
+    NSLog(@"==============================================================================");
+    NSLog(@"==============================================================================");
+    NSLog(@"==============================================================================");
+    NSLog(@"==============================================================================");
+    NSLog(@"==============================================================================");
+    NSLog(@"==============================================================================");
 }
 
 - (BOOL) appEngineRemoveFileForUserId:(id)userId
@@ -487,13 +533,13 @@ id otherUserId(Message* message) {
 ///////////////////////////////////////////////////////////
 + (void) appEngineSendMessage:(NSString*) textToSend
                          type:(MessageTypes)type
-                         data:(NSData*) thumbnail
                          file:(PFFile*) file
-                     filename:(NSString*) filename
-                          url:(NSURL*) url
+                         data:(NSData*) thumbnail
+                   resolution:(NSString*)info
                        toUser:(PFUser*) user
 {
     PFUser *me = [PFUser currentUser];
+
     MessageObject *msgo = [MessageObject new];
     Message *msgd = [Message new];
     
@@ -504,7 +550,7 @@ id otherUserId(Message* message) {
     msgd.toUserId = user.objectId;
     
     msgo.isRead = NO;
-    msgd.isRead = YES;
+    msgd.isRead = NO;
     
     msgo.isSyncFromUser = YES;
     msgd.isSyncFromUser = YES;
@@ -516,6 +562,8 @@ id otherUserId(Message* message) {
     
     msgo.type = type;
     msgd.type = type;
+    
+    textToSend = textToSend ? textToSend : @"";
     
     switch (type) {
         case kMessageTypeText:
@@ -543,22 +591,29 @@ id otherUserId(Message* message) {
             msgd.message = textToSend;
             break;
     }
-    msgo.file = file;
-    msgd.fileName = filename;
-    msgd.fileURL = url;
-    msgd.data = thumbnail;
+    if (file) {
+        msgo.file = file;
+        msgd.fileName = file.name;
+        msgd.fileURL = file.url;
+    }
     
-    msgo.mediaInfo = message.mediaInfo;
+    if (thumbnail) {
+        msgd.data = thumbnail;
+    }
+    
+    if (info) {
+        msgo.mediaInfo = info;
+        msgd.mediaInfo = info;
+    }
     
     [msgo saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
         if (succeeded) {
-            message.objectId = msgo.objectId;
-            Message *dup = [Message messageWithMessage:objectFromMessage(msgo)];
-            NSLog(@"DUP:%@", dup);
-            NSLog(@"REL:%@", message);
-            //            [self appEngineSendPush:[Message messageWithMessage:objectFromMessage(msgo)] toUser:user];
-            [self appEngineSendPush:message toUser:user];
-            [[AppEngine engine] appEngineAddMessage:message save:YES];
+            msgd.objectId = msgo.objectId;
+            msgd.createdAt = msgo.createdAt;
+            msgd.updatedAt = msgo.updatedAt;
+            
+            [[AppEngine engine] appEngineSendPushMessage:textToSend messageId:msgd.objectId toUser:user];
+            [[AppEngine engine] appEngineAddMessage:msgd save:YES];
         }
         else {
             NSLog(@"ERROR SAVING MESSAGE TO PARSE:%@", error.localizedDescription);
@@ -566,11 +621,7 @@ id otherUserId(Message* message) {
     }];
 }
 
-+ (void) appEngineSendMessage:(Message *)message file:(PFFile*)file toUser:(PFUser *)user
-{
-}
-
-+ (void) appEngineSendPush:(Message*)message toUser:(PFUser*) user
+- (void) appEngineSendPushMessage:textToSend messageId:(id)messageId toUser:(PFUser*) user
 {
     PFUser *me = [PFUser currentUser];
     
@@ -578,8 +629,8 @@ id otherUserId(Message* message) {
                        withParameters:@{
                                         AppPushRecipientIdField: user.objectId,
                                         AppPushSenderIdField: me.objectId,
-                                        AppPushMessageField: message.message,
-                                        AppPushObjectIdField: message.objectId,
+                                        AppPushMessageField: textToSend,
+                                        AppPushObjectIdField: messageId,
                                         AppPushType: AppPushTypeMessage
                                         }
                                 block:^(NSString *success, NSError *error) {
@@ -864,7 +915,6 @@ float heading(PFGeoPoint* fromLoc, PFGeoPoint* toLoc)
 
 NSData* compressedImageData(NSData* data, CGFloat width)
 {
-    NSLog(@"Loaded data of size:%ld", [data length]);
     UIImage *image = [UIImage imageWithData:data];
     const CGFloat thumbnailWidth = width;
     CGFloat thumbnailHeight = image.size.width ? thumbnailWidth * image.size.height / image.size.width : 200;
