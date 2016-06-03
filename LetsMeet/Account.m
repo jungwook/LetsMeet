@@ -140,7 +140,9 @@
 }
 
 - (IBAction)editPhoto:(id)sender {
-    [ImagePicker proceedWithParentViewController:self withPhotoSelectedBlock:^(id data, ImagePickerMediaType type, NSString* info, NSURL* url) {
+    [ImagePicker proceedWithParentViewController:self
+                                       featuring:kImagePickerSourceCamera | kImagePickerSourceLibrary
+                              photoSelectedBlock:^(id data, ImagePickerMediaType type, NSString *sizeString, NSURL *url) {
         UIImage *photo = [UIImage imageWithData:data];
         UIImage *small = scaleImage(photo, AppProfilePhotoSize);
         NSData *smallData = UIImageJPEGRepresentation(small, AppProfilePhotoCompression);
@@ -171,7 +173,8 @@
         } progressBlock:^(int percentDone) {
             NSLog(@"SAVING IN PROGRESS:%d", percentDone);
         }];
-    } featuring:kImagePickerSourceCamera | kImagePickerSourceLibrary];
+     } cancelBlock:^{
+     }];
 }
 
 - (IBAction)chargePoints:(id)sender {

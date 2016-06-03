@@ -12,9 +12,11 @@
 
 @interface ImagePicker : UIImagePickerController <UIImagePickerControllerDelegate, UIAlertViewDelegate, UINavigationControllerDelegate>
 - (instancetype)initWithParentViewController:(UIViewController*)parent
-                      withPhotoSelectedBlock:(ImagePickerBlock)actionBlock
-                                   featuring:(ImagePickerSourceTypes)types;
+                                   featuring:(ImagePickerSourceTypes)types
+                          photoSelectedBlock:(ImagePickerBlock)actionBlock
+                                 cancelBlock:(voidBlock)cancelBlock;
 + (void) proceedWithParentViewController:(UIViewController*)parent
-                  withPhotoSelectedBlock:(ImagePickerBlock)actionBlock
-                               featuring:(ImagePickerSourceTypes)types;
+                               featuring:(ImagePickerSourceTypes)types
+                  photoSelectedBlock:(ImagePickerBlock)actionBlock
+                             cancelBlock:(voidBlock)cancelBlock;
 @end

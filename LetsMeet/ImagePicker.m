@@ -12,17 +12,27 @@
 @property (nonatomic, strong) UIAlertController* alert;
 @property (nonatomic, weak) UINavigationController  * parent;
 @property (strong, nonatomic) ImagePickerBlock pickerBlock;
+@property (strong, nonatomic) voidBlock cancelBlock;
 @property (nonatomic) ImagePickerSourceTypes types;
 @end
 
 @implementation ImagePicker
 
-+ (void) proceedWithParentViewController:(UIViewController*)parent withPhotoSelectedBlock:(ImagePickerBlock)actionBlock featuring:(ImagePickerSourceTypes)types
++ (void) proceedWithParentViewController:(UIViewController*)parent
+                               featuring:(ImagePickerSourceTypes)types
+                      photoSelectedBlock:(ImagePickerBlock)actionBlock
+                             cancelBlock:(voidBlock)cancelBlock
 {
-    __unused ImagePicker *picker = [[ImagePicker alloc] initWithParentViewController:parent withPhotoSelectedBlock:actionBlock featuring:(ImagePickerSourceTypes)types];
+    __unused ImagePicker *picker = [[ImagePicker alloc] initWithParentViewController:parent
+                                                                           featuring:types
+                                                                  photoSelectedBlock:actionBlock
+                                                                         cancelBlock:cancelBlock];
 }
 
-- (instancetype)initWithParentViewController:(UIViewController*)parent withPhotoSelectedBlock:(ImagePickerBlock)actionBlock featuring:(ImagePickerSourceTypes)types
+- (instancetype)initWithParentViewController:(UIViewController*)parent
+                                   featuring:(ImagePickerSourceTypes)types
+                          photoSelectedBlock:(ImagePickerBlock)actionBlock
+                                 cancelBlock:(voidBlock)cancelBlock
 {
     self = [super init];
     if (self) {
@@ -30,6 +40,7 @@
         self.allowsEditing = NO;
         self.parent = parent.navigationController;
         self.pickerBlock = actionBlock;
+        self.cancelBlock = cancelBlock;
         self.types = types;
         self.videoQuality = UIImagePickerControllerQualityType640x480;
         self.modalPresentationStyle = UIModalPresentationOverCurrentContext;
@@ -75,22 +86,13 @@
             }]];
         }
         
-        [self.alert addAction:[UIAlertAction actionWithTitle:@"취소" style:UIAlertActionStyleCancel handler:nil]];
+        [self.alert addAction:[UIAlertAction actionWithTitle:@"취소" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            if (self.cancelBlock)
+                self.cancelBlock();
+        }]];
         [parent presentViewController:self.alert animated:YES completion:nil];
     }
     return self;
-}
-
-- (void) dismissPicker:(UIImagePickerController *)picker
-{
-    [self.parent setNavigationBarHidden:NO animated:YES];
-    
-    [self dismissViewControllerAnimated:YES completion:NULL];
-}
-
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
-{
-    [self dismissPicker:picker];
 }
 
 - (UIImage *)fixOrientation:(UIImage*) image
@@ -176,45 +178,57 @@
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info
 {
-    NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
-    NSURL *url = (NSURL*)[info objectForKey:UIImagePickerControllerMediaURL];
-    
-    // Handle a still image capture
-    if (CFStringCompare ((CFStringRef) mediaType, kUTTypeImage, 0) == kCFCompareEqualTo) {
-        UIImage *image = (UIImage *) [info objectForKey:UIImagePickerControllerOriginalImage];
-        CGSize imageSize = image.size;
+    [self.parent setNavigationBarHidden:NO animated:YES];
+    [self dismissViewControllerAnimated:YES completion:^{
+        NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
+        NSURL *url = (NSURL*)[info objectForKey:UIImagePickerControllerMediaURL];
         
-        UIImageWriteToSavedPhotosAlbum (image, nil, nil , nil);
-
-        image = [self fixOrientation:image];
-        NSData *data = UIImageJPEGRepresentation(image, 1.0);
-        
-        if (self.pickerBlock) {
-            self.pickerBlock(data, kImagePickerMediaPhoto, NSStringFromCGSize(imageSize), url);
-        }
-    }
-    
-    // Handle a movie capture
-    if (CFStringCompare ((CFStringRef) mediaType, kUTTypeMovie, 0)== kCFCompareEqualTo) {
-        AVAsset *asset = [AVAsset assetWithURL:url];
-        
-        AVAssetTrack *track = [[asset tracksWithMediaType:AVMediaTypeVideo] firstObject];
-        CGSize dimensions = track ? CGSizeApplyAffineTransform(track.naturalSize, track.preferredTransform) : CGSizeMake(400, 300);
-        dimensions.width = fabs(dimensions.width);
-        dimensions.height = fabs(dimensions.height);
-        
-        NSString *moviePath = [((NSURL*)[info objectForKey:UIImagePickerControllerMediaURL]) path];
-        
-        if (UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(moviePath)) {
-            UISaveVideoAtPathToSavedPhotosAlbum(moviePath, nil, nil, nil);
+        // Handle a still image capture
+        if (CFStringCompare ((CFStringRef) mediaType, kUTTypeImage, 0) == kCFCompareEqualTo) {
+            UIImage *image = (UIImage *) [info objectForKey:UIImagePickerControllerOriginalImage];
+            CGSize imageSize = image.size;
+            
+            UIImageWriteToSavedPhotosAlbum (image, nil, nil , nil);
+            
+            image = [self fixOrientation:image];
+            NSData *data = UIImageJPEGRepresentation(image, 1.0);
+            
+            if (self.pickerBlock) {
+                self.pickerBlock(data, kImagePickerMediaPhoto, NSStringFromCGSize(imageSize), url);
+            }
         }
         
-        if (self.pickerBlock) {
-            self.pickerBlock(moviePath, kImagePickerMediaMovie, NSStringFromCGSize(dimensions), url);
+        // Handle a movie capture
+        if (CFStringCompare ((CFStringRef) mediaType, kUTTypeMovie, 0)== kCFCompareEqualTo) {
+            AVAsset *asset = [AVAsset assetWithURL:url];
+            
+            AVAssetTrack *track = [[asset tracksWithMediaType:AVMediaTypeVideo] firstObject];
+            CGSize dimensions = track ? CGSizeApplyAffineTransform(track.naturalSize, track.preferredTransform) : CGSizeMake(400, 300);
+            dimensions.width = fabs(dimensions.width);
+            dimensions.height = fabs(dimensions.height);
+            
+            NSString *moviePath = [((NSURL*)[info objectForKey:UIImagePickerControllerMediaURL]) path];
+            
+            if (UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(moviePath)) {
+                UISaveVideoAtPathToSavedPhotosAlbum(moviePath, nil, nil, nil);
+            }
+            
+            if (self.pickerBlock) {
+                self.pickerBlock(moviePath, kImagePickerMediaMovie, NSStringFromCGSize(dimensions), url);
+            }
         }
-    }
-    
-    [self dismissPicker:picker];
+    }];
 }
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
+{
+    [self.parent setNavigationBarHidden:NO animated:YES];
+    [self dismissViewControllerAnimated:YES completion:^{
+        if (self.cancelBlock) {
+            self.cancelBlock();
+        }
+    }];
+}
+
 
 @end

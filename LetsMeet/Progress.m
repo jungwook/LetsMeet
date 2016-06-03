@@ -38,7 +38,7 @@
     self.progressLayer = [CAShapeLayer new];
     self.lineWidth = 2.0;
     
-    self.font = [UIFont systemFontOfSize:30];
+    self.font = [UIFont systemFontOfSize:17];
     self.progressLabel.font = self.font;
     self.progressLabel.textColor = self.strokeColor;
     self.progressLabel.textAlignment = NSTextAlignmentCenter;

@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LetsMeet/Account.m"
-            timestampString = "486438815.100851"
+            timestampString = "486606059.849954"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "192"
-            endingLineNumber = "192"
+            startingLineNumber = "195"
+            endingLineNumber = "195"
             landmarkName = "-tableView:cellForRowAtIndexPath:"
             landmarkType = "5">
          </BreakpointContent>
@@ -410,11 +410,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LetsMeet/Chat.m"
-            timestampString = "486569930.656991"
+            timestampString = "486606351.843037"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "323"
-            endingLineNumber = "323"
+            startingLineNumber = "336"
+            endingLineNumber = "336"
             landmarkName = "-keyBoardEvent:duration:animationType:"
             landmarkType = "5">
          </BreakpointContent>
@@ -922,11 +922,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LetsMeet/Chat.m"
-            timestampString = "486569930.656991"
+            timestampString = "486604566.872059"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "81"
-            endingLineNumber = "81"
+            startingLineNumber = "88"
+            endingLineNumber = "88"
             landmarkName = "-viewWillAppear:"
             landmarkType = "5">
          </BreakpointContent>
@@ -938,11 +938,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LetsMeet/Chat.m"
-            timestampString = "486569930.656991"
+            timestampString = "486604566.872059"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "91"
-            endingLineNumber = "91"
+            startingLineNumber = "98"
+            endingLineNumber = "98"
             landmarkName = "-viewWillDisappear:"
             landmarkType = "5">
          </BreakpointContent>
@@ -953,14 +953,46 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "LetsMeet/ImagePicker.m"
-            timestampString = "486551782.844425"
+            filePath = "LetsMeet/Chat.m"
+            timestampString = "486606468.374733"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "86"
-            endingLineNumber = "86"
-            landmarkName = "-dismissPicker:"
+            startingLineNumber = "197"
+            endingLineNumber = "197"
+            landmarkName = "-sendMedia"
             landmarkType = "5">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__17-[Chat sendMedia]_block_invoke.167"
+                  moduleName = "LetsMeet"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jungwook/Documents/Development/LetsMeet/LetsMeet/Chat.m"
+                  timestampString = "486606567.776874"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "197"
+                  endingLineNumber = "197"
+                  offsetFromSymbolStart = "44">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__17-[Chat sendMedia]_block_invoke_2.168"
+                  moduleName = "LetsMeet"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jungwook/Documents/Development/LetsMeet/LetsMeet/Chat.m"
+                  timestampString = "486606567.777031"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "197"
+                  endingLineNumber = "197"
+                  offsetFromSymbolStart = "12">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -969,13 +1001,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "LetsMeet/Chat.m"
-            timestampString = "486569930.656991"
+            filePath = "LetsMeet/ImagePicker.m"
+            timestampString = "486606566.725999"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "168"
-            endingLineNumber = "168"
-            landmarkName = "-sendMedia"
+            startingLineNumber = "227"
+            endingLineNumber = "227"
+            landmarkName = "-imagePickerControllerDidCancel:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

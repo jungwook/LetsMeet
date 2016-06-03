@@ -539,7 +539,7 @@ NSDictionary* objectFromMessage(id object)
 ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 
-+ (void) appEngineSendPush:(MessageObject *)message toUser:(PFUser*) user
++ (void) appEngineSendPush:(NSMutableDictionary *)message toUser:(PFUser*) user
 {
     PFUser *me = [PFUser currentUser];
     
@@ -547,13 +547,13 @@ NSDictionary* objectFromMessage(id object)
                        withParameters:@{
                                         AppPushRecipientIdField: user.objectId,
                                         AppPushSenderIdField: me.objectId,
-                                        AppPushMessageField: message.msgContent,
+                                        AppPushMessageField: message.text,
                                         AppPushObjectIdField: message.objectId,
                                         AppPushType: AppPushTypeMessage
                                         }
                                 block:^(NSString *success, NSError *error) {
                                     if (!error) {
-                                        [[AppEngine engine] appEngineAddMessage:message save:YES];
+                                        [[AppEngine engine] appEngineAddMessage:message2 save:YES];
                                     }
                                     else {
                                         NSLog(@"ERROR SENDING PUSH:%@", error.localizedDescription);

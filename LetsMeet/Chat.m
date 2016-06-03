@@ -26,6 +26,7 @@
 @property (nonatomic, strong) PFUser* user;
 @property (nonatomic, strong) UIImage* myPhoto;
 @property (nonatomic, strong) UIImage* userPhoto;
+@property (nonatomic) CGRect windowFrame;
 @end
 
 @implementation Chat
@@ -34,9 +35,10 @@
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        self.definesPresentationContext = YES;
+        _windowFrame = [[UIApplication sharedApplication] keyWindow].bounds;
         _me = [PFUser currentUser];
         _engine = [AppEngine engine];
+        self.definesPresentationContext = YES;
     }
     return self;
 }
@@ -134,47 +136,49 @@
 
 // From MessageBarDelegate. A message was sent from the messageBar.
 
+- (Progress*) progressViewOnView:(UIView*)view
+{
+    CGFloat progressSize = 60;
+    UIVisualEffectView *backView = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleLight]];
+    backView.frame = self.windowFrame;
+    Progress *progress = [[Progress alloc] initWithFrame:CGRectMake((self.windowFrame.size.width-progressSize)/2, (self.windowFrame.size.height-progressSize)/3, progressSize, progressSize)];
+    [backView addSubview:progress];
+    [view addSubview:backView];
+    [progress startLoading];
+    
+    return progress;
+}
 
 - (void)sendMedia
 {
-    [ImagePicker proceedWithParentViewController:self withPhotoSelectedBlock:^(NSData* data, ImagePickerMediaType type, NSString* stringSize, NSURL* url) {
+    Progress *progress = [self progressViewOnView:self.view];
+    
+    [ImagePicker proceedWithParentViewController:self
+                                       featuring:kImagePickerSourceCamera | kImagePickerSourceLibrary | kImagePickerSourceVoice | kImagePickerSourceURL
+                              photoSelectedBlock:^(id data, ImagePickerMediaType type, NSString *stringSize, NSURL *url)
+    {
         switch (type) {
             case kImagePickerMediaPhoto: {
-                NSLog(@"data of size:%ld", data.length);
-                [self pickerWithRootViewController:self title:@"CHOOSE SIZE" message:@"Please select appropriate size to send" data:data handler:^(NSData *data) {
-                    CGRect frame = [[UIApplication sharedApplication] keyWindow].bounds;
-                    
-                    FXBlurView *black = [[FXBlurView alloc] initWithFrame:frame];
-//                    UIVisualEffectView *black = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleDark]];
-                    [black setFrame:frame];
-                    [[[UIApplication sharedApplication] keyWindow] addSubview:black];
-                    
-                    Progress *progress = [[Progress alloc] initWithFrame:CGRectMake((frame.size.width-100)/2, (frame.size.height-100)/2, 100, 100)];
-                    [black addSubview:progress];
-                    
-                    [UIView animateWithDuration:1 animations:^{
-                        black.alpha = 1;
-                        [progress startLoading];
-                    } completion:^(BOOL finished) {
-                        
-                    }];
-                    
-                    [CachedFile saveData:data named:@"ChatImage.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                        [self sendMessageOfType:[NSMutableDictionary typeStringForType:kMessageTypePhoto] contentFile:file info:stringSize];
-                        [progress completeLoading:YES block:^{
-                            [black removeFromSuperview];
-                        }];
-                    } progressBlock:^(int percentDone) {
-                        progress.progress = percentDone / 100.0f;
-                    }];
-                }];
+                [self pickerWithRootViewController:self
+                                             title:@"CHOOSE SIZE" message:@"Please select appropriate size to send"
+                                              data:data
+                                           handler:^(NSData *data)
+                 {
+                     [CachedFile saveData:data named:@"photo.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
+                         [self sendMessageOfType:[NSMutableDictionary typeStringForType:kMessageTypePhoto] contentFile:file info:stringSize];
+                         [progress completeLoading:YES block:^{
+                             [progress.superview removeFromSuperview];
+                         }];
+                     } progressBlock:^(int percentDone) {
+                         progress.progress = percentDone / 100.0f;
+                     }];
+                 }];
             }
                 break;
             case kImagePickerMediaMovie: {
-                [CachedFile saveData:data named:@"ChatMovie.mov" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
+                [CachedFile saveData:data named:@"movie.mov" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
                     [self sendMessageOfType:[NSMutableDictionary typeStringForType:kMessageTypeVideo] contentFile:file info:stringSize];
                 } progressBlock:^(int percentDone) {
-//                    NSLog(@"SAVING IN PROGRESS:%d", percentDone);
                 }];
             }
                 break;
@@ -184,7 +188,11 @@
                 break;
         }
         
-    } featuring:kImagePickerSourceCamera | kImagePickerSourceLibrary | kImagePickerSourceVoice | kImagePickerSourceURL];
+    } cancelBlock:^{
+        [progress completeLoading:YES block:^{
+            [progress.superview removeFromSuperview];
+        }];
+    }];
 }
 
 - (MessageObject*) message
@@ -343,7 +351,6 @@ typedef void (^MessageCellBlock)(MessageCell *cell);
 
 - (void)tappedPhoto:(NSMutableDictionary *)message image:(UIImage *)image view:(UIView *)view
 {
-    NSLog(@"TAPPED BY DELEGATE");
     [self performSegueWithIdentifier:@"Preview" sender:message];
 }
 
@@ -359,12 +366,9 @@ typedef void (^MessageCellBlock)(MessageCell *cell);
 - (void) pickerWithRootViewController:(UIViewController*)parent
                                 title:(NSString*)title
                               message:(NSString*)message
-                                data:(NSData*)data
+                                 data:(NSData*)data
                               handler:(DataBlock)block
 {
-    if (!data || !parent || !block)
-        return;
-    
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleActionSheet];
     
     UIImage *image = [UIImage imageWithData:data];
@@ -387,8 +391,8 @@ typedef void (^MessageCellBlock)(MessageCell *cell);
         }];
         [alert addAction:action];
     }
-    
-    [parent presentViewController:alert animated:YES completion:nil];
+    [parent presentViewController:alert animated:YES completion:^{
+    }];
 }
 
 @end
