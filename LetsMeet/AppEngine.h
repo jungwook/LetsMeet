@@ -23,10 +23,10 @@
 #define AppPushSenderIdField @"senderId"
 #define AppPushMessageField @"message"
 #define AppPushObjectIdField AppKeyMessageIdKey
+
 #define AppPushCloudAppPush @"sendPushToUser"
 #define AppPushCloudAppBroadcast @"broadcastMessage"
 #define AppPushBroadcastDurationKey @"duration"
-
 
 #define AppPushType @"pushType"
 #define AppPushTypeMessage @"pushTypeMessage"

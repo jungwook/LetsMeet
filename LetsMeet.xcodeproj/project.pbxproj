@@ -24,7 +24,6 @@
 		126AF4111CEEACA200E3ED67 /* ValueTrackingSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF40F1CEEACA200E3ED67 /* ValueTrackingSlider.m */; };
 		126AF4141CEEF04300E3ED67 /* Account.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF4131CEEF04300E3ED67 /* Account.m */; };
 		127EF37F1CF3343100312D1D /* Octagon.m in Sources */ = {isa = PBXBuildFile; fileRef = 127EF37E1CF3343100312D1D /* Octagon.m */; };
-		1297646E1D01DC8200C673B6 /* Engine.m in Sources */ = {isa = PBXBuildFile; fileRef = 1297646D1D01DC8200C673B6 /* Engine.m */; };
 		12C5C9E51CF419EF00315C79 /* Hive.m in Sources */ = {isa = PBXBuildFile; fileRef = 12C5C9E41CF419EF00315C79 /* Hive.m */; };
 		12DE5F691CF814EC009B315F /* PFUser+Attributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5F681CF814EC009B315F /* PFUser+Attributes.m */; };
 		12DE5F6C1CFAFD84009B315F /* Square.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5F6B1CFAFD84009B315F /* Square.m */; };
@@ -34,6 +33,8 @@
 		12DE5FB31CFEF58A009B315F /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12DE5FB21CFEF58A009B315F /* Photos.framework */; };
 		12DE5FB81CFFB1A2009B315F /* Preview.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FB71CFFB1A2009B315F /* Preview.m */; };
 		12DE5FBB1D004443009B315F /* Progress.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FBA1D004443009B315F /* Progress.m */; };
+		12DE5FE21D02BC79009B315F /* FileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FE11D02BC79009B315F /* FileSystem.m */; };
+		12DE5FE51D02D523009B315F /* NSMutableDictionary+Bullet.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FE41D02D523009B315F /* NSMutableDictionary+Bullet.m */; };
 		12F7418C1CE4B97100E8267A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418B1CE4B97100E8267A /* main.m */; };
 		12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418E1CE4B97100E8267A /* AppDelegate.m */; };
 		12F741951CE4B97100E8267A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12F741931CE4B97100E8267A /* Main.storyboard */; };
@@ -103,8 +104,6 @@
 		126AF4131CEEF04300E3ED67 /* Account.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Account.m; sourceTree = "<group>"; };
 		127EF37D1CF3343100312D1D /* Octagon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Octagon.h; sourceTree = "<group>"; };
 		127EF37E1CF3343100312D1D /* Octagon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Octagon.m; sourceTree = "<group>"; };
-		1297646C1D01DC8200C673B6 /* Engine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Engine.h; sourceTree = "<group>"; };
-		1297646D1D01DC8200C673B6 /* Engine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Engine.m; sourceTree = "<group>"; };
 		12C5C9E31CF419EF00315C79 /* Hive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Hive.h; sourceTree = "<group>"; };
 		12C5C9E41CF419EF00315C79 /* Hive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Hive.m; sourceTree = "<group>"; };
 		12DE5F671CF814EC009B315F /* PFUser+Attributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "PFUser+Attributes.h"; sourceTree = "<group>"; };
@@ -122,6 +121,10 @@
 		12DE5FB71CFFB1A2009B315F /* Preview.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preview.m; sourceTree = "<group>"; };
 		12DE5FB91D004443009B315F /* Progress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Progress.h; sourceTree = "<group>"; };
 		12DE5FBA1D004443009B315F /* Progress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Progress.m; sourceTree = "<group>"; };
+		12DE5FE01D02BC79009B315F /* FileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileSystem.h; sourceTree = "<group>"; };
+		12DE5FE11D02BC79009B315F /* FileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileSystem.m; sourceTree = "<group>"; };
+		12DE5FE31D02D523009B315F /* NSMutableDictionary+Bullet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableDictionary+Bullet.h"; sourceTree = "<group>"; };
+		12DE5FE41D02D523009B315F /* NSMutableDictionary+Bullet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableDictionary+Bullet.m"; sourceTree = "<group>"; };
 		12F741871CE4B97000E8267A /* LetsMeet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LetsMeet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12F7418B1CE4B97100E8267A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		12F7418D1CE4B97100E8267A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -255,6 +258,17 @@
 			name = "Views etc";
 			sourceTree = "<group>";
 		};
+		12DE5FDF1D02BC1F009B315F /* File Manager */ = {
+			isa = PBXGroup;
+			children = (
+				12DE5FE01D02BC79009B315F /* FileSystem.h */,
+				12DE5FE11D02BC79009B315F /* FileSystem.m */,
+				12DE5FE31D02D523009B315F /* NSMutableDictionary+Bullet.h */,
+				12DE5FE41D02D523009B315F /* NSMutableDictionary+Bullet.m */,
+			);
+			name = "File Manager";
+			sourceTree = "<group>";
+		};
 		12F7417E1CE4B97000E8267A = {
 			isa = PBXGroup;
 			children = (
@@ -367,14 +381,13 @@
 		12F741F71CE5B11000E8267A /* Engine */ = {
 			isa = PBXGroup;
 			children = (
+				12DE5FDF1D02BC1F009B315F /* File Manager */,
 				124176721D007747008D24F5 /* FXBlurView.h */,
 				124176731D007747008D24F5 /* FXBlurView.m */,
 				12F741F81CE5B13D00E8267A /* AppEngine.h */,
 				12F741F91CE5B13D00E8267A /* AppEngine.m */,
 				125AEF3A1CF9F08300553475 /* SimulatedUsers.h */,
 				125AEF3B1CF9F08300553475 /* SimulatedUsers.m */,
-				1297646C1D01DC8200C673B6 /* Engine.h */,
-				1297646D1D01DC8200C673B6 /* Engine.m */,
 			);
 			name = Engine;
 			sourceTree = "<group>";
@@ -463,16 +476,17 @@
 				12F741E61CE5853F00E8267A /* Search.m in Sources */,
 				12F741F51CE59C7F00E8267A /* MenuCell.m in Sources */,
 				12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */,
-				1297646E1D01DC8200C673B6 /* Engine.m in Sources */,
 				12DE5FA61CFD40DD009B315F /* MessageCell.m in Sources */,
 				126AF4101CEEACA200E3ED67 /* ValuePopUpView.m in Sources */,
 				12F742001CE6CE4000E8267A /* SignUp.m in Sources */,
 				12F741EF1CE593A500E8267A /* Menu.m in Sources */,
 				12DE5FB81CFFB1A2009B315F /* Preview.m in Sources */,
 				126AF3F31CEA966B00E3ED67 /* Chat.m in Sources */,
+				12DE5FE21D02BC79009B315F /* FileSystem.m in Sources */,
 				12C5C9E51CF419EF00315C79 /* Hive.m in Sources */,
 				124928B21CF2E65A0038A2F3 /* ToggleButton.m in Sources */,
 				12F741D11CE56B3400E8267A /* FloatingDrawerView.m in Sources */,
+				12DE5FE51D02D523009B315F /* NSMutableDictionary+Bullet.m in Sources */,
 				12F7418C1CE4B97100E8267A /* main.m in Sources */,
 				124928AF1CF2CD370038A2F3 /* RefreshControl.m in Sources */,
 				12DE5FBB1D004443009B315F /* Progress.m in Sources */,

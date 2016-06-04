@@ -10,6 +10,7 @@
 #import "AppDelegate.h"
 #import "AppEngine.h"
 #import "PFUser+Attributes.h"
+#import "NSMutableDictionary+Bullet.h"
 
 @interface AppDelegate ()
 @property (nonatomic, weak, readonly) AppEngine *engine;
@@ -22,7 +23,10 @@
     // Override point for customization after application launch.
     
     [Parse enableLocalDatastore];
+    
     [MessageObject registerSubclass];
+    [BulletObject registerSubclass];
+    [Originals registerSubclass];
     
     [Parse initializeWithConfiguration:[ParseClientConfiguration configurationWithBlock:^(id<ParseMutableClientConfiguration> configuration) {
         configuration.applicationId = @"appLetsMeet";

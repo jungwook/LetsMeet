@@ -110,22 +110,27 @@
     }
 }
 
-+ (PFFile*) saveData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(FileBooleanResultBlock)block progressBlock:(PFProgressBlock)progressBlock
++ (void) saveData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(FileBooleanResultBlock)block progressBlock:(PFProgressBlock)progressBlock
 {
     return [[CachedFile file] saveData:data named:name inBackgroundWithBlock:block progressBlock:progressBlock];
 }
 
-- (PFFile*) saveData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(FileBooleanResultBlock)block progressBlock:(PFProgressBlock)progressBlock
+- (void) saveData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(FileBooleanResultBlock)block progressBlock:(PFProgressBlock)progressBlock
 {
-    PFFile *file = [PFFile fileWithName:name data:data];
-    [file saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-        [self setObject:data forKey:file.name];
+    if (data) {
+        PFFile *file = [PFFile fileWithName:name data:data];
+        [file saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+            [self setObject:data forKey:file.name];
+            if (block) {
+                block(file, succeeded, error);
+            }
+        } progressBlock:progressBlock];
+    }
+    else {
         if (block) {
-            block(file, succeeded, error);
+            block(nil, YES, nil);
         }
-    } progressBlock:progressBlock];
-    
-    return file;
+    }
 }
 
 @end
