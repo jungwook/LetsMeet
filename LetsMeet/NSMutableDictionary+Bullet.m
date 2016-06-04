@@ -370,7 +370,7 @@
     
     return bullet;
 }
-
+ 
 + (NSString *)parseClassName {
     return @"Bullets";
 }
