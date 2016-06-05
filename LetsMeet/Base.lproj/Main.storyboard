@@ -500,11 +500,12 @@ Hello</string>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="N9G-3d-KiC">
                                                     <rect key="frame" x="0.0" y="0.0" width="320" height="319.5"/>
                                                     <subviews>
-                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RWM-cd-uwh">
-                                                            <rect key="frame" x="8" y="8" width="44" height="30"/>
+                                                        <button opaque="NO" alpha="0.5" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RWM-cd-uwh">
+                                                            <rect key="frame" x="8" y="281" width="56" height="30"/>
+                                                            <color key="backgroundColor" red="0.68235296010000002" green="0.80392158030000005" blue="0.94509804249999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="30" id="SoT-Wd-UJq"/>
-                                                                <constraint firstAttribute="width" constant="44" id="zYQ-P2-9HX"/>
+                                                                <constraint firstAttribute="width" constant="56" id="zYQ-P2-9HX"/>
                                                             </constraints>
                                                             <state key="normal" title="EDIT"/>
                                                             <connections>
@@ -515,15 +516,22 @@ Hello</string>
                                                     <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                                     <constraints>
                                                         <constraint firstItem="RWM-cd-uwh" firstAttribute="leading" secondItem="N9G-3d-KiC" secondAttribute="leading" constant="8" id="O3d-eH-lqq"/>
-                                                        <constraint firstItem="RWM-cd-uwh" firstAttribute="top" secondItem="N9G-3d-KiC" secondAttribute="top" constant="8" id="qhO-xw-8t9"/>
+                                                        <constraint firstAttribute="bottom" secondItem="RWM-cd-uwh" secondAttribute="bottom" constant="8.5" id="nGs-1C-Tiu"/>
                                                     </constraints>
                                                 </view>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Lxb-yE-1xB">
+                                                    <rect key="frame" x="8" y="8" width="304" height="303.5"/>
+                                                </imageView>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstAttribute="bottomMargin" secondItem="Lxb-yE-1xB" secondAttribute="bottom" id="Bwl-K0-0zd"/>
                                                 <constraint firstItem="N9G-3d-KiC" firstAttribute="centerY" secondItem="CaH-N7-uYM" secondAttribute="centerY" id="DKQ-e8-lmS"/>
+                                                <constraint firstItem="Lxb-yE-1xB" firstAttribute="leading" secondItem="CaH-N7-uYM" secondAttribute="leadingMargin" id="cBB-sf-aWm"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="Lxb-yE-1xB" secondAttribute="trailing" id="ka5-Mq-jxn"/>
                                                 <constraint firstItem="N9G-3d-KiC" firstAttribute="centerX" secondItem="CaH-N7-uYM" secondAttribute="centerX" id="khf-i4-KO0"/>
                                                 <constraint firstItem="N9G-3d-KiC" firstAttribute="width" secondItem="CaH-N7-uYM" secondAttribute="width" id="lej-As-uMb"/>
                                                 <constraint firstItem="N9G-3d-KiC" firstAttribute="height" secondItem="CaH-N7-uYM" secondAttribute="height" id="pSd-wb-lYj"/>
+                                                <constraint firstItem="Lxb-yE-1xB" firstAttribute="top" secondItem="CaH-N7-uYM" secondAttribute="topMargin" id="yYf-Tg-bwP"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -664,10 +672,13 @@ Hello</string>
                     <navigationItem key="navigationItem" title="Profile" id="ERH-QU-Yxz"/>
                     <connections>
                         <outlet property="ageTF" destination="Xw7-Qn-UXe" id="Cpx-DI-elU"/>
+                        <outlet property="editPhotoBut" destination="RWM-cd-uwh" id="Z3c-qE-ZcL"/>
+                        <outlet property="imageView" destination="Lxb-yE-1xB" id="tzZ-1E-W0o"/>
                         <outlet property="introTF" destination="h7j-VL-XeK" id="24m-j4-kGk"/>
                         <outlet property="nicknameTF" destination="LwH-X1-QQg" id="C7d-Bx-1mA"/>
                         <outlet property="photoView" destination="N9G-3d-KiC" id="cBr-oE-dwy"/>
                         <outlet property="pointsLB" destination="WMC-4b-iUC" id="5Uf-9L-Jie"/>
+                        <outlet property="sexTF" destination="9Kg-EN-tI9" id="PJn-Xr-vKf"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="J2Q-6d-XSy" userLabel="First Responder" sceneMemberID="firstResponder"/>

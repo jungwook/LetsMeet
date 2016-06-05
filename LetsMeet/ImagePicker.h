@@ -10,14 +10,6 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "NSMutableDictionary+Bullet.h"
 
-typedef NS_OPTIONS(NSUInteger, ImagePickerSourceTypes) {
-    kImagePickerSourceNone                  = 0,
-    kImagePickerSourceCamera                = 1 << 0,
-    kImagePickerSourceLibrary               = 1 << 1,
-    kImagePickerSourceVoice                 = 1 << 2,
-    kImagePickerSourceURL                   = 1 << 3,
-};
-
 typedef NS_OPTIONS(NSUInteger, ImagePickerMediaType) {
     kImagePickerMediaNone                   = 0,
     kImagePickerMediaPhoto                  = 1 << 0,
@@ -25,13 +17,13 @@ typedef NS_OPTIONS(NSUInteger, ImagePickerMediaType) {
     kImagePickerMediaVoice                  = 1 << 2,
 };
 
+typedef void (^ImagePickerBlock)(id data, BulletTypes type, NSString* sizeString, NSURL *url);
+
 @interface ImagePicker : UIImagePickerController <UIImagePickerControllerDelegate, UIAlertViewDelegate, UINavigationControllerDelegate>
 - (instancetype)initWithParentViewController:(UIViewController*)parent
-                                   featuring:(ImagePickerSourceTypes)types
                           photoSelectedBlock:(ImagePickerBlock)actionBlock
                                  cancelBlock:(voidBlock)cancelBlock;
 + (void) proceedWithParentViewController:(UIViewController*)parent
-                               featuring:(ImagePickerSourceTypes)types
                   photoSelectedBlock:(ImagePickerBlock)actionBlock
                              cancelBlock:(voidBlock)cancelBlock;
 @end

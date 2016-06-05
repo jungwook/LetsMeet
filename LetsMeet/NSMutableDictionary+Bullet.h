@@ -33,7 +33,6 @@ typedef void (^CountResultBlock)(NSUInteger count);
 typedef void (^DictionaryResultBlock)(NSDictionary *messages);
 typedef void (^DictionaryArrayResultBlock)(NSDictionary *messages, NSArray *users);
 typedef void (^CachedFileBlock)(NSData * data, NSError * error, BOOL fromCache);
-typedef void (^ImagePickerBlock)(id data, BulletTypes type, NSString* sizeString, NSURL *url);
 typedef void (^ImageSizePickerBlock)(NSData *data, Progress* progress);
 typedef void (^NewUserBlock)(User* me);
 
@@ -113,19 +112,31 @@ typedef NS_OPTIONS(BOOL, SexTypes)
     kSexFemale
 };
 
+typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
+{
+    kProfileMediaPhoto = 0,
+    kProfileMediaVideo
+};
+
 @interface User : PFUser<PFSubclassing>
 @property (retain) NSString* nickname;
 @property (retain) PFGeoPoint* location;
 @property (retain) NSDate* locationUdateAt;
-@property SexTypes sex;
 @property (retain) NSString* age;
 @property (retain) NSString* intro;
 @property (retain) PFFile* profilePhoto;
 @property (retain) PFFile* originalPhoto;
+@property (retain) PFFile* profileVideo;
+@property ProfileMediaTypes profileMediaType;
+
 @property BOOL isSimulated;
+@property SexTypes sex;
 
 + (instancetype) me;
 - (void) createMe:(NewUserBlock)block;
 - (void) removeMe;
+- (NSString*) sexString;
+- (BOOL) profileIsVideo;
+- (BOOL) profileIsPhoto;
 @end
 

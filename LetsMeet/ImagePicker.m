@@ -13,24 +13,20 @@
 @property (nonatomic, weak) UINavigationController  * parent;
 @property (strong, nonatomic) ImagePickerBlock pickerBlock;
 @property (strong, nonatomic) voidBlock cancelBlock;
-@property (nonatomic) ImagePickerSourceTypes types;
 @end
 
 @implementation ImagePicker
 
 + (void) proceedWithParentViewController:(UIViewController*)parent
-                               featuring:(ImagePickerSourceTypes)types
                       photoSelectedBlock:(ImagePickerBlock)actionBlock
                              cancelBlock:(voidBlock)cancelBlock
 {
     __unused ImagePicker *picker = [[ImagePicker alloc] initWithParentViewController:parent
-                                                                           featuring:types
                                                                   photoSelectedBlock:actionBlock
                                                                          cancelBlock:cancelBlock];
 }
 
 - (instancetype)initWithParentViewController:(UIViewController*)parent
-                                   featuring:(ImagePickerSourceTypes)types
                           photoSelectedBlock:(ImagePickerBlock)actionBlock
                                  cancelBlock:(voidBlock)cancelBlock
 {
@@ -41,7 +37,6 @@
         self.parent = parent.navigationController;
         self.pickerBlock = actionBlock;
         self.cancelBlock = cancelBlock;
-        self.types = types;
         self.videoQuality = UIImagePickerControllerQualityType640x480;
         self.modalPresentationStyle = UIModalPresentationOverCurrentContext;
         self.videoMaximumDuration = 10;
@@ -49,41 +44,25 @@
         
         self.alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
         
-        if (types >> kImagePickerSourceCamera) {
-            UIAlertAction *camera = [UIAlertAction actionWithTitle:@"카메라" style:UIAlertActionStyleDefault
-                                                           handler:^(UIAlertAction * action) {
-                                                               self.sourceType = UIImagePickerControllerSourceTypeCamera;
-                                                               self.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypeCamera];
-                                                               [parent presentViewController:self animated:YES completion:nil];
-                                                           }];
-            if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-                [self.alert addAction:camera];
-            }
-        }
-
-        if (types >> kImagePickerSourceLibrary) {
-            UIAlertAction *library = [UIAlertAction actionWithTitle:@"사진/동영상" style:UIAlertActionStyleDefault
-                                                            handler:^(UIAlertAction * action) {
-                                                                self.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-                                                                self.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
-                                                                [parent presentViewController:self animated:YES completion:nil];
-                                                            }];
-
-            if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
-                [self.alert addAction:library];
-            }
-        }
+        UIAlertAction *camera = [UIAlertAction actionWithTitle:@"카메라" style:UIAlertActionStyleDefault
+                                                       handler:^(UIAlertAction * action) {
+                                                           self.sourceType = UIImagePickerControllerSourceTypeCamera;
+                                                           self.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypeCamera];
+                                                           [parent presentViewController:self animated:YES completion:nil];
+                                                       }];
+        UIAlertAction *library = [UIAlertAction actionWithTitle:@"사진/동영상" style:UIAlertActionStyleDefault
+                                                        handler:^(UIAlertAction * action) {
+                                                            self.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+                                                            self.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
+                                                            [parent presentViewController:self animated:YES completion:nil];
+                                                        }];
         
-        if (types << kImagePickerSourceVoice) {
-            [self.alert addAction:[UIAlertAction actionWithTitle:@"보이스" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                
-            }]];
-        }
         
-        if (types << kImagePickerSourceURL) {
-            [self.alert addAction:[UIAlertAction actionWithTitle:@"링크" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                
-            }]];
+        if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+            [self.alert addAction:camera];
+        }
+        if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
+            [self.alert addAction:library];
         }
         
         [self.alert addAction:[UIAlertAction actionWithTitle:@"취소" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
@@ -93,6 +72,16 @@
         [parent presentViewController:self.alert animated:YES completion:nil];
     }
     return self;
+}
+
+- (UIImage *)fixVideoThumbnailOrientation:(UIImage*) image
+{
+    NSLog(@"IMAGE LOADED OF SIZE:%@", NSStringFromCGSize(image.size));
+    CGFloat ratio = ((image.size.width > image.size.height) ? image.size.height : image.size.width) / 320.0f;
+    UIImage *rotated = [UIImage imageWithCGImage:image.CGImage scale:ratio orientation:UIImageOrientationRight];
+    NSLog(@"IMAGE ROTATED OF SIZE:%@[%@]", NSStringFromCGSize(rotated.size), rotated);
+    
+    return rotated;
 }
 
 - (UIImage *)fixOrientation:(UIImage*) image
@@ -187,9 +176,7 @@
         if (CFStringCompare ((CFStringRef) mediaType, kUTTypeImage, 0) == kCFCompareEqualTo) {
             UIImage *image = (UIImage *) [info objectForKey:UIImagePickerControllerOriginalImage];
             CGSize imageSize = image.size;
-            
-            UIImageWriteToSavedPhotosAlbum (image, nil, nil , nil);
-            
+//            UIImageWriteToSavedPhotosAlbum (image, nil, nil , nil);
             image = [self fixOrientation:image];
             NSData *data = UIImageJPEGRepresentation(image, 1.0);
             
@@ -201,23 +188,30 @@
         // Handle a movie capture
         if (CFStringCompare ((CFStringRef) mediaType, kUTTypeMovie, 0)== kCFCompareEqualTo) {
             AVAsset *asset = [AVAsset assetWithURL:url];
-            
             AVAssetTrack *track = [[asset tracksWithMediaType:AVMediaTypeVideo] firstObject];
-            CGSize dimensions = track ? CGSizeApplyAffineTransform(track.naturalSize, track.preferredTransform) : CGSizeMake(400, 300);
+            
+            CGSize dimensions = track ? CGSizeApplyAffineTransform(track.naturalSize, track.preferredTransform) : CGSizeMake(320, 200);
             dimensions.width = fabs(dimensions.width);
             dimensions.height = fabs(dimensions.height);
             
-            NSString *moviePath = [((NSURL*)[info objectForKey:UIImagePickerControllerMediaURL]) path];
-            
-            if (UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(moviePath)) {
-                UISaveVideoAtPathToSavedPhotosAlbum(moviePath, nil, nil, nil);
-            }
-            
+            UIImage *thumbnail = [self thumbnailFromVideoAsset:asset];
+            NSData *newData = UIImageJPEGRepresentation(thumbnail, kJPEGCompressionFull);
+
             if (self.pickerBlock) {
-                self.pickerBlock(moviePath, kBulletTypeVideo, NSStringFromCGSize(dimensions), url);
+                self.pickerBlock(newData, kBulletTypeVideo, NSStringFromCGSize(dimensions), url);
             }
         }
     }];
+}
+
+- (UIImage*) thumbnailFromVideoAsset:(AVAsset*)asset
+{
+    AVAssetImageGenerator *generateImg = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+    UIImage *thumbnail = [[UIImage alloc] initWithCGImage:[generateImg copyCGImageAtTime:CMTimeMake(1, 1) actualTime:NULL error:nil]];
+    
+//    UIImage *rotated = [UIImage imageWithCGImage:thumbnail.CGImage scale:1.0f orientation:UIImageOrientationRight];
+    UIImage *rotated = [UIImage imageWithCGImage:thumbnail.CGImage scale:1.0f orientation:UIImageOrientationUp];
+    return rotated;
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker

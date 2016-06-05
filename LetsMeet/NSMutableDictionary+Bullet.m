@@ -380,7 +380,7 @@
 
 
 @implementation User
-@dynamic nickname,location,locationUdateAt, sex, age, intro,  profilePhoto, originalPhoto, isSimulated;
+@dynamic nickname,location,locationUdateAt, sex, age, intro,  profilePhoto, originalPhoto, isSimulated, profileVideo, profileMediaType;
 
 + (instancetype) me
 {
@@ -444,6 +444,21 @@
     }
     
     return idString;
+}
+
+- (NSString*) sexString
+{
+    return self.sex == kSexFemale? NSLocalizedString(@"여자", @"여자") : NSLocalizedString(@"남자", @"남자");
+}
+
+- (BOOL)profileIsPhoto
+{
+    return self.profileMediaType == kProfileMediaPhoto ? YES : NO;
+}
+
+- (BOOL)profileIsVideo
+{
+    return self.profileMediaType == kProfileMediaVideo ? YES : NO;
 }
 
 @end
