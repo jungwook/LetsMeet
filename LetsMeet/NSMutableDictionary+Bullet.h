@@ -48,7 +48,7 @@ typedef NSMutableDictionary Bullet;
 
 + (NSString*) bulletTypeStringForType:(BulletTypes)bulletType;
 - (NSString*) bulletTypeString;
-- (NSString*) defaultFileName;
+- (NSString*) defaultNameForBulletType;
 
 + (instancetype) bulletWithBullet:(Bullet*)newDic;
 + (instancetype) bulletWithText:(NSString*)text;
@@ -88,4 +88,25 @@ typedef NSMutableDictionary Bullet;
 @property (retain) PFFile* file;
 
 @end
+
+typedef NS_OPTIONS(BOOL, SexTypes)
+{
+    kSexMale = 0,
+    kSexFemale
+};
+
+@interface User : PFUser<PFSubclassing>
+@property (retain) NSString* nickname;
+@property (retain) PFGeoPoint* location;
+@property (retain) NSDate* locationUdateAt;
+@property SexTypes sex;
+@property (retain) NSString* age;
+@property (retain) NSString* intro;
+@property (retain) PFFile* profilePhoto;
+@property (retain) PFFile* originalPhoto;
+
++ (instancetype) me;
+@end
+
+
 

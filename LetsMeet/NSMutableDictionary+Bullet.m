@@ -105,7 +105,7 @@
     return [Bullet bulletTypeStringForType:self.bulletType];
 }
 
-- (NSString*) defaultFileName
+- (NSString*) defaultNameForBulletType
 {
     switch (self.bulletType) {
         case kBulletTypePhoto:
@@ -309,13 +309,8 @@
     self.createdAt = object.createdAt;
     self.updatedAt = object.updatedAt;
     
-    PFUser *fromUser = [PFUser user];
-    fromUser.objectId = self.fromUserId;
-    PFUser *toUser = [PFUser user];
-    toUser.objectId = self.toUserId;
-    
-    object.fromUser = fromUser;
-    object.toUser = toUser;
+    object.fromUser = [User objectWithoutDataWithObjectId:self.fromUserId];
+    object.toUser = [User objectWithoutDataWithObjectId:self.toUserId];
     
     if (self.message)
         object.message = self.message;
@@ -412,6 +407,15 @@
 
 + (NSString *)parseClassName {
     return @"Originals";
+}
+
+@end
+
+@implementation User
+@dynamic nickname,location,locationUdateAt, sex, age, intro,  profilePhoto, originalPhoto;
++ (instancetype) me
+{
+    return [User currentUser];
 }
 
 @end

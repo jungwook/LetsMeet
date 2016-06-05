@@ -27,6 +27,7 @@
     [MessageObject registerSubclass];
     [BulletObject registerSubclass];
     [Originals registerSubclass];
+    [User registerSubclass];
     
     [Parse initializeWithConfiguration:[ParseClientConfiguration configurationWithBlock:^(id<ParseMutableClientConfiguration> configuration) {
         configuration.applicationId = @"appLetsMeet";

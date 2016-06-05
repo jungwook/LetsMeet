@@ -18,7 +18,7 @@
 @property (nonatomic, strong) NSURL *messagesDirectoryPath;
 @property (nonatomic, strong) NSFileManager *manager;
 @property (nonatomic, strong) NSMutableDictionary *bullets;
-@property (nonatomic, weak) PFUser* me;
+@property (nonatomic, weak) User* me;
 @end
 
 @implementation FileSystem
@@ -40,7 +40,10 @@
     self = [super init];
     if (self) {
         NSError *error = [NSError new];
-        self.me = [PFUser currentUser];
+        self.me = [User me];
+        
+        // If me is nil then need to find a way of loging in a new user.
+        
         self.applicationPath = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
         self.systemPath = [self.applicationPath URLByAppendingPathComponent:@"Engine"];
         self.usersPath = [self.systemPath URLByAppendingPathComponent:@"Users"];
@@ -67,6 +70,16 @@
 }
 
 - (NSMutableArray*)bulletsWith:(id)userId
+{
+    return [self.bullets objectForKey:userId];
+}
+
+/**
+ messages array converted to a "read only" NSArray of messages for the user. It will only pass a reflection of the underlying system array of messages for the user with userId.
+ 
+ **/
+
+- (NSArray*) messagesWith:(id)userId
 {
     return [self.bullets objectForKey:userId];
 }
@@ -129,7 +142,7 @@
 {
     NSMutableArray *userMessages = [self bulletsWith:userId];
     
-    [CachedFile saveData:thumbnail named:[bullet defaultFileName] inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
+    [CachedFile saveData:thumbnail named:[bullet defaultNameForBulletType] inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
         if (succeeded) {
             bullet.isRead = NO;
             bullet.isSyncFromUser = YES;
@@ -144,7 +157,7 @@
             [self saveUser:userId];
             [self notifyChatSystemWithMessageId:bullet.objectId];
             
-            [CachedFile saveData:originalData named:[bullet defaultFileName] inBackgroundWithBlock:^(PFFile *original, BOOL succeeded, NSError *error) {
+            [CachedFile saveData:originalData named:[bullet defaultNameForBulletType] inBackgroundWithBlock:^(PFFile *original, BOOL succeeded, NSError *error) {
                 if (succeeded) {
                     Originals *media = [Originals new];
                     media.messageId = bullet.objectId;
@@ -243,7 +256,7 @@
 
 + (void) appEngineBroadcastPush:(NSString*)message duration:(NSNumber*)duration
 {
-    PFUser *me = [PFUser currentUser];
+    User *me = [User currentUser];
     
     [PFCloud callFunctionInBackground:AppPushCloudAppBroadcast
                        withParameters:@{
@@ -326,6 +339,24 @@
     }
 }
 
+- (void)usersNearMeInBackground:(UsersArrayBlock)block
+{
+    PFQuery *query = [User query];
+    [query whereKey:@"location" nearGeoPoint:self.location];
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
+        if (block)
+            block(users);
+    }];
+}
+
+- (PFGeoPoint*) location
+{
+    return [PFGeoPoint geoPointWithLocation:self.currentLocation];
+}
+
+/**
+The - (void) initLocationServices method initializes the location management system
+ **/
 
 - (void) initLocationServices
 {
@@ -366,9 +397,9 @@
     self.currentLocation = location;
     
     PFGeoPoint *geo = [PFGeoPoint geoPointWithLocation:location];
-    [[PFUser currentUser] setObject:geo forKey:@"location"];
-    [[PFUser currentUser] setObject:location.timestamp forKey:@"locationUpdatedAt"];
-    [[PFUser currentUser] saveInBackground];
+    [self.me setObject:geo forKey:@"location"];
+    [self.me setObject:location.timestamp forKey:@"locationUpdatedAt"];
+    [self.me saveInBackground];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status

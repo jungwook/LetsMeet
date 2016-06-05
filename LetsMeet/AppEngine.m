@@ -318,6 +318,7 @@ id otherUserId(Message* message) {
             BOOL ret = [self appEngineRemoveFileForUserId:user.objectId];
             NSLog(@"======DELETED FILE FOR:%@ %@SUCCESSFULLY",user.objectId, ret ? @"" : @"UN");
         }];
+        
     }];
     NSLog(@"==============================================================================");
     NSLog(@"==============================================================================");
