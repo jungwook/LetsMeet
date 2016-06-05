@@ -55,7 +55,7 @@
 }
 
 -(void)viewDidAppear:(BOOL)animated
-{
+{ 
 }
 
 - (void) subscribeToChannelCurrentUser
