@@ -20,5 +20,6 @@
 #import <Parse/Parse.h>
 #import <QuartzCore/QuartzCore.h>
 #import "AppDelegate.h"
+#import "BaseFunctions.h"
 
 #endif /* PrefixHeader_pch */

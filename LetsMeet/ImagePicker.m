@@ -194,7 +194,7 @@
             NSData *data = UIImageJPEGRepresentation(image, 1.0);
             
             if (self.pickerBlock) {
-                self.pickerBlock(data, kMessageTypePhoto, NSStringFromCGSize(imageSize), url);
+                self.pickerBlock(data, kBulletTypePhoto, NSStringFromCGSize(imageSize), url);
             }
         }
         
@@ -214,7 +214,7 @@
             }
             
             if (self.pickerBlock) {
-                self.pickerBlock(moviePath, kMessageTypeVideo, NSStringFromCGSize(dimensions), url);
+                self.pickerBlock(moviePath, kBulletTypeVideo, NSStringFromCGSize(dimensions), url);
             }
         }
     }];

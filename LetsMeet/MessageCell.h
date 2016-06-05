@@ -7,15 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PFUser+Attributes.h"
-#import "AppEngine.h"
+#import "NSMutableDictionary+Bullet.h"
 
 @protocol MessageCellDelegate;
 
 @interface MessageCell : UITableViewCell
-@property (nonatomic, weak) Message* message;
+@property (nonatomic, weak) Bullet* message;
 @property (nonatomic, weak) id<MessageCellDelegate> delegate;
-- (void)setMessage:(Message*)message
+- (void)setMessage:(Bullet*)    message
            myPhoto:(UIImage*)   myPhoto
          userPhoto:(UIImage*)   userPhoto
           userName:(NSString*)  userName
@@ -23,6 +22,6 @@
 @end
 
 @protocol MessageCellDelegate <NSObject>
-- (void) tappedPhoto:(Message*)message image:(UIImage*)image view:(UIView*)view;
-- (void) redrawCell:(Message*)message;
+- (void) tappedPhoto:(Bullet*)message image:(UIImage*)image view:(UIView*)view;
+- (void) redrawCell:(Bullet*)message;
 @end

@@ -8,12 +8,11 @@
 
 #import <Parse/Parse.h>
 #import "AppDelegate.h"
-#import "AppEngine.h"
-#import "PFUser+Attributes.h"
+#import "FileSystem.h"
 #import "NSMutableDictionary+Bullet.h"
 
 @interface AppDelegate ()
-@property (nonatomic, weak, readonly) AppEngine *engine;
+@property (nonatomic, strong) FileSystem *system;
 @end
 
 @implementation AppDelegate
@@ -24,7 +23,6 @@
     
     [Parse enableLocalDatastore];
     
-    [MessageObject registerSubclass];
     [BulletObject registerSubclass];
     [Originals registerSubclass];
     [User registerSubclass];
@@ -34,6 +32,7 @@
         configuration.clientKey = @"clientLetsMeet";
         configuration.server = @"http://parse.kr:1338/parse";
     }]];
+    
     
 // OK... DOING THIS
 //    [PFUser enableAutomaticUser];
@@ -59,7 +58,6 @@
     [application registerUserNotificationSettings:settings];
     [application registerForRemoteNotifications];
     
-    
     // Extract the notification data
     NSDictionary *payload = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
     
@@ -67,7 +65,7 @@
         NSLog(@"PAYLOAD:%@", payload);
     }
     
-    _engine = [AppEngine engine];
+    self.system = [FileSystem new];
     
     return YES;
 }
@@ -86,7 +84,8 @@
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
     NSLog(@"Foreground");
-    [[AppEngine engine] AppEngineFetchLastObjects];
+    
+    [self.system fetchOutstandingBullets];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -106,7 +105,7 @@
     [PFPush subscribeToChannelInBackground:@"" block:^(BOOL succeeded, NSError *error) {
         if (succeeded) {
             NSLog(@"ParseStarterProject successfully subscribed to push notifications on the broadcast channel.");
-            [[AppEngine engine] AppEngineFetchLastObjects];
+            [self.system fetchOutstandingBullets];
         } else {
             NSLog(@"ParseStarterProject failed to subscribe to push notifications on the broadcast channel.");
         }
@@ -116,7 +115,7 @@
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
     if (error.code == 3010) {
         NSLog(@"Push notifications are not supported in the iOS Simulator.");
-        [[AppEngine engine] startTimeKeeperIfSimulator];
+        [self.system timeKeep];
     } else {
         // show some alert or otherwise handle the failure to register.
         NSLog(@"application:didFailToRegisterForRemoteNotificationsWithError: %@", error);
@@ -124,9 +123,7 @@
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-//    [PFPush handlePush:userInfo];
-    
-    [AppEngine appEngineTreatPushUserInfo:userInfo];
+    [self.system treatPushNotificationWith:userInfo];
     
     if (application.applicationState == UIApplicationStateInactive) {
         [PFAnalytics trackAppOpenedWithRemoteNotificationPayload:userInfo];
@@ -139,9 +136,7 @@
 
 + (void) toggleMenu
 {
-    [[[self globalDelegate] mainMenu] toggleDrawerWithSide:FloatingDrawerSideLeft animated:YES completion:^(BOOL finished) {
-        
-    }];
+    [[[self globalDelegate] mainMenu] toggleDrawerWithSide:FloatingDrawerSideLeft animated:YES completion:nil];
 }
 
 + (void) toggleMenuWithScreenID:(NSString *)screen

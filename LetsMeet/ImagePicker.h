@@ -7,8 +7,23 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "AppEngine.h"
 #import <MobileCoreServices/MobileCoreServices.h>
+#import "NSMutableDictionary+Bullet.h"
+
+typedef NS_OPTIONS(NSUInteger, ImagePickerSourceTypes) {
+    kImagePickerSourceNone                  = 0,
+    kImagePickerSourceCamera                = 1 << 0,
+    kImagePickerSourceLibrary               = 1 << 1,
+    kImagePickerSourceVoice                 = 1 << 2,
+    kImagePickerSourceURL                   = 1 << 3,
+};
+
+typedef NS_OPTIONS(NSUInteger, ImagePickerMediaType) {
+    kImagePickerMediaNone                   = 0,
+    kImagePickerMediaPhoto                  = 1 << 0,
+    kImagePickerMediaMovie                  = 1 << 1,
+    kImagePickerMediaVoice                  = 1 << 2,
+};
 
 @interface ImagePicker : UIImagePickerController <UIImagePickerControllerDelegate, UIAlertViewDelegate, UINavigationControllerDelegate>
 - (instancetype)initWithParentViewController:(UIViewController*)parent

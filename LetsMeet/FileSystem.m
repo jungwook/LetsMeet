@@ -9,6 +9,8 @@
 #import "FileSystem.h"
 #import "CachedFile.h"
 
+
+
 @interface FileSystem()
 @property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, strong) CLLocation* currentLocation;
@@ -21,12 +23,12 @@
 @property (nonatomic, weak) User* me;
 @end
 
+#define __LF NSLog(@"%s", __FUNCTION__);
+
 @implementation FileSystem 
 
 + (instancetype) new
 {
-    NSLog(@"INITIALIZING FILE SYSTEM V2");
-    
     static id sharedFile = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -37,12 +39,16 @@
 
 - (instancetype)initOnce
 {
+    __LF
     self = [super init];
     if (self) {
-        NSError *error = [NSError new];
+        NSError *error = nil;
         self.me = [User me];
         
         // If me is nil then need to find a way of loging in a new user.
+        if (!self.me) {
+            [self.me createMe:nil];
+        }
         
         self.applicationPath = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
         self.systemPath = [self.applicationPath URLByAppendingPathComponent:@"Engine"];
@@ -66,11 +72,15 @@
 
 - (NSArray*)usersInTheSystem
 {
+    __LF
+
     return [self.bullets allKeys];
 }
 
 - (NSMutableArray*)bulletsWith:(id)userId
 {
+    __LF
+    
     return [self.bullets objectForKey:userId];
 }
 
@@ -81,17 +91,24 @@
 
 - (NSArray*) messagesWith:(id)userId
 {
+    __LF
+
     return [self.bullets objectForKey:userId];
 }
 
 - (NSString*)usersFilename
 {
+    __LF
+
     return [self.usersPath path];
 }
 
 - (void)load
 {
-    NSError *error = [NSError new];
+    __LF
+
+    NSError *error = nil;
+
     NSLog(@"LOADING ALL USER MESSAGES");
     
     NSArray *fileURLs = [self.manager contentsOfDirectoryAtURL:self.messagesDirectoryPath includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:&error];
@@ -108,6 +125,8 @@
 
 - (BOOL)save
 {
+    __LF
+
     [self.usersInTheSystem enumerateObjectsUsingBlock:^(id _Nonnull userId, NSUInteger idx, BOOL * _Nonnull stop) {
         [self saveUser:userId];
     }];
@@ -116,13 +135,17 @@
 
 - (BOOL)saveUser:(id)userId
 {
+    __LF
+
     NSURL *userMessagesPath = [self.messagesDirectoryPath URLByAppendingPathComponent:userId];
     return [[self bulletsWith:userId] writeToURL:userMessagesPath atomically:YES];
 }
 
 - (BOOL)removeUser:(id)userId
 {
-    NSError *error = [NSError new];
+    __LF
+
+    NSError *error = nil;
     
     NSURL *userMessagesPath = [self.messagesDirectoryPath URLByAppendingPathComponent:userId];
     BOOL ret = [self.manager removeItemAtURL:userMessagesPath error:&error];
@@ -140,6 +163,8 @@
 
 - (void)add:(Bullet *)bullet for:(id)userId thumbnail:(NSData *)thumbnail originalData:(NSData*)originalData
 {
+    __LF
+
     NSMutableArray *userMessages = [self bulletsWith:userId];
     
     [CachedFile saveData:thumbnail named:[bullet defaultNameForBulletType] inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
@@ -155,14 +180,14 @@
             
             [userMessages addObject:bullet]; // ADD TO DICTIONARY SYSTEM.
             [self saveUser:userId];
-            [self notifyChatSystemWithMessageId:bullet.objectId];
+            [self notifySystemOfNewMessage:bullet];
             
-            [CachedFile saveData:originalData named:[bullet defaultNameForBulletType] inBackgroundWithBlock:^(PFFile *original, BOOL succeeded, NSError *error) {
+            [CachedFile saveData:originalData named:[bullet defaultNameForBulletType] inBackgroundWithBlock:^(PFFile *originalData, BOOL succeeded, NSError *error) {
                 if (succeeded) {
                     Originals *media = [Originals new];
                     media.messageId = bullet.objectId;
-                    if (original)
-                        media.file = original;
+                    if (originalData)
+                        media.file = originalData;
                     
                     [media saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
                         [object saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
@@ -187,6 +212,8 @@
 
 - (void) update:(Bullet *)message for:(id)userId
 {
+    __LF
+
     NSMutableArray *userMessages = [self bulletsWith:userId];
     
     [userMessages enumerateObjectsUsingBlock:^(Bullet* _Nonnull bullet, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -194,53 +221,62 @@
             [userMessages removeObjectAtIndex:idx];
             [userMessages insertObject:message atIndex:idx];
             
-            [self notifyChatSystemWithMessageId:message.objectId];
+            [self notifySystemOfNewMessage:message];
             *stop = YES;
         }
     }];
     [self saveUser:userId];
 }
 
-- (void)addMessageFromObjectId:(id)objectId
+- (void)addMessageFromObject:(BulletObject*) object
 {
-    BulletObject *object = [BulletObject new];
-    object.objectId = objectId;
+    __LF
+
+    Bullet *bullet = [object bullet];
     
-    [object fetchInBackgroundWithBlock:^(PFObject * _Nullable obj, NSError * _Nullable error) {
+    // ONLY ASSIGNS FILE NAME AND URL
+    // LAZY LOADING OF THE THUMBNAIL HAPPENS NOW
+    
+    [CachedFile getDataInBackgroundWithBlock:^(NSData *thumbnail, NSError *error, BOOL fromCache) {
+        bullet.thumbnail = thumbnail; //THUMBNAIL IMAGE OF THE MEDIA SENT
         
-        Bullet *bullet = [object bullet];
-        
-        // ONLY ASSIGNS FILE NAME AND URL
-        // LAZY LOADING OF THE THUMBNAIL HAPPENS NOW
-        
-        [CachedFile getDataInBackgroundWithBlock:^(NSData *data, NSError *error, BOOL fromCache) {
-            bullet.data = data; //THUMBNAIL IMAGE OF THE MEDIA SENT
-            
-            NSMutableArray *userMessages = [self bulletsWith:object.fromUser.objectId];
-            [userMessages addObject:bullet];
-            
-            [self notifyChatSystemWithMessageId:bullet.objectId];
-            [self notifySystemOfNewMessage:bullet];
-        } fromFile:object.file];
+        NSMutableArray *userMessages = [self bulletsWith:object.fromUser.objectId];
+        [userMessages addObject:bullet];
         
         // SET ISSYNCTOUSER TO YES SO THAT I DO NOT RELOAD THE SAME MESSAGE
         BOOL mine = [object.toUser.objectId isEqualToString:self.me.objectId];
         if (mine) {
             object.isSyncToUser = YES;
-            [object saveInBackground];
+            [object saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+                if (succeeded) {
+                    [self notifySystemOfNewMessage:bullet];
+                }
+            }];
         }
+    } fromFile:object.file];
+}
+
+- (void)addMessageFromObjectId:(id)objectId
+{
+    __LF
+
+    BulletObject *object = [BulletObject objectWithoutDataWithObjectId:objectId];
+    [object fetchInBackgroundWithBlock:^(PFObject * _Nullable obj, NSError * _Nullable error) {
+        [self addMessageFromObject:object];
     }];
 }
 
 - (void) sendPushMessage:textToSend messageId:(id)messageId toUserId:(id)userId
 {
-    [PFCloud callFunctionInBackground:AppPushCloudAppPush
+    __LF
+
+    [PFCloud callFunctionInBackground:@"sendPushToUser"
                        withParameters:@{
-                                        AppPushRecipientIdField: userId,
-                                        AppPushSenderIdField: self.me.objectId,
-                                        AppPushMessageField: textToSend,
-                                        AppPushObjectIdField: messageId,
-                                        AppPushType: AppPushTypeMessage
+                                        @"recipientId": userId,
+                                        @"senderId":    self.me.objectId,
+                                        @"message":     textToSend,
+                                        @"messageId":   messageId,
+                                        @"pushType":    @"pushTypeMessage"
                                         }
                                 block:^(NSString *success, NSError *error) {
                                     if (!error) {
@@ -252,18 +288,18 @@
                                 }];
 }
 
-
-
-+ (void) appEngineBroadcastPush:(NSString*)message duration:(NSNumber*)duration
++ (void) sendBroadcastMessage:(NSString*)message duration:(NSNumber*)duration
 {
-    User *me = [User currentUser];
+    __LF
+
+    User *me = [User me];
     
-    [PFCloud callFunctionInBackground:AppPushCloudAppBroadcast
+    [PFCloud callFunctionInBackground:@"broadcastMessage"
                        withParameters:@{
-                                        AppPushSenderIdField: me.objectId,
-                                        AppPushMessageField: message,
-                                        AppPushBroadcastDurationKey: duration,
-                                        AppPushType: AppPushTypeBroadcast
+                                        @"senderId":    me.objectId,
+                                        @"message":     message,
+                                        @"duration":    duration,
+                                        @"pushType":    @"pushTypeBroadcast"
                                         }
                                 block:^(NSString *success, NSError *error) {
                                     if (!error) {
@@ -275,8 +311,30 @@
                                 }];
 }
 
-+ (void) treatPushNotificationWith:(NSDictionary *)userInfo
+- (void) fetchOutstandingBullets
 {
+    __LF
+
+    NSLog(@"Fetching Outstanding Bullets");
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:
+                              @"( fromUser == %@ AND isSyncFromUser != true) OR (toUser == %@ AND isSyncToUser != true)",
+                              self.me,
+                              self.me];
+    
+    
+    PFQuery *query = [BulletObject queryWithPredicate:predicate];
+    [query setLimit:1000];
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable bullets, NSError * _Nullable error) {
+        [bullets enumerateObjectsUsingBlock:^(BulletObject* _Nonnull bullet, NSUInteger idx, BOOL * _Nonnull stop) {
+            [self addMessageFromObjectId:bullet.objectId];
+        }];
+    }];
+}
+
+- (void) treatPushNotificationWith:(NSDictionary *)userInfo
+{
+    __LF
+
     FileSystem* system = [FileSystem new];
     if ([userInfo[@"pushType"] isEqualToString:@"pushTypeMessage"]) {
         [system addMessageFromObjectId:userInfo[@"messageId"]];
@@ -288,21 +346,22 @@
 
 - (void) notifySystemOfBroadcast:(id)userInfo
 {
+    __LF
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NotifySystemOfBroadcast" object:userInfo];
 }
 
 - (void) notifySystemOfNewMessage:(id)bullet
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"NotifySystemOfNewMessage" object:bullet];
-}
+    __LF
 
-- (void) notifyChatSystemWithMessageId:(id)bulletId
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"NotifyChatSystemWithMessageId" object:bulletId];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"NotifySystemOfNewMessage" object:bullet];
 }
 
 - (void) readUnreadBulletsWithUserId:(id)userId
 {
+    __LF
+
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"toUserId == %@ AND isRead == NO", self.me.objectId];
     NSArray *unreadBullets = [[self bulletsWith:userId] filteredArrayUsingPredicate:predicate];
     [unreadBullets enumerateObjectsUsingBlock:^(Bullet* _Nonnull bullet, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -316,6 +375,8 @@
 
 - (NSUInteger) unreadMessages
 {
+    __LF
+
     __block NSUInteger count = 0;
     [[self usersInTheSystem] enumerateObjectsUsingBlock:^(id _Nonnull userId, NSUInteger idx, BOOL * _Nonnull stop) {
         count = count + [self unreadMessagesFromUser:userId];
@@ -325,12 +386,16 @@
 
 - (NSUInteger) unreadMessagesFromUser:(id)userId
 {
+    __LF
+
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"toUserId == %@ AND isRead == NO", self.me.objectId];
     return [[[self bulletsWith:userId] filteredArrayUsingPredicate:predicate] count];
 }
 
 - (void) resetInstallationBadge
 {
+    __LF
+
     NSUInteger count = [self unreadMessages];
     PFInstallation *install = [PFInstallation currentInstallation];
     if (install.badge != count) {
@@ -341,6 +406,8 @@
 
 - (void)usersNearMeInBackground:(UsersArrayBlock)block
 {
+    __LF
+
     PFQuery *query = [User query];
     [query whereKey:@"location" nearGeoPoint:self.location];
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
@@ -351,6 +418,8 @@
 
 - (PFGeoPoint*) location
 {
+    __LF
+
     return [PFGeoPoint geoPointWithLocation:self.currentLocation];
 }
 
@@ -360,6 +429,8 @@ The - (void) initLocationServices method initializes the location management sys
 
 - (void) initLocationServices
 {
+    __LF
+
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
     self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
@@ -393,6 +464,8 @@ The - (void) initLocationServices method initializes the location management sys
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations
 {
+    __LF
+
     CLLocation* location = [locations lastObject];
     self.currentLocation = location;
     
@@ -404,6 +477,8 @@ The - (void) initLocationServices method initializes the location management sys
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
+    __LF
+
     switch (status) {
         case kCLAuthorizationStatusDenied:
         case kCLAuthorizationStatusRestricted:
@@ -414,13 +489,37 @@ The - (void) initLocationServices method initializes the location management sys
             break;
         case kCLAuthorizationStatusAuthorizedAlways:
         case kCLAuthorizationStatusAuthorizedWhenInUse:
-            [self.locationManager startUpdatingLocation];
+            [self.locationManager startMonitoringSignificantLocationChanges];
             break;
         default:
             break;
     }
 }
 
+- (void) timeKeep
+{
+    __LF
+
+    static NSTimer *timeKeeper;
+    
+    if (![PFUser currentUser]) {
+        NSLog(@"NO USER LOGGED IN SO TRY AGAIN IN 5 SECS");
+        timeKeeper = [NSTimer scheduledTimerWithTimeInterval:5.0f
+                                                           target:self
+                                                         selector:@selector(timeKeep)
+                                                         userInfo:nil
+                                                          repeats:NO];
+        return;
+    }
+    
+    [self fetchOutstandingBullets];
+    timeKeeper = [NSTimer scheduledTimerWithTimeInterval:60.0f
+                                                       target:self
+                                                     selector:@selector(timeKeep)
+                                                     userInfo:nil
+                                                      repeats:NO];
+    NSLog(@"TIMEKEEPER KICKING IN...");
+}
 
 @end
 

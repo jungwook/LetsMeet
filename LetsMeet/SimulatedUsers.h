@@ -9,5 +9,5 @@
 #import <Foundation/Foundation.h>
 
 @interface SimulatedUsers : NSObject
-+ (void) createHives;
++ (void) createUsers;
 @end

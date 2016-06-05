@@ -7,11 +7,16 @@
 //
 
 #import "ToggleButton.h"
-#import "AppEngine.h"
-#import "AppDelegate.h"
 #import "UIBarButtonItem+Badge.h"
+#import "NSMutableDictionary+Bullet.h"
+#import "Notifications.h"
+
+typedef void(^BulletBlock)(id bullet);
+typedef void (^BulletBlock)(id bullet);
 
 @interface ToggleButton()
+@property (nonatomic, strong) Notifications *notification;
+@property (nonatomic, strong) FileSystem *system;
 @end
 
 @implementation ToggleButton
@@ -20,14 +25,17 @@
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(updateBadge)
-                                                     name:AppUserNewMessageReceivedNotification
-                                                   object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(updateBadge)
-                                                     name:AppUserRefreshBadgeNotificaiton
-                                                   object:nil];
+        _system = [FileSystem new];
+        self.notification = [Notifications new];
+        
+        __typeof(self) __weak welf = self;
+        [self.notification setBulletAction:^(id bullet) {
+            [welf updateBadge];
+        }];
+        
+        [self.notification setBroadcastAction:^(id senderId, NSString *message, NSTimeInterval duration) {
+            [welf updateBadge];
+        }];
         
         self.action = @selector(toggleMenu:);
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -37,25 +45,14 @@
     return self;
 }
 
-- (void) dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:AppUserNewMessageReceivedNotification
-                                                  object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:AppUserRefreshBadgeNotificaiton
-                                                  object:nil];
-}
-
 - (void) updateBadge
 {
-    self.badgeValue = [NSString stringWithFormat:@"%ld", (unsigned long)[AppEngine appEngineUnreadCount]];
+    self.badgeValue = [NSString stringWithFormat:@"%ld", (unsigned long)self.system.unreadMessages];
 }
 
 - (void) toggleMenu:(id)sender
 {
     [AppDelegate toggleMenu];
 }
-
 
 @end

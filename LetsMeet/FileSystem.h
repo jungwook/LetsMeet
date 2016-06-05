@@ -44,5 +44,8 @@ typedef void (^UsersArrayBlock)(NSArray<User*>*users);
 - (void) update:(Bullet*)message for:(id)userId;
 - (NSUInteger) unreadMessages;
 - (void) readUnreadBulletsWithUserId:(id)userId;
-+ (void) treatPushNotificationWith:(NSDictionary *)userInfo;
+- (void) fetchOutstandingBullets;
+- (void) treatPushNotificationWith:(NSDictionary *)userInfo;
+
+- (void) timeKeep; // For the simulator
 @end

@@ -7,9 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PFUser+Attributes.h"
 #import "IndentedLabel.h"
-#import "AppEngine.h"
 
 @interface Balloon : UIView
 @property (nonatomic) BOOL isMine;

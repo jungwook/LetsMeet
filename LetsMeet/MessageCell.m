@@ -8,7 +8,6 @@
 
 #import "MessageCell.h"
 #import "Balloon.h"
-#import "AppEngine.h"   
 #import "CachedFile.h"
 
 @interface MessageCell()
@@ -50,14 +49,14 @@
 
 
 
-- (void)setupMessage:(Message*)message
+- (void)setupMessage:(Bullet*)message
 {
     const CGFloat offset = 45;
     const CGFloat inset = 10;
     
     CGFloat width = [[[UIApplication sharedApplication] keyWindow] bounds].size.width * 0.7f;
     
-    if (message.type == kMessageTypeText) {
+    if (message.bulletType == kBulletTypeText) {
         NSString *string = [message.message stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
         CGRect frame = rectForString(string, self.messageLabel.font, width);
         CGFloat w = frame.size.width+2.5*inset;
@@ -68,12 +67,12 @@
         self.messagePhotoView.alpha = NO;
         self.messageLabel.alpha = YES;
     }
-    else if (message.type == kMessageTypePhoto) {
-        NSData *data = message.data ? message.data : [CachedFile getDataInBackgroundWithBlock:^(NSData *data, NSError *error, BOOL fromCache) {
+    else if (message.bulletType == kBulletTypePhoto) {
+        NSData *data = message.thumbnail ? message.thumbnail : [CachedFile getDataInBackgroundWithBlock:^(NSData *data, NSError *error, BOOL fromCache) {
             if (!error) {
-                message.data = data;
-                data = message.data;
-                [message save];
+                message.thumbnail = data;
+                data = message.thumbnail;
+                
                 if ([self.delegate respondsToSelector:@selector(redrawCell:)]) {
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.001 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                         [self.delegate redrawCell:message];
@@ -121,7 +120,7 @@
     self.name.textAlignment = self.isMine ? NSTextAlignmentRight : NSTextAlignmentLeft;
 }
 
-- (void)setMessage:(Message*)message
+- (void)setMessage:(Bullet*)message
            myPhoto:(UIImage*)myPhoto
          userPhoto:(UIImage*)userPhoto
           userName:(NSString*)userName
@@ -129,6 +128,7 @@
 {
     _message = message;
     _isMine = message.isFromMe;
+    
     [self.balloon setIsMine:self.isMine];
     self.myPhoto.alpha = self.isMine;
     self.photo.alpha = !self.isMine;

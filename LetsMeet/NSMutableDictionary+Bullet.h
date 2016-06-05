@@ -18,6 +18,25 @@ typedef NS_OPTIONS(NSUInteger, BulletTypes) {
     kBulletTypeURL
 };
 
+@class Progress;
+@class BulletObject;
+@class User;
+
+typedef void (^FileBooleanResultBlock)(PFFile *file, BOOL succeeded, NSError * error);
+typedef void (^ArrayResultBlock)(NSArray *objects);
+typedef void (^DataBlock)(NSData *data);
+typedef void (^ArrayIntResultBlock)(NSArray *objects, int levels);
+typedef void (^UserResultBlock)(PFUser *user);
+typedef void (^voidBlock)(void);
+typedef void (^RefreshControlBlock)(UIRefreshControl* refreshControl);
+typedef void (^CountResultBlock)(NSUInteger count);
+typedef void (^DictionaryResultBlock)(NSDictionary *messages);
+typedef void (^DictionaryArrayResultBlock)(NSDictionary *messages, NSArray *users);
+typedef void (^CachedFileBlock)(NSData * data, NSError * error, BOOL fromCache);
+typedef void (^ImagePickerBlock)(id data, BulletTypes type, NSString* sizeString, NSURL *url);
+typedef void (^ImageSizePickerBlock)(NSData *data, Progress* progress);
+typedef void (^NewUserBlock)(User* me);
+
 #define kJPEGCompressionLow 0.2f
 #define kJPEGCompressionMedium 0.4f
 #define kJPEGCompressionDefault 0.6f
@@ -25,7 +44,6 @@ typedef NS_OPTIONS(NSUInteger, BulletTypes) {
 #define kThumbnailWidth 230.0f
 
 typedef NSMutableDictionary Bullet;
-@class BulletObject;
 
 @interface NSMutableDictionary(Bullet)
 @property (nonatomic, assign) NSString* objectId;
@@ -104,9 +122,10 @@ typedef NS_OPTIONS(BOOL, SexTypes)
 @property (retain) NSString* intro;
 @property (retain) PFFile* profilePhoto;
 @property (retain) PFFile* originalPhoto;
+@property BOOL isSimulated;
 
 + (instancetype) me;
+- (void) createMe:(NewUserBlock)block;
+- (void) removeMe;
 @end
-
-
 

@@ -7,8 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PFUser+Attributes.h"
-#import "AppEngine.h"
 
 @protocol MessageBarDelegate;
 

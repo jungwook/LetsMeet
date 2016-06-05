@@ -8,7 +8,6 @@
 
 #import "MainController.h"
 #import "FloatingDrawerSpringAnimator.h"
-#import "AppEngine.h"
 #import "CachedFile.h"
 
 @interface MainController ()
@@ -18,23 +17,14 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self subscribeToChannelCurrentUser];
+    [self initializeMainViewController];
 }
 
 - (BOOL)initializeViewControllers {
     
     
-    self.screens = @{ @"Board" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Board"],
-                                    @"title"   : @"보드",
-                                    @"menu"    : @"보드",
-                                    @"icon"    : @"488-github",
-                                    @"badge"   : @(NO)
-                                    },
-                      @"Search2" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"SearchV2"],
-                                     @"title"   : @"SEARCH",
-                                     @"menu"    : @"SEARCH",
-                                     @"icon"    : @"488-github",
-                                     @"badge"   : @(NO)
-                                     },
+    self.screens = @{
                       @"Search" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Search"],
                                      @"title"   : @"주변",
                                      @"menu"    : @"주변",
@@ -66,45 +56,6 @@
 
 -(void)viewDidAppear:(BOOL)animated
 {
-    static bool firstTime = YES;
-    
-    NSString *username = [AppEngine uniqueDeviceID];
-    PFUser *user = [PFUser currentUser];
-    
-    if (!user) {
-        user = [PFUser user];
-        user.username = username;
-        user.password = username;
-        
-        [user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-            if (succeeded) {
-                [PFUser logInWithUsernameInBackground:user.username password:user.password block:^(PFUser * _Nullable user, NSError * _Nullable error) {
-                    [[AppEngine engine] initLocationServices];
-                    [self subscribeToChannelCurrentUser];
-                    UITableViewController *signup = [[self storyboard] instantiateViewControllerWithIdentifier:@"SignUp"];
-                    [self presentViewController:signup animated:YES completion:^{
-                        NSLog(@"PRESENTING USER:%@", [PFUser currentUser]);
-                    }];
-                }];
-            }
-            else {
-                NSLog(@"CANNOT SIGNUP NEW USER");
-            }
-        }];
-    }
-    else {
-        if (firstTime) {
-            firstTime = NO;
-            // Load all personall pictures into Cache
-            [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error, BOOL fromCache) {
-                NSLog(@"PROFILE PHOTO LOADED IN CACHE");
-            } fromFile:user[AppProfilePhotoField]];
-            [CachedFile getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error, BOOL fromCache) {
-                NSLog(@"ORIGINAL PHOTO LOADED IN CACHE");
-            } fromFile:user[AppProfileOriginalPhotoField]];
-        }
-        [self initializeMainViewController];
-    }
 }
 
 - (void) subscribeToChannelCurrentUser
@@ -145,10 +96,9 @@
         NSLog(@"All systems go...");
         
         self.leftViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"LeftMenu"];
-//        self.centerViewController = self.screens[@"Board"][@"screen"];
-        self.centerViewController = self.screens[@"Search2"][@"screen"];
+        self.centerViewController = self.screens[@"Account"][@"screen"];
         self.animator = [[FloatingDrawerSpringAnimator alloc] init];
-        self.backgroundImage = [UIImage imageNamed:@"sky"];
+        self.backgroundImage = [UIImage imageNamed:@"bg"];
 
         [AppDelegate globalDelegate].mainMenu = self;
     }

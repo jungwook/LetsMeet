@@ -7,7 +7,7 @@
 //
 
 #import "MessageBar.h"
-#import "AppEngine.h"
+#import "NSMutableDictionary+Bullet.h"
 #import "ImagePicker.h"
 
 @interface MessageBar()
@@ -129,7 +129,7 @@ static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCur
     [self.textView resignFirstResponder];
 }
 
-- (void) mediaButPressed:(Message*)sender
+- (void) mediaButPressed:(Bullet*)sender
 {
     if ([self.barDelegate respondsToSelector:@selector(sendMedia)]) {
         [self.barDelegate sendMedia];

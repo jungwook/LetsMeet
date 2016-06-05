@@ -16,7 +16,7 @@
 + (instancetype)bulletWithText:(NSString *)text
 {
     Bullet* bullet = [Bullet new];
-    bullet.type = kBulletTypeText;
+    bullet.bulletType = kBulletTypeText;
     bullet.message = text;
     return bullet;
 }
@@ -24,7 +24,7 @@
 + (instancetype)bulletWithPhoto:(PFFile*)file
 {
     Bullet* bullet = [Bullet new];
-    bullet.type = kBulletTypePhoto;
+    bullet.bulletType = kBulletTypePhoto;
     bullet.fileName = file.name;
     bullet.fileURL = file.url;
     return bullet;
@@ -33,7 +33,7 @@
 + (instancetype)bulletWithVideo:(PFFile*)file
 {
     Bullet* bullet = [Bullet new];
-    bullet.type = kBulletTypeVideo;
+    bullet.bulletType = kBulletTypeVideo;
     bullet.fileName = file.name;
     bullet.fileURL = file.url;
     return bullet;
@@ -42,7 +42,7 @@
 + (instancetype)bulletWithAudio:(PFFile*)file
 {
     Bullet* bullet = [Bullet new];
-    bullet.type = kBulletTypeAudio;
+    bullet.bulletType = kBulletTypeAudio;
     bullet.fileName = file.name;
     bullet.fileURL = file.url;
     return bullet;
@@ -252,43 +252,10 @@
     return [self objectForKey:@"thumbnail"];
 }
 
-- (CALayer*) drawImageOnLayer:(UIImage*)image size:(CGSize) size
-{
-    CALayer *layer = [CALayer layer];
-    [layer setBounds:CGRectMake(0, 0, size.width, size.height)];
-    [layer setContents:(id)image.CGImage];
-    [layer setContentsGravity:kCAGravityResizeAspect];
-    [layer setMasksToBounds:YES];
-    return layer;
-}
-
-
-- (UIImage*) scaleImage:(UIImage*)image
-                   size:(CGSize)size
-{
-    UIGraphicsBeginImageContextWithOptions(size, false, 0.0);
-    [[self drawImageOnLayer:image size:size] renderInContext:UIGraphicsGetCurrentContext()];
-    UIImage *smallImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    return smallImage;
-}
-
-- (NSData*) compressedImageData:(NSData*) data width:(CGFloat) width
-{
-    UIImage *image = [UIImage imageWithData:data];
-    const CGFloat thumbnailWidth = width;
-    CGFloat thumbnailHeight = image.size.width ? thumbnailWidth * image.size.height / image.size.width : 200;
-    image = [self scaleImage:image size:CGSizeMake(thumbnailWidth, thumbnailHeight)];
-    
-    return UIImageJPEGRepresentation(image, kJPEGCompressionMedium);
-}
-
-
 - (void)setThumbnail:(NSData *)thumbnail
 {
     if (thumbnail) {
-        thumbnail = [self compressedImageData:thumbnail width:kThumbnailWidth];
+        thumbnail = compressedImageData(thumbnail, kThumbnailWidth);
         [self setObject:thumbnail forKey:@"thumbnail"];
     }
     else {
@@ -411,11 +378,72 @@
 
 @end
 
+
 @implementation User
-@dynamic nickname,location,locationUdateAt, sex, age, intro,  profilePhoto, originalPhoto;
+@dynamic nickname,location,locationUdateAt, sex, age, intro,  profilePhoto, originalPhoto, isSimulated;
+
 + (instancetype) me
 {
     return [User currentUser];
+}
+
+- (void) removeMe
+{
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"UNIQUEDEVICEID"];
+    if ([User me]) {
+        [[User me] delete];
+        [User logOut];
+    }
+}
+
+- (void) createMe:(NewUserBlock)block
+{
+    User *user = [User me];
+    if ([User me])
+        return;
+    
+    NSString *username = [self uniqueUsername];
+    user = [User user];
+    user.username = username;
+    user.password = username;
+    
+    [user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+            [PFUser logInWithUsernameInBackground:user.username password:user.password block:^(PFUser * _Nullable loggedInUser, NSError * _Nullable error) {
+                
+                PFInstallation *currentInstallation = [PFInstallation currentInstallation];
+                if (!currentInstallation[@"user"]) {
+                    currentInstallation[@"user"] = user;
+                    [currentInstallation saveInBackground];
+                    NSLog(@"CURRENT INSTALLATION: saving user to Installation");
+                }
+                else {
+                    NSLog(@"CURRENT INSTALLATION: Installation already has user. No need to set");
+                }
+                if (block) {
+                    block([User me]);
+                }
+            }];
+        }
+        else {
+            NSLog(@"CANNOT SIGNUP NEW USER");
+        }
+    }];
+}
+
+- (NSString*) uniqueUsername
+{
+    NSString *cudid = [[NSUserDefaults standardUserDefaults] objectForKey:@"UNIQUEDEVICEID"];
+    NSString *idString;
+    if (cudid) {
+        idString = cudid;
+    }
+    else {
+        idString = [[UIDevice currentDevice] identifierForVendor].UUIDString;
+        [[NSUserDefaults standardUserDefaults] setObject:idString forKey:@"UNIQUEDEVICEID"];
+    }
+    
+    return idString;
 }
 
 @end

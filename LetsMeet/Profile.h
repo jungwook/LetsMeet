@@ -1,13 +1,13 @@
 //
-//  InBox.h
+//  Profile.h
 //  LetsMeet
 //
-//  Created by 한정욱 on 2016. 5. 13..
+//  Created by 한정욱 on 2016. 6. 5..
 //  Copyright © 2016년 SMARTLY CO. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 
-@interface InBox : UITableViewController
+@interface Profile : UITableViewController
 
 @end
