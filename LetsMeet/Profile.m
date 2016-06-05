@@ -88,11 +88,14 @@
 
 - (void)setPhoto:(UIImage*)image
 {
+    NSLog(@"Image to set:%@, %ld", image, image.imageOrientation);
     self.photoHeight = 320.0f * image.size.height / image.size.width;
     
-    UIImage *scaledImage = scaleImage(image, CGSizeMake(320.0f, self.photoHeight));
+//    UIImage *scaledImage = scaleImage(image, CGSizeMake(320.0f, self.photoHeight));
+    
+    
     [self.imageView setContentMode:UIViewContentModeScaleAspectFill];
-    [self.imageView setImage:scaledImage];
+    [self.imageView setImage:image];
     [self.tableView reloadData];
 }
 

@@ -172,7 +172,6 @@
         NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
         NSURL *url = (NSURL*)[info objectForKey:UIImagePickerControllerMediaURL];
         
-        // Handle a still image capture
         if (CFStringCompare ((CFStringRef) mediaType, kUTTypeImage, 0) == kCFCompareEqualTo) {
             UIImage *image = (UIImage *) [info objectForKey:UIImagePickerControllerOriginalImage];
             CGSize imageSize = image.size;
@@ -186,19 +185,17 @@
         }
         
         // Handle a movie capture
-        if (CFStringCompare ((CFStringRef) mediaType, kUTTypeMovie, 0)== kCFCompareEqualTo) {
+        if (CFStringCompare ((CFStringRef) mediaType, kUTTypeMovie, 0)== kCFCompareEqualTo)
+        {
+            // Load Movie Asset.
             AVAsset *asset = [AVAsset assetWithURL:url];
-            AVAssetTrack *track = [[asset tracksWithMediaType:AVMediaTypeVideo] firstObject];
-            
-            CGSize dimensions = track ? CGSizeApplyAffineTransform(track.naturalSize, track.preferredTransform) : CGSizeMake(320, 200);
-            dimensions.width = fabs(dimensions.width);
-            dimensions.height = fabs(dimensions.height);
             
             UIImage *thumbnail = [self thumbnailFromVideoAsset:asset];
+            thumbnail = [self fixOrientation:thumbnail];
             NSData *newData = UIImageJPEGRepresentation(thumbnail, kJPEGCompressionFull);
 
             if (self.pickerBlock) {
-                self.pickerBlock(newData, kBulletTypeVideo, NSStringFromCGSize(dimensions), url);
+                self.pickerBlock(newData, kBulletTypeVideo, NSStringFromCGSize(thumbnail.size), url);
             }
         }
     }];
@@ -210,7 +207,7 @@
     UIImage *thumbnail = [[UIImage alloc] initWithCGImage:[generateImg copyCGImageAtTime:CMTimeMake(1, 1) actualTime:NULL error:nil]];
     
 //    UIImage *rotated = [UIImage imageWithCGImage:thumbnail.CGImage scale:1.0f orientation:UIImageOrientationRight];
-    UIImage *rotated = [UIImage imageWithCGImage:thumbnail.CGImage scale:1.0f orientation:UIImageOrientationUp];
+    UIImage *rotated = [UIImage imageWithCGImage:thumbnail.CGImage scale:1.0f orientation:UIImageOrientationLeft];
     return rotated;
 }
 
