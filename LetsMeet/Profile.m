@@ -157,7 +157,7 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
             } progressBlock:^(int percentDone) {
                 printf("V>>");
             }];
-        }
+        } 
     }];
 }
 
