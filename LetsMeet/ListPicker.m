@@ -33,7 +33,7 @@
         self.delegate = self;
         self.dataSource = self;
         self.textField = textField;
-        self.dataSelectedBlock = actionBlock;
+        self.dataSelectedBlock = actionBlock; 
         self.showsSelectionIndicator = YES;
         self.textField.inputView = self;
         
