@@ -18,6 +18,7 @@
 @property (weak, nonatomic) IBOutlet UITextField *introTF;
 @property (weak, nonatomic) IBOutlet UITextField *ageTF;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
+@property (weak, nonatomic) IBOutlet UIImageView *profileView;
 @property (weak, nonatomic) IBOutlet UITextField *sexTF;
 @property (weak, nonatomic) IBOutlet UILabel *pointsLB;
 @property (weak, nonatomic) IBOutlet UIButton *editPhotoBut;
@@ -44,41 +45,57 @@
     circleizeView(self.editPhotoBut, 0.1f);
     
     self.nicknameTF.text = self.me.nickname;
+    
     self.introTF.text = self.me.intro ? self.me.intro : @"";
-    self.introTF.inputView = [ListPicker pickerWithArray:@[@"우리 만나요!", @"애인 찾아요", @"함께 드라이브 해요", @"나쁜 친구 찾아요", @"착한 친구 찾아요", @"맛난거 먹으러 가요", @"술친구 찾아요"] withPhotoSelectedBlock:^(id data) {
-        self.introTF.text = data;
-        [self.introTF resignFirstResponder];
+    [ListPicker pickerWithArray:@[@"우리 만나요!", @"애인 찾아요", @"함께 드라이브 해요", @"나쁜 친구 찾아요", @"착한 친구 찾아요", @"맛난거 먹으러 가요", @"술친구 찾아요"] onTextField:self.introTF selection:^(id data) {
         self.me.intro = data;
         [self.me saveInBackground];
     }];
+    
     self.ageTF.text = self.me.age;
-    self.ageTF.inputView = [ListPicker pickerWithArray:@[@"고딩", @"20대", @"30대", @"40대", @"비밀"] withPhotoSelectedBlock:^(id data) {
-        self.ageTF.text = data;
-        [self.ageTF resignFirstResponder];
+    [ListPicker pickerWithArray:@[@"고딩", @"20대", @"30대", @"40대", @"비밀"] onTextField:self.ageTF selection:^(id data) {
         self.me.age = data;
         [self.me saveInBackground];
     }];
     
     self.sexTF.text = self.me.sexString;
-    self.sexTF.inputView = [ListPicker pickerWithArray:@[@"여자", @"남자"] withPhotoSelectedBlock:^(id data) {
-        self.sexTF.text = data;
-        [self.sexTF resignFirstResponder];
+    [ListPicker pickerWithArray:@[@"여자", @"남자"] onTextField:self.sexTF selection:^(id data) {
         self.me.sex = [data isEqualToString:@"여자"] ? kSexFemale : kSexMale ;
         [self.me saveInBackground];
     }];
     
+    NSLog(@"ME:%@", self.me);
+    
     [CachedFile getDataInBackgroundWithBlock:^(NSData *data, NSError *error, BOOL fromCache) {
         UIImage *image = [UIImage imageWithData:data];
-
-        NSLog(@"IMAGE PICKED OF SIZE:%@", NSStringFromCGSize(image.size));
-
         [self setPhoto:image];
+        
+        if (!self.me.profileMediaType == kProfileMediaPhoto) {
+            PFFile *file = self.me.profileVideo;
+            
+            [file getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
+                NSLog(@"DOWNLOADED VIDEO DATA :%ld from %@", data.length, self.me.profileVideo.url);
+                NSURL *outputURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"test.mov"];
+                
+                BOOL ret = [data writeToURL:outputURL atomically:YES];
+                NSLog(@"SAVED %@SUCCESSFULLY TO:%@", ret ? @"" : @"UN", [outputURL path]);
+                
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.001 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    AVPlayer *player = [[AVPlayer alloc] initWithURL:outputURL];
+                    AVPlayerLayer *layer = [AVPlayerLayer playerLayerWithPlayer:player];
+                    layer.frame = self.imageView.bounds;
+                    layer.masksToBounds = YES;
+                    [self.imageView.layer addSublayer:layer];
+                    [player play];
+                });
+            }];
+        }
     } fromFile:self.me.profilePhoto];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.section == 0) {
+    if (indexPath.section == 1) {
         return self.photoHeight;
     }
     else {
@@ -88,9 +105,8 @@
 
 - (void)setPhoto:(UIImage*)image
 {
-    self.photoHeight = self.imageView.frame.size.width * image.size.height / image.size.width;
-    [self.imageView setContentMode:UIViewContentModeScaleAspectFit];
-    [self.imageView setImage:image];
+    self.photoHeight = image.size.width ? self.imageView.frame.size.width * image.size.height / image.size.width : 400;
+    [self.profileView setImage:image];
     [self.tableView reloadData];
 }
 
@@ -146,7 +162,7 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
                 [self.me saveInBackground];
                 NSLog(@"URL:%@", file.url);
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    AVPlayer *player = [[AVPlayer alloc] initWithURL:[NSURL URLWithString:file.url]];
+                    AVPlayer *player = [[AVPlayer alloc] initWithURL:[NSURL URLWithString:outputURL]];
                     AVPlayerLayer *layer = [AVPlayerLayer playerLayerWithPlayer:player];
                     layer.frame = self.imageView.bounds;
                     layer.masksToBounds = YES;

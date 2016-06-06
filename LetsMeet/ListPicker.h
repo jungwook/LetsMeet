@@ -9,6 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface ListPicker : UIPickerView <UIPickerViewDelegate, UIPickerViewDataSource>
-+(instancetype) pickerWithArray:(NSArray*)array withPhotoSelectedBlock:(void(^)(id data))actionBlock;
++(instancetype) pickerWithArray:(NSArray*)array onTextField:(UITextField*)textField selection:(void(^)(id data))actionBlock;
 
 @end

@@ -195,57 +195,15 @@
     }
 }
 
-static inline CGFloat RadiansToDegrees(CGFloat radians) {
-    return radians * 180 / M_PI;
-}
-UIImage *refit(UIImage *image, UIImageOrientation orientation);
-
-
 - (void) handleVideo:(NSDictionary<NSString*, id>*)info url:(NSURL*)url
 {
     AVAsset *asset = [AVAsset assetWithURL:url];
     
-    CGSize dimensions = CGSizeZero;
-    
-    
-    AVAssetTrack* videoTrack    = [[asset tracksWithMediaType:AVMediaTypeVideo] firstObject];
-    CGAffineTransform txf       = [videoTrack preferredTransform];
-    CGFloat videoAngleInDegree  = RadiansToDegrees(atan2(txf.b, txf.a));
-    
-    NSLog(@"TRANSFORM:%@", NSStringFromCGAffineTransform(txf));
     UIImage *thumbnail = [self thumbnailFromVideoAsset:asset];
-    switch ((int)videoAngleInDegree) {
-        case 0:
-            NSLog(@"VIDEO RIGHT");
-//            thumbnail = refit(thumbnail, UIImageOrientationRight);
-            break;
-        case 90:
-            NSLog(@"VIDEO UP");
-            break;
-        case 180:
-//            thumbnail = refit(thumbnail, UIImageOrientationLeft);
-            NSLog(@"VIDEO LEFT");
-            break;
-        case -90:
-//            thumbnail = refit(thumbnail, UIImageOrientationDown);
-            NSLog(@"VIDEO DOWN");
-            break;
-        default:
-            NSLog(@"VIDEO DONT KNOW");
-            break;
-    }
-/*
- AVAssetTrack *track = [[asset tracksWithMediaType:AVMediaTypeVideo] firstObject];
-    CGSize dimensions = track ? CGSizeApplyAffineTransform(track.naturalSize, track.preferredTransform) : CGSizeMake(320, 200);
-    dimensions.width = fabs(dimensions.width);
-    dimensions.height = fabs(dimensions.height);
- */
-    
     NSData *newData = UIImageJPEGRepresentation(thumbnail, kJPEGCompressionFull);
-    dimensions = thumbnail.size;
     
     if (self.pickerBlock) {
-        self.pickerBlock(newData, kBulletTypeVideo, NSStringFromCGSize(dimensions), url);
+        self.pickerBlock(newData, kBulletTypeVideo, NSStringFromCGSize(thumbnail.size), url);
     }
 }
 

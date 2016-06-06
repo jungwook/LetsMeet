@@ -49,6 +49,9 @@
         if (!self.me) {
             [self.me createMe:nil];
         }
+        else {
+            [self.me fetchInBackground];
+        }
         
         self.applicationPath = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
         self.systemPath = [self.applicationPath URLByAppendingPathComponent:@"Engine"];
