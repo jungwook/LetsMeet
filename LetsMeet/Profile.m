@@ -5,7 +5,8 @@
 //  Created by 한정욱 on 2016. 6. 5..
 //  Copyright © 2016년 SMARTLY CO. All rights reserved.
 //
-
+#import "AVFoundation/AVFoundation.h"
+#import "AVKit/AVKit.h"
 #import "Profile.h"
 #import "NSMutableDictionary+Bullet.h"
 #import "ListPicker.h"
@@ -19,7 +20,6 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UITextField *sexTF;
 @property (weak, nonatomic) IBOutlet UILabel *pointsLB;
-@property (weak, nonatomic) IBOutlet UIView *photoView;
 @property (weak, nonatomic) IBOutlet UIButton *editPhotoBut;
 @property CGFloat photoHeight;
 
@@ -88,63 +88,98 @@
 
 - (void)setPhoto:(UIImage*)image
 {
-    self.photoHeight = 320.0f * image.size.height / image.size.width;
-    
-    UIImage *scaledImage = scaleImage(image, CGSizeMake(320.0f, self.photoHeight));
-    [self.imageView setContentMode:UIViewContentModeScaleAspectFill];
-    [self.imageView setImage:scaledImage];
+    self.photoHeight = self.imageView.frame.size.width * image.size.height / image.size.width;
+    [self.imageView setContentMode:UIViewContentModeScaleAspectFit];
+    [self.imageView setImage:image];
     [self.tableView reloadData];
+}
+
+- (void) treatPhotoData:(NSData*)data type:(BulletTypes)type mediaInfo:(NSString*)sizeString url:(NSURL*)url
+{
+    self.me.profileMediaType = kProfileMediaPhoto;
+    
+    NSData *originalData = compressedImageData(data, 1024);
+    NSData *profileData = compressedImageData(data, 320);
+    
+    [self setPhoto:[UIImage imageWithData:data]];
+    
+    [CachedFile saveData:originalData named:@"original.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
+        self.me.originalPhoto = file;
+        [self.me saveInBackground];
+    } progressBlock:nil];
+    [CachedFile saveData:profileData named:@"profile.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
+        self.me.profilePhoto = file;
+        [self.me saveInBackground];
+    } progressBlock:nil];
+}
+
+UIImage *refit(UIImage *image, UIImageOrientation orientation)
+{
+    return [UIImage imageWithCGImage:image.CGImage scale:1.0f orientation:orientation];
+}
+
+- (void) treatVideoData:(NSData*)data type:(BulletTypes)type mediaInfo:(NSString*)sizeString url:(NSURL*)url
+{
+    self.me.profileMediaType = kProfileMediaVideo;
+    
+    UIImage *image = [UIImage imageWithData:data];
+    NSLog(@"IMAGE:%@", image);
+    data = UIImageJPEGRepresentation(image, kJPEGCompressionFull);
+    [self setPhoto:image];
+    
+    [CachedFile saveData:data named:@"profile.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
+        self.me.originalPhoto = file;
+        self.me.profilePhoto = file;
+        [self.me saveInBackground];
+    } progressBlock:nil];
+    
+    NSURL *outputURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"profile.mov"];
+    
+    [self convertVideoToLowQuailtyWithInputURL:url outputURL:outputURL handler:^(AVAssetExportSession *exportSession)
+    {
+        if (exportSession.status == AVAssetExportSessionStatusCompleted) {
+    
+            NSData *videoData = [NSData dataWithContentsOfURL:outputURL];
+            NSLog(@"VIDEO SIZE:%ld", videoData.length);
+            [CachedFile saveData:videoData named:@"profile.mov" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
+                self.me.profileVideo = file;
+                [self.me saveInBackground];
+                NSLog(@"URL:%@", file.url);
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    AVPlayer *player = [[AVPlayer alloc] initWithURL:[NSURL URLWithString:file.url]];
+                    AVPlayerLayer *layer = [AVPlayerLayer playerLayerWithPlayer:player];
+                    layer.frame = self.imageView.bounds;
+                    layer.masksToBounds = YES;
+                    [self.imageView.layer addSublayer:layer];
+                    [player play];
+                });
+
+            } progressBlock:^(int percentDone) {
+                printf("V>>");
+            }];
+        }
+    }];
+}
+
+- (void)convertVideoToLowQuailtyWithInputURL:(NSURL*)inputURL outputURL:(NSURL*)outputURL handler:(void (^)(AVAssetExportSession*))handler {
+    [[NSFileManager defaultManager] removeItemAtURL:outputURL error:nil];
+    AVURLAsset *asset = [AVURLAsset URLAssetWithURL:inputURL options:nil];
+    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:asset presetName:AVAssetExportPreset640x480];
+    exportSession.outputURL = outputURL;
+    exportSession.fileLengthLimit = 3000000;
+    exportSession.outputFileType = AVFileTypeQuickTimeMovie;
+    [exportSession exportAsynchronouslyWithCompletionHandler:^(void) {
+        handler(exportSession);
+    }];
 }
 
 - (IBAction)editPhoto:(id)sender {
     [ImagePicker proceedWithParentViewController:self photoSelectedBlock:^(id data, BulletTypes type, NSString *sizeString, NSURL *url) {
         if (type == kBulletTypePhoto) {
-            self.me.profileMediaType = kProfileMediaPhoto;
-            
-            NSData *originalData = compressedImageData(data, 1024);
-            NSData *profileData = compressedImageData(data, 320);
-            
-            [self setPhoto:[UIImage imageWithData:data]];
-
-            [CachedFile saveData:originalData named:@"original.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                self.me.originalPhoto = file;
-                [self.me saveInBackground];
-            } progressBlock:nil];
-            [CachedFile saveData:profileData named:@"profile.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                self.me.profilePhoto = file;
-                [self.me saveInBackground];
-            } progressBlock:nil];
+            [self treatPhotoData:data type:type mediaInfo:sizeString url:url];
         }
         else if (type == kBulletTypeVideo) {
-            self.me.profileMediaType = kProfileMediaVideo;
-
-            [self setPhoto:[UIImage imageWithData:data]];
-            
-            [CachedFile saveData:data named:@"profile.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                self.me.originalPhoto = file;
-                self.me.profilePhoto = file;
-                [self.me saveInBackground];
-            } progressBlock:nil];
-            
-            AVURLAsset *asset = [AVURLAsset assetWithURL:url];
-            NSURL *fileURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"profile.mp4"];
-            
-            __block NSData *assetData = nil;
-            
-            AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:asset presetName:AVAssetExportPreset640x480];
-            exportSession.shouldOptimizeForNetworkUse = YES;
-            exportSession.outputURL = fileURL;
-            exportSession.outputFileType = AVFileTypeMPEG4;
-            
-            [exportSession exportAsynchronouslyWithCompletionHandler:^{
-                assetData = [NSData dataWithContentsOfURL:fileURL];
-                [CachedFile saveData:assetData named:@"profile.mp4" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                    self.me.profileVideo = file;
-                    [self.me saveInBackground];
-                } progressBlock:^(int percentDone) {
-                    printf("V>>");
-                }];
-            }];
+            [self treatVideoData:data type:type mediaInfo:sizeString url:url];
         }
     } cancelBlock:nil];
 }
@@ -159,6 +194,10 @@
 
 #pragma mark - Table view data source
 
+- (BOOL)shouldAutorotate
+{
+    return NO;
+}
 /*
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];

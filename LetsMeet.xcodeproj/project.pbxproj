@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1201428C1D04703200D66905 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1201428A1D04703200D66905 /* AVFoundation.framework */; };
+		1201428D1D04703200D66905 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1201428B1D04703200D66905 /* AVKit.framework */; };
 		124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928831CEFF7F70038A2F3 /* ImagePicker.m */; };
 		124928871CF003420038A2F3 /* CachedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928861CF003420038A2F3 /* CachedFile.m */; };
 		1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928891CF0176C0038A2F3 /* ListPicker.m */; };
@@ -58,6 +60,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1201428A1D04703200D66905 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		1201428B1D04703200D66905 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 		124928821CEFF7F70038A2F3 /* ImagePicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePicker.h; sourceTree = "<group>"; };
 		124928831CEFF7F70038A2F3 /* ImagePicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImagePicker.m; sourceTree = "<group>"; };
 		124928851CF003420038A2F3 /* CachedFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CachedFile.h; sourceTree = "<group>"; };
@@ -144,6 +148,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1201428C1D04703200D66905 /* AVFoundation.framework in Frameworks */,
+				1201428D1D04703200D66905 /* AVKit.framework in Frameworks */,
 				12DE5FB31CFEF58A009B315F /* Photos.framework in Frameworks */,
 				12F741BE1CE4BF0100E8267A /* AudioToolbox.framework in Frameworks */,
 				12F741BF1CE4BF0100E8267A /* CFNetwork.framework in Frameworks */,
@@ -167,6 +173,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		120142891D045C3F00D66905 /* SimulatedUser */ = {
+			isa = PBXGroup;
+			children = (
+				125AEF3A1CF9F08300553475 /* SimulatedUsers.h */,
+				125AEF3B1CF9F08300553475 /* SimulatedUsers.m */,
+			);
+			name = SimulatedUser;
+			sourceTree = "<group>";
+		};
 		124928B31CF2ED790038A2F3 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -272,6 +287,8 @@
 		12F741A71CE4BE8D00E8267A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1201428A1D04703200D66905 /* AVFoundation.framework */,
+				1201428B1D04703200D66905 /* AVKit.framework */,
 				12DE5FB21CFEF58A009B315F /* Photos.framework */,
 				12F741B41CE4BF0100E8267A /* AudioToolbox.framework */,
 				12F741B51CE4BF0100E8267A /* CFNetwork.framework */,
@@ -325,9 +342,8 @@
 		12F741F71CE5B11000E8267A /* Engine */ = {
 			isa = PBXGroup;
 			children = (
+				120142891D045C3F00D66905 /* SimulatedUser */,
 				12DE5FDF1D02BC1F009B315F /* File Manager */,
-				125AEF3A1CF9F08300553475 /* SimulatedUsers.h */,
-				125AEF3B1CF9F08300553475 /* SimulatedUsers.m */,
 			);
 			name = Engine;
 			sourceTree = "<group>";

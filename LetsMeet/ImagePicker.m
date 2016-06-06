@@ -169,49 +169,94 @@
 {
     [self.parent setNavigationBarHidden:NO animated:YES];
     [self dismissViewControllerAnimated:YES completion:^{
+        
         NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
         NSURL *url = (NSURL*)[info objectForKey:UIImagePickerControllerMediaURL];
         
-        // Handle a still image capture
         if (CFStringCompare ((CFStringRef) mediaType, kUTTypeImage, 0) == kCFCompareEqualTo) {
-            UIImage *image = (UIImage *) [info objectForKey:UIImagePickerControllerOriginalImage];
-            CGSize imageSize = image.size;
-//            UIImageWriteToSavedPhotosAlbum (image, nil, nil , nil);
-            image = [self fixOrientation:image];
-            NSData *data = UIImageJPEGRepresentation(image, 1.0);
-            
-            if (self.pickerBlock) {
-                self.pickerBlock(data, kBulletTypePhoto, NSStringFromCGSize(imageSize), url);
-            }
+            [self handlePhoto:info url:url];
         }
-        
-        // Handle a movie capture
-        if (CFStringCompare ((CFStringRef) mediaType, kUTTypeMovie, 0)== kCFCompareEqualTo) {
-            AVAsset *asset = [AVAsset assetWithURL:url];
-            AVAssetTrack *track = [[asset tracksWithMediaType:AVMediaTypeVideo] firstObject];
-            
-            CGSize dimensions = track ? CGSizeApplyAffineTransform(track.naturalSize, track.preferredTransform) : CGSizeMake(320, 200);
-            dimensions.width = fabs(dimensions.width);
-            dimensions.height = fabs(dimensions.height);
-            
-            UIImage *thumbnail = [self thumbnailFromVideoAsset:asset];
-            NSData *newData = UIImageJPEGRepresentation(thumbnail, kJPEGCompressionFull);
-
-            if (self.pickerBlock) {
-                self.pickerBlock(newData, kBulletTypeVideo, NSStringFromCGSize(dimensions), url);
-            }
+        else if (CFStringCompare ((CFStringRef) mediaType, kUTTypeMovie, 0)== kCFCompareEqualTo) {
+            [self handleVideo:info url:url];
         }
     }];
 }
 
+- (void) handlePhoto:(NSDictionary<NSString*, id>*)info url:(NSURL*)url
+{
+    UIImage *image = (UIImage *) [info objectForKey:UIImagePickerControllerOriginalImage];
+    CGSize imageSize = image.size;
+    //            UIImageWriteToSavedPhotosAlbum (image, nil, nil , nil);
+    image = [self fixOrientation:image];
+    NSData *data = UIImageJPEGRepresentation(image, 1.0);
+    
+    if (self.pickerBlock) {
+        self.pickerBlock(data, kBulletTypePhoto, NSStringFromCGSize(imageSize), url);
+    }
+}
+
+static inline CGFloat RadiansToDegrees(CGFloat radians) {
+    return radians * 180 / M_PI;
+}
+UIImage *refit(UIImage *image, UIImageOrientation orientation);
+
+
+- (void) handleVideo:(NSDictionary<NSString*, id>*)info url:(NSURL*)url
+{
+    AVAsset *asset = [AVAsset assetWithURL:url];
+    
+    CGSize dimensions = CGSizeZero;
+    
+    
+    AVAssetTrack* videoTrack    = [[asset tracksWithMediaType:AVMediaTypeVideo] firstObject];
+    CGAffineTransform txf       = [videoTrack preferredTransform];
+    CGFloat videoAngleInDegree  = RadiansToDegrees(atan2(txf.b, txf.a));
+    
+    NSLog(@"TRANSFORM:%@", NSStringFromCGAffineTransform(txf));
+    UIImage *thumbnail = [self thumbnailFromVideoAsset:asset];
+    switch ((int)videoAngleInDegree) {
+        case 0:
+            NSLog(@"VIDEO RIGHT");
+//            thumbnail = refit(thumbnail, UIImageOrientationRight);
+            break;
+        case 90:
+            NSLog(@"VIDEO UP");
+            break;
+        case 180:
+//            thumbnail = refit(thumbnail, UIImageOrientationLeft);
+            NSLog(@"VIDEO LEFT");
+            break;
+        case -90:
+//            thumbnail = refit(thumbnail, UIImageOrientationDown);
+            NSLog(@"VIDEO DOWN");
+            break;
+        default:
+            NSLog(@"VIDEO DONT KNOW");
+            break;
+    }
+/*
+ AVAssetTrack *track = [[asset tracksWithMediaType:AVMediaTypeVideo] firstObject];
+    CGSize dimensions = track ? CGSizeApplyAffineTransform(track.naturalSize, track.preferredTransform) : CGSizeMake(320, 200);
+    dimensions.width = fabs(dimensions.width);
+    dimensions.height = fabs(dimensions.height);
+ */
+    
+    NSData *newData = UIImageJPEGRepresentation(thumbnail, kJPEGCompressionFull);
+    dimensions = thumbnail.size;
+    
+    if (self.pickerBlock) {
+        self.pickerBlock(newData, kBulletTypeVideo, NSStringFromCGSize(dimensions), url);
+    }
+}
+
+
 - (UIImage*) thumbnailFromVideoAsset:(AVAsset*)asset
 {
     AVAssetImageGenerator *generateImg = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+    generateImg.appliesPreferredTrackTransform = YES;
     UIImage *thumbnail = [[UIImage alloc] initWithCGImage:[generateImg copyCGImageAtTime:CMTimeMake(1, 1) actualTime:NULL error:nil]];
     
-//    UIImage *rotated = [UIImage imageWithCGImage:thumbnail.CGImage scale:1.0f orientation:UIImageOrientationRight];
-    UIImage *rotated = [UIImage imageWithCGImage:thumbnail.CGImage scale:1.0f orientation:UIImageOrientationUp];
-    return rotated;
+    return thumbnail;
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
