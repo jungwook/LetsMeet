@@ -157,7 +157,7 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
             } progressBlock:^(int percentDone) {
                 printf("V>>");
             }];
-        } 
+        }
     }];
 }
 
@@ -172,7 +172,7 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
         handler(exportSession);
     }];
 }
-
+ 
 - (IBAction)editPhoto:(id)sender {
     [ImagePicker proceedWithParentViewController:self photoSelectedBlock:^(id data, BulletTypes type, NSString *sizeString, NSURL *url) {
         if (type == kBulletTypePhoto) {
