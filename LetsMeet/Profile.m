@@ -88,7 +88,7 @@
                     [self.imageView.layer addSublayer:layer];
                     [player play];
                 });
-            }];
+            }]; 
         }
     } fromFile:self.me.profilePhoto];
 }
