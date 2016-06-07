@@ -20,11 +20,6 @@
     return [[ListPicker alloc] initPickerWithArray:array onTextField:(UITextField*)textField selection:actionBlock];
 }
 
-- (void) action
-{
-    NSLog(@"lalala");
-}
-
 - (instancetype) initPickerWithArray:(NSArray*)array onTextField:(UITextField*)textField selection:(void(^)(id data))actionBlock
 {
     self = [super init];
@@ -33,7 +28,7 @@
         self.delegate = self;
         self.dataSource = self;
         self.textField = textField;
-        self.dataSelectedBlock = actionBlock; 
+        self.dataSelectedBlock = actionBlock;
         self.showsSelectionIndicator = YES;
         self.textField.inputView = self;
         
