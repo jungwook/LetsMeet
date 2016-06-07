@@ -14,9 +14,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "45"
-            endingLineNumber = "45"
-            landmarkName = "-initWithParentViewController:photoSelectedBlock:cancelBlock:"
-            landmarkType = "5">
+            endingLineNumber = "45">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -26,12 +24,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LetsMeet/Profile.m"
-            timestampString = "486833633.345138"
+            timestampString = "486993856.650044"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "125"
-            endingLineNumber = "125"
-            landmarkName = "-treatVideoData:type:mediaInfo:url:"
+            startingLineNumber = "113"
+            endingLineNumber = "113"
+            landmarkName = "-treatPhotoData:type:mediaInfo:url:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

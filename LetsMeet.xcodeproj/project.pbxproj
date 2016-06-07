@@ -30,6 +30,7 @@
 		12DE5FBB1D004443009B315F /* Progress.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FBA1D004443009B315F /* Progress.m */; };
 		12DE5FE21D02BC79009B315F /* FileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FE11D02BC79009B315F /* FileSystem.m */; };
 		12DE5FE51D02D523009B315F /* NSMutableDictionary+Bullet.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FE41D02D523009B315F /* NSMutableDictionary+Bullet.m */; };
+		12F0D70D1D06D53D00A37C40 /* MediaPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F0D70C1D06D53D00A37C40 /* MediaPlayer.m */; };
 		12F7418C1CE4B97100E8267A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418B1CE4B97100E8267A /* main.m */; };
 		12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418E1CE4B97100E8267A /* AppDelegate.m */; };
 		12F741951CE4B97100E8267A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12F741931CE4B97100E8267A /* Main.storyboard */; };
@@ -103,6 +104,8 @@
 		12DE5FE11D02BC79009B315F /* FileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileSystem.m; sourceTree = "<group>"; };
 		12DE5FE31D02D523009B315F /* NSMutableDictionary+Bullet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableDictionary+Bullet.h"; sourceTree = "<group>"; };
 		12DE5FE41D02D523009B315F /* NSMutableDictionary+Bullet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableDictionary+Bullet.m"; sourceTree = "<group>"; };
+		12F0D70B1D06D53D00A37C40 /* MediaPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaPlayer.h; sourceTree = "<group>"; };
+		12F0D70C1D06D53D00A37C40 /* MediaPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaPlayer.m; sourceTree = "<group>"; };
 		12F741871CE4B97000E8267A /* LetsMeet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LetsMeet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12F7418B1CE4B97100E8267A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		12F7418D1CE4B97100E8267A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -221,6 +224,8 @@
 				12DE5FA51CFD40DD009B315F /* MessageCell.m */,
 				12DE5FB91D004443009B315F /* Progress.h */,
 				12DE5FBA1D004443009B315F /* Progress.m */,
+				12F0D70B1D06D53D00A37C40 /* MediaPlayer.h */,
+				12F0D70C1D06D53D00A37C40 /* MediaPlayer.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -438,6 +443,7 @@
 				124928B21CF2E65A0038A2F3 /* ToggleButton.m in Sources */,
 				12F741D11CE56B3400E8267A /* FloatingDrawerView.m in Sources */,
 				12DE5FE51D02D523009B315F /* NSMutableDictionary+Bullet.m in Sources */,
+				12F0D70D1D06D53D00A37C40 /* MediaPlayer.m in Sources */,
 				1296A7A91D03BB5500E44642 /* Notifications.m in Sources */,
 				12F7418C1CE4B97100E8267A /* main.m in Sources */,
 				124928AF1CF2CD370038A2F3 /* RefreshControl.m in Sources */,

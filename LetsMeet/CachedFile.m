@@ -133,4 +133,29 @@
     }
 }
 
+- (void) saveVideoData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(FileBooleanResultBlock)block progressBlock:(PFProgressBlock)progressBlock
+{
+    if (data) {
+        PFFile *file = [PFFile fileWithName:name data:data contentType:@"video/quicktime"];
+        [file saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+            [self setObject:data forKey:file.name];
+            if (block) {
+                block(file, succeeded, error);
+            }
+        } progressBlock:progressBlock];
+    }
+    else {
+        if (block) {
+            block(nil, YES, nil);
+        }
+    }
+}
+
+
++ (void) saveVideoData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(FileBooleanResultBlock)block progressBlock:(PFProgressBlock)progressBlock
+{
+    return [[CachedFile file] saveVideoData:data named:name inBackgroundWithBlock:block progressBlock:progressBlock];
+}
+
+
 @end

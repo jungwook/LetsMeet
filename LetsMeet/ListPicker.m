@@ -6,28 +6,35 @@
 //  Copyright © 2016년 SMARTLY CO. All rights reserved.
 //
 
-#import "ListPicker.h"
+#import "ListPicker.h" 
 @interface ListPicker()
 @property (nonatomic, strong) NSArray* array;
+@property (nonatomic, weak) UITextField* textField;
 @property (strong, nonatomic) void (^dataSelectedBlock)(id data);
 @end
 
 @implementation ListPicker
 
-+(instancetype) pickerWithArray:(NSArray*)array withPhotoSelectedBlock:(void(^)(id data))actionBlock
++(instancetype) pickerWithArray:(NSArray*)array onTextField:(UITextField*)textField selection:(void(^)(id data))actionBlock
 {
-    return [[ListPicker alloc] initPickerWithArray:array withPhotoSelectedBlock:actionBlock];
+    return [[ListPicker alloc] initPickerWithArray:array onTextField:(UITextField*)textField selection:actionBlock];
 }
 
-- (instancetype) initPickerWithArray:(NSArray*)array withPhotoSelectedBlock:(void(^)(id data))actionBlock
+- (instancetype) initPickerWithArray:(NSArray*)array onTextField:(UITextField*)textField selection:(void(^)(id data))actionBlock
 {
     self = [super init];
     if (self) {
         self.array = array;
         self.delegate = self;
         self.dataSource = self;
+        self.textField = textField;
         self.dataSelectedBlock = actionBlock;
         self.showsSelectionIndicator = YES;
+        self.textField.inputView = self;
+        
+        int row = [array indexOfObject:textField.text];
+        
+        [self selectRow:row > 0 ? row : 0 inComponent:0 animated:NO];
     }
     return self;
 }
@@ -45,6 +52,8 @@
 }
 
 -(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
+    [self.textField resignFirstResponder];
+    self.textField.text = self.array[row];
     if (self.dataSelectedBlock) {
         self.dataSelectedBlock(self.array[row]);
     }
