@@ -67,8 +67,6 @@
             NSString* imageName = [NSString stringWithFormat:@"image%d", idx];
             UIImage *image = [UIImage imageNamed:imageName];
             
-            CGSize size = CGSizeMake(360, 360);
-            
             CALayer *layer = [CALayer layer];
             UIGraphicsBeginImageContextWithOptions(CGSizeMake(image.size.width, image.size.width), false, 0.0);
             layer.frame = CGRectMake(0, 0, image.size.width, image.size.width);
@@ -79,19 +77,13 @@
             UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
             
-            UIImage *profilePhoto = scaleImage(newImage, size);
             UIImage *originalPhoto = scaleImage(newImage, CGSizeMake(1024, 1024));
-            
-            NSData *smallData = UIImageJPEGRepresentation(profilePhoto, kJPEGCompressionLow);
             NSData *largeData = UIImageJPEGRepresentation(originalPhoto, kJPEGCompressionMedium);
-            
-            PFFile *file = [PFFile fileWithName:@"profile.jpg" data:smallData];
-            [file save];
-            
+
             PFFile *orig = [PFFile fileWithName:@"original.jpg" data:largeData];
             [orig save];
             
-            loggedIn.profilePhoto = file;
+            loggedIn.profilePhoto = orig;
             loggedIn.originalPhoto = orig;
             BOOL userSaved = [loggedIn save];
             NSLog(@"USER %@SUCCESSFULLY SAVED", userSaved ? @"" : @"UN");

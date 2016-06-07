@@ -10,6 +10,7 @@
 #import "AppDelegate.h"
 #import "FileSystem.h"
 #import "NSMutableDictionary+Bullet.h"
+#import "SimulatedUsers.h"
 
 @interface AppDelegate ()
 @property (nonatomic, strong) FileSystem *system;
@@ -33,9 +34,7 @@
         configuration.server = @"http://parse.kr:1338/parse";
     }]];
     
-    
-// OK... DOING THIS
-//    [PFUser enableAutomaticUser];
+//    [SimulatedUsers createUsers];
     
     PFACL *defaultACL = [PFACL ACL];
     

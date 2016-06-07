@@ -16,5 +16,6 @@ typedef void (^FileBooleanResultBlock)(PFFile *file, BOOL succeeded, NSError * e
 + (NSData*) getDataInBackgroundWithBlock:(CachedFileBlock)block name:(NSString*)name andURL:(NSURL*)url;
 + (void) saveData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(FileBooleanResultBlock)block progressBlock:(PFProgressBlock)progressBlock;
 + (id)objectForKey:(id)key;
++ (void) saveVideoData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(FileBooleanResultBlock)block progressBlock:(PFProgressBlock)progressBlock;
 
 @end

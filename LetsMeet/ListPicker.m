@@ -32,7 +32,9 @@
         self.showsSelectionIndicator = YES;
         self.textField.inputView = self;
         
-        [self selectRow:[array indexOfObject:textField.text] inComponent:0 animated:NO];
+        int row = [array indexOfObject:textField.text];
+        
+        [self selectRow:row > 0 ? row : 0 inComponent:0 animated:NO];
     }
     return self;
 }
