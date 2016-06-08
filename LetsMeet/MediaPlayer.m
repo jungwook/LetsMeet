@@ -22,35 +22,40 @@
     return [[MediaPlayer alloc] initWithURL:URL onView:view];
 }
 
+- (void) setPlayerItemURL:(NSURL *)url
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemPlaybackStalledNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemFailedToPlayToEndTimeNotification object:nil];
+    [self.item removeObserver:self forKeyPath:@"status"];
+    self.item = [AVPlayerItem playerItemWithURL:url];
+    [self.item addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.item];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemStalled:) name:AVPlayerItemPlaybackStalledNotification object:self.item];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemFailedToPlayToEndTimeNotification object:self.item];
+}
+
 - (instancetype) initWithURL:(NSURL *)URL onView:(UIView*)view
 {
     self = [super init];
     if (self) {
-        self.item = [AVPlayerItem playerItemWithURL:URL];
+        [self setPlayerItemURL:URL];
+        
         self.player = [AVPlayer playerWithPlayerItem:self.item];
         self.view = view;
         self.layer = [AVPlayerLayer playerLayerWithPlayer:self.player];
-        [view.layer addSublayer:self.layer];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.item];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemStalled:) name:AVPlayerItemPlaybackStalledNotification object:self.item];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemFailedToPlayToEndTimeNotification object:self.item];
-        
-        [self.item addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+        [self.view.layer addSublayer:self.layer];
     }
     return self;
 }
 
 -(void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemPlaybackStalledNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemFailedToPlayToEndTimeNotification object:nil];
-    [self.item removeObserver:self forKeyPath:@"status"];
 }
 
 - (void)playerItemStalled:(NSNotification *)notification
 {
-    NSLog(@"STALLING");
+//    NSLog(@"STALLING");
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.player play];
     });
@@ -60,14 +65,28 @@
 {
     NSLog(@"REACHED END");
     [self.player seekToTime:kCMTimeZero];
-    [self.player play];
+    [self playVideo];
 }
 
 - (void)setURL:(NSURL*) url
 {
-    self.item = [AVPlayerItem playerItemWithURL:url];
+    NSLog(@"SETTING NEW URL");
+    
+    [self.layer removeFromSuperlayer];
+    if (url) {
+        [self.view.layer addSublayer:self.layer];
+    }
+    
+    [self setPlayerItemURL:url];
     [self.player replaceCurrentItemWithPlayerItem:self.item];
     [self.player seekToTime:kCMTimeZero];
+}
+
+- (void) playVideo
+{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.0001 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.player play];
+    });
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context
@@ -75,18 +94,17 @@
     if (object == self.item && [keyPath isEqualToString:@"status"]) {
         NSLog(@"STATUS CHANGED");
         switch (self.item.status) {
-            case AVPlayerItemStatusReadyToPlay:
+            case AVPlayerItemStatusReadyToPlay: {
                 [self.layer setFrame:self.view.bounds];
                 [self.layer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
-                [self.player play];
+                [self playVideo];
+            }
                 break;
-                
             case AVPlayerItemStatusFailed:
-                NSLog(@"ITEM fAILED");
+                NSLog(@"ITEM FAILED: PROBABLY CAUSE ITEM DOES NOT EXIST");
                 break;
             case AVPlayerItemStatusUnknown:
                 NSLog(@"ITEM UNKNOWN");
-
             default:
                 break;
         }

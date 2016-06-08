@@ -40,11 +40,11 @@
     
     long age = 20+ arc4random()%30;
     
-    NSString *username = [[NSUUID UUID] UUIDString];
+//    NSString *username = [[NSUUID UUID] UUIDString];
     User *user = [User user];
     
-    user.username = username;
-    user.password = username;
+    user.username = name;
+    user.password = name;
     
     user.nickname = name;
     user.location = geoLocation;
