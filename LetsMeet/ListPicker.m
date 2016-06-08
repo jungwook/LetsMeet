@@ -32,9 +32,10 @@
         self.showsSelectionIndicator = YES;
         self.textField.inputView = self;
         
-        int row = [array indexOfObject:textField.text];
-        
-        [self selectRow:row > 0 ? row : 0 inComponent:0 animated:NO];
+        NSUInteger row = [array indexOfObject:textField.text];
+        if (row != NSNotFound) {
+            [self selectRow:row inComponent:0 animated:NO];
+        }
     }
     return self;
 }
