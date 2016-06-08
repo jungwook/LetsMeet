@@ -7,7 +7,7 @@
 //
 
 #import <AVFoundation/AVFoundation.h>
-
+#import <AVKit/AVKit.h>
 
 @interface MediaPlayer : NSObject
 + (instancetype)playerWithURL:(NSURL *)URL onView:(UIView *)view;

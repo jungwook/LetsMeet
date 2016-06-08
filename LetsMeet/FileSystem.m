@@ -49,6 +49,8 @@
 //        [PFUser logOut];
 //        [PFUser logInWithUsername:@"5363EA36-7EB0-420F-9122-61E94CF25046" password:@"5363EA36-7EB0-420F-9122-61E94CF25046"];
         
+//        [PFUser logOut];
+//        [PFUser logInWithUsername:@"희라" password:@"희라"];
         
         // If me is nil then need to find a way of loging in a new user.
         if (!self.me) {

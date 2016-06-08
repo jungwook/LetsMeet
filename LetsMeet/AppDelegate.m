@@ -12,15 +12,86 @@
 #import "NSMutableDictionary+Bullet.h"
 #import "SimulatedUsers.h"
 
+
 @interface AppDelegate ()
 @property (nonatomic, strong) FileSystem *system;
 @end
 
 @implementation AppDelegate
 
+- (void)setupAWSCredentials
+{
+    AWSCognitoCredentialsProvider *credentialsProvider = [[AWSCognitoCredentialsProvider alloc] initWithRegionType:AWSRegionUSEast1 identityPoolId:@"us-east-1:cf811cfd-3215-4274-aec5-82040e033bfe"];
+    AWSServiceConfiguration *configuration = [[AWSServiceConfiguration alloc] initWithRegion:AWSRegionAPNortheast2 credentialsProvider:credentialsProvider];
+    configuration.maxRetryCount = 3;
+    AWSServiceManager.defaultServiceManager.defaultServiceConfiguration = configuration;
+    
+    [AWSLogger defaultLogger].logLevel = AWSLogLevelError;
+}
+
+- (void)testFileUpAndDownLoads
+{
+    UIImage *image = [UIImage imageNamed:@"image"];
+    NSData *data = UIImagePNGRepresentation(image);
+    
+    NSURL *outputURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"image.png"];
+    
+    BOOL ret = [data writeToURL:outputURL atomically:YES];
+    
+    NSLog(@"UPLOADED DATA:%ld", data.length);
+    if (ret) {
+        NSLog(@"IMAGE ON DISK URL :%@", outputURL);
+        AWSS3TransferManager *transferManager = [AWSS3TransferManager defaultS3TransferManager];
+        AWSS3TransferManagerUploadRequest *uploadRequest = [AWSS3TransferManagerUploadRequest new];
+        uploadRequest.bucket = @"parsekr";
+        uploadRequest.key = @"test/image.png";
+        uploadRequest.body = outputURL;
+        
+        [[transferManager upload:uploadRequest] continueWithExecutor:[AWSExecutor mainThreadExecutor]
+                                                           withBlock:^id(AWSTask *task) {
+                                                               if (task.error != nil) {
+                                                                   NSLog(@"%s %@","Error uploading :", uploadRequest.key);
+                                                               }
+                                                               else { NSLog(@"Upload completed"); }
+                                                               return nil;
+                                                           }];
+    }
+    
+    
+    NSString *downloadingFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"download.png"];
+    NSURL *downloadingFileURL = [NSURL fileURLWithPath:downloadingFilePath];
+    
+    [[NSFileManager defaultManager] removeItemAtURL:downloadingFileURL error:nil];
+    
+    AWSS3TransferManagerDownloadRequest *downloadRequest = [AWSS3TransferManagerDownloadRequest new];
+    downloadRequest.bucket = @"parsekr";
+    downloadRequest.key = @"image.png";
+    downloadRequest.downloadingFileURL = downloadingFileURL;
+    
+    AWSS3TransferManager *transferManager = [AWSS3TransferManager defaultS3TransferManager];
+    NSLog(@"Download started, please wait...");
+    
+    [[transferManager download:downloadRequest] continueWithExecutor:[AWSExecutor mainThreadExecutor]
+                                                           withBlock:^id(AWSTask *task){
+                                                               if (task.error != nil) {
+                                                                   NSLog(@"%s %@","Error downloading :", downloadRequest.key);
+                                                               }
+                                                               else {
+                                                                   NSLog(@"download completed");
+                                                                   NSData *downloadedData = [NSData dataWithContentsOfURL:downloadingFileURL];
+                                                                   NSLog(@"DOWNLOADED:%ld", downloadedData.length);
+                                                               }
+                                                               return nil;
+                                                           }];
+    
+
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    [self setupAWSCredentials];
+    [self testFileUpAndDownLoads];
     
     [Parse enableLocalDatastore];
     
