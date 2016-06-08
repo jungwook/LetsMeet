@@ -10,6 +10,7 @@
 #import "NSMutableDictionary+Bullet.h"
 
 typedef void (^FileBooleanResultBlock)(PFFile *file, BOOL succeeded, NSError * error);
+typedef void (^CachedFileBlock)(NSData * data, NSError * error, BOOL fromCache);
 
 @interface CachedFile : NSCache
 + (void) getDataInBackgroundWithBlock:(CachedFileBlock)block fromFile:(PFFile*)file;
@@ -19,3 +20,4 @@ typedef void (^FileBooleanResultBlock)(PFFile *file, BOOL succeeded, NSError * e
 + (void) saveVideoData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(FileBooleanResultBlock)block progressBlock:(PFProgressBlock)progressBlock;
 
 @end
+

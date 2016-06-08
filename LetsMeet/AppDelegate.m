@@ -78,6 +78,7 @@
                                                                }
                                                                else {
                                                                    NSLog(@"download completed");
+                                                                   
                                                                    NSData *downloadedData = [NSData dataWithContentsOfURL:downloadingFileURL];
                                                                    NSLog(@"DOWNLOADED:%ld", downloadedData.length);
                                                                }
@@ -91,7 +92,7 @@
     // Override point for customization after application launch.
     
     [self setupAWSCredentials];
-    [self testFileUpAndDownLoads];
+//    [self testFileUpAndDownLoads];
     
     [Parse enableLocalDatastore];
     

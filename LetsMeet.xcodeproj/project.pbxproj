@@ -13,6 +13,7 @@
 		120142E11D08802600D66905 /* AWSCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 120142DE1D08802600D66905 /* AWSCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		120142E21D08802600D66905 /* AWSS3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 120142DF1D08802600D66905 /* AWSS3.framework */; };
 		120142E31D08802600D66905 /* AWSS3.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 120142DF1D08802600D66905 /* AWSS3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		120142E81D08930B00D66905 /* S3File.m in Sources */ = {isa = PBXBuildFile; fileRef = 120142E71D08930B00D66905 /* S3File.m */; };
 		124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928831CEFF7F70038A2F3 /* ImagePicker.m */; };
 		124928871CF003420038A2F3 /* CachedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928861CF003420038A2F3 /* CachedFile.m */; };
 		1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928891CF0176C0038A2F3 /* ListPicker.m */; };
@@ -84,6 +85,8 @@
 		1201428B1D04703200D66905 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 		120142DE1D08802600D66905 /* AWSCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AWSCore.framework; sourceTree = "<group>"; };
 		120142DF1D08802600D66905 /* AWSS3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AWSS3.framework; sourceTree = "<group>"; };
+		120142E61D08930B00D66905 /* S3File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = S3File.h; sourceTree = "<group>"; };
+		120142E71D08930B00D66905 /* S3File.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = S3File.m; sourceTree = "<group>"; };
 		124928821CEFF7F70038A2F3 /* ImagePicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePicker.h; sourceTree = "<group>"; };
 		124928831CEFF7F70038A2F3 /* ImagePicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImagePicker.m; sourceTree = "<group>"; };
 		124928851CF003420038A2F3 /* CachedFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CachedFile.h; sourceTree = "<group>"; };
@@ -237,6 +240,8 @@
 				124928891CF0176C0038A2F3 /* ListPicker.m */,
 				124928851CF003420038A2F3 /* CachedFile.h */,
 				124928861CF003420038A2F3 /* CachedFile.m */,
+				120142E61D08930B00D66905 /* S3File.h */,
+				120142E71D08930B00D66905 /* S3File.m */,
 				124928AD1CF2CD370038A2F3 /* RefreshControl.h */,
 				124928AE1CF2CD370038A2F3 /* RefreshControl.m */,
 				124928B01CF2E65A0038A2F3 /* ToggleButton.h */,
@@ -502,6 +507,7 @@
 				1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */,
 				12F741DA1CE56F4300E8267A /* MainController.m in Sources */,
 				12F741D01CE56B3400E8267A /* FloatingDrawerSpringAnimator.m in Sources */,
+				120142E81D08930B00D66905 /* S3File.m in Sources */,
 				1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */,
 				124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */,
 			);

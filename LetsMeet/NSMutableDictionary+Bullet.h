@@ -32,7 +32,6 @@ typedef void (^RefreshControlBlock)(UIRefreshControl* refreshControl);
 typedef void (^CountResultBlock)(NSUInteger count);
 typedef void (^DictionaryResultBlock)(NSDictionary *messages);
 typedef void (^DictionaryArrayResultBlock)(NSDictionary *messages, NSArray *users);
-typedef void (^CachedFileBlock)(NSData * data, NSError * error, BOOL fromCache);
 typedef void (^ImageSizePickerBlock)(NSData *data, Progress* progress);
 typedef void (^NewUserBlock)(User* me);
 
