@@ -23,8 +23,6 @@
 @property (nonatomic, weak) User* me;
 @end
 
-#define __LF NSLog(@"%s", __FUNCTION__);
-
 @implementation FileSystem 
 
 + (instancetype) new

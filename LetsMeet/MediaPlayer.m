@@ -8,6 +8,8 @@
 
 #import "MediaPlayer.h"
 
+#define S3LOCATION @"http://parsekr.s3.ap-northeast-2.amazonaws.com/"
+
 @interface MediaPlayer()
 @property (nonatomic, strong) AVPlayer* player;
 @property (nonatomic, strong) AVPlayerItem *item;
@@ -17,13 +19,29 @@
 
 @implementation MediaPlayer
 
-+ (instancetype)playerWithURL:(NSURL *)URL onView:(UIView *)view
++ (instancetype)playerWithPath:(NSString *)path onView:(UIView *)view frameChange:(FrameChangedBlock)frameChange
 {
-    return [[MediaPlayer alloc] initWithURL:URL onView:view];
+    return [[MediaPlayer alloc] initWithPath:path onView:view frameChange:frameChange];
 }
 
-- (void) setPlayerItemURL:(NSURL *)url
+- (void) setPlayerItemWithPath:(NSString*)path
 {
+    NSString *fullPath = [S3LOCATION stringByAppendingString:path];
+    [self setPlayerItemwithURL:[NSURL URLWithString:fullPath]];
+}
+
+- (void) reframe
+{
+    if (self.frameChangedBlock) {
+        CGSize size = self.item.presentationSize;
+        self.frameChangedBlock(CGRectMake(0, 0, size.width, size.height));
+    }
+}
+
+- (void) setPlayerItemwithURL:(NSURL*)url
+{
+    [self.player pause];
+    self.view.alpha = 0;
     [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemPlaybackStalledNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemFailedToPlayToEndTimeNotification object:nil];
@@ -35,11 +53,12 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemFailedToPlayToEndTimeNotification object:self.item];
 }
 
-- (instancetype) initWithURL:(NSURL *)URL onView:(UIView*)view
+- (instancetype) initWithPath:(NSString *)path onView:(UIView*)view frameChange:(FrameChangedBlock)frameChange
 {
     self = [super init];
     if (self) {
-        [self setPlayerItemURL:URL];
+        self.frameChangedBlock = frameChange;
+        [self setPlayerItemWithPath:path];
         
         self.player = [AVPlayer playerWithPlayerItem:self.item];
         self.view = view;
@@ -51,6 +70,10 @@
 
 -(void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemPlaybackStalledNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemFailedToPlayToEndTimeNotification object:nil];
+    [self.item removeObserver:self forKeyPath:@"status"];
 }
 
 - (void)playerItemStalled:(NSNotification *)notification
@@ -68,23 +91,39 @@
     [self playVideo];
 }
 
-- (void)setURL:(NSURL*) url
+- (void)setURL:(NSURL *)url
 {
-    NSLog(@"SETTING NEW URL");
-    
-    [self.layer removeFromSuperlayer];
-    if (url) {
-        [self.view.layer addSublayer:self.layer];
-    }
-    
-    [self setPlayerItemURL:url];
-    [self.player replaceCurrentItemWithPlayerItem:self.item];
-    [self.player seekToTime:kCMTimeZero];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"REMOVING FROM SUPERLAYER");
+        [self.layer removeFromSuperlayer];
+        if (url) {
+            NSLog(@"ADDING SUBLAYER");
+            [self.view.layer addSublayer:self.layer];
+        }
+        NSLog(@"ASSIGNING PLAYER ITEM");
+        [self setPlayerItemwithURL:url];
+        [self.player replaceCurrentItemWithPlayerItem:self.item];
+        [self.player seekToTime:kCMTimeZero];
+    });
+}
+
+- (void)setPath:(NSString *)path
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.layer removeFromSuperlayer];
+        if (path) {
+            [self.view.layer addSublayer:self.layer];
+        }
+        [self setPlayerItemWithPath:path];
+        [self.player replaceCurrentItemWithPlayerItem:self.item];
+        [self.player seekToTime:kCMTimeZero];
+    });
 }
 
 - (void) playVideo
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.0001 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//        self.view.alpha = 1;
         [self.player play];
     });
 }
@@ -97,6 +136,7 @@
             case AVPlayerItemStatusReadyToPlay: {
                 [self.layer setFrame:self.view.bounds];
                 [self.layer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
+                [self reframe];
                 [self playVideo];
             }
                 break;

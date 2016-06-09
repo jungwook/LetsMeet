@@ -13,7 +13,7 @@ typedef void (^S3PutBlock)(NSString *file, BOOL succeeded, NSError * error);
 typedef void (^S3ProgressBlock)(int percentDone);
 
 @interface S3File : NSCache
-+ (void) getDataInBackgroundWithBlock:(S3GetBlock)block fromFile:(NSString*)file;
-+ (void) saveData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progressBlock;
++ (void) getDataFromFile:(id)filename completedBlock:(S3GetBlock)block progressBlock:(S3ProgressBlock)progress;
++ (void) saveData:(NSData*)data named:(id)filename completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress;
 + (id)objectForKey:(id)key;
 @end

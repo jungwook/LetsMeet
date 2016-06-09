@@ -9,7 +9,11 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
 
+typedef void(^FrameChangedBlock)(CGRect rect);
+
 @interface MediaPlayer : NSObject
-+ (instancetype)playerWithURL:(NSURL *)URL onView:(UIView *)view;
-- (void)setURL:(NSURL*) url;
+@property (nonatomic, strong) FrameChangedBlock frameChangedBlock;
++ (instancetype)playerWithPath:(NSString*)path onView:(UIView *)view frameChange:(FrameChangedBlock)frameChange;
+- (void) setPath:(NSString*)path;
+- (void) setURL:(NSURL*)url;
 @end

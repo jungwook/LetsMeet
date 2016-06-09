@@ -16,6 +16,30 @@
     [[SimulatedUsers new] createUsers];
 }
 
++ (void) resetUsers
+{
+    PFQuery *query = [User query];
+    
+    [query whereKey:@"isSimulated" equalTo:@(YES)];
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
+        [users enumerateObjectsUsingBlock:^(User*  _Nonnull user, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSString *name = user.username;
+            PFUser *loggedIn = [PFUser logInWithUsername:name password:name];
+            if (!loggedIn) {
+                NSLog(@"Error: FAILED TO LOGIN AS :%@", loggedIn);
+            }
+            else {
+                NSLog(@"SETTING UP PROFILE IMAGE FOR %@", user.nickname);
+                PFFile* file = loggedIn[@"originalPhoto"];
+                NSString *filename = [@"ParseFiles/" stringByAppendingString:file.name];
+                loggedIn[@"profileMedia"] = filename;
+                [loggedIn save];
+                [PFUser logOut];
+            }
+        }];
+    }];
+}
+
 - (void) createUsers
 {
     NSArray *names = @[@"가리온", @"가은", @"강다이", @"고루나", @"고운비", @"그레", @"그리미", @"글샘", @"기찬", @"길한", @"나나", @"나도람", @"나슬", @"난새", @"난한벼리", @"내누리", @"누니", @"늘새찬", @"늘품", @"늘해찬", @"다보라", @"다소나", @"다솜", @"다슴", @"다올", @"다조은", @"달래울", @"달비슬", @"대누리", @"드레", @"말그미", @"모도리", @"무아", @"미리내", @"미슬기", @"바다", @"바로", @"바우", @"밝음이", @"별아", @"보다나", @"봄이", @"비치", @"빛들", @"빛새온", @"빛찬온", @"사나래", @"새라", @"새로나", @"새미라", @"새하", @"샘나", @"소담", @"소란", @"솔다우니", @"슬미", @"아늘", @"아로미", @"아름이", @"아림", @"아음", @"애리", @"여슬", @"영아름", @"예달", @"온비", @"정다와", @"정아라미", @"조은", @"지예", @"진아", @"차니", @"찬샘", @"찬아람", @"참이", @"초은", @"파라", @"파랑", @"푸르나", @"푸르내", @"풀잎", @"하나", @"하나슬", @"하리", @"하은", @"한진이", @"한비", @"한아름", @"해나", @"해슬아", @"희라"];
@@ -83,8 +107,8 @@
             PFFile *orig = [PFFile fileWithName:@"original.jpg" data:largeData];
             [orig save];
             
-            loggedIn.profilePhoto = orig;
-            loggedIn.originalPhoto = orig;
+//            loggedIn.profileMedia =
+//            loggedIn.originalPhoto = orig;
             BOOL userSaved = [loggedIn save];
             NSLog(@"USER %@SUCCESSFULLY SAVED", userSaved ? @"" : @"UN");
         }

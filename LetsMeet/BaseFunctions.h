@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+#define __LF NSLog(@"%s", __FUNCTION__);
+
 CALayer*    drawImageOnLayer(UIImage *image, CGSize size);
 UIImage*    scaleImage(UIImage* image, CGSize size);
 void        drawImage(UIImage *image, UIView* view);

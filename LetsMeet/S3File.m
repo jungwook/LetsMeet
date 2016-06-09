@@ -33,12 +33,12 @@
     return [[S3File file] objectForKey:key];
 }
 
-+ (void) getDataInBackgroundWithBlock:(S3GetBlock)block fromFile:(NSString*)file
++ (void) getDataFromFile:(id)filename completedBlock:(S3GetBlock)block progressBlock:(S3ProgressBlock)progress
 {
-    [[S3File file] getDataInBackgroundWithBlock:block fromFile:file];
+    [[S3File file] getDataFromFile:filename completedBlock:block progressBlock:progress];
 }
 
-- (void) getDataInBackgroundWithBlock:(S3GetBlock)block fromFile:(NSString*)file
+- (void) getDataFromFile:(id)file completedBlock:(S3GetBlock)block progressBlock:(S3ProgressBlock)progress
 {
     if (!file) {
         if (block) {
@@ -53,14 +53,21 @@
         }
     }
     else {
-        NSString *downloadingFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:file];
+        NSString *downloadingFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSURL URLWithString:file] lastPathComponent]];
         NSURL *downloadingFileURL = [NSURL fileURLWithPath:downloadingFilePath];
+        // If temp file exists then delete
         [[NSFileManager defaultManager] removeItemAtURL:downloadingFileURL error:nil];
         
         AWSS3TransferManagerDownloadRequest *downloadRequest = [AWSS3TransferManagerDownloadRequest new];
         downloadRequest.bucket = @"parsekr";
         downloadRequest.key = file;
         downloadRequest.downloadingFileURL = downloadingFileURL;
+        downloadRequest.downloadProgress = ^(int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend) {
+            int rate = (int)(totalBytesSent * 100.0 / totalBytesExpectedToSend);
+            if (progress) {
+                progress(rate);
+            }
+        };
         
         AWSS3TransferManager *transferManager = [AWSS3TransferManager defaultS3TransferManager];
         NSLog(@"Download started, please wait...");
@@ -80,19 +87,28 @@
                     block(downloadedData, task.error, NO);
                 }
             }
+
+            // delete temp download file location.
             [[NSFileManager defaultManager] removeItemAtURL:downloadingFileURL error:nil];
+            
             return nil;
         }];
     }
 }
 
-- (void) saveData:(NSData*)data named:(NSString*)name inBackgroundWithBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progressBlock
++ (void) saveData:(NSData *)data named:(id)filename completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
+{
+    [[S3File file] saveData:data named:filename completedBlock:block progressBlock:progress];
+}
+
+- (void) saveData:(NSData *)data named:(id)name completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
 {
     if (data) {
         NSUUID *uuid = [NSUUID UUID];
-        NSString *filename = [[uuid UUIDString] stringByAppendingString:name];
+        NSString *filename = [@"ParseFiles/" stringByAppendingString:[[uuid UUIDString] stringByAppendingString:name]];
+        NSURL *uploadFileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:[[NSURL URLWithString:filename] lastPathComponent]]];
         
-        NSURL *uploadFileURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:filename];
+        [[NSFileManager defaultManager] removeItemAtURL:uploadFileURL error:nil];
         BOOL ret = [data writeToURL:uploadFileURL atomically:YES];
         if (ret) {
             NSLog(@"UPLOADING DATA %@(%ld)", filename, data.length);
@@ -101,10 +117,11 @@
             uploadRequest.bucket = @"parsekr";
             uploadRequest.key = filename;
             uploadRequest.body = uploadFileURL;
+            uploadRequest.ACL = AWSS3ObjectCannedACLPublicRead;
             uploadRequest.uploadProgress = ^(int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend) {
-                int progress = (int)(totalBytesSent * 100.0 / totalBytesExpectedToSend);
-                if (progressBlock) {
-                    progressBlock(progress);
+                int rate = (int)(totalBytesSent * 100.0 / totalBytesExpectedToSend);
+                if (progress) {
+                    progress(rate);
                 }
             };
             
@@ -133,10 +150,4 @@
         }
     }
 }
-
-+(void)saveData:(NSData *)data named:(NSString *)name inBackgroundWithBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progressBlock
-{
-    return [[S3File file] saveData:data named:name inBackgroundWithBlock:block progressBlock:progressBlock];
-}
-
 @end

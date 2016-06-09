@@ -123,9 +123,7 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
 @property (retain) NSDate* locationUdateAt;
 @property (retain) NSString* age;
 @property (retain) NSString* intro;
-@property (retain) PFFile* profilePhoto;
-@property (retain) PFFile* originalPhoto;
-@property (retain) PFFile* profileVideo;
+@property (retain) NSString* profileMedia;
 @property ProfileMediaTypes profileMediaType;
 
 @property BOOL isSimulated;

@@ -12,7 +12,8 @@
 #import "ListPicker.h"
 #import "CachedFile.h"
 #import "ImagePicker.h"
-#import "MediaPlayer.h"
+#import "MediaView.h"
+#import "S3File.h"
 
 @interface UIImageView(animated)
 - (void)setImage:(UIImage *)image animated:(BOOL)animated;
@@ -41,12 +42,11 @@
 @property (weak, nonatomic) IBOutlet UITextField *nicknameTF;
 @property (weak, nonatomic) IBOutlet UITextField *introTF;
 @property (weak, nonatomic) IBOutlet UITextField *ageTF;
-@property (weak, nonatomic) IBOutlet UIImageView *profileView;
 @property (weak, nonatomic) IBOutlet UITextField *sexTF;
 @property (weak, nonatomic) IBOutlet UILabel *pointsLB;
 @property (weak, nonatomic) IBOutlet UIButton *editPhotoBut;
 @property (weak, nonatomic) IBOutlet UIView *gradientView;
-@property (strong, nonatomic) MediaPlayer* player;
+@property (weak, nonatomic) IBOutlet MediaView *mediaView;
 @property CGFloat photoHeight;
 
 @property (strong, nonatomic) User *me;
@@ -118,38 +118,12 @@
     view.clipsToBounds = NO;
 }
 
-- (void)setGradient:(UIView*) myImageView;
-{
-    CAGradientLayer *gradientLayer = [CAGradientLayer layer];
-    gradientLayer.frame = myImageView.layer.bounds;
-    
-    gradientLayer.colors = [NSArray arrayWithObjects:
-                            (id)[UIColor colorWithWhite:0.0f alpha:0.9f].CGColor,
-                            (id)[UIColor colorWithWhite:0.0f alpha:0.0f].CGColor,
-                            (id)[UIColor colorWithWhite:0.0f alpha:0.9f].CGColor,
-                            nil];
-    
-    gradientLayer.locations = [NSArray arrayWithObjects:
-                               [NSNumber numberWithFloat:0.0f],
-                               [NSNumber numberWithFloat:0.5f],
-                               [NSNumber numberWithFloat:0.7f],
-                               nil];
-    
-    //If you want to have a border for this layer also
-    gradientLayer.borderColor = [UIColor colorWithWhite:1.0f alpha:1.0f].CGColor;
-    gradientLayer.borderWidth = 1;
-    [myImageView.layer addSublayer:gradientLayer];
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-//    [self setGradient:self.gradientView];
-    [self setShadowOnView:self.editPhotoBut];
-    
-    circleizeView(self.editPhotoBut, 0.1f);
-    
+//    [self setShadowOnView:self.editPhotoBut];
     self.nicknameTF.text = self.me.nickname;
+    self.gradientView.hidden = YES;
     
     self.introTF.text = self.me.intro ? self.me.intro : @"";
     [ListPicker pickerWithArray:@[@"우리 만나요!", @"애인 찾아요", @"함께 드라이브 해요", @"나쁜 친구 찾아요", @"착한 친구 찾아요", @"함께 먹으러 가요", @"술친구 찾아요"] onTextField:self.introTF selection:^(id data) {
@@ -169,44 +143,21 @@
         [self.me saveInBackground];
     }];
     
-    [CachedFile getDataInBackgroundWithBlock:^(NSData *data, NSError *error, BOOL fromCache) {
-        UIImage *image = [UIImage imageWithData:data];
-        [self setPhoto:image];
-        
-        self.player = [MediaPlayer playerWithURL: (self.me.profileMediaType == kProfileMediaVideo) ?[NSURL URLWithString:self.me.profileVideo.url] : nil onView:self.profileView];
-    } fromFile:self.me.profilePhoto];
+    [self.mediaView setMediaFromUser:self.me frameBlock:^(CGSize size) {
+        NSLog(@"REFRAMING:%@", NSStringFromCGSize(size));
+        self.photoHeight = size.width ? self.mediaView.frame.size.width * size.height / size.width + 20 : 400;
+        [self.tableView reloadData];
+    }];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (indexPath.section == 0) {
-        return MIN(self.photoHeight, 400.0f);
+        return MIN(self.photoHeight, 500);
     }
     else {
         return 45.0f;
     }
-}
-
-- (void)setPhoto:(UIImage*)image
-{
-    self.photoHeight = image.size.width ? self.profileView.frame.size.width * image.size.height / image.size.width + 20 : 400;
-    
-    [self.profileView setImage:image animated:YES];
-    [self.tableView reloadData];
-}
-
-- (void) treatPhotoData:(NSData*)data type:(BulletTypes)type mediaInfo:(NSString*)sizeString url:(NSURL*)url
-{
-    [self.player setURL:nil];
-    [self setPhoto:[UIImage imageWithData:data]];
-    
-    [CachedFile saveData:data named:@"original.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-        self.me.originalPhoto = file;
-        self.me.profilePhoto = file;
-        self.me.profileMediaType = kProfileMediaPhoto;
-        self.me.profileVideo = nil;
-        [self.me saveInBackground];
-    } progressBlock:nil];
 }
 
 UIImage *refit(UIImage *image, UIImageOrientation orientation)
@@ -214,37 +165,35 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
     return [UIImage imageWithCGImage:image.CGImage scale:1.0f orientation:orientation];
 }
 
-- (void) treatVideoData:(NSData*)data type:(BulletTypes)type mediaInfo:(NSString*)sizeString url:(NSURL*)url
+- (void) treatVideoOfType:(BulletTypes)type url:(NSURL*)url
 {
-    UIImage *image = [UIImage imageWithData:data];
-    [self setPhoto:image];
-    
-    [CachedFile saveData:data named:@"profile.jpg" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-        self.me.profileMediaType = kProfileMediaVideo;
-        self.me.originalPhoto = file;
-        self.me.profilePhoto = file;
-        [self.me saveInBackground];
-    } progressBlock:nil];
     
     NSURL *outputURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"profile_video.mov"];
+    
     
     [self convertVideoToLowQuailtyWithInputURL:url outputURL:outputURL handler:^(AVAssetExportSession *exportSession)
     {
         if (exportSession.status == AVAssetExportSessionStatusCompleted) {
-            [self.player setURL:url];
-    
             NSData *videoData = [NSData dataWithContentsOfURL:outputURL];
-            [CachedFile saveVideoData:videoData named:@"profile_video.mov" inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-                self.me.profileVideo = file;
-                self.me.profileMediaType = kProfileMediaVideo;
-                [self.me saveInBackground];
+            
+            [S3File saveData:videoData named:@"profile.mov" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    NSLog(@"SAVED FILENAME:%@", file);
+                    self.me.profileMediaType = kProfileMediaVideo;
+                    self.me.profileMedia = file;
+                    [self.me saveInBackground];
+                    
+                    // DELETING TEMP FILE AFTER UPLOAD
+                    [[NSFileManager defaultManager] removeItemAtURL:outputURL error:nil];
+                }
+                else {
+                    NSLog(@"ERROR:%@", error.localizedDescription);
+                }
             } progressBlock:^(int percentDone) {
-                printf("V>>");
+                NSLog(@"Saving Progress:%d", percentDone);
             }];
-            NSLog(@"ReACHER 1");
         }
     }];
-    NSLog(@"ReACHER 2");
 }
 
 - (void)convertVideoToLowQuailtyWithInputURL:(NSURL*)inputURL outputURL:(NSURL*)outputURL handler:(void (^)(AVAssetExportSession*))handler {
@@ -252,7 +201,7 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
     AVURLAsset *asset = [AVURLAsset URLAssetWithURL:inputURL options:nil];
     AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:asset presetName:AVAssetExportPreset640x480];
     exportSession.outputURL = outputURL;
-    exportSession.fileLengthLimit = 3000000;
+//    exportSession.fileLengthLimit = 3000000;
     exportSession.outputFileType = AVFileTypeQuickTimeMovie;
     [exportSession exportAsynchronouslyWithCompletionHandler:^(void) {
         handler(exportSession);
@@ -262,10 +211,23 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
 - (IBAction)editPhoto:(id)sender {
     [ImagePicker proceedWithParentViewController:self photoSelectedBlock:^(id data, BulletTypes type, NSString *sizeString, NSURL *url) {
         if (type == kBulletTypePhoto) {
-            [self treatPhotoData:data type:type mediaInfo:sizeString url:url];
+            [S3File saveData:data named:@"profile.jpg" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    self.me.profileMedia = file;
+                    self.me.profileMediaType = kProfileMediaPhoto;
+                    [self.me saveInBackground];
+                    [self.mediaView setMediaFromUser:self.me];
+                }
+                else {
+                    NSLog(@"ERROR:%@", error.localizedDescription);
+                }
+            } progressBlock:^(int percentDone) {
+                NSLog(@"Saving Progress:%d", percentDone);
+            }];
         }
         else if (type == kBulletTypeVideo) {
-            [self treatVideoData:data type:type mediaInfo:sizeString url:url];
+            [self.mediaView setPlayerItemURL:url];
+            [self treatVideoOfType:type url:url];
         }
     } cancelBlock:nil];
 }

@@ -469,15 +469,15 @@ Hello</string>
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="178.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="1IF-Q2-SK9">
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="68d-dJ-p8h" customClass="MediaView">
                                                     <rect key="frame" x="0.0" y="0.0" width="320" height="178.5"/>
-                                                    <color key="backgroundColor" red="0.37254901959999998" green="0.65490196079999996" blue="0.8980392157" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                </imageView>
+                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                </view>
                                                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UME-lq-x4a" customClass="GradientView">
                                                     <rect key="frame" x="0.0" y="0.0" width="320" height="178.5"/>
                                                 </view>
                                                 <button opaque="NO" alpha="0.69999999999999996" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RWM-cd-uwh">
-                                                    <rect key="frame" x="16" y="132" width="60" height="30"/>
+                                                    <rect key="frame" x="8" y="132" width="60" height="30"/>
                                                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="SoT-Wd-UJq"/>
@@ -489,7 +489,7 @@ Hello</string>
                                                     </connections>
                                                 </button>
                                                 <textField opaque="NO" clipsSubviews="YES" alpha="0.69999999999999996" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="nickname" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="LwH-X1-QQg">
-                                                    <rect key="frame" x="165" y="132" width="140" height="30"/>
+                                                    <rect key="frame" x="172" y="132" width="140" height="30"/>
                                                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="140" id="DXt-FX-AD1"/>
@@ -506,18 +506,19 @@ Hello</string>
                                                 </textField>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="leadingMargin" secondItem="1IF-Q2-SK9" secondAttribute="leading" constant="8" id="9X9-Pq-2Qa"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="1IF-Q2-SK9" secondAttribute="trailing" constant="-8" id="J1l-be-EpD"/>
-                                                <constraint firstItem="UME-lq-x4a" firstAttribute="centerY" secondItem="1IF-Q2-SK9" secondAttribute="centerY" id="M0J-Ry-XAU"/>
-                                                <constraint firstItem="UME-lq-x4a" firstAttribute="width" secondItem="1IF-Q2-SK9" secondAttribute="width" id="NDc-Gc-ofc"/>
-                                                <constraint firstItem="1IF-Q2-SK9" firstAttribute="leading" secondItem="RWM-cd-uwh" secondAttribute="trailing" constant="-76" id="Qb1-QI-Ibv"/>
-                                                <constraint firstAttribute="topMargin" secondItem="1IF-Q2-SK9" secondAttribute="top" constant="8" id="Sn9-nL-Ufm"/>
-                                                <constraint firstItem="UME-lq-x4a" firstAttribute="centerX" secondItem="1IF-Q2-SK9" secondAttribute="centerX" id="cfC-4A-Zyy"/>
-                                                <constraint firstItem="RWM-cd-uwh" firstAttribute="top" secondItem="1IF-Q2-SK9" secondAttribute="bottom" constant="-46.5" id="hBp-R2-Qun"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="UME-lq-x4a" secondAttribute="trailing" constant="-8" id="2Tm-XH-OfA"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="68d-dJ-p8h" secondAttribute="bottom" constant="-8" id="3ID-9X-w1e"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="RWM-cd-uwh" secondAttribute="bottom" constant="8.5" id="9Uz-tT-0Yr"/>
+                                                <constraint firstItem="LwH-X1-QQg" firstAttribute="top" secondItem="RWM-cd-uwh" secondAttribute="top" id="AqC-Jt-mpI"/>
+                                                <constraint firstItem="UME-lq-x4a" firstAttribute="leading" secondItem="1Vt-fH-dtR" secondAttribute="leadingMargin" constant="-8" id="DIs-SH-5ZA"/>
+                                                <constraint firstItem="UME-lq-x4a" firstAttribute="top" secondItem="1Vt-fH-dtR" secondAttribute="topMargin" constant="-8" id="IA4-ox-JEe"/>
+                                                <constraint firstItem="RWM-cd-uwh" firstAttribute="leading" secondItem="1Vt-fH-dtR" secondAttribute="leadingMargin" id="K4a-Ob-YEj"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="UME-lq-x4a" secondAttribute="bottom" constant="-8" id="SSA-rD-ght"/>
+                                                <constraint firstItem="68d-dJ-p8h" firstAttribute="leading" secondItem="1Vt-fH-dtR" secondAttribute="leadingMargin" constant="-8" id="dYp-gz-s0Z"/>
+                                                <constraint firstItem="68d-dJ-p8h" firstAttribute="top" secondItem="1Vt-fH-dtR" secondAttribute="topMargin" constant="-8" id="fCJ-QM-G2D"/>
                                                 <constraint firstItem="LwH-X1-QQg" firstAttribute="top" secondItem="RWM-cd-uwh" secondAttribute="top" id="l08-2o-auV"/>
-                                                <constraint firstItem="UME-lq-x4a" firstAttribute="height" secondItem="1IF-Q2-SK9" secondAttribute="height" id="nSa-hA-N2w"/>
-                                                <constraint firstItem="LwH-X1-QQg" firstAttribute="leading" secondItem="1IF-Q2-SK9" secondAttribute="trailing" constant="-155" id="uQk-zG-Tza"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="1IF-Q2-SK9" secondAttribute="bottom" constant="-8" id="yMF-Lo-gRY"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="LwH-X1-QQg" secondAttribute="trailing" id="uIT-4w-Me3"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="68d-dJ-p8h" secondAttribute="trailing" constant="-8" id="uKs-vC-Xm1"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -649,9 +650,9 @@ Hello</string>
                         <outlet property="editPhotoBut" destination="RWM-cd-uwh" id="Z3c-qE-ZcL"/>
                         <outlet property="gradientView" destination="UME-lq-x4a" id="keT-HK-AwA"/>
                         <outlet property="introTF" destination="h7j-VL-XeK" id="24m-j4-kGk"/>
+                        <outlet property="mediaView" destination="68d-dJ-p8h" id="XxC-ew-e9b"/>
                         <outlet property="nicknameTF" destination="LwH-X1-QQg" id="C7d-Bx-1mA"/>
                         <outlet property="pointsLB" destination="WMC-4b-iUC" id="5Uf-9L-Jie"/>
-                        <outlet property="profileView" destination="1IF-Q2-SK9" id="V0O-44-Amd"/>
                         <outlet property="sexTF" destination="9Kg-EN-tI9" id="PJn-Xr-vKf"/>
                     </connections>
                 </tableViewController>

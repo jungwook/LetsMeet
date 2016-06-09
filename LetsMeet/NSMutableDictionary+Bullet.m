@@ -380,7 +380,7 @@
 
 
 @implementation User
-@dynamic nickname,location,locationUdateAt, sex, age, intro,  profilePhoto, originalPhoto, isSimulated, profileVideo, profileMediaType;
+@dynamic nickname,location,locationUdateAt, sex, age, intro, isSimulated, profileMedia, profileMediaType;
 
 + (instancetype) me
 {

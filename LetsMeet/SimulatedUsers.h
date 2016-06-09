@@ -10,4 +10,5 @@
 
 @interface SimulatedUsers : NSObject
 + (void) createUsers;
++ (void) resetUsers;
 @end
