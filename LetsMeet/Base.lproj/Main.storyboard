@@ -344,7 +344,7 @@
                                 <rect key="frame" x="0.0" y="92" width="320" height="80"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="mI3-eP-eqr" id="x4i-aO-i9i">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="79.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="79"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AEm-8n-IFh">
@@ -463,18 +463,18 @@ Hello</string>
                             <tableViewSection headerTitle="PROFILE" footerTitle="" id="Aga-Ie-ce7">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="PointsCell" rowHeight="179" id="B30-x9-ZAA">
-                                        <rect key="frame" x="0.0" y="113.5" width="320" height="179"/>
+                                        <rect key="frame" x="0.0" y="114" width="320" height="179"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="B30-x9-ZAA" id="1Vt-fH-dtR">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="178.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="178"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="68d-dJ-p8h" customClass="MediaView">
-                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="178.5"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="178"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 </view>
                                                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UME-lq-x4a" customClass="GradientView">
-                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="178.5"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="178"/>
                                                 </view>
                                                 <button opaque="NO" alpha="0.69999999999999996" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RWM-cd-uwh">
                                                     <rect key="frame" x="8" y="132" width="60" height="30"/>
@@ -527,10 +527,10 @@ Hello</string>
                             <tableViewSection headerTitle="POINTS" footerTitle="" id="LJ4-fr-RcA">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="PointsCell" rowHeight="45" id="arW-O6-gi6">
-                                        <rect key="frame" x="0.0" y="342.5" width="320" height="45"/>
+                                        <rect key="frame" x="0.0" y="344" width="320" height="45"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="arW-O6-gi6" id="Ukv-YV-fL4">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="44.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textField opaque="NO" clipsSubviews="YES" alpha="0.69999999999999996" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="30대" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Xw7-Qn-UXe">
@@ -598,10 +598,10 @@ Hello</string>
                             <tableViewSection headerTitle="POINTS" footerTitle="" id="uOy-gL-Esq">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="PointsCell" rowHeight="45" id="I9P-oA-dfm">
-                                        <rect key="frame" x="0.0" y="437.5" width="320" height="45"/>
+                                        <rect key="frame" x="0.0" y="440" width="320" height="45"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="I9P-oA-dfm" id="bDx-l6-hix">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="44.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gdG-8O-2bi">

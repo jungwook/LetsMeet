@@ -14,9 +14,9 @@
 @property (nonatomic, strong) AVPlayerLayer *playerLayer;
 @property (nonatomic, strong) CALayer *photoLayer;
 @property (nonatomic, strong) FrameChangedBlock frameChangedBlock;
-@property (nonatomic, assign) ProfileMediaTypes profileMediaType;
 @property (nonatomic, strong) UIButton *playButton;
-@property (nonatomic, strong) UIView *contentView;
+@property (nonatomic, strong) UIView *playerView;
+@property (nonatomic, strong) UIView *photoView;
 @property (nonatomic, strong) UITapGestureRecognizer *tap;
 @end
 
@@ -28,7 +28,9 @@
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        self.contentView = [UIView new];
+        self.photoView = [UIView new];
+        self.playerView = [UIView new];
+        
         self.playerItem = nil;
         self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
         self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
@@ -38,18 +40,23 @@
         
         self.playButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [self.playButton setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
-
         [self.playButton addTarget:self action:@selector(playItem) forControlEvents:UIControlEventTouchUpInside];
+        [self.playButton setExclusiveTouch:YES];
+        
         [self addGestureRecognizer:self.tap];
         
-        [self addSubview:self.contentView];
-        [self addSubview:self.playButton];
+        [self addSubview:self.photoView];
+        [self addSubview:self.playerView];
         
         [self.playerLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
-        [self.contentView.layer addSublayer:self.playerLayer];
-        [self.contentView.layer addSublayer:self.photoLayer];
+        [self.playerView.layer addSublayer:self.playerLayer];
+        [self.photoView.layer addSublayer:self.photoLayer];
+        [self.playerView addSubview:self.playButton];
+        [self.playerView addGestureRecognizer:self.tap];
         
-        [self hidePlayButton];
+        self.playerView.alpha = 0.0f;
+        self.photoView.alpha = 0.0f;
+        self.playButton.alpha = 0.0f;
     }
     
     return self;
@@ -64,11 +71,12 @@
     CGRect r = self.bounds;
     CGRect f1 = CGRectMake((r.size.width-s)/2.0f,(r.size.height-s)/2.0f-25,s,s);
     
-    self.contentView.frame = self.bounds;
+    self.playerView.frame = self.bounds;
+    self.photoView.frame = self.bounds;
     
     self.playButton.frame = f1;
-    self.playerLayer.frame = self.bounds;
-    self.photoLayer.frame = self.bounds;
+    self.playerLayer.frame = self.playerView.bounds;
+    self.photoLayer.frame = self.photoView.bounds;
 }
 
 - (void)setMediaFromUser:(User *)user frameBlock:(FrameChangedBlock)frameBlock
@@ -77,25 +85,24 @@
     [self setMediaFromUser:user];
 }
 
-- (void)setProfileMediaType:(ProfileMediaTypes)profileMediaType
+- (void)showPhotoView
 {
-    _profileMediaType = profileMediaType;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:0.5 animations:^{
+            self.photoView.alpha = 1.0f;
+            self.playerView.alpha = 0.0f;
+        }];
+    });
 }
 
-- (void)showPlayer
+- (void)showPlayerView
 {
-    self.photoLayer.hidden = YES;
-    self.playerLayer.hidden = NO;
-    
-    [self addGestureRecognizer:self.tap];
-}
-
-- (void)hidePlayer
-{
-    self.photoLayer.hidden = NO;
-    self.playerLayer.hidden = YES;
-    
-    [self removeGestureRecognizer:self.tap];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:0.5 animations:^{
+            self.photoView.alpha = 0.0f;
+            self.playerView.alpha = 1.0f;
+        }];
+    });
 }
 
 - (void)setMediaFromUser:(User *)user
@@ -104,14 +111,14 @@
     
     NSURL *url = [NSURL URLWithString:[S3LOCATION stringByAppendingString:user.profileMedia]];
     
-    [self setProfileMediaType:user.profileMediaType];
     [self pauseItem];
     
     switch (user.profileMediaType) {
         case kProfileMediaPhoto: {
+            // Media Type Photo.
+            [self showPhotoView];
+            
             [S3File getDataFromFile:user.profileMedia completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
-                [self hidePlayButton];
-                [self hidePlayer];
                 UIImage *image = [UIImage imageWithData:data];
                 if (self.frameChangedBlock) {
                     self.frameChangedBlock(image.size);
@@ -126,7 +133,7 @@
         }
             break;
         case kProfileMediaVideo:
-            [self showPlayer];
+            [self showPlayerView];
             [self setPlayerItemURL:url];
             break;
         default:
@@ -139,7 +146,6 @@
     __LF
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.player pause];
-        
         if (url) {
             [self removeObservers];
             self.playerItem = [AVPlayerItem playerItemWithURL:url];
@@ -149,31 +155,19 @@
     });
 }
 
-- (void)showPlayButton
-{
-    [UIView animateWithDuration:1.0f delay:0.5f options:UIViewAnimationOptionCurveEaseOut animations:^{
-        self.playButton.alpha = 1.0f;
-    } completion:^(BOOL finished) {
-        
-    }];
-}
-
-- (void)hidePlayButton
-{
-    [UIView animateWithDuration:1.0f delay:0.5f options:UIViewAnimationOptionCurveEaseOut animations:^{
-        self.playButton.alpha = 0.0f;
-    } completion:^(BOOL finished) {
-        
-    }];
-}
-
 - (void)playerItemStalled:(NSNotification *)notification
 {
     __LF
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.player play];
-        [self showPlayButton];
     });
+}
+
+- (void)showPlayButton:(BOOL)show
+{
+    [UIView animateWithDuration:1.0f delay:0.5f options:UIViewAnimationOptionCurveEaseOut animations:^{
+        self.playButton.alpha = show;
+    } completion:nil];
 }
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification
@@ -182,25 +176,35 @@
     [self.player seekToTime:kCMTimeZero];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self showPlayButton];
+        [self reframe];
+        [self setNeedsLayout];
+        [self showPlayButton:YES];
     });
 }
 
 - (void)playItem
 {
     __LF
+    [self.player play];
+
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.player play];
-        [self hidePlayButton];
+        [self showPlayButton:NO];
     });
+}
+
+- (void)pause
+{
+    __LF;
+    [self pauseItem];
 }
 
 - (void)pauseItem
 {
     __LF
+    [self.player pause];
+    
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.player pause];
-        [self showPlayButton];
+        [self showPlayButton:YES];
     });
 }
 
@@ -220,10 +224,8 @@
     if (object == self.playerItem && [keyPath isEqualToString:@"status"]) {
         switch (self.playerItem.status) {
             case AVPlayerItemStatusReadyToPlay: {
-                [self.layer setFrame:self.bounds];
-                [self showPlayer];
-                [self reframe];
-                [self showPlayButton];
+                [self showPlayerView];
+                [self playerItemDidReachEnd:nil];
             }
                 break;
             case AVPlayerItemStatusFailed:

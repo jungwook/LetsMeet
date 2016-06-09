@@ -16,4 +16,5 @@ typedef void(^FrameChangedBlock)(CGSize size);
 - (void) setMediaFromUser:(User*)user;
 - (void) setMediaFromUser:(User*)user frameBlock:(FrameChangedBlock)frameBlock;
 - (void) setPlayerItemURL:(NSURL *)url;
+- (void) pause;
 @end

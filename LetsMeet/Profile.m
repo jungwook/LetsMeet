@@ -122,6 +122,7 @@
     [super viewDidLoad];
     
 //    [self setShadowOnView:self.editPhotoBut];
+    self.editPhotoBut.exclusiveTouch = YES;
     self.nicknameTF.text = self.me.nickname;
     self.gradientView.hidden = YES;
     
@@ -170,7 +171,10 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
     
     NSURL *outputURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"profile_video.mov"];
     
-    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"PLAYING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        [self.mediaView setPlayerItemURL:url];
+    });
     [self convertVideoToLowQuailtyWithInputURL:url outputURL:outputURL handler:^(AVAssetExportSession *exportSession)
     {
         if (exportSession.status == AVAssetExportSessionStatusCompleted) {
@@ -209,6 +213,8 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
 }
  
 - (IBAction)editPhoto:(id)sender {
+    [self.mediaView pause];
+    
     [ImagePicker proceedWithParentViewController:self photoSelectedBlock:^(id data, BulletTypes type, NSString *sizeString, NSURL *url) {
         if (type == kBulletTypePhoto) {
             [S3File saveData:data named:@"profile.jpg" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
@@ -226,7 +232,6 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
             }];
         }
         else if (type == kBulletTypeVideo) {
-            [self.mediaView setPlayerItemURL:url];
             [self treatVideoOfType:type url:url];
         }
     } cancelBlock:nil];
