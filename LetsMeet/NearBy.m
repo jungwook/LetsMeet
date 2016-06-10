@@ -7,6 +7,7 @@
 //
 
 #import "NearBy.h"
+#import "NearByCell.h"
 #import "RefreshControl.h"
 #import "FileSystem.h"
 
@@ -19,7 +20,7 @@
 
 @implementation NearBy
 
-static NSString * const reuseIdentifier = @"Square";
+static NSString * const reuseIdentifier = @"NearByCell";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -31,8 +32,6 @@ static NSString * const reuseIdentifier = @"Square";
         [self reloadAllUsers];
     }];
     [self.collectionView addSubview:self.refresh];
-//    [self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:reuseIdentifier];
-    
     [self.refresh beginRefreshing];
     [self reloadAllUsers];
 }
@@ -86,10 +85,34 @@ static NSString * const reuseIdentifier = @"Square";
     return self.users.count;
 }
 
+typedef void (^NearByCellBlock)(NearByCell *cell);
+
+- (void)updateCellForUserId:(id)userId block:(NearByCellBlock)block
+{
+    NSArray *visible = [self.collectionView visibleCells];
+    [visible enumerateObjectsUsingBlock:^(NearByCell* cell, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([cell.user.objectId isEqualToString:userId]) {
+            if (block)
+                block(cell);
+            *stop = YES;
+        }
+    }];
+}
+
+
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:reuseIdentifier forIndexPath:indexPath];
+    NearByCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:reuseIdentifier forIndexPath:indexPath];
     
     // Configure the cell
+    
+    NSUInteger row = indexPath.row;
+    
+    User*user = [self.users objectAtIndex:row];
+    [cell setUser:user completion:^(User *user, NSData* data) {
+        [self updateCellForUserId:user.objectId block:^(NearByCell *cell) {
+            [cell setUserProfileImageWithData:data];
+        }];
+    }];
     
     return cell;
 }

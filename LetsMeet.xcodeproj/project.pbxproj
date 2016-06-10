@@ -28,6 +28,7 @@
 		1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A51D03B3CA00E44642 /* BaseFunctions.m */; };
 		1296A7A91D03BB5500E44642 /* Notifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A81D03BB5500E44642 /* Notifications.m */; };
 		1296A7AC1D03E0CA00E44642 /* Profile.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7AB1D03E0CA00E44642 /* Profile.m */; };
+		129B07531D0AAAB5000C0276 /* NearByCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 129B07521D0AAAB5000C0276 /* NearByCell.m */; };
 		12DE5FA61CFD40DD009B315F /* MessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FA51CFD40DD009B315F /* MessageCell.m */; };
 		12DE5FA91CFD43A7009B315F /* Balloon.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FA81CFD43A7009B315F /* Balloon.m */; };
 		12DE5FB31CFEF58A009B315F /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12DE5FB21CFEF58A009B315F /* Photos.framework */; };
@@ -119,6 +120,8 @@
 		1296A7A81D03BB5500E44642 /* Notifications.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifications.m; sourceTree = "<group>"; };
 		1296A7AA1D03E0CA00E44642 /* Profile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Profile.h; sourceTree = "<group>"; };
 		1296A7AB1D03E0CA00E44642 /* Profile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Profile.m; sourceTree = "<group>"; };
+		129B07511D0AAAB5000C0276 /* NearByCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NearByCell.h; sourceTree = "<group>"; };
+		129B07521D0AAAB5000C0276 /* NearByCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NearByCell.m; sourceTree = "<group>"; };
 		12DE5FA41CFD40DD009B315F /* MessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageCell.h; sourceTree = "<group>"; };
 		12DE5FA51CFD40DD009B315F /* MessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageCell.m; sourceTree = "<group>"; };
 		12DE5FA71CFD43A7009B315F /* Balloon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Balloon.h; sourceTree = "<group>"; };
@@ -237,7 +240,6 @@
 		126AF4081CEDADE800E3ED67 /* Views etc */ = {
 			isa = PBXGroup;
 			children = (
-				12F741931CE4B97100E8267A /* Main.storyboard */,
 				12DE5FB61CFFB1A2009B315F /* Preview.h */,
 				12DE5FB71CFFB1A2009B315F /* Preview.m */,
 				126AF3F41CEA983800E3ED67 /* MessageBar.h */,
@@ -274,6 +276,15 @@
 				12F0D7151D0A773000A37C40 /* TextFieldAlert.m */,
 			);
 			name = "Views etc";
+			sourceTree = "<group>";
+		};
+		129B07541D0AAABB000C0276 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				129B07511D0AAAB5000C0276 /* NearByCell.h */,
+				129B07521D0AAAB5000C0276 /* NearByCell.m */,
+			);
+			name = Cells;
 			sourceTree = "<group>";
 		};
 		12DE5FDF1D02BC1F009B315F /* File Manager */ = {
@@ -380,6 +391,8 @@
 		12F741D31CE56DD400E8267A /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				12F741931CE4B97100E8267A /* Main.storyboard */,
+				129B07541D0AAABB000C0276 /* Cells */,
 				12F741D81CE56F4300E8267A /* MainController.h */,
 				12F741D91CE56F4300E8267A /* MainController.m */,
 				12F741ED1CE593A500E8267A /* Menu.h */,
@@ -527,6 +540,7 @@
 				126AF40B1CEDAE0E00E3ED67 /* IndentedLabel.m in Sources */,
 				125AEF3C1CF9F08300553475 /* SimulatedUsers.m in Sources */,
 				12F0D7131D0A3B8800A37C40 /* Signup.m in Sources */,
+				129B07531D0AAAB5000C0276 /* NearByCell.m in Sources */,
 				1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */,
 				12F741DA1CE56F4300E8267A /* MainController.m in Sources */,
 				12F0D7161D0A773000A37C40 /* TextFieldAlert.m in Sources */,
