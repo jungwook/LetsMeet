@@ -109,6 +109,8 @@
 {
     __LF
     
+    if (!user.profileMedia)
+        return;
     NSURL *url = [NSURL URLWithString:[S3LOCATION stringByAppendingString:user.profileMedia]];
     
     [self pauseItem];

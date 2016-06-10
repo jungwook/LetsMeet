@@ -124,13 +124,14 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
 @property (retain) NSString* age;
 @property (retain) NSString* intro;
 @property (retain) NSString* profileMedia;
+@property (retain) NSString* thumbnail;
 @property ProfileMediaTypes profileMediaType;
 
 @property BOOL isSimulated;
 @property SexTypes sex;
 
 + (instancetype) me;
-- (void) createMe:(NewUserBlock)block;
++ (void) createMe;
 - (void) removeMe;
 - (NSString*) sexString;
 - (BOOL) profileIsVideo;

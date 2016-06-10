@@ -8,11 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "MainController.h"
+#import "FileSystem.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 @property (strong, nonatomic) MainController *mainMenu;
+@property (strong, nonatomic) FileSystem *system;
 
 + (AppDelegate *)globalDelegate;
 + (void)toggleMenu;

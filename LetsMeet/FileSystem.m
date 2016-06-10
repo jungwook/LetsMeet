@@ -8,8 +8,7 @@
 
 #import "FileSystem.h"
 #import "CachedFile.h"
-
-
+#import "Signup.h"
 
 @interface FileSystem()
 @property (nonatomic, strong) CLLocationManager *locationManager;
@@ -21,6 +20,7 @@
 @property (nonatomic, strong) NSFileManager *manager;
 @property (nonatomic, strong) NSMutableDictionary *bullets;
 @property (nonatomic, weak) User* me;
+@property (nonatomic, strong) NSTimer *timeKeeper;
 @end
 
 @implementation FileSystem 
@@ -40,42 +40,56 @@
     __LF
     self = [super init];
     if (self) {
-        NSError *error = nil;
+//        [PFUser logOut];
         self.me = [User me];
-        
-        
-//        [PFUser logOut];
-//        [PFUser logInWithUsername:@"5363EA36-7EB0-420F-9122-61E94CF25046" password:@"5363EA36-7EB0-420F-9122-61E94CF25046"];
-        
-//        [PFUser logOut];
-//        [PFUser logInWithUsername:@"희라" password:@"희라"];
-        
-        // If me is nil then need to find a way of loging in a new user.
-        if (!self.me) {
-            [self.me createMe:nil];
+        if (self.me) {
+            [self.me fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+                [self initializeSystem];
+            }];
         }
         else {
-            [self.me fetchInBackground];
+            [User createMe];
+            [self initializeSystem];
         }
-        
-        self.applicationPath = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-        self.systemPath = [self.applicationPath URLByAppendingPathComponent:@"Engine"];
-        self.usersPath = [self.systemPath URLByAppendingPathComponent:@"Users"];
-        self.messagesDirectoryPath = [self.systemPath URLByAppendingPathComponent:@"Messages"];
-        self.manager = [NSFileManager defaultManager];
-        self.bullets = [NSMutableDictionary dictionary];
-        
-        BOOL ret = [self.manager createDirectoryAtURL:self.messagesDirectoryPath withIntermediateDirectories:YES attributes:nil error:&error];
-        if (!ret) {
-            NSLog(@"ERROR:%@", error.localizedDescription);
-            NSLog(@"ERROR:%@", error.localizedRecoverySuggestion);
-        } else {
-            NSLog(@"SYSTEM & MESSAGES PATH[%@] SUCCESSFULLY SETUP", [self.messagesDirectoryPath path]);
-        }
-        [self load];
-        [self initLocationServices];
     }
     return self;
+}
+
+- (void) initializeSystem
+{
+    __LF
+    NSError *error = nil;
+
+    self.applicationPath = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+    self.systemPath = [self.applicationPath URLByAppendingPathComponent:@"Engine"];
+    self.usersPath = [self.systemPath URLByAppendingPathComponent:@"Users"];
+    self.messagesDirectoryPath = [self.systemPath URLByAppendingPathComponent:@"Messages"];
+    self.manager = [NSFileManager defaultManager];
+    self.bullets = [NSMutableDictionary dictionary];
+    
+    BOOL ret = [self.manager createDirectoryAtURL:self.messagesDirectoryPath withIntermediateDirectories:YES attributes:nil error:&error];
+    if (!ret) {
+        NSLog(@"ERROR:%@", error.localizedDescription);
+        NSLog(@"ERROR:%@", error.localizedRecoverySuggestion);
+    } else {
+        NSLog(@"SYSTEM & MESSAGES PATH[%@] SUCCESSFULLY SETUP", [self.messagesDirectoryPath path]);
+    }
+    [self load];
+    [self initLocationServices];
+    self.timeKeeper = [NSTimer scheduledTimerWithTimeInterval:5.0f
+                                                       target:self
+                                                     selector:@selector(timeKeep)
+                                                     userInfo:nil
+                                                      repeats:NO];
+}
+
+- (void) timeKeep
+{
+    static int count = 0;
+    
+    if ((++count)%10 == 0  && self.isSimulator) {
+        [self fetchOutstandingBullets];
+    }
 }
 
 - (NSArray*)usersInTheSystem
@@ -503,31 +517,5 @@ The - (void) initLocationServices method initializes the location management sys
             break;
     }
 }
-
-- (void) timeKeep
-{
-    __LF
-
-    static NSTimer *timeKeeper;
-    
-    if (![PFUser currentUser]) {
-        NSLog(@"NO USER LOGGED IN SO TRY AGAIN IN 5 SECS");
-        timeKeeper = [NSTimer scheduledTimerWithTimeInterval:5.0f
-                                                           target:self
-                                                         selector:@selector(timeKeep)
-                                                         userInfo:nil
-                                                          repeats:NO];
-        return;
-    }
-    
-    [self fetchOutstandingBullets];
-    timeKeeper = [NSTimer scheduledTimerWithTimeInterval:60.0f
-                                                       target:self
-                                                     selector:@selector(timeKeep)
-                                                     userInfo:nil
-                                                      repeats:NO];
-    NSLog(@"TIMEKEEPER KICKING IN...");
-}
-
 @end
 

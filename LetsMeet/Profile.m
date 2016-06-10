@@ -14,6 +14,7 @@
 #import "ImagePicker.h"
 #import "MediaView.h"
 #import "S3File.h"
+#import "TextFieldAlert.h"
 
 @interface UIImageView(animated)
 - (void)setImage:(UIImage *)image animated:(BOOL)animated;
@@ -118,37 +119,56 @@
     view.clipsToBounds = NO;
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    __LF
+    [super viewWillAppear:animated];
+    self.me = [User me];
+    
+    if (!self.me.nickname) {
+        [TextFieldAlert alertWithTitle:@"Set Nickname" message:@"Please input nickname\nYou cannot change your nickname" onViewController:self stringEnteredBlock:^(NSString *string) {
+            self.nicknameTF.text = string;
+            self.navigationItem.title = string;
+            self.me.nickname = string;
+            [self viewWillAppear:YES];
+            [self.me saveInBackground];
+        }];
+    }
+    self.navigationItem.title = self.me.nickname;
+    
+    if (self.me) {
+        self.editPhotoBut.exclusiveTouch = YES;
+        self.nicknameTF.text = self.me.nickname;
+        
+        self.introTF.text = self.me.intro ? self.me.intro : @"";
+        [ListPicker pickerWithArray:@[@"우리 만나요!", @"애인 찾아요", @"함께 드라이브 해요", @"나쁜 친구 찾아요", @"착한 친구 찾아요", @"함께 먹으러 가요", @"술친구 찾아요"] onTextField:self.introTF selection:^(id data) {
+            self.me.intro = data;
+            [self.me saveInBackground];
+        }];
+        
+        self.ageTF.text = self.me.age;
+        [ListPicker pickerWithArray:@[@"고딩", @"20대", @"30대", @"40대", @"비밀"] onTextField:self.ageTF selection:^(id data) {
+            self.me.age = data;
+            [self.me saveInBackground];
+        }];
+        
+        self.sexTF.text = self.me.sexString;
+        [ListPicker pickerWithArray:@[@"여자", @"남자"] onTextField:self.sexTF selection:^(id data) {
+            self.me.sex = [data isEqualToString:@"여자"] ? kSexFemale : kSexMale ;
+            [self.me saveInBackground];
+        }];
+        
+        [self.mediaView setMediaFromUser:self.me frameBlock:^(CGSize size) {
+            NSLog(@"REFRAMING:%@", NSStringFromCGSize(size));
+            self.photoHeight = size.width ? self.mediaView.frame.size.width * size.height / size.width + 20 : 400;
+            [self.tableView reloadData];
+        }];
+    }
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-//    [self setShadowOnView:self.editPhotoBut];
-    self.editPhotoBut.exclusiveTouch = YES;
-    self.nicknameTF.text = self.me.nickname;
     self.gradientView.hidden = YES;
-    
-    self.introTF.text = self.me.intro ? self.me.intro : @"";
-    [ListPicker pickerWithArray:@[@"우리 만나요!", @"애인 찾아요", @"함께 드라이브 해요", @"나쁜 친구 찾아요", @"착한 친구 찾아요", @"함께 먹으러 가요", @"술친구 찾아요"] onTextField:self.introTF selection:^(id data) {
-        self.me.intro = data;
-        [self.me saveInBackground];
-    }];
-    
-    self.ageTF.text = self.me.age;
-    [ListPicker pickerWithArray:@[@"고딩", @"20대", @"30대", @"40대", @"비밀"] onTextField:self.ageTF selection:^(id data) {
-        self.me.age = data;
-        [self.me saveInBackground];
-    }];
-    
-    self.sexTF.text = self.me.sexString;
-    [ListPicker pickerWithArray:@[@"여자", @"남자"] onTextField:self.sexTF selection:^(id data) {
-        self.me.sex = [data isEqualToString:@"여자"] ? kSexFemale : kSexMale ;
-        [self.me saveInBackground];
-    }];
-    
-    [self.mediaView setMediaFromUser:self.me frameBlock:^(CGSize size) {
-        NSLog(@"REFRAMING:%@", NSStringFromCGSize(size));
-        self.photoHeight = size.width ? self.mediaView.frame.size.width * size.height / size.width + 20 : 400;
-        [self.tableView reloadData];
-    }];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -166,38 +186,44 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
     return [UIImage imageWithCGImage:image.CGImage scale:1.0f orientation:orientation];
 }
 
-- (void) treatVideoOfType:(BulletTypes)type url:(NSURL*)url
+- (void) treatVideoOfType:(BulletTypes)type url:(NSURL*)url thumbnail:(NSData*)data
 {
-    
     NSURL *outputURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"profile_video.mov"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"PLAYING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         [self.mediaView setPlayerItemURL:url];
     });
-    [self convertVideoToLowQuailtyWithInputURL:url outputURL:outputURL handler:^(AVAssetExportSession *exportSession)
-    {
-        if (exportSession.status == AVAssetExportSessionStatusCompleted) {
-            NSData *videoData = [NSData dataWithContentsOfURL:outputURL];
-            
-            [S3File saveData:videoData named:@"profile.mov" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-                if (succeeded) {
-                    NSLog(@"SAVED FILENAME:%@", file);
-                    self.me.profileMediaType = kProfileMediaVideo;
-                    self.me.profileMedia = file;
-                    [self.me saveInBackground];
-                    
-                    // DELETING TEMP FILE AFTER UPLOAD
-                    [[NSFileManager defaultManager] removeItemAtURL:outputURL error:nil];
-                }
-                else {
-                    NSLog(@"ERROR:%@", error.localizedDescription);
-                }
-            } progressBlock:^(int percentDone) {
-                NSLog(@"Saving Progress:%d", percentDone);
-            }];
-        }
-    }];
+    
+    [S3File saveData:compressedImageData(data, 400) named:@"thumbnail.jpg" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+        self.me.thumbnail = file;
+        [self.me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+            if (succeeded) {
+                [self convertVideoToLowQuailtyWithInputURL:url outputURL:outputURL handler:^(AVAssetExportSession *exportSession)
+                 {
+                     if (exportSession.status == AVAssetExportSessionStatusCompleted) {
+                         NSData *videoData = [NSData dataWithContentsOfURL:outputURL];
+                         
+                         [S3File saveData:videoData named:@"profile.mov" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+                             if (succeeded) {
+                                 NSLog(@"SAVED FILENAME:%@", file);
+                                 self.me.profileMediaType = kProfileMediaVideo;
+                                 self.me.profileMedia = file;
+                                 [self.me saveInBackground];
+                                 
+                                 // DELETING TEMP FILE AFTER UPLOAD
+                                 [[NSFileManager defaultManager] removeItemAtURL:outputURL error:nil];
+                             }
+                             else {
+                                 NSLog(@"ERROR:%@", error.localizedDescription);
+                             }
+                         } progressBlock:^(int percentDone) {
+                             NSLog(@"Saving Progress:%d", percentDone);
+                         }];
+                     }
+                 }];
+            }
+        }];
+    } progressBlock:nil];
 }
 
 - (void)convertVideoToLowQuailtyWithInputURL:(NSURL*)inputURL outputURL:(NSURL*)outputURL handler:(void (^)(AVAssetExportSession*))handler {
@@ -232,7 +258,7 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
             }];
         }
         else if (type == kBulletTypeVideo) {
-            [self treatVideoOfType:type url:url];
+            [self treatVideoOfType:type url:url thumbnail:data];
         }
     } cancelBlock:nil];
 }

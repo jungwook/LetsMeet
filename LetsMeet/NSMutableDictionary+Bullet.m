@@ -380,7 +380,7 @@
 
 
 @implementation User
-@dynamic nickname,location,locationUdateAt, sex, age, intro, isSimulated, profileMedia, profileMediaType;
+@dynamic nickname,location,locationUdateAt, sex, age, intro, isSimulated, profileMedia, thumbnail, profileMediaType;
 
 + (instancetype) me
 {
@@ -396,42 +396,33 @@
     }
 }
 
-- (void) createMe:(NewUserBlock)block
++ (void) createMe
 {
     User *user = [User me];
     if ([User me])
         return;
     
-    NSString *username = [self uniqueUsername];
+    NSString *username = [User uniqueUsername];
     user = [User user];
     user.username = username;
     user.password = username;
     
-    [user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-        if (succeeded) {
-            [PFUser logInWithUsernameInBackground:user.username password:user.password block:^(PFUser * _Nullable loggedInUser, NSError * _Nullable error) {
-                
-                PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-                if (!currentInstallation[@"user"]) {
-                    currentInstallation[@"user"] = user;
-                    [currentInstallation saveInBackground];
-                    NSLog(@"CURRENT INSTALLATION: saving user to Installation");
-                }
-                else {
-                    NSLog(@"CURRENT INSTALLATION: Installation already has user. No need to set");
-                }
-                if (block) {
-                    block([User me]);
-                }
-            }];
+    BOOL succeeded = [user signUp];
+    if (succeeded) {
+        [PFUser logInWithUsername:username password:username];
+        PFInstallation *currentInstallation = [PFInstallation currentInstallation];
+        if (!currentInstallation[@"user"]) {
+            currentInstallation[@"user"] = user;
+            [currentInstallation saveInBackground];
+            NSLog(@"CURRENT INSTALLATION: saving user to Installation");
         }
         else {
-            NSLog(@"CANNOT SIGNUP NEW USER");
+            NSLog(@"CURRENT INSTALLATION: Installation already has user. No need to set");
         }
-    }];
+    }
 }
 
-- (NSString*) uniqueUsername
++ (NSString*) uniqueUsername
 {
     NSString *cudid = [[NSUserDefaults standardUserDefaults] objectForKey:@"UNIQUEDEVICEID"];
     NSString *idString;

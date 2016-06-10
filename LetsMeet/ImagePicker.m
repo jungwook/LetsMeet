@@ -38,6 +38,7 @@
         self.pickerBlock = actionBlock;
         self.cancelBlock = cancelBlock;
         self.videoQuality = UIImagePickerControllerQualityType640x480;
+        self.allowsEditing = TRUE;
         self.modalPresentationStyle = UIModalPresentationOverCurrentContext;
         self.videoMaximumDuration = 10;
         [self.parent setNavigationBarHidden:YES animated:YES];
@@ -184,7 +185,7 @@
 
 - (void) handlePhoto:(NSDictionary<NSString*, id>*)info url:(NSURL*)url
 {
-    UIImage *image = (UIImage *) [info objectForKey:UIImagePickerControllerOriginalImage];
+    UIImage *image = (UIImage *) [info objectForKey:UIImagePickerControllerEditedImage];
     CGSize imageSize = image.size;
     //            UIImageWriteToSavedPhotosAlbum (image, nil, nil , nil);
     image = [self fixOrientation:image];

@@ -37,6 +37,9 @@
 		12DE5FE51D02D523009B315F /* NSMutableDictionary+Bullet.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FE41D02D523009B315F /* NSMutableDictionary+Bullet.m */; };
 		12F0D70D1D06D53D00A37C40 /* MediaPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F0D70C1D06D53D00A37C40 /* MediaPlayer.m */; };
 		12F0D7101D092F8600A37C40 /* MediaView.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F0D70F1D092F8600A37C40 /* MediaView.m */; };
+		12F0D7131D0A3B8800A37C40 /* Signup.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F0D7121D0A3B8800A37C40 /* Signup.m */; };
+		12F0D7161D0A773000A37C40 /* TextFieldAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F0D7151D0A773000A37C40 /* TextFieldAlert.m */; };
+		12F0D7191D0A7C6100A37C40 /* NearBy.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F0D7181D0A7C6100A37C40 /* NearBy.m */; };
 		12F7418C1CE4B97100E8267A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418B1CE4B97100E8267A /* main.m */; };
 		12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418E1CE4B97100E8267A /* AppDelegate.m */; };
 		12F741951CE4B97100E8267A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12F741931CE4B97100E8267A /* Main.storyboard */; };
@@ -133,6 +136,12 @@
 		12F0D70C1D06D53D00A37C40 /* MediaPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaPlayer.m; sourceTree = "<group>"; };
 		12F0D70E1D092F8600A37C40 /* MediaView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaView.h; sourceTree = "<group>"; };
 		12F0D70F1D092F8600A37C40 /* MediaView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaView.m; sourceTree = "<group>"; };
+		12F0D7111D0A3B8800A37C40 /* Signup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Signup.h; sourceTree = "<group>"; };
+		12F0D7121D0A3B8800A37C40 /* Signup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Signup.m; sourceTree = "<group>"; };
+		12F0D7141D0A773000A37C40 /* TextFieldAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextFieldAlert.h; sourceTree = "<group>"; };
+		12F0D7151D0A773000A37C40 /* TextFieldAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextFieldAlert.m; sourceTree = "<group>"; };
+		12F0D7171D0A7C6100A37C40 /* NearBy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NearBy.h; sourceTree = "<group>"; };
+		12F0D7181D0A7C6100A37C40 /* NearBy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NearBy.m; sourceTree = "<group>"; };
 		12F741871CE4B97000E8267A /* LetsMeet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LetsMeet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12F7418B1CE4B97100E8267A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		12F7418D1CE4B97100E8267A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -259,6 +268,10 @@
 				12F0D70C1D06D53D00A37C40 /* MediaPlayer.m */,
 				12F0D70E1D092F8600A37C40 /* MediaView.h */,
 				12F0D70F1D092F8600A37C40 /* MediaView.m */,
+				12F0D7111D0A3B8800A37C40 /* Signup.h */,
+				12F0D7121D0A3B8800A37C40 /* Signup.m */,
+				12F0D7141D0A773000A37C40 /* TextFieldAlert.h */,
+				12F0D7151D0A773000A37C40 /* TextFieldAlert.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -375,6 +388,8 @@
 				1296A7A21D03B34000E44642 /* BaseCollections.m */,
 				1296A7AA1D03E0CA00E44642 /* Profile.h */,
 				1296A7AB1D03E0CA00E44642 /* Profile.m */,
+				12F0D7171D0A7C6100A37C40 /* NearBy.h */,
+				12F0D7181D0A7C6100A37C40 /* NearBy.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -503,6 +518,7 @@
 				124928AF1CF2CD370038A2F3 /* RefreshControl.m in Sources */,
 				12DE5FBB1D004443009B315F /* Progress.m in Sources */,
 				126AF3F61CEA983800E3ED67 /* MessageBar.m in Sources */,
+				12F0D7191D0A7C6100A37C40 /* NearBy.m in Sources */,
 				12F741D21CE56B3400E8267A /* FloatingDrawerViewController.m in Sources */,
 				124928B91CF2ED810038A2F3 /* UIButton+Badge.m in Sources */,
 				1296A7A31D03B34000E44642 /* BaseCollections.m in Sources */,
@@ -510,8 +526,10 @@
 				124928B81CF2ED810038A2F3 /* UIBarButtonItem+Badge.m in Sources */,
 				126AF40B1CEDAE0E00E3ED67 /* IndentedLabel.m in Sources */,
 				125AEF3C1CF9F08300553475 /* SimulatedUsers.m in Sources */,
+				12F0D7131D0A3B8800A37C40 /* Signup.m in Sources */,
 				1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */,
 				12F741DA1CE56F4300E8267A /* MainController.m in Sources */,
+				12F0D7161D0A773000A37C40 /* TextFieldAlert.m in Sources */,
 				12F741D01CE56B3400E8267A /* FloatingDrawerSpringAnimator.m in Sources */,
 				120142E81D08930B00D66905 /* S3File.m in Sources */,
 				1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */,

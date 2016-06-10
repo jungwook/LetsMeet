@@ -18,6 +18,7 @@ typedef void (^FileManagerLoadUserMessagesBlock)(Bullet* userMessages, BOOL succ
 typedef void (^UsersArrayBlock)(NSArray<User*>*users);
 
 @interface FileSystem : NSObject <CLLocationManagerDelegate>
+@property (nonatomic) BOOL isSimulator;
 /**
  The 'loadUserMessages' method loads all
  */
@@ -36,6 +37,9 @@ typedef void (^UsersArrayBlock)(NSArray<User*>*users);
 
 - (void) add:(Bullet*)message for:(id)userId thumbnail:(NSData*)thumbnail originalData:(NSData*)originalData;
 
+/**
+ Looks for users near the currentUser's location through the UsersArrayBlock block.
+ **/
 - (void) usersNearMeInBackground:(UsersArrayBlock)block;
 
 /**
@@ -46,6 +50,6 @@ typedef void (^UsersArrayBlock)(NSArray<User*>*users);
 - (void) readUnreadBulletsWithUserId:(id)userId;
 - (void) fetchOutstandingBullets;
 - (void) treatPushNotificationWith:(NSDictionary *)userInfo;
+- (void) initializeSystem;
 
-- (void) timeKeep; // For the simulator
 @end

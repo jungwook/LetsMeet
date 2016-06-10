@@ -16,6 +16,7 @@
 @implementation MainController
 
 - (void)viewDidLoad {
+    __LF
     [super viewDidLoad];
     [self subscribeToChannelCurrentUser];
     [self initializeMainViewController];
@@ -82,8 +83,6 @@
 {
     UINavigationController *nav = self.screens[screen][@"screen"];
     NSString* title = self.screens[screen][@"title"];
-    
-    NSLog(@"TITLE:%@", title);
     if (nav) {
         self.centerViewController = nav;
         [self.centerViewController setTitle:title];
