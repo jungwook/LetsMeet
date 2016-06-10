@@ -619,8 +619,29 @@ Hello</string>
                                                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" text="age" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rTr-n3-dBH">
-                                                    <rect key="frame" x="356" y="360" width="50" height="30"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="intro" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="grg-qV-zmw">
+                                                    <rect key="frame" x="136" y="360" width="138" height="30"/>
+                                                    <color key="backgroundColor" red="0.68235296010000002" green="0.80392158030000005" blue="0.94509804249999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="100" id="ArC-m2-dtt"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rtX-i6-Flb" customClass="IndentedLabel">
+                                                    <rect key="frame" x="114" y="352" width="21" height="21"/>
+                                                    <color key="backgroundColor" red="0.94117647410000005" green="0.32156863810000003" blue="0.17254902420000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="21" id="CzD-ff-boa"/>
+                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="21" id="orw-tq-PW9"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="12"/>
+                                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="age" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rTr-n3-dBH">
+                                                    <rect key="frame" x="340" y="360" width="50" height="30"/>
                                                     <color key="backgroundColor" red="0.68235296010000002" green="0.80392158030000005" blue="0.94509804249999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="50" id="7iW-n2-Cn8"/>
@@ -629,8 +650,8 @@ Hello</string>
                                                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" text="sex" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mv7-Iq-Fmy">
-                                                    <rect key="frame" x="298" y="360" width="50" height="30"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="sex" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mv7-Iq-Fmy">
+                                                    <rect key="frame" x="282" y="360" width="50" height="30"/>
                                                     <color key="backgroundColor" red="0.68235296010000002" green="0.80392158030000005" blue="0.94509804249999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="50" id="3jR-hB-ibc"/>
@@ -639,20 +660,24 @@ Hello</string>
                                                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="intro" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="grg-qV-zmw">
-                                                    <rect key="frame" x="136" y="360" width="154" height="30"/>
-                                                    <color key="backgroundColor" red="0.68235296010000002" green="0.80392158030000005" blue="0.94509804249999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
-                                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
                                             </subviews>
                                             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                             <constraints>
                                                 <constraint firstAttribute="bottom" secondItem="2CM-zV-QyA" secondAttribute="bottom" constant="8" id="5sQ-fS-7NG"/>
+                                                <constraint firstItem="grg-qV-zmw" firstAttribute="leading" secondItem="2CM-zV-QyA" secondAttribute="trailing" constant="8" id="77t-nc-eJR"/>
+                                                <constraint firstItem="rTr-n3-dBH" firstAttribute="height" secondItem="grg-qV-zmw" secondAttribute="height" id="PBK-G6-hle"/>
+                                                <constraint firstItem="Mv7-Iq-Fmy" firstAttribute="leading" secondItem="grg-qV-zmw" secondAttribute="trailing" constant="8" id="QER-YX-Qqq"/>
+                                                <constraint firstItem="grg-qV-zmw" firstAttribute="height" secondItem="2CM-zV-QyA" secondAttribute="height" id="RGW-QG-u9F"/>
+                                                <constraint firstItem="Mv7-Iq-Fmy" firstAttribute="top" secondItem="2CM-zV-QyA" secondAttribute="top" id="UJm-rc-fiX"/>
                                                 <constraint firstItem="2CM-zV-QyA" firstAttribute="leading" secondItem="4By-kR-3O3" secondAttribute="leading" constant="8" id="ZF6-99-gjh"/>
+                                                <constraint firstItem="rtX-i6-Flb" firstAttribute="leading" secondItem="2CM-zV-QyA" secondAttribute="trailing" constant="-14" id="fYd-2S-ZIE"/>
+                                                <constraint firstItem="rTr-n3-dBH" firstAttribute="top" secondItem="2CM-zV-QyA" secondAttribute="top" id="g3y-Ub-3Oy"/>
+                                                <constraint firstItem="2CM-zV-QyA" firstAttribute="top" secondItem="rtX-i6-Flb" secondAttribute="bottom" constant="-13" id="h7h-ie-JE9"/>
+                                                <constraint firstItem="rTr-n3-dBH" firstAttribute="leading" secondItem="Mv7-Iq-Fmy" secondAttribute="trailing" constant="8" id="it9-f9-Tri"/>
                                                 <constraint firstAttribute="width" secondItem="4By-kR-3O3" secondAttribute="height" multiplier="1:1" id="jIJ-Xi-0gB"/>
+                                                <constraint firstItem="grg-qV-zmw" firstAttribute="top" secondItem="2CM-zV-QyA" secondAttribute="top" id="l4U-La-SaL"/>
                                                 <constraint firstAttribute="trailing" secondItem="rTr-n3-dBH" secondAttribute="trailing" constant="8" id="nYw-me-W1T"/>
+                                                <constraint firstItem="Mv7-Iq-Fmy" firstAttribute="height" secondItem="grg-qV-zmw" secondAttribute="height" id="rBi-ZP-FWK"/>
                                             </constraints>
                                         </view>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&lt;1km" textAlignment="center" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SVa-UY-PES" customClass="IndentedLabel">
@@ -663,17 +688,6 @@ Hello</string>
                                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="65" id="wuU-CD-l1Y"/>
                                             </constraints>
                                             <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
-                                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" text="1" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rtX-i6-Flb" customClass="IndentedLabel">
-                                            <rect key="frame" x="105" y="400" width="21" height="21"/>
-                                            <color key="backgroundColor" red="0.94117647410000005" green="0.32156863810000003" blue="0.17254902420000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="21" id="CzD-ff-boa"/>
-                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="21" id="orw-tq-PW9"/>
-                                            </constraints>
-                                            <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="12"/>
                                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
