@@ -8,6 +8,7 @@
 
 #import "SimulatedUsers.h"
 #import "NSMutableDictionary+Bullet.h"
+#import "S3File.h"
 
 @implementation SimulatedUsers
 
@@ -64,7 +65,6 @@
     
     long age = 20+ arc4random()%30;
     
-//    NSString *username = [[NSUUID UUID] UUIDString];
     User *user = [User user];
     
     user.username = name;
@@ -102,19 +102,94 @@
             UIGraphicsEndImageContext();
             
             UIImage *originalPhoto = scaleImage(newImage, CGSizeMake(1024, 1024));
-            NSData *largeData = UIImageJPEGRepresentation(originalPhoto, kJPEGCompressionMedium);
-
-            PFFile *orig = [PFFile fileWithName:@"original.jpg" data:largeData];
-            [orig save];
             
-//            loggedIn.profileMedia =
-//            loggedIn.originalPhoto = orig;
-            BOOL userSaved = [loggedIn save];
-            NSLog(@"USER %@SUCCESSFULLY SAVED", userSaved ? @"" : @"UN");
+            NSData *largeData = UIImageJPEGRepresentation(originalPhoto, kJPEGCompressionMedium);
+            NSData *tnData = compressedImageData(largeData, 100);
+            
+            NSString *oFN = [loggedIn.objectId stringByAppendingString:@".jpg"];
+            NSString *tFN = [loggedIn.objectId stringByAppendingString:@"TN.jpg"];
+            
+            loggedIn.profileMedia = [self fullname:oFN];
+            loggedIn.thumbnail = [self fullname:tFN];
+            
+            [self saveData:largeData named:oFN completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    NSLog(@"saved profile media [%@/%ld] for %@/%@ ", oFN, largeData.length, loggedIn.username, loggedIn.objectId);
+                }
+            } progressBlock:^(int percentDone) {
+                
+            }];
+            
+            [self saveData:tnData named:tFN completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    NSLog(@"saved thumbnail [%@/%ld] for %@/%@ ", tFN, tnData.length, loggedIn.username, loggedIn.objectId);
+                }
+            } progressBlock:^(int percentDone) {
+                
+            }];
+            
+            [loggedIn save];
         }
     }
     else {
         NSLog(@"ERROR SIGNINGUP USER");
     }
 }
+
+- (NSString*) fullname:(NSString*)filename
+{
+    return [@"ProfileMedia/" stringByAppendingString:filename];
+}
+
+
+- (void) saveData:(NSData *)data named:(id)name completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
+{
+    if (data) {
+        NSString *filename = [self fullname:name];
+        NSString *shortname = [[NSURL URLWithString:filename] lastPathComponent];
+        
+        NSURL *uploadFileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:shortname]];
+        
+        [[NSFileManager defaultManager] removeItemAtURL:uploadFileURL error:nil];
+        BOOL ret = [data writeToURL:uploadFileURL atomically:YES];
+        if (ret) {
+            NSLog(@"UPLOADING DATA %@(%ld)", filename, data.length);
+            AWSS3TransferManager *transferManager = [AWSS3TransferManager defaultS3TransferManager];
+            AWSS3TransferManagerUploadRequest *uploadRequest = [AWSS3TransferManagerUploadRequest new];
+            uploadRequest.bucket = @"parsekr";
+            uploadRequest.key = filename;
+            uploadRequest.body = uploadFileURL;
+            uploadRequest.ACL = AWSS3ObjectCannedACLPublicRead;
+            uploadRequest.uploadProgress = ^(int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend) {
+                int rate = (int)(totalBytesSent * 100.0 / totalBytesExpectedToSend);
+                if (progress) {
+                    progress(rate);
+                }
+            };
+            
+            [[transferManager upload:uploadRequest] continueWithExecutor:[AWSExecutor mainThreadExecutor] withBlock:^id(AWSTask *task) {
+                if (task.error != nil) {
+                    NSLog(@"%s %@","Error uploading :", uploadRequest.key);
+                    if (block) {
+                        block(nil, NO, task.error);
+                    }
+                }
+                else {
+                    NSLog(@"Upload completed");
+                    if (block) {
+                        block(filename, YES, nil);
+                    }
+                }
+                [[NSFileManager defaultManager] removeItemAtURL:uploadFileURL error:nil];
+                return nil;
+            }];
+        }
+    }
+    else {
+        if (block) {
+            block(nil, YES, nil);
+        }
+    }
+}
+
 @end

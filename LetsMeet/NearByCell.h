@@ -9,10 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "NSMutableDictionary+Bullet.h"
 
-typedef void(^SetUserBlock)(User* user, NSData *data);
-
 @interface NearByCell : UICollectionViewCell
 @property (nonatomic, strong) User* user;
-- (void)setUser:(User*) user completion:(SetUserBlock)block;
-- (void)setUserProfileImageWithData:(NSData*)data;
+- (void)setUser:(User*)user collectionView:(UICollectionView*)collectionView;
 @end

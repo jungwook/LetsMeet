@@ -194,7 +194,7 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
         [self.mediaView setPlayerItemURL:url];
     });
     
-    [S3File saveData:compressedImageData(data, 400) named:@"thumbnail.jpg" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+    [S3File saveData:compressedImageData(data, 100) named:@"thumbnail.jpg" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
         self.me.thumbnail = file;
         [self.me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
             if (succeeded) {
@@ -231,7 +231,6 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
     AVURLAsset *asset = [AVURLAsset URLAssetWithURL:inputURL options:nil];
     AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:asset presetName:AVAssetExportPreset640x480];
     exportSession.outputURL = outputURL;
-//    exportSession.fileLengthLimit = 3000000;
     exportSession.outputFileType = AVFileTypeQuickTimeMovie;
     [exportSession exportAsynchronouslyWithCompletionHandler:^(void) {
         handler(exportSession);
@@ -243,24 +242,42 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
     
     [ImagePicker proceedWithParentViewController:self photoSelectedBlock:^(id data, BulletTypes type, NSString *sizeString, NSURL *url) {
         if (type == kBulletTypePhoto) {
-            [S3File saveData:data named:@"profile.jpg" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-                if (succeeded) {
-                    self.me.profileMedia = file;
-                    self.me.profileMediaType = kProfileMediaPhoto;
-                    [self.me saveInBackground];
-                    [self.mediaView setMediaFromUser:self.me];
-                }
-                else {
-                    NSLog(@"ERROR:%@", error.localizedDescription);
-                }
-            } progressBlock:^(int percentDone) {
-                NSLog(@"Saving Progress:%d", percentDone);
-            }];
+            id orig = compressedImageData(data, 1024);
+            id thumb = compressedImageData(data, 100);
+            [self save:self.me orig:orig thumb:thumb];
         }
         else if (type == kBulletTypeVideo) {
             [self treatVideoOfType:type url:url thumbnail:data];
         }
     } cancelBlock:nil];
+}
+
+- (void) save:(User*)user orig:(NSData*)orig thumb:(NSData*)thumb
+{
+    const NSString* group = @"ProfileMedia/";
+    
+    NSString *oFN = [user.objectId stringByAppendingString:@".jpg"];
+    NSString *tFN = [user.objectId stringByAppendingString:@"TN.jpg"];
+    
+    user.profileMedia = [group stringByAppendingString:oFN];
+    user.thumbnail = [group stringByAppendingString:tFN];
+    
+    user.profileMediaType = kProfileMediaPhoto;
+    [user saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+            [S3File saveData:orig named:oFN group:group completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    [S3File saveData:thumb named:tFN group:group completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+                        if (succeeded) {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                [self.mediaView setMediaFromUser:user];
+                            });
+                        }
+                    } progressBlock:nil];
+                }
+            } progressBlock:nil];
+        }
+    }];
 }
 
 - (IBAction)chargePoints:(id)sender {
@@ -278,4 +295,8 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
     return NO;
 }
 
+- (NSString*) fullname:(NSString*)filename
+{
+    return [@"ProfileMedia/" stringByAppendingString:filename];
+}
 @end

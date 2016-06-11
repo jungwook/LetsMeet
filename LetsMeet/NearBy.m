@@ -38,15 +38,12 @@ static NSString * const reuseIdentifier = @"NearByCell";
 
 - (void)setCellSpacing
 {
-    const CGFloat kCellsPerRow = 1;
+    const CGFloat kCellsPerRow = 4.0f;
     UICollectionViewFlowLayout *flowLayout = (UICollectionViewFlowLayout*)self.collectionView.collectionViewLayout;
-    flowLayout.minimumLineSpacing = 0;
-    flowLayout.minimumInteritemSpacing = 0;
-    
-    CGFloat availableWidthForCells = CGRectGetWidth(self.collectionView.frame) - flowLayout.sectionInset.left - flowLayout.sectionInset.right - 1.0 * (kCellsPerRow - 1);
+    CGFloat availableWidthForCells = CGRectGetWidth(self.collectionView.frame) - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * (kCellsPerRow - 1);
     
     CGFloat cellWidth = availableWidthForCells / kCellsPerRow;
-    flowLayout.itemSize = CGSizeMake(cellWidth, cellWidth+8);
+    flowLayout.itemSize = CGSizeMake(cellWidth, cellWidth * 1.2);
 }
 
 - (void)reloadAllUsers
@@ -85,21 +82,6 @@ static NSString * const reuseIdentifier = @"NearByCell";
     return self.users.count;
 }
 
-typedef void (^NearByCellBlock)(NearByCell *cell);
-
-- (void)updateCellForUserId:(id)userId block:(NearByCellBlock)block
-{
-    NSArray *visible = [self.collectionView visibleCells];
-    [visible enumerateObjectsUsingBlock:^(NearByCell* cell, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([cell.user.objectId isEqualToString:userId]) {
-            if (block)
-                block(cell);
-            *stop = YES;
-        }
-    }];
-}
-
-
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     NearByCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:reuseIdentifier forIndexPath:indexPath];
     
@@ -108,11 +90,7 @@ typedef void (^NearByCellBlock)(NearByCell *cell);
     NSUInteger row = indexPath.row;
     
     User*user = [self.users objectAtIndex:row];
-    [cell setUser:user completion:^(User *user, NSData* data) {
-        [self updateCellForUserId:user.objectId block:^(NearByCell *cell) {
-            [cell setUserProfileImageWithData:data];
-        }];
-    }];
+    [cell setUser:user collectionView:self.collectionView];
     
     return cell;
 }

@@ -33,7 +33,6 @@
     }]];
     
 //    [SimulatedUsers createUsers];
-//    [SimulatedUsers resetUsers];
     
     [self registerForNotifications:application launchOptions:launchOptions];
     [self setDefaultsForACL];

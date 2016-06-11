@@ -44,6 +44,7 @@
         if (block) {
             block(nil, nil, YES);
         }
+        return;
     }
 
     NSData *data = [self objectForKey:file];
@@ -51,6 +52,7 @@
         if (block) {
             block(data, nil, YES);
         }
+        return;
     }
     else {
         NSString *downloadingFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSURL URLWithString:file] lastPathComponent]];
@@ -70,48 +72,51 @@
         };
         
         AWSS3TransferManager *transferManager = [AWSS3TransferManager defaultS3TransferManager];
-        NSLog(@"Download started, please wait...");
         
         [[transferManager download:downloadRequest] continueWithExecutor:[AWSExecutor mainThreadExecutor] withBlock:^id(AWSTask *task){
             if (task.error != nil) {
-                NSLog(@"%s %@","Error downloading :", downloadRequest.key);
+                NSLog(@"%s %@ (%@)","Error downloading :", downloadRequest.key, file);
                 if (block) {
                     block(nil, task.error, NO);
                 }
             }
             else {
-                NSLog(@"download completed");
                 NSData *downloadedData = [NSData dataWithContentsOfURL:downloadingFileURL];
                 [self setObject:downloadedData forKey:file];
                 if (block) {
-                    block(downloadedData, task.error, NO);
+                    block(downloadedData, nil, NO);
                 }
             }
-
             // delete temp download file location.
             [[NSFileManager defaultManager] removeItemAtURL:downloadingFileURL error:nil];
             
             return nil;
         }];
+        
+        return;
     }
 }
 
 + (void) saveData:(NSData *)data named:(id)filename completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
 {
-    [[S3File file] saveData:data named:filename completedBlock:block progressBlock:progress];
+    [[S3File file] saveData:data named:filename group:@"ParseFiles/" completedBlock:block progressBlock:progress];
 }
 
-- (void) saveData:(NSData *)data named:(id)name completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
++ (void) saveData:(NSData *)data named:(id)filename group:(id)group completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
+{
+    [[S3File file] saveData:data named:filename group:group completedBlock:block progressBlock:progress];
+}
+
+- (void) saveData:(NSData *)data named:(id)name group:(id)group completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
 {
     if (data) {
         NSUUID *uuid = [NSUUID UUID];
-        NSString *filename = [@"ParseFiles/" stringByAppendingString:[[uuid UUIDString] stringByAppendingString:name]];
+        NSString *filename = [group stringByAppendingString:[[uuid UUIDString] stringByAppendingString:name]];
         NSURL *uploadFileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:[[NSURL URLWithString:filename] lastPathComponent]]];
         
         [[NSFileManager defaultManager] removeItemAtURL:uploadFileURL error:nil];
         BOOL ret = [data writeToURL:uploadFileURL atomically:YES];
         if (ret) {
-            NSLog(@"UPLOADING DATA %@(%ld)", filename, data.length);
             AWSS3TransferManager *transferManager = [AWSS3TransferManager defaultS3TransferManager];
             AWSS3TransferManagerUploadRequest *uploadRequest = [AWSS3TransferManagerUploadRequest new];
             uploadRequest.bucket = @"parsekr";
@@ -133,7 +138,6 @@
                     }
                 }
                 else {
-                    NSLog(@"Upload completed");
                     [self setObject:data forKey:filename];
                     if (block) {
                         block(filename, YES, nil);

@@ -95,7 +95,7 @@
         NSLog(@"All systems go...");
         
         self.leftViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"LeftMenu"];
-        self.centerViewController = self.screens[@"Account"][@"screen"];
+        self.centerViewController = self.screens[@"Search"][@"screen"];
         self.animator = [[FloatingDrawerSpringAnimator alloc] init];
         self.backgroundImage = [UIImage imageNamed:@"bg"];
 

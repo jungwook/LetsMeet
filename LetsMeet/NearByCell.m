@@ -17,10 +17,18 @@
 @property (weak, nonatomic) IBOutlet UILabel *ageLB;
 @property (weak, nonatomic) IBOutlet IndentedLabel *distanceLB;
 @property (weak, nonatomic) IBOutlet UIView *photoView;
-@property (nonatomic, strong) SetUserBlock block;
+
 @end
 
 @implementation NearByCell
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+    }
+    return self;
+}
 
 - (NSString*) distanceString:(double)distance
 {
@@ -35,10 +43,14 @@
     }
 }
 
--(void)setUser:(User *)user completion:(SetUserBlock)block
+-(void)setUser:(User *)user collectionView:(UICollectionView *)collectionView
 {
+    static NSData *placeholder = nil;
+    
+    if (!placeholder) {
+        placeholder = UIImageJPEGRepresentation([UIImage imageNamed:@"girl"], 1.0f);
+    }
     _user = user;
-    _block = block;
 
     double distance = [[User me].location distanceInKilometersTo:self.user.location];
     
@@ -47,25 +59,49 @@
     self.sexLB.text = self.user.sexString;
     self.introLB.text = self.user.intro;
     self.distanceLB.text = [self distanceString:distance];
-
-    [S3File getDataFromFile:self.user.profileMediaType == kProfileMediaPhoto ? self.user.profileMedia : self.user.thumbnail completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
-        if (fromCache) {
-            [self setUserProfileImageWithData:data];
-        }
-        if (!error) {
-            if (self.block) {
-                self.block(self.user, data);
+    self.photoView.contentMode = UIViewContentModeScaleAspectFill;
+    
+    id filename = self.user.profileMediaType == kProfileMediaPhoto ? self.user.profileMedia : self.user.thumbnail;
+    filename = self.user.thumbnail;
+    
+    NSData *imageData = [S3File objectForKey:filename];
+    if (imageData) {
+        [self setUserProfileImageWithData:imageData animate:NO];
+    }
+    else {
+        [self setUserProfileImageWithData:placeholder animate:NO];
+        [S3File getDataFromFile:filename completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
+            if (!fromCache) {
+                NSArray *visibles = [collectionView visibleCells];
+                [visibles enumerateObjectsUsingBlock:^(NearByCell* _Nonnull cell, NSUInteger idx, BOOL * _Nonnull stop) {
+                    if ([cell.user.objectId isEqualToString:user.objectId]) {
+                        *stop = YES;
+                        [self setUserProfileImageWithData:data animate:YES];
+                    }
+                }];
             }
-        }
-    } progressBlock:^(int percentDone) {
-        
-    }];
+        } progressBlock:^(int percentDone) {
+            
+        }];
+    }
 }
 
-- (void)setUserProfileImageWithData:(NSData *)data
+- (void)setUserProfileImageWithData:(NSData *)data animate:(BOOL)animate
 {
-    self.photoView.layer.contents = (id) [UIImage imageWithData:data].CGImage;
-    self.photoView.layer.contentsGravity = kCAGravityResizeAspectFill;
+    if (animate) {
+        [UIView animateWithDuration:0.2 animations:^{
+            self.photoView.alpha = 0.0f;
+        } completion:^(BOOL finished) {
+            self.photoView.layer.contents = (id) [UIImage imageWithData:data].CGImage;
+            [UIView animateWithDuration:0.1f animations:^{
+                self.photoView.alpha = 1.0f;
+            }];
+        }];
+    }
+    else {
+        self.photoView.alpha = 1.0f;
+        self.photoView.layer.contents = (id) [UIImage imageWithData:data].CGImage;
+    }
 }
 
 @end

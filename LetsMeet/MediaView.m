@@ -121,6 +121,7 @@
             [self showPhotoView];
             
             [S3File getDataFromFile:user.profileMedia completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
+                NSLog(@"DOWNLOADED PROFILE MEDIA FOR %@", user.nickname);
                 UIImage *image = [UIImage imageWithData:data];
                 if (self.frameChangedBlock) {
                     self.frameChangedBlock(image.size);
