@@ -395,6 +395,9 @@ Hello</string>
                                                         </userDefinedRuntimeAttribute>
                                                     </userDefinedRuntimeAttributes>
                                                 </textField>
+                                                <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" fixedFrame="YES" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="CAx-g1-ATM">
+                                                    <rect key="frame" x="0.0" y="177.5" width="320" height="2"/>
+                                                </progressView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailingMargin" secondItem="UME-lq-x4a" secondAttribute="trailing" constant="-8" id="2Tm-XH-OfA"/>
