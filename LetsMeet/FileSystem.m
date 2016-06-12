@@ -452,12 +452,38 @@
 - (void)usersNearMeInBackground:(UsersArrayBlock)block
 {
     __LF
-
+    
     PFQuery *query = [User query];
-    [query whereKey:@"location" nearGeoPoint:self.location];
+    [query whereKey:@"location" nearGeoPoint:self.me.location];
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
         if (block)
             block(users);
+    }];
+}
+
+- (void)usersNearMeInBackground2:(UsersArrayBlock)block
+{
+    __LF
+
+    PFQuery *query = [User query];
+    [query whereKey:@"location" nearGeoPoint:self.me.location];
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
+        if (block)
+            block([users sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+                PFGeoPoint *p1 = ((User*)obj1).location;
+                PFGeoPoint *p2 = ((User*)obj2).location;
+
+                CGFloat distanceA = [self.me.location distanceInKilometersTo:p1];
+                CGFloat distanceB = [self.me.location distanceInKilometersTo:p2];
+                
+                if (distanceA < distanceB) {
+                    return NSOrderedAscending;
+                } else if (distanceA > distanceB) {
+                    return NSOrderedDescending;
+                } else {
+                    return NSOrderedSame;
+                }
+            }]);
     }];
 }
 

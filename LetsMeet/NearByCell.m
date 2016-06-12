@@ -15,8 +15,9 @@
 @property (weak, nonatomic) IBOutlet UILabel *introLB;
 @property (weak, nonatomic) IBOutlet UILabel *sexLB;
 @property (weak, nonatomic) IBOutlet UILabel *ageLB;
-@property (weak, nonatomic) IBOutlet IndentedLabel *distanceLB;
+@property (weak, nonatomic) IBOutlet UILabel *distanceLB;
 @property (weak, nonatomic) IBOutlet UIView *photoView;
+@property (weak, nonatomic) IBOutlet IndentedLabel *unreadLB;
 
 @end
 
@@ -29,6 +30,12 @@
     }
     return self;
 }
+
+- (void)awakeFromNib
+{
+    __LF
+}
+
 
 - (NSString*) distanceString:(double)distance
 {

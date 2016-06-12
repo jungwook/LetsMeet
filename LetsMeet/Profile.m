@@ -40,7 +40,6 @@
 @end
 
 @interface Profile ()
-@property (weak, nonatomic) IBOutlet UITextField *nicknameTF;
 @property (weak, nonatomic) IBOutlet UITextField *introTF;
 @property (weak, nonatomic) IBOutlet UITextField *ageTF;
 @property (weak, nonatomic) IBOutlet UITextField *sexTF;
@@ -48,6 +47,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *editPhotoBut;
 @property (weak, nonatomic) IBOutlet UIView *gradientView;
 @property (weak, nonatomic) IBOutlet MediaView *mediaView;
+@property (weak, nonatomic) IBOutlet UIProgressView *progress;
 @property CGFloat photoHeight;
 
 @property (strong, nonatomic) User *me;
@@ -102,8 +102,6 @@
     self = [super initWithCoder:aDecoder];
     if (self)
     {
-        self.me = [User me];
-        self.photoHeight = 320;
     }
     return self;
 }
@@ -124,10 +122,11 @@
     __LF
     [super viewWillAppear:animated];
     self.me = [User me];
+    self.photoHeight = 320;
+    self.progress.progress = 0.0f;
     
     if (!self.me.nickname) {
         [TextFieldAlert alertWithTitle:@"Set Nickname" message:@"Please input nickname\nYou cannot change your nickname" onViewController:self stringEnteredBlock:^(NSString *string) {
-            self.nicknameTF.text = string;
             self.navigationItem.title = string;
             self.me.nickname = string;
             [self viewWillAppear:YES];
@@ -138,7 +137,6 @@
     
     if (self.me) {
         self.editPhotoBut.exclusiveTouch = YES;
-        self.nicknameTF.text = self.me.nickname;
         
         self.introTF.text = self.me.intro ? self.me.intro : @"";
         [ListPicker pickerWithArray:@[@"우리 만나요!", @"애인 찾아요", @"함께 드라이브 해요", @"나쁜 친구 찾아요", @"착한 친구 찾아요", @"함께 먹으러 가요", @"술친구 찾아요"] onTextField:self.introTF selection:^(id data) {
@@ -195,7 +193,8 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
     });
     
     NSData *thumb = compressedImageData(thumbnail, 100);
-    self.me.thumbnail = [S3File saveProfileThumbnailData:thumb completedBlock:nil progressBlock:nil];
+    self.me.thumbnail = [S3File saveProfileThumbnailData:thumb completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+    } progress:self.progress];
     
     [self convertVideoToLowQuailtyWithInputURL:url outputURL:outputURL handler:^(AVAssetExportSession *exportSession)
      {
@@ -211,7 +210,7 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
                  else {
                      NSLog(@"ERROR:%@", error.localizedDescription);
                  }
-             } progressBlock:nil];
+             } progress:self.progress];
          }
      }];
 }
@@ -251,12 +250,9 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
                 [self.mediaView setMediaFromUser:user];
             });
         }
-    } progressBlock:nil];
-    user.thumbnail = [S3File saveProfileThumbnailData:thumb completedBlock:nil progressBlock:nil];
-    [user saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-        if (succeeded) {
-        }
-    }];
+    } progress:self.progress];
+    user.thumbnail = [S3File saveProfileThumbnailData:thumb completedBlock:nil progress:self.progress];
+    [user saveInBackground];
 }
 
 - (IBAction)chargePoints:(id)sender {
@@ -269,13 +265,4 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
 
 #pragma mark - Table view data source
 
-- (BOOL)shouldAutorotate
-{
-    return NO;
-}
-
-- (NSString*) fullname:(NSString*)filename
-{
-    return [@"ProfileMedia/" stringByAppendingString:filename];
-}
 @end

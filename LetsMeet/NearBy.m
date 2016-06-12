@@ -38,12 +38,13 @@ static NSString * const reuseIdentifier = @"NearByCell";
 
 - (void)setCellSpacing
 {
-    const CGFloat kCellsPerRow = 2.0f;
+    const CGFloat kCellsPerRow = 1.f;
     UICollectionViewFlowLayout *flowLayout = (UICollectionViewFlowLayout*)self.collectionView.collectionViewLayout;
     CGFloat availableWidthForCells = CGRectGetWidth(self.collectionView.frame) - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * (kCellsPerRow - 1);
     
     CGFloat cellWidth = availableWidthForCells / kCellsPerRow;
-    flowLayout.itemSize = CGSizeMake(cellWidth, cellWidth * 1.2);
+    CGFloat cellHeight = 115.f;
+    flowLayout.itemSize = CGSizeMake(cellWidth, cellHeight);
 }
 
 - (void)reloadAllUsers

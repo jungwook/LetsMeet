@@ -95,6 +95,26 @@ NSString* randomObjectId();
     }
 }
 
++ (NSString*) saveData:(NSData *)data named:(id)filename extension:(NSString*)extension group:(id)group completedBlock:(S3PutBlock)block progress:(UIProgressView *)progress
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        progress.progress = 0.0f;
+    });
+    return [[S3File file] saveData:data named:filename extension:extension group:group completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            progress.progress = 0.0f;
+        });
+        if (block) {
+            block(file, succeeded, error);
+        }
+    } progressBlock:^(int percentDone) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            progress.progress = percentDone / 100.0f;
+        });
+    }];
+}
+
+
 + (NSString*) saveData:(NSData *)data named:(id)filename extension:(NSString*)extension group:(id)group completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
 {
     return [[S3File file] saveData:data named:filename extension:extension group:group completedBlock:block progressBlock:progress];
@@ -186,4 +206,84 @@ NSString* randomObjectId();
     return [S3File saveData:data named:nil extension:@".mov" group:@"ProfileMedia/" completedBlock:block progressBlock:progress];
 }
 
+
++ (NSString *)saveProfileMovieData:(NSData *)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress
+{
+    return [S3File saveData:data named:@"profile" extension:@".mov" group:@"ProfileMedia/" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            progress.progress = 0.0f;
+        });
+        if (block) {
+            block(file, succeeded, error);
+        }
+    } progressBlock:^(int percentDone) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            progress.progress = percentDone / 100.0f;
+        });
+    }];
+}
+
++ (NSString *)saveProfileThumbnailData:(NSData *)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress
+{
+    return [S3File saveData:data named:@"thumbnail" extension:@".jpg" group:@"ProfileMedia/" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            progress.progress = 0.0f;
+        });
+        if (block) {
+            block(file, succeeded, error);
+        }
+    } progressBlock:^(int percentDone) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            progress.progress = percentDone / 100.0f;
+        });
+    }];
+}
+
++ (NSString *)saveProfileImageData:(NSData *)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress
+{
+    return [S3File saveData:data named:@"profile" extension:@".jpg" group:@"ProfileMedia/" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            progress.progress = 0.0f;
+        });
+        if (block) {
+            block(file, succeeded, error);
+        }
+    } progressBlock:^(int percentDone) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            progress.progress = percentDone / 100.0f;
+        });
+    }];
+}
+
++ (NSString *)saveImageData:(NSData *)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress
+{
+    return [S3File saveData:data named:nil extension:@".jpg" group:@"ProfileMedia/" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            progress.progress = 0.0f;
+        });
+        if (block) {
+            block(file, succeeded, error);
+        }
+    } progressBlock:^(int percentDone) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            progress.progress = percentDone / 100.0f;
+        });
+    }];
+}
+
++ (NSString *)saveMovieData:(NSData *)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress
+{
+    return [S3File saveData:data named:nil extension:@".mov" group:@"ProfileMedia/" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            progress.progress = 0.0f;
+        });
+        if (block) {
+            block(file, succeeded, error);
+        }
+    } progressBlock:^(int percentDone) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            progress.progress = percentDone / 100.0f;
+        });
+    }];
+}
 @end
