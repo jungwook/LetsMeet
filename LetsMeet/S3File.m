@@ -38,16 +38,18 @@
     [[S3File file] getDataFromFile:filename completedBlock:block progressBlock:progress];
 }
 
-- (void) getDataFromFile:(id)file completedBlock:(S3GetBlock)block progressBlock:(S3ProgressBlock)progress
+NSString* randomObjectId();
+
+- (void) getDataFromFile:(id)filename completedBlock:(S3GetBlock)block progressBlock:(S3ProgressBlock)progress
 {
-    if (!file) {
+    if (!filename) {
         if (block) {
             block(nil, nil, YES);
         }
         return;
     }
 
-    NSData *data = [self objectForKey:file];
+    NSData *data = [self objectForKey:filename];
     if (data) {
         if (block) {
             block(data, nil, YES);
@@ -55,15 +57,14 @@
         return;
     }
     else {
-        NSString *downloadingFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSURL URLWithString:file] lastPathComponent]];
-        NSURL *downloadingFileURL = [NSURL fileURLWithPath:downloadingFilePath];
-        // If temp file exists then delete
-        [[NSFileManager defaultManager] removeItemAtURL:downloadingFileURL error:nil];
+        NSString *tempId = randomObjectId();
+        NSURL *downloadURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:tempId]];
+        [[NSFileManager defaultManager] removeItemAtURL:downloadURL error:nil];
         
         AWSS3TransferManagerDownloadRequest *downloadRequest = [AWSS3TransferManagerDownloadRequest new];
         downloadRequest.bucket = @"parsekr";
-        downloadRequest.key = file;
-        downloadRequest.downloadingFileURL = downloadingFileURL;
+        downloadRequest.key = filename;
+        downloadRequest.downloadingFileURL = downloadURL;
         downloadRequest.downloadProgress = ^(int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend) {
             int rate = (int)(totalBytesSent * 100.0 / totalBytesExpectedToSend);
             if (progress) {
@@ -72,56 +73,52 @@
         };
         
         AWSS3TransferManager *transferManager = [AWSS3TransferManager defaultS3TransferManager];
-        
         [[transferManager download:downloadRequest] continueWithExecutor:[AWSExecutor mainThreadExecutor] withBlock:^id(AWSTask *task){
             if (task.error != nil) {
-                NSLog(@"%s %@ (%@)","Error downloading :", downloadRequest.key, file);
+                NSLog(@"%s %@ (%@)","Error downloading :", downloadRequest.key, filename);
                 if (block) {
                     block(nil, task.error, NO);
                 }
             }
             else {
-                NSData *downloadedData = [NSData dataWithContentsOfURL:downloadingFileURL];
-                [self setObject:downloadedData forKey:file];
+                NSData *data = [NSData dataWithContentsOfURL:downloadURL];
+                [self setObject:data forKey:filename];
                 if (block) {
-                    block(downloadedData, nil, NO);
+                    block(data, nil, NO);
                 }
             }
-            // delete temp download file location.
-            [[NSFileManager defaultManager] removeItemAtURL:downloadingFileURL error:nil];
+            [[NSFileManager defaultManager] removeItemAtURL:downloadURL error:nil];
             
             return nil;
         }];
-        
         return;
     }
 }
 
-+ (void) saveData:(NSData *)data named:(id)filename completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
++ (NSString*) saveData:(NSData *)data named:(id)filename extension:(NSString*)extension group:(id)group completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
 {
-    [[S3File file] saveData:data named:filename group:@"ParseFiles/" completedBlock:block progressBlock:progress];
+    return [[S3File file] saveData:data named:filename extension:extension group:group completedBlock:block progressBlock:progress];
 }
 
-+ (void) saveData:(NSData *)data named:(id)filename group:(id)group completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
-{
-    [[S3File file] saveData:data named:filename group:group completedBlock:block progressBlock:progress];
-}
-
-- (void) saveData:(NSData *)data named:(id)name group:(id)group completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
+- (NSString*) saveData:(NSData *)data named:(id)filename extension:(NSString*)extension group:(id)group completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
 {
     if (data) {
-        NSUUID *uuid = [NSUUID UUID];
-        NSString *filename = [group stringByAppendingString:[[uuid UUIDString] stringByAppendingString:name]];
-        NSURL *uploadFileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:[[NSURL URLWithString:filename] lastPathComponent]]];
+        if (!filename) {
+            filename = [FileSystem objectId];
+        }
+        NSString *username = [[User me] objectId];
+        NSString *longname = [[[@"" stringByAppendingPathComponent:group] stringByAppendingPathComponent:username] stringByAppendingPathComponent:[filename stringByAppendingString:extension]];
         
-        [[NSFileManager defaultManager] removeItemAtURL:uploadFileURL error:nil];
-        BOOL ret = [data writeToURL:uploadFileURL atomically:YES];
+        NSString *tempId = randomObjectId();
+        NSURL *saveURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingString:tempId]];
+        [[NSFileManager defaultManager] removeItemAtURL:saveURL error:nil];
+        BOOL ret = [data writeToURL:saveURL atomically:YES];
         if (ret) {
             AWSS3TransferManager *transferManager = [AWSS3TransferManager defaultS3TransferManager];
             AWSS3TransferManagerUploadRequest *uploadRequest = [AWSS3TransferManagerUploadRequest new];
             uploadRequest.bucket = @"parsekr";
-            uploadRequest.key = filename;
-            uploadRequest.body = uploadFileURL;
+            uploadRequest.key = longname;
+            uploadRequest.body = saveURL;
             uploadRequest.ACL = AWSS3ObjectCannedACLPublicRead;
             uploadRequest.uploadProgress = ^(int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend) {
                 int rate = (int)(totalBytesSent * 100.0 / totalBytesExpectedToSend);
@@ -138,20 +135,55 @@
                     }
                 }
                 else {
-                    [self setObject:data forKey:filename];
+                    [self setObject:data forKey:longname];
                     if (block) {
-                        block(filename, YES, nil);
+                        block(longname, YES, nil);
                     }
                 }
-                [[NSFileManager defaultManager] removeItemAtURL:uploadFileURL error:nil];
+                [[NSFileManager defaultManager] removeItemAtURL:saveURL error:nil];
                 return nil;
             }];
+            
+            return longname;
+        }
+        else {
+            if (block) {
+                block(nil, NO, nil);
+            }
+            return nil;
         }
     }
     else {
         if (block) {
-            block(nil, YES, nil);
+            block(nil, NO, nil);
         }
+        return nil;
     }
 }
+
++ (NSString *)saveProfileMovieData:(NSData *)data completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
+{
+    return [S3File saveData:data named:@"profile" extension:@".mov" group:@"ProfileMedia/" completedBlock:block progressBlock:progress];
+}
+
++ (NSString *)saveProfileThumbnailData:(NSData *)data completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
+{
+    return [S3File saveData:data named:@"thumbnail" extension:@".jpg" group:@"ProfileMedia/" completedBlock:block progressBlock:progress];
+}
+
++ (NSString *)saveProfileImageData:(NSData *)data completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
+{
+    return [S3File saveData:data named:@"profile" extension:@".jpg" group:@"ProfileMedia/" completedBlock:block progressBlock:progress];
+}
+
++ (NSString *)saveImageData:(NSData *)data completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
+{
+    return [S3File saveData:data named:nil extension:@".jpg" group:@"ProfileMedia/" completedBlock:block progressBlock:progress];
+}
+
++ (NSString *)saveMovieData:(NSData *)data completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
+{
+    return [S3File saveData:data named:nil extension:@".mov" group:@"ProfileMedia/" completedBlock:block progressBlock:progress];
+}
+
 @end

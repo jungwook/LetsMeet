@@ -19,10 +19,15 @@ typedef void (^UsersArrayBlock)(NSArray<User*>*users);
 
 @interface FileSystem : NSObject <CLLocationManagerDelegate>
 @property (nonatomic) BOOL isSimulator;
-/**
- The 'loadUserMessages' method loads all
- */
 
+/**
+ Creates and returns a new objectId, checked for local uniqueness within the system.
+ **/
++ (NSString *) objectId;
+
+/**
+ Creates a singleton instance of the FileSystem.
+ */
 + (instancetype) new;
 - (void) load;
 - (BOOL) save; 

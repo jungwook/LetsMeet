@@ -186,7 +186,7 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
     return [UIImage imageWithCGImage:image.CGImage scale:1.0f orientation:orientation];
 }
 
-- (void) treatVideoOfType:(BulletTypes)type url:(NSURL*)url thumbnail:(NSData*)data
+- (void) treatVideoOfType:(BulletTypes)type url:(NSURL*)url thumbnail:(NSData*)thumbnail
 {
     NSURL *outputURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"profile_video.mov"];
     
@@ -194,36 +194,26 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
         [self.mediaView setPlayerItemURL:url];
     });
     
-    [S3File saveData:compressedImageData(data, 100) named:@"thumbnail.jpg" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-        self.me.thumbnail = file;
-        [self.me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-            if (succeeded) {
-                [self convertVideoToLowQuailtyWithInputURL:url outputURL:outputURL handler:^(AVAssetExportSession *exportSession)
-                 {
-                     if (exportSession.status == AVAssetExportSessionStatusCompleted) {
-                         NSData *videoData = [NSData dataWithContentsOfURL:outputURL];
-                         
-                         [S3File saveData:videoData named:@"profile.mov" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-                             if (succeeded) {
-                                 NSLog(@"SAVED FILENAME:%@", file);
-                                 self.me.profileMediaType = kProfileMediaVideo;
-                                 self.me.profileMedia = file;
-                                 [self.me saveInBackground];
-                                 
-                                 // DELETING TEMP FILE AFTER UPLOAD
-                                 [[NSFileManager defaultManager] removeItemAtURL:outputURL error:nil];
-                             }
-                             else {
-                                 NSLog(@"ERROR:%@", error.localizedDescription);
-                             }
-                         } progressBlock:^(int percentDone) {
-                             NSLog(@"Saving Progress:%d", percentDone);
-                         }];
-                     }
-                 }];
-            }
-        }];
-    } progressBlock:nil];
+    NSData *thumb = compressedImageData(thumbnail, 100);
+    self.me.thumbnail = [S3File saveProfileThumbnailData:thumb completedBlock:nil progressBlock:nil];
+    
+    [self convertVideoToLowQuailtyWithInputURL:url outputURL:outputURL handler:^(AVAssetExportSession *exportSession)
+     {
+         if (exportSession.status == AVAssetExportSessionStatusCompleted) {
+             NSData *videoData = [NSData dataWithContentsOfURL:outputURL];
+             self.me.profileMedia = [S3File saveProfileMovieData:videoData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+                 if (succeeded) {
+                     self.me.profileMediaType = kProfileMediaVideo;
+                     [self.me saveInBackground];
+                     
+                     [[NSFileManager defaultManager] removeItemAtURL:outputURL error:nil];
+                 }
+                 else {
+                     NSLog(@"ERROR:%@", error.localizedDescription);
+                 }
+             } progressBlock:nil];
+         }
+     }];
 }
 
 - (void)convertVideoToLowQuailtyWithInputURL:(NSURL*)inputURL outputURL:(NSURL*)outputURL handler:(void (^)(AVAssetExportSession*))handler {
@@ -254,28 +244,17 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
 
 - (void) save:(User*)user orig:(NSData*)orig thumb:(NSData*)thumb
 {
-    const NSString* group = @"ProfileMedia/";
-    
-    NSString *oFN = [user.objectId stringByAppendingString:@".jpg"];
-    NSString *tFN = [user.objectId stringByAppendingString:@"TN.jpg"];
-    
-    user.profileMedia = [group stringByAppendingString:oFN];
-    user.thumbnail = [group stringByAppendingString:tFN];
-    
     user.profileMediaType = kProfileMediaPhoto;
+    user.profileMedia = [S3File saveProfileImageData:orig completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+        if (succeeded) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.mediaView setMediaFromUser:user];
+            });
+        }
+    } progressBlock:nil];
+    user.thumbnail = [S3File saveProfileThumbnailData:thumb completedBlock:nil progressBlock:nil];
     [user saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
         if (succeeded) {
-            [S3File saveData:orig named:oFN group:group completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-                if (succeeded) {
-                    [S3File saveData:thumb named:tFN group:group completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-                        if (succeeded) {
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                [self.mediaView setMediaFromUser:user];
-                            });
-                        }
-                    } progressBlock:nil];
-                }
-            } progressBlock:nil];
         }
     }];
 }

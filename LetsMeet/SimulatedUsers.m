@@ -109,25 +109,17 @@
             NSString *oFN = [loggedIn.objectId stringByAppendingString:@".jpg"];
             NSString *tFN = [loggedIn.objectId stringByAppendingString:@"TN.jpg"];
             
-            loggedIn.profileMedia = [self fullname:oFN];
-            loggedIn.thumbnail = [self fullname:tFN];
-            
-            [self saveData:largeData named:oFN completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+            loggedIn.profileMedia = [S3File saveData:largeData named:@"profile" extension:@".jpg" group:@"ProfileMedia" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
                 if (succeeded) {
                     NSLog(@"saved profile media [%@/%ld] for %@/%@ ", oFN, largeData.length, loggedIn.username, loggedIn.objectId);
                 }
-            } progressBlock:^(int percentDone) {
-                
-            }];
+            } progressBlock:nil];
             
-            [self saveData:tnData named:tFN completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+            loggedIn.thumbnail = [S3File saveData:tnData named:@"thumbnail" extension:@".jpg" group:@"ProfileMedia" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
                 if (succeeded) {
                     NSLog(@"saved thumbnail [%@/%ld] for %@/%@ ", tFN, tnData.length, loggedIn.username, loggedIn.objectId);
                 }
-            } progressBlock:^(int percentDone) {
-                
-            }];
-            
+            } progressBlock:nil];
             [loggedIn save];
         }
     }
@@ -141,55 +133,5 @@
     return [@"ProfileMedia/" stringByAppendingString:filename];
 }
 
-
-- (void) saveData:(NSData *)data named:(id)name completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
-{
-    if (data) {
-        NSString *filename = [self fullname:name];
-        NSString *shortname = [[NSURL URLWithString:filename] lastPathComponent];
-        
-        NSURL *uploadFileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:shortname]];
-        
-        [[NSFileManager defaultManager] removeItemAtURL:uploadFileURL error:nil];
-        BOOL ret = [data writeToURL:uploadFileURL atomically:YES];
-        if (ret) {
-            NSLog(@"UPLOADING DATA %@(%ld)", filename, data.length);
-            AWSS3TransferManager *transferManager = [AWSS3TransferManager defaultS3TransferManager];
-            AWSS3TransferManagerUploadRequest *uploadRequest = [AWSS3TransferManagerUploadRequest new];
-            uploadRequest.bucket = @"parsekr";
-            uploadRequest.key = filename;
-            uploadRequest.body = uploadFileURL;
-            uploadRequest.ACL = AWSS3ObjectCannedACLPublicRead;
-            uploadRequest.uploadProgress = ^(int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend) {
-                int rate = (int)(totalBytesSent * 100.0 / totalBytesExpectedToSend);
-                if (progress) {
-                    progress(rate);
-                }
-            };
-            
-            [[transferManager upload:uploadRequest] continueWithExecutor:[AWSExecutor mainThreadExecutor] withBlock:^id(AWSTask *task) {
-                if (task.error != nil) {
-                    NSLog(@"%s %@","Error uploading :", uploadRequest.key);
-                    if (block) {
-                        block(nil, NO, task.error);
-                    }
-                }
-                else {
-                    NSLog(@"Upload completed");
-                    if (block) {
-                        block(filename, YES, nil);
-                    }
-                }
-                [[NSFileManager defaultManager] removeItemAtURL:uploadFileURL error:nil];
-                return nil;
-            }];
-        }
-    }
-    else {
-        if (block) {
-            block(nil, YES, nil);
-        }
-    }
-}
 
 @end

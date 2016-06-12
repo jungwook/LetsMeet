@@ -10,6 +10,12 @@
 #import "CachedFile.h"
 #import "Signup.h"
 
+@interface ObjectIdStore : NSObject
++ (BOOL) addObjectId:(id)objectId;
++ (BOOL) containsObjectId:(id)objectId;
+@end
+
+
 @interface FileSystem()
 @property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, strong) CLLocation* currentLocation;
@@ -21,6 +27,8 @@
 @property (nonatomic, strong) NSMutableDictionary *bullets;
 @property (nonatomic, weak) User* me;
 @property (nonatomic, strong) NSTimer *timeKeeper;
+
+@property (nonatomic, strong) NSObject *lock;
 @end
 
 @implementation FileSystem 
@@ -41,7 +49,10 @@
     self = [super init];
     if (self) {
 //        [PFUser logOut];
+        
+        self.lock = [NSObject new]; //MUTEX LOCK
         self.me = [User me];
+        
         if (self.me) {
             [self.me fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
                 [self initializeSystem];
@@ -59,6 +70,18 @@
 {
     __LF
     NSError *error = nil;
+    
+    NSLog( @"LOCAL:%@", [self createObjectId]);
+    NSLog( @"LOCAL:%@", [self createObjectId]);
+    NSLog( @"LOCAL:%@", [self createObjectId]);
+    NSLog( @"LOCAL:%@", [self createObjectId]);
+    NSLog( @"LOCAL:%@", [self createObjectId]);
+    NSLog( @"LOCAL:%@", [self createObjectId]);
+    NSLog( @"LOCAL:%@", [self createObjectId]);
+    NSLog( @"LOCAL:%@", [self createObjectId]);
+    NSLog( @"LOCAL:%@", [self createObjectId]);
+    NSLog( @"LOCAL:%@", [self createObjectId]);
+    NSLog( @"LOCAL:%@", [self createObjectId]);
 
     self.applicationPath = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
     self.systemPath = [self.applicationPath URLByAppendingPathComponent:@"Engine"];
@@ -517,5 +540,106 @@ The - (void) initLocationServices method initializes the location management sys
             break;
     }
 }
+
+NSString* randomObjectId()
+{
+    int length = 8;
+    char *base62chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    
+    NSString *code = @"";
+    
+    for (int i=0; i<length; i++) {
+        int rand = arc4random_uniform(36);
+        code = [code stringByAppendingString:[NSString stringWithFormat:@"%c", base62chars[rand]]];
+    }
+    
+    return code;
+}
+
++ (NSString *) objectId {
+    FileSystem *system = [FileSystem new];
+    
+    @synchronized (system.lock) {
+        NSString *randId = @"";
+        do {
+            randId = randomObjectId();
+        } while ([ObjectIdStore containsObjectId:randId]);
+        [ObjectIdStore addObjectId:randId];
+        
+        return randId;
+    }
+}
+
+- (NSString *) createObjectId {
+    @synchronized (_lock) {
+        NSString *randId = @"";
+        do {
+            randId = randomObjectId();
+        } while ([ObjectIdStore containsObjectId:randId]);
+        [ObjectIdStore addObjectId:randId];
+        
+        return randId;
+    }
+}
+
+
+@end
+@interface ObjectIdStore()
+@property (nonatomic, strong) NSMutableSet *objectIdSet;
+@property (nonatomic, strong) NSObject *lock;
+@property (nonatomic, strong) NSURL *systemPath;
+@end
+
+@implementation ObjectIdStore
+
++ (instancetype) new
+{
+    static id sharedFile = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedFile = [[self alloc] initOnce];
+    });
+    return sharedFile;
+}
+
+- (instancetype)initOnce
+{
+    __LF
+    self = [super init];
+    if (self) {
+        self.systemPath = [[[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"Engine"] URLByAppendingPathComponent:@"ObjectIdStore"];
+        self.objectIdSet = [NSMutableSet setWithArray:[NSArray arrayWithContentsOfURL:self.systemPath]];
+        self.lock = [NSObject new]; //MUTEX LOCK
+    }
+    return self;
+}
+
++ (BOOL) addObjectId:(id)objectId
+{
+    ObjectIdStore *store = [ObjectIdStore new];
+    return [store addObjectId:objectId];
+}
+
+- (BOOL) addObjectId:(id)objectId
+{
+    @synchronized (self.lock) {
+        [self.objectIdSet addObject:objectId];
+        return [[self.objectIdSet allObjects] writeToURL:self.systemPath atomically:YES];
+    }
+}
+
++ (BOOL) containsObjectId:(id)objectId
+{
+    ObjectIdStore *store = [ObjectIdStore new];
+    return [store containsObjectId:objectId];
+}
+
+- (BOOL) containsObjectId:(id)objectId
+{
+    return [self.objectIdSet containsObject:objectId];
+}
+
+
+
 @end
 

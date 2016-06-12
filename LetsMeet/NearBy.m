@@ -38,7 +38,7 @@ static NSString * const reuseIdentifier = @"NearByCell";
 
 - (void)setCellSpacing
 {
-    const CGFloat kCellsPerRow = 4.0f;
+    const CGFloat kCellsPerRow = 2.0f;
     UICollectionViewFlowLayout *flowLayout = (UICollectionViewFlowLayout*)self.collectionView.collectionViewLayout;
     CGFloat availableWidthForCells = CGRectGetWidth(self.collectionView.frame) - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * (kCellsPerRow - 1);
     
