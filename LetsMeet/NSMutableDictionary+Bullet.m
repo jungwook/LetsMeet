@@ -385,6 +385,7 @@
 
 - (void) removeMe
 {
+    __LF
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"UNIQUEDEVICEID"];
     if ([User me]) {
         [[User me] delete];
@@ -394,6 +395,7 @@
 
 + (void) createMe
 {
+    __LF
     User *user = [User me];
     if ([User me])
         return;
@@ -420,6 +422,7 @@
 
 + (NSString*) uniqueUsername
 {
+    __LF
     NSString *cudid = [[NSUserDefaults standardUserDefaults] objectForKey:@"UNIQUEDEVICEID"];
     NSString *idString;
     if (cudid) {

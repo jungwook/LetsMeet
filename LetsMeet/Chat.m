@@ -11,6 +11,7 @@
 #import "MessageBar.h"
 #import "NSMutableDictionary+Bullet.h"
 #import "FileSystem.h"
+#import "Notifications.h"
 
 @interface Chat ()
 {
@@ -25,6 +26,7 @@
 @property (nonatomic) CGFloat textViewHeight;
 @property (nonatomic, strong) NSArray* messages;
 @property (nonatomic, strong) FileSystem* system;
+@property (nonatomic, strong) Notifications* notifications;
 @end
 
 @implementation Chat
@@ -40,9 +42,22 @@
 
 - (void)setUser:(User *)user
 {
+    __LF
     _user = user;
+    self.notifications = [Notifications notificationWithMessage:^(id bullet) {
+        NSLog(@"NITIF RECEIVED");
+        [self.tableView reloadData];
+    } broadcast:^(id senderId, NSString *message, NSTimeInterval duration) {
+        
+    }];
     self.messages = [self.system messagesWith:self.user.objectId];
-    NSLog(@"MESSAGES:%@", self.messages);
+    [self.system readUnreadBulletsWithUserId:self.user.objectId];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self.tableView reloadData];
 }
 
 - (void)viewDidLoad {

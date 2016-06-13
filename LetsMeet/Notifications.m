@@ -15,8 +15,17 @@
 
 @implementation Notifications
 
++ (instancetype) notificationWithMessage:(BulletBlock)block broadcast:(BroadcastBlock)broadcast
+{
+    return [[Notifications alloc] initWithMessage:block broadcast:broadcast];
+}
 
 - (instancetype)init
+{
+    return [self initWithMessage:nil broadcast:nil];;
+}
+
+- (instancetype)initWithMessage:(BulletBlock)block broadcast:(BroadcastBlock)broadcast
 {
     self = [super init];
     if (self) {
@@ -28,9 +37,13 @@
                                                  selector:@selector(newMessage:)
                                                      name:@"NotifySystemOfNewMessage"
                                                    object:nil];
+        
+        self.bulletAction = block;
+        self.broadcastAction = broadcast;
     }
     return self;
 }
+
 
 - (void) dealloc
 {

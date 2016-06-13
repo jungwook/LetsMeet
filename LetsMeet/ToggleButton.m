@@ -23,31 +23,43 @@ typedef void (^BulletBlock)(id bullet);
 
 - (id)initWithCoder:(NSCoder *)aDecoder
 {
+    __LF
+    
+    NSLog(@"%@ %s", [self class], __FUNCTION__);
+    
     self = [super initWithCoder:aDecoder];
     if (self) {
         _system = [FileSystem new];
-        self.notification = [Notifications new];
-        
-        __typeof(self) __weak welf = self;
-        [self.notification setBulletAction:^(id bullet) {
-            [welf updateBadge];
-        }];
-        
-        [self.notification setBroadcastAction:^(id senderId, NSString *message, NSTimeInterval duration) {
-            [welf updateBadge];
-        }];
-        
-        self.action = @selector(toggleMenu:);
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self updateBadge];
-        });        
     }
     return self;
 }
 
+- (void)awakeFromNib
+{
+    __LF
+    
+    self.notification = [Notifications notificationWithMessage:^(id bullet) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateBadge];
+        });
+    } broadcast:^(id senderId, NSString *message, NSTimeInterval duration) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateBadge];
+        });
+    }];
+    
+    self.action = @selector(toggleMenu:);
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self updateBadge];
+    });
+}
+
 - (void) updateBadge
 {
-    self.badgeValue = [NSString stringWithFormat:@"%ld", (unsigned long)self.system.unreadMessages];
+    NSUInteger count = (unsigned long)self.system.unreadMessages;
+    
+    self.badgeValue = [NSString stringWithFormat:@"%ld", count == 0 ? 99 : count];
 }
 
 - (void) toggleMenu:(id)sender

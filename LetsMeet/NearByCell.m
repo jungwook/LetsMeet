@@ -9,6 +9,7 @@
 #import "NearByCell.h"
 #import "IndentedLabel.h"
 #import "S3File.h"
+#import "FileSystem.h"
 
 @interface NearByCell()
 @property (weak, nonatomic) IBOutlet UILabel *nicknameLB;
@@ -18,6 +19,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *distanceLB;
 @property (weak, nonatomic) IBOutlet UIView *photoView;
 @property (weak, nonatomic) IBOutlet IndentedLabel *unreadLB;
+@property (strong, nonatomic) FileSystem *system;
 
 @end
 
@@ -33,14 +35,13 @@
 
 - (void)awakeFromNib
 {
-
 }
 
 
 - (NSString*) distanceString:(double)distance
 {
     if (distance > 500) {
-        return [NSString stringWithFormat:@"TOO FAR!"];
+        return [NSString stringWithFormat:@"멀어요"];
     }
     else if (distance < 1.0f) {
         return [NSString stringWithFormat:@"%.0fm", distance*1000];
@@ -53,6 +54,7 @@
 -(void)setUser:(User *)user collectionView:(UICollectionView *)collectionView
 {
     static NSData *placeholder = nil;
+    self.system = [FileSystem new];
     
     if (!placeholder) {
         placeholder = UIImageJPEGRepresentation([UIImage imageNamed:@"girl"], 1.0f);
@@ -66,6 +68,10 @@
     self.sexLB.text = self.user.sexString;
     self.introLB.text = self.user.intro;
     self.distanceLB.text = [self distanceString:distance];
+    NSInteger count = [self.system unreadMessagesFromUser:self.user.objectId];
+    self.unreadLB.text = [NSString stringWithFormat:@"%ld", count];
+    self.unreadLB.hidden = (count == 0);
+
     self.photoView.contentMode = UIViewContentModeScaleAspectFill;
     
     id filename = self.user.profileMediaType == kProfileMediaPhoto ? self.user.profileMedia : self.user.thumbnail;

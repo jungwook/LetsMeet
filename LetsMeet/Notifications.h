@@ -14,5 +14,5 @@ typedef void(^BulletBlock)(id bullet);
 @interface Notifications : NSObject
 - (void)setBulletAction:(BulletBlock)bulletAction;
 - (void)setBroadcastAction:(BroadcastBlock)broadcastAction;
-
++ (instancetype) notificationWithMessage:(BulletBlock)block broadcast:(BroadcastBlock)broadcast;
 @end

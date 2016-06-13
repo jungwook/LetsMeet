@@ -54,8 +54,23 @@
         self.me = [User me];
         
         if (self.me) {
+            NSLog(@"ME:%@", self.me);
             [self.me fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
-                [self initializeSystem];
+                if (error) {
+                    NSLog(@"ERROR FETCHING:%@", error.localizedDescription);
+                    [PFUser logInWithUsernameInBackground:@"희라" password:@"희라" block:^(PFUser * _Nullable user, NSError * _Nullable error) {
+                        if (!error) {
+                            [self initializeSystem];
+                        }
+                        else {
+                            NSLog(@"ERROR LOGIN IN:%@", error.localizedDescription);
+                        }
+                    }];
+                    
+                }
+                else {
+                    [self initializeSystem];
+                }
             }];
         }
         else {
@@ -91,11 +106,12 @@
                                                        target:self
                                                      selector:@selector(timeKeep)
                                                      userInfo:nil
-                                                      repeats:NO];
+                                                      repeats:YES];
 }
 
 - (void) timeKeep
 {
+    __LF
     static int count = 0;
     
     if ((++count)%10 == 0  && self.isSimulator) {
@@ -112,13 +128,13 @@
 
 - (NSMutableArray*)bulletsWith:(id)userId
 {
-    __LF
+//    __LF
     NSMutableArray *bullets = [self.bullets objectForKey:userId];
     if (!bullets) {
         bullets = [NSMutableArray array];
         [self.bullets setObject:bullets forKey:userId];
     }
-    return bullets;
+    return [self.bullets objectForKey:userId];
 }
 
 /**
@@ -157,7 +173,7 @@
         NSMutableArray *bullets = [NSMutableArray arrayWithContentsOfURL:url];
         [self.bullets setObject:bullets ? bullets : [NSMutableArray array] forKey:userId];
         NSLog(@"==> LOADED MESSAGES %ld FOR USER %@", bullets.count, userId );
-        NSLog(@"%@", [self messagesWith:userId]);
+        NSLog(@"MESSAGE %@", bullets);
     }];
 }
 
@@ -217,6 +233,7 @@
                 bullet.createdAt = object.createdAt;
                 bullet.updatedAt = object.updatedAt;
             
+                NSLog(@"ADDING BBULLET:%@", bullet);
                 [[self bulletsWith:userId] addObject:bullet];
                 [self saveUser:userId];
                 [self notifySystemOfNewMessage:bullet];
@@ -254,6 +271,9 @@
     __LF
 
     Bullet *bullet = [object bullet];
+    
+    NSLog(@"BULLET RECEIVED:%@", bullet);
+    NSLog(@"object RECEVIED:%@", object);
     
     // ONLY ASSIGNS FILE NAME AND URL
     // LAZY LOADING OF THE THUMBNAIL HAPPENS NOW
@@ -383,7 +403,7 @@
 {
     __LF
 
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"toUserId == %@ AND isRead == NO", self.me.objectId];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"toUser == %@ AND isRead == NO", self.me.objectId];
     NSArray *unreadBullets = [[self bulletsWith:userId] filteredArrayUsingPredicate:predicate];
     [unreadBullets enumerateObjectsUsingBlock:^(Bullet* _Nonnull bullet, NSUInteger idx, BOOL * _Nonnull stop) {
         bullet.isRead = YES;
@@ -402,14 +422,16 @@
     [[self usersInTheSystem] enumerateObjectsUsingBlock:^(id _Nonnull userId, NSUInteger idx, BOOL * _Nonnull stop) {
         count = count + [self unreadMessagesFromUser:userId];
     }];
+    
+    NSLog(@"UNREAD COUNT:%ld", count);
     return count;
 }
 
 - (NSUInteger) unreadMessagesFromUser:(id)userId
 {
-    __LF
+//    __LF
 
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"toUserId == %@ AND isRead == NO", self.me.objectId];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"toUser == %@ AND isRead == NO", self.me.objectId];
     return [[[self bulletsWith:userId] filteredArrayUsingPredicate:predicate] count];
 }
 

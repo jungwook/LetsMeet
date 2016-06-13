@@ -56,5 +56,5 @@ typedef void (^UsersArrayBlock)(NSArray<User*>*users);
 - (void) fetchOutstandingBullets;
 - (void) treatPushNotificationWith:(NSDictionary *)userInfo;
 - (void) initializeSystem;
-
+- (NSUInteger) unreadMessagesFromUser:(id)userId;
 @end
