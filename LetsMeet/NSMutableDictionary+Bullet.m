@@ -270,11 +270,7 @@
 
 - (BulletObject *)object
 {
-    BulletObject *object = [BulletObject new];
-    
-    self.objectId = object.objectId;
-    self.createdAt = object.createdAt;
-    self.updatedAt = object.updatedAt;
+    BulletObject *object = [BulletObject object];
     
     object.fromUser = [User objectWithoutDataWithObjectId:self.fromUserId];
     object.toUser = [User objectWithoutDataWithObjectId:self.toUserId];

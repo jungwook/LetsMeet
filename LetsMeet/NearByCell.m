@@ -33,7 +33,7 @@
 
 - (void)awakeFromNib
 {
-    __LF
+
 }
 
 

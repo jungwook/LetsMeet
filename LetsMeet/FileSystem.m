@@ -71,18 +71,6 @@
     __LF
     NSError *error = nil;
     
-    NSLog( @"LOCAL:%@", [self createObjectId]);
-    NSLog( @"LOCAL:%@", [self createObjectId]);
-    NSLog( @"LOCAL:%@", [self createObjectId]);
-    NSLog( @"LOCAL:%@", [self createObjectId]);
-    NSLog( @"LOCAL:%@", [self createObjectId]);
-    NSLog( @"LOCAL:%@", [self createObjectId]);
-    NSLog( @"LOCAL:%@", [self createObjectId]);
-    NSLog( @"LOCAL:%@", [self createObjectId]);
-    NSLog( @"LOCAL:%@", [self createObjectId]);
-    NSLog( @"LOCAL:%@", [self createObjectId]);
-    NSLog( @"LOCAL:%@", [self createObjectId]);
-
     self.applicationPath = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
     self.systemPath = [self.applicationPath URLByAppendingPathComponent:@"Engine"];
     self.usersPath = [self.systemPath URLByAppendingPathComponent:@"Users"];
@@ -125,8 +113,12 @@
 - (NSMutableArray*)bulletsWith:(id)userId
 {
     __LF
-    
-    return [self.bullets objectForKey:userId];
+    NSMutableArray *bullets = [self.bullets objectForKey:userId];
+    if (!bullets) {
+        bullets = [NSMutableArray array];
+        [self.bullets setObject:bullets forKey:userId];
+    }
+    return bullets;
 }
 
 /**
@@ -165,6 +157,7 @@
         NSMutableArray *bullets = [NSMutableArray arrayWithContentsOfURL:url];
         [self.bullets setObject:bullets ? bullets : [NSMutableArray array] forKey:userId];
         NSLog(@"==> LOADED MESSAGES %ld FOR USER %@", bullets.count, userId );
+        NSLog(@"%@", [self messagesWith:userId]);
     }];
 }
 
@@ -209,50 +202,33 @@
 - (void)add:(Bullet *)bullet for:(id)userId thumbnail:(NSData *)thumbnail originalData:(NSData*)originalData
 {
     __LF
-
-    NSMutableArray *userMessages = [self bulletsWith:userId];
     
-    [CachedFile saveData:thumbnail named:[bullet defaultNameForBulletType] inBackgroundWithBlock:^(PFFile *file, BOOL succeeded, NSError *error) {
-        if (succeeded) {
+    switch (bullet.bulletType) {
+        case kBulletTypeText: {
             bullet.isRead = NO;
             bullet.isSyncFromUser = YES;
             bullet.isSyncToUser = [bullet isFromMe];
+            bullet.fromUserId = self.me.objectId;
+            bullet.toUserId = userId;
             
             BulletObject *object = [bullet object];
-            if (file) {
-                object.file = file;
-            }
+            [object saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+                bullet.objectId = object.objectId;
+                bullet.createdAt = object.createdAt;
+                bullet.updatedAt = object.updatedAt;
             
-            [userMessages addObject:bullet]; // ADD TO DICTIONARY SYSTEM.
-            [self saveUser:userId];
-            [self notifySystemOfNewMessage:bullet];
-            
-            [CachedFile saveData:originalData named:[bullet defaultNameForBulletType] inBackgroundWithBlock:^(PFFile *originalData, BOOL succeeded, NSError *error) {
-                if (succeeded) {
-                    Originals *media = [Originals new];
-                    media.messageId = bullet.objectId;
-                    if (originalData)
-                        media.file = originalData;
-                    
-                    [media saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-                        [object saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-                            [self sendPushMessage:bullet.message messageId:bullet.objectId toUserId:bullet.toUserId];
-                        }];
-                    }];
-                }
-                else {
-                    NSLog(@"ERROR SAVING ORIGINAL MEDIA WITH ERROR:%@", error.localizedDescription);
-                }
-            } progressBlock:^(int percentDone) {
-                // DO SOMETHING...
-                printf("==>");
+                [[self bulletsWith:userId] addObject:bullet];
+                [self saveUser:userId];
+                [self notifySystemOfNewMessage:bullet];
+                [self sendPushMessage:bullet.message messageId:bullet.objectId toUserId:bullet.toUserId];
             }];
         }
-        else {
-            NSLog(@"ERROR SAVING THUMBNAIL WITH ERROR:%@", error.localizedDescription);
-        }
-    } progressBlock:nil];
-    
+            
+            break;
+            
+        default:
+            break;
+    }
 }
 
 - (void) update:(Bullet *)message for:(id)userId

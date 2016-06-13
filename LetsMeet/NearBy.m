@@ -10,6 +10,7 @@
 #import "NearByCell.h"
 #import "RefreshControl.h"
 #import "FileSystem.h"
+#import "Chat.h"
 
 @interface NearBy ()
 @property (nonatomic, weak) User *me;
@@ -62,14 +63,22 @@ static NSString * const reuseIdentifier = @"NearByCell";
     // Dispose of any resources that can be recreated.
 }
 
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    __LF
+    
+    if ([[segue identifier] isEqualToString:@"GotoChat"])
+    {
+        NSIndexPath *indexPath = [[self.collectionView indexPathsForSelectedItems] firstObject];
+        User *selectedUser = self.users[indexPath.row];
+        Chat *vc = [segue destinationViewController];
+        [vc setUser:selectedUser];
+    }
+}
+
 /*
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
 */
 
 #pragma mark <UICollectionViewDataSource>

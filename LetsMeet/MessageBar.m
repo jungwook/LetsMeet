@@ -24,12 +24,6 @@
 #define LEFTBUTSIZE 45
 #define TOPINSET 8
 
-static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCurve curve)
-{
-    return curve << 16;
-}
-
-
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
 {
     self = [super initWithCoder:aDecoder];
@@ -69,21 +63,21 @@ static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCur
 
 - (void)doEndEditingEvent:(NSString *)string
 {
+    __LF
 }
 
 - (void)doKeyBoardEvent:(NSNotification *)notification
 {
+    __LF
     CGRect keyboardEndFrameWindow;
-    [[notification.userInfo valueForKey:UIKeyboardFrameEndUserInfoKey] getValue: &keyboardEndFrameWindow];
-    
     double keyboardTransitionDuration;
-    [[notification.userInfo valueForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&keyboardTransitionDuration];
-    
     UIViewAnimationCurve keyboardTransitionAnimationCurve;
+    [[notification.userInfo valueForKey:UIKeyboardFrameEndUserInfoKey] getValue: &keyboardEndFrameWindow];
+    [[notification.userInfo valueForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&keyboardTransitionDuration];
     [[notification.userInfo valueForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&keyboardTransitionAnimationCurve];
     
     if ([self.barDelegate respondsToSelector:@selector(keyBoardEvent:duration:animationType:)]) {
-        [self.barDelegate keyBoardEvent:keyboardEndFrameWindow duration:keyboardTransitionDuration animationType:AnimationOptionsForCurve(keyboardTransitionAnimationCurve)];
+        [self.barDelegate keyBoardEvent:keyboardEndFrameWindow duration:keyboardTransitionDuration animationType:keyboardTransitionAnimationCurve];
     }
 }
 
@@ -112,7 +106,8 @@ static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCur
     
     //textView.autocapitalizationType = UITextAutocapitalizationTypeSentences;
     self.textView.keyboardType = UIKeyboardTypeDefault;
-    self.textView.returnKeyType = UIReturnKeySend;
+    self.textView.autocorrectionType = UITextAutocorrectionTypeNo;
+    self.textView.returnKeyType = UIReturnKeyNext;
     self.textView.enablesReturnKeyAutomatically = YES;
     self.textView.layer.cornerRadius = 5.0;
     self.textView.layer.borderWidth = 0.5;
@@ -147,14 +142,30 @@ static inline UIViewAnimationOptions AnimationOptionsForCurve(UIViewAnimationCur
     [self.textView becomeFirstResponder];
 }
 
+
+
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
 {
+    if ([text isEqualToString:@"\n"]) {
+        NSString *string = textView.text;
+        
+        CGRect rect = rectForString(string, textView.font, textView.frame.size.width);
+        CGRect tvfr = textView.frame;
+        NSLog(@"RECT:%@", NSStringFromCGRect(rect));
+        
+        CGRect frame = CGRectMake(tvfr.origin.x, tvfr.origin.y, tvfr.size.width, tvfr.size.height);
+        textView.frame = frame;
+    }
+    return YES;
+    
+/*
     if ([text isEqualToString:@"\n"]) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.001 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self sendText];
         });
     }
     return YES;
+*/
 }
 
 @end
