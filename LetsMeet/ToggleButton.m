@@ -57,7 +57,7 @@ typedef void (^BulletBlock)(id bullet);
     dispatch_async(dispatch_get_main_queue(), ^{
         NSUInteger count = (unsigned long)self.system.unreadMessages;
         
-        self.badgeValue = [NSString stringWithFormat:@"%ld", count == 0 ? 99 : count];
+        self.badgeValue = [NSString stringWithFormat:@"%ld", count];
     });
 }
 

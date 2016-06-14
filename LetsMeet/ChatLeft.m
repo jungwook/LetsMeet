@@ -10,6 +10,7 @@
 #import "Balloon.h"
 #import "S3File.h"
 #import "NSDate+TimeAgo.h"
+#import "EXPhotoViewer.h"
 
 @interface ChatLeft()
 @property (weak, nonatomic) IBOutlet Balloon *balloon;
@@ -17,7 +18,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
 @property (weak, nonatomic) IBOutlet UIView *photoView;
 @property (weak, nonatomic) IBOutlet UILabel *messageLabel;
-@property (weak, nonatomic) IBOutlet UIView *thumbnailView;
+@property (weak, nonatomic) IBOutlet UIImageView *thumbnailView;
 @property (weak, nonatomic) IBOutlet UIImageView *playView;
 @property (nonatomic, strong) id mediaFile;
 @property (nonatomic) BulletTypes bulletType;
@@ -38,8 +39,11 @@
         [self.photoView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedPhotoView:)]];
     }
     
+    self.thumbnailView.userInteractionEnabled = YES;
     if (![self.thumbnailView.gestureRecognizers count]) {
-        [self.thumbnailView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedThumbnailView:)]];
+        [self.thumbnailView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self.thumbnailView action:@selector(tappedThumbnailView:)]];
+    } else {
+        NSLog(@"GESTURES:%@", self.thumbnailView.gestureRecognizers);
     }
 
 }
@@ -52,6 +56,9 @@
 - (void) tappedThumbnailView:(id)sender
 {
     NSLog(@"Tapped Thumbnail");
+    if (self.bulletType==kBulletTypePhoto) {
+        [EXPhotoViewer showImageFrom:sender];
+    }
 }
 
 - (void)setMessage:(Bullet *)message user:(User*)user tableView:(UITableView*)tableView
@@ -83,16 +90,17 @@
             self.playView.hidden = (message.bulletType == kBulletTypePhoto);
             [S3File getDataFromFile:message.mediaThumbnailFile completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
                 if (!error) {
-                    [[tableView visibleCells] enumerateObjectsUsingBlock:^(ChatLeft* _Nonnull cell, NSUInteger idx, BOOL * _Nonnull stop) {
-                        if ([self.messageId isEqualToString:message.objectId]) {
-                            *stop = YES;
-                            self.thumbnailView.hidden = NO;
-                            UIImage *thumbnailImage = [UIImage imageWithData:data];
-                            self.spacing.constant = self.contentView.bounds.size.width-240-85;
-                            self.thumbnailView.layer.contents = (id) thumbnailImage.CGImage;
-                        }
-                    }];
-                    
+                    if (fromCache) {
+                        [self setupThumbnailImageWithData:data];
+                    }
+                    else {
+                        [[tableView visibleCells] enumerateObjectsUsingBlock:^(ChatLeft* _Nonnull cell, NSUInteger idx, BOOL * _Nonnull stop) {
+                            if ([cell.messageId isEqualToString:self.messageId]) {
+                                *stop = YES;
+                                [self setupThumbnailImageWithData:data];
+                            }
+                        }];
+                    }
                 }
             } progressBlock:nil];
         }
@@ -100,6 +108,16 @@
         default:
             break;
     }
+}
+
+- (void)setupThumbnailImageWithData:(NSData*) data
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.thumbnailView.hidden = NO;
+        UIImage *thumbnailImage = [UIImage imageWithData:data];
+        self.spacing.constant = self.contentView.bounds.size.width-240-85;
+        self.thumbnailView.layer.contents = (id) thumbnailImage.CGImage;
+    });
 }
 
 

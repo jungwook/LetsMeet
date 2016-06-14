@@ -14,6 +14,7 @@
 		120142E21D08802600D66905 /* AWSS3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 120142DF1D08802600D66905 /* AWSS3.framework */; };
 		120142E31D08802600D66905 /* AWSS3.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 120142DF1D08802600D66905 /* AWSS3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		120142E81D08930B00D66905 /* S3File.m in Sources */ = {isa = PBXBuildFile; fileRef = 120142E71D08930B00D66905 /* S3File.m */; };
+		120142EE1D1042AD00D66905 /* EXPhotoViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 120142ED1D1042AD00D66905 /* EXPhotoViewer.m */; };
 		1235BC8B1D0FD30100E4AA27 /* ChatRight.m in Sources */ = {isa = PBXBuildFile; fileRef = 1235BC8A1D0FD30100E4AA27 /* ChatRight.m */; };
 		1235BC8E1D0FD30E00E4AA27 /* ChatLeft.m in Sources */ = {isa = PBXBuildFile; fileRef = 1235BC8D1D0FD30E00E4AA27 /* ChatLeft.m */; };
 		1235BC911D0FF82500E4AA27 /* NSDate+TimeAgo.m in Sources */ = {isa = PBXBuildFile; fileRef = 1235BC901D0FF82500E4AA27 /* NSDate+TimeAgo.m */; };
@@ -96,6 +97,8 @@
 		120142DF1D08802600D66905 /* AWSS3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AWSS3.framework; sourceTree = "<group>"; };
 		120142E61D08930B00D66905 /* S3File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = S3File.h; sourceTree = "<group>"; };
 		120142E71D08930B00D66905 /* S3File.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = S3File.m; sourceTree = "<group>"; };
+		120142EC1D1042AD00D66905 /* EXPhotoViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXPhotoViewer.h; sourceTree = "<group>"; };
+		120142ED1D1042AD00D66905 /* EXPhotoViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXPhotoViewer.m; sourceTree = "<group>"; };
 		1235BC891D0FD30100E4AA27 /* ChatRight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatRight.h; sourceTree = "<group>"; };
 		1235BC8A1D0FD30100E4AA27 /* ChatRight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatRight.m; sourceTree = "<group>"; };
 		1235BC8C1D0FD30E00E4AA27 /* ChatLeft.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatLeft.h; sourceTree = "<group>"; };
@@ -283,6 +286,8 @@
 				12F0D7121D0A3B8800A37C40 /* Signup.m */,
 				12F0D7141D0A773000A37C40 /* TextFieldAlert.h */,
 				12F0D7151D0A773000A37C40 /* TextFieldAlert.m */,
+				120142EC1D1042AD00D66905 /* EXPhotoViewer.h */,
+				120142ED1D1042AD00D66905 /* EXPhotoViewer.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -553,6 +558,7 @@
 				126AF3F61CEA983800E3ED67 /* MessageBar.m in Sources */,
 				12F0D7191D0A7C6100A37C40 /* NearBy.m in Sources */,
 				12F741D21CE56B3400E8267A /* FloatingDrawerViewController.m in Sources */,
+				120142EE1D1042AD00D66905 /* EXPhotoViewer.m in Sources */,
 				124928B91CF2ED810038A2F3 /* UIButton+Badge.m in Sources */,
 				1296A7A31D03B34000E44642 /* BaseCollections.m in Sources */,
 				12DE5FA91CFD43A7009B315F /* Balloon.m in Sources */,
