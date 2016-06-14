@@ -111,10 +111,11 @@ NSData* compressedImageData(NSData* data, CGFloat width)
 CGRect rectForString(NSString *string, UIFont *font, CGFloat maxWidth)
 {
     string = [string stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-    CGRect rect = CGRectIntegral([string boundingRectWithSize:CGSizeMake(maxWidth, MAXFLOAT)
+    CGRect rect = CGRectIntegral([string boundingRectWithSize:CGSizeMake(maxWidth, 0)
                                                       options:NSStringDrawingUsesLineFragmentOrigin
                                                    attributes:@{
                                                                 NSFontAttributeName: font,
                                                                 } context:nil]);
+    
     return rect;
 }

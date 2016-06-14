@@ -8,7 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import "MessageBar.h"
+#import <MobileCoreServices/MobileCoreServices.h>
 
-@interface Chat : UIViewController <UITextViewDelegate, UITableViewDelegate, UITableViewDataSource>
+@interface Chat : UIViewController <UITextViewDelegate, UITableViewDelegate, UITableViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 @property (nonatomic, strong) User *user;
 @end

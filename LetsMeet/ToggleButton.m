@@ -39,27 +39,26 @@ typedef void (^BulletBlock)(id bullet);
     __LF
     
     self.notification = [Notifications notificationWithMessage:^(id bullet) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self updateBadge];
-        });
+        [self updateBadge];
     } broadcast:^(id senderId, NSString *message, NSTimeInterval duration) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self updateBadge];
-        });
+        [self updateBadge];
+    } refresh:^{
+        [self updateBadge];
     }];
     
-    self.action = @selector(toggleMenu:);
+    [self.notification on];
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self updateBadge];
-    });
+    self.action = @selector(toggleMenu:);
+    [self updateBadge];
 }
 
 - (void) updateBadge
 {
-    NSUInteger count = (unsigned long)self.system.unreadMessages;
-    
-    self.badgeValue = [NSString stringWithFormat:@"%ld", count == 0 ? 99 : count];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSUInteger count = (unsigned long)self.system.unreadMessages;
+        
+        self.badgeValue = [NSString stringWithFormat:@"%ld", count == 0 ? 99 : count];
+    });
 }
 
 - (void) toggleMenu:(id)sender

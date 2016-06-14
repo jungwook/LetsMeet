@@ -7,7 +7,7 @@
 //
 
 #import "FileSystem.h"
-#import "CachedFile.h"
+//#import "CachedFile.h"
 #import "Signup.h"
 
 @interface ObjectIdStore : NSObject
@@ -54,7 +54,6 @@
         self.me = [User me];
         
         if (self.me) {
-            NSLog(@"ME:%@", self.me);
             [self.me fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
                 if (error) {
                     NSLog(@"ERROR FETCHING:%@", error.localizedDescription);
@@ -66,7 +65,6 @@
                             NSLog(@"ERROR LOGIN IN:%@", error.localizedDescription);
                         }
                     }];
-                    
                 }
                 else {
                     [self initializeSystem];
@@ -100,7 +98,10 @@
     } else {
         NSLog(@"SYSTEM & MESSAGES PATH[%@] SUCCESSFULLY SETUP", [self.messagesDirectoryPath path]);
     }
+    
     [self load];
+    
+//    [self save];
     [self initLocationServices];
     self.timeKeeper = [NSTimer scheduledTimerWithTimeInterval:5.0f
                                                        target:self
@@ -146,7 +147,8 @@
 {
     __LF
 
-    return [self.bullets objectForKey:userId];
+    NSSortDescriptor *sd = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES];
+    return [[self.bullets objectForKey:userId] sortedArrayUsingDescriptors:@[sd]];
 }
 
 - (NSString*)usersFilename
@@ -191,61 +193,55 @@
 {
     __LF
 
-    NSURL *userMessagesPath = [self.messagesDirectoryPath URLByAppendingPathComponent:userId];
-    return [[self bulletsWith:userId] writeToURL:userMessagesPath atomically:YES];
+    @synchronized (self.lock) {
+        NSURL *userMessagesPath = [self.messagesDirectoryPath URLByAppendingPathComponent:userId];
+        return [[self bulletsWith:userId] writeToURL:userMessagesPath atomically:YES];
+    };
 }
 
 - (BOOL)removeUser:(id)userId
 {
     __LF
-
-    NSError *error = nil;
-    
-    NSURL *userMessagesPath = [self.messagesDirectoryPath URLByAppendingPathComponent:userId];
-    BOOL ret = [self.manager removeItemAtURL:userMessagesPath error:&error];
-    if (ret) {
-        NSUInteger count = [self bulletsWith:userId].count;
-        [self.bullets removeObjectForKey:userId];
-        NSLog(@"SUCCESSFULLY REMOVED %ld MESSAGES FOR USER:%@", count, userId);
+    @synchronized (self.lock) {
+        NSError *error = nil;
+        
+        NSURL *userMessagesPath = [self.messagesDirectoryPath URLByAppendingPathComponent:userId];
+        BOOL ret = [self.manager removeItemAtURL:userMessagesPath error:&error];
+        if (ret) {
+            NSUInteger count = [self bulletsWith:userId].count;
+            [self.bullets removeObjectForKey:userId];
+            NSLog(@"SUCCESSFULLY REMOVED %ld MESSAGES FOR USER:%@", count, userId);
+        }
+        else {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+            NSLog(@"ERROR:%@", error.localizedRecoverySuggestion);
+        }
+        return ret;
     }
-    else {
-        NSLog(@"ERROR:%@", error.localizedDescription);
-        NSLog(@"ERROR:%@", error.localizedRecoverySuggestion);
-    }
-    return ret;
 }
 
-- (void)add:(Bullet *)bullet for:(id)userId thumbnail:(NSData *)thumbnail originalData:(NSData*)originalData
+- (void)add:(Bullet *)bullet for:(id)userId
 {
     __LF
-    
-    switch (bullet.bulletType) {
-        case kBulletTypeText: {
-            bullet.isRead = NO;
-            bullet.isSyncFromUser = YES;
-            bullet.isSyncToUser = [bullet isFromMe];
-            bullet.fromUserId = self.me.objectId;
-            bullet.toUserId = userId;
+    bullet.isRead = NO;
+    bullet.isSyncFromUser = YES;
+    bullet.isSyncToUser = [bullet isFromMe];
+    bullet.fromUserId = self.me.objectId;
+    bullet.toUserId = userId;
+    BulletObject *object = [bullet object];
+    [object saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+            bullet.objectId = object.objectId;
+            bullet.createdAt = object.createdAt;
+            bullet.updatedAt = object.updatedAt;
             
-            BulletObject *object = [bullet object];
-            [object saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-                bullet.objectId = object.objectId;
-                bullet.createdAt = object.createdAt;
-                bullet.updatedAt = object.updatedAt;
-            
-                NSLog(@"ADDING BBULLET:%@", bullet);
-                [[self bulletsWith:userId] addObject:bullet];
-                [self saveUser:userId];
-                [self notifySystemOfNewMessage:bullet];
-                [self sendPushMessage:bullet.message messageId:bullet.objectId toUserId:bullet.toUserId];
-            }];
+            NSLog(@"ADDING BULLET:%@", bullet);
+            [[self bulletsWith:userId] addObject:bullet];
+            [self saveUser:userId];
+            [self notifySystemOfNewMessage:bullet];
+            [self sendPushMessage:bullet.message messageId:bullet.objectId toUserId:bullet.toUserId];
         }
-            
-            break;
-            
-        default:
-            break;
-    }
+    }];
 }
 
 - (void) update:(Bullet *)message for:(id)userId
@@ -275,26 +271,22 @@
     NSLog(@"BULLET RECEIVED:%@", bullet);
     NSLog(@"object RECEVIED:%@", object);
     
-    // ONLY ASSIGNS FILE NAME AND URL
-    // LAZY LOADING OF THE THUMBNAIL HAPPENS NOW
+    // TODO DO SOMETHING ABOUT THE MEDIA SENT
+    // ALSO DO SOMETHING ABOUT THE FILE ATTRIBUTE... SHOULD BE SOMETHING LIKE MEDIA
     
-    [CachedFile getDataInBackgroundWithBlock:^(NSData *thumbnail, NSError *error, BOOL fromCache) {
-        bullet.thumbnail = thumbnail; //THUMBNAIL IMAGE OF THE MEDIA SENT
-        
-        NSMutableArray *userMessages = [self bulletsWith:object.fromUser.objectId];
-        [userMessages addObject:bullet];
-        
-        // SET ISSYNCTOUSER TO YES SO THAT I DO NOT RELOAD THE SAME MESSAGE
-        BOOL mine = [object.toUser.objectId isEqualToString:self.me.objectId];
-        if (mine) {
-            object.isSyncToUser = YES;
-            [object saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-                if (succeeded) {
-                    [self notifySystemOfNewMessage:bullet];
-                }
-            }];
-        }
-    } fromFile:object.file];
+    NSMutableArray *userMessages = [self bulletsWith:object.fromUser.objectId];
+    [userMessages addObject:bullet];
+    
+    // SET ISSYNCTOUSER TO YES SO THAT I DO NOT RELOAD THE SAME MESSAGE
+    BOOL mine = [object.toUser.objectId isEqualToString:self.me.objectId];
+    if (mine) {
+        object.isSyncToUser = YES;
+        [object saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+            if (succeeded) {
+                [self notifySystemOfNewMessage:bullet];
+            }
+        }];
+    }
 }
 
 - (void)addMessageFromObjectId:(id)objectId
@@ -310,7 +302,13 @@
 - (void) sendPushMessage:textToSend messageId:(id)messageId toUserId:(id)userId
 {
     __LF
-
+    const NSInteger maxLength = 100;
+    NSUInteger length = [textToSend length];
+    if (length >= maxLength) {
+        textToSend = [textToSend substringToIndex:maxLength];
+        textToSend = [textToSend stringByAppendingString:@"..."];
+    }
+    
     [PFCloud callFunctionInBackground:@"sendPushToUser"
                        withParameters:@{
                                         @"recipientId": userId,
@@ -385,6 +383,13 @@
     }
 }
 
+- (void) notifySystemToRefreshBadge
+{
+    __LF
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"NotifySystemToRefreshBadge" object:nil];
+}
+
 - (void) notifySystemOfBroadcast:(id)userInfo
 {
     __LF
@@ -410,6 +415,7 @@
     }];
     
     if ([self saveUser:userId]) {
+        [self notifySystemToRefreshBadge];
         [self resetInstallationBadge];
     }
 }

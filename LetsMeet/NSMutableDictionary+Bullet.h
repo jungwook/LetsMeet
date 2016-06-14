@@ -48,29 +48,25 @@ typedef NSMutableDictionary Bullet;
 @property (nonatomic, assign) NSString* fromUserId;
 @property (nonatomic, assign) NSString* toUserId;
 @property (nonatomic, assign) NSString* message;
-@property (nonatomic, assign) NSString* fileName;
-@property (nonatomic, assign) NSString* fileURL;
-@property (nonatomic, assign) NSString* mediaInfo;
 @property (nonatomic, assign) NSDate* createdAt;
 @property (nonatomic, assign) NSDate* updatedAt;
 @property (nonatomic) BulletTypes bulletType;
 @property (nonatomic) BOOL isSyncFromUser;
 @property (nonatomic) BOOL isSyncToUser;
 @property (nonatomic) BOOL isRead;
-@property (nonatomic, assign) NSData* thumbnail;
+@property (nonatomic, assign) NSString* mediaFile;
+@property (nonatomic, assign) NSString* mediaThumbnailFile;
 
 - (BOOL) isFromMe;
-- (BOOL) isDataAvailable;
-
 + (NSString*) bulletTypeStringForType:(BulletTypes)bulletType;
 - (NSString*) bulletTypeString;
-- (NSString*) defaultNameForBulletType;
+- (NSString*) defaultFileNameForBulletType;
 
 + (instancetype) bulletWithBullet:(Bullet*)newDic;
 + (instancetype) bulletWithText:(NSString*)text;
-+ (instancetype) bulletWithPhoto:(PFFile*)file;
-+ (instancetype) bulletWithVideo:(PFFile*)file;
-+ (instancetype) bulletWithAudio:(PFFile*)file;
++ (instancetype) bulletWithPhoto:(NSString*)filename thumbnail:(NSString*)thumbnail;
++ (instancetype) bulletWithVideo:(NSString*)filename thumbnail:(NSString*)thumbnail;
++ (instancetype) bulletWithAudio:(NSString*)filename thumbnail:(NSString*)thumbnail;
 
 - (BulletObject*) object;
 @end
@@ -80,13 +76,13 @@ typedef NSMutableDictionary Bullet;
 
 @property (retain) PFUser *fromUser;
 @property (retain) PFUser *toUser;
-@property (retain) PFFile* file;
 @property (retain) NSString *message;
-@property (retain) NSString *mediaInfo;
+@property (retain) NSString *mediaFile;
+@property (retain) NSString *mediaThumbnailFile;
 @property BulletTypes bulletType;
 @property BOOL isSyncFromUser;
 @property BOOL isSyncToUser;
-@property BOOL isRead;
+//@property BOOL isRead;
 
 - (BOOL) isTextMessage;
 - (BOOL) isPhotoMessage;

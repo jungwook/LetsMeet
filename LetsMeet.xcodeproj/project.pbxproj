@@ -14,6 +14,10 @@
 		120142E21D08802600D66905 /* AWSS3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 120142DF1D08802600D66905 /* AWSS3.framework */; };
 		120142E31D08802600D66905 /* AWSS3.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 120142DF1D08802600D66905 /* AWSS3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		120142E81D08930B00D66905 /* S3File.m in Sources */ = {isa = PBXBuildFile; fileRef = 120142E71D08930B00D66905 /* S3File.m */; };
+		1235BC8B1D0FD30100E4AA27 /* ChatRight.m in Sources */ = {isa = PBXBuildFile; fileRef = 1235BC8A1D0FD30100E4AA27 /* ChatRight.m */; };
+		1235BC8E1D0FD30E00E4AA27 /* ChatLeft.m in Sources */ = {isa = PBXBuildFile; fileRef = 1235BC8D1D0FD30E00E4AA27 /* ChatLeft.m */; };
+		1235BC911D0FF82500E4AA27 /* NSDate+TimeAgo.m in Sources */ = {isa = PBXBuildFile; fileRef = 1235BC901D0FF82500E4AA27 /* NSDate+TimeAgo.m */; };
+		1235BC931D0FF97B00E4AA27 /* NSDateTimeAgo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 1235BC921D0FF97B00E4AA27 /* NSDateTimeAgo.bundle */; };
 		124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928831CEFF7F70038A2F3 /* ImagePicker.m */; };
 		124928871CF003420038A2F3 /* CachedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928861CF003420038A2F3 /* CachedFile.m */; };
 		1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928891CF0176C0038A2F3 /* ListPicker.m */; };
@@ -29,9 +33,7 @@
 		1296A7A91D03BB5500E44642 /* Notifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A81D03BB5500E44642 /* Notifications.m */; };
 		1296A7AC1D03E0CA00E44642 /* Profile.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7AB1D03E0CA00E44642 /* Profile.m */; };
 		129B07531D0AAAB5000C0276 /* NearByCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 129B07521D0AAAB5000C0276 /* NearByCell.m */; };
-		12DB01A91D0E312300E33359 /* ChatCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB01A81D0E312300E33359 /* ChatCell.m */; };
 		12DB01B21D0E317700E33359 /* Chat.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB01B11D0E317700E33359 /* Chat.m */; };
-		12DE5FA61CFD40DD009B315F /* MessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FA51CFD40DD009B315F /* MessageCell.m */; };
 		12DE5FA91CFD43A7009B315F /* Balloon.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FA81CFD43A7009B315F /* Balloon.m */; };
 		12DE5FB31CFEF58A009B315F /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12DE5FB21CFEF58A009B315F /* Photos.framework */; };
 		12DE5FB81CFFB1A2009B315F /* Preview.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FB71CFFB1A2009B315F /* Preview.m */; };
@@ -94,6 +96,13 @@
 		120142DF1D08802600D66905 /* AWSS3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AWSS3.framework; sourceTree = "<group>"; };
 		120142E61D08930B00D66905 /* S3File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = S3File.h; sourceTree = "<group>"; };
 		120142E71D08930B00D66905 /* S3File.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = S3File.m; sourceTree = "<group>"; };
+		1235BC891D0FD30100E4AA27 /* ChatRight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatRight.h; sourceTree = "<group>"; };
+		1235BC8A1D0FD30100E4AA27 /* ChatRight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatRight.m; sourceTree = "<group>"; };
+		1235BC8C1D0FD30E00E4AA27 /* ChatLeft.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatLeft.h; sourceTree = "<group>"; };
+		1235BC8D1D0FD30E00E4AA27 /* ChatLeft.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatLeft.m; sourceTree = "<group>"; };
+		1235BC8F1D0FF82500E4AA27 /* NSDate+TimeAgo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+TimeAgo.h"; sourceTree = "<group>"; };
+		1235BC901D0FF82500E4AA27 /* NSDate+TimeAgo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+TimeAgo.m"; sourceTree = "<group>"; };
+		1235BC921D0FF97B00E4AA27 /* NSDateTimeAgo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = NSDateTimeAgo.bundle; sourceTree = "<group>"; };
 		124928821CEFF7F70038A2F3 /* ImagePicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePicker.h; sourceTree = "<group>"; };
 		124928831CEFF7F70038A2F3 /* ImagePicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImagePicker.m; sourceTree = "<group>"; };
 		124928851CF003420038A2F3 /* CachedFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CachedFile.h; sourceTree = "<group>"; };
@@ -124,12 +133,8 @@
 		1296A7AB1D03E0CA00E44642 /* Profile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Profile.m; sourceTree = "<group>"; };
 		129B07511D0AAAB5000C0276 /* NearByCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NearByCell.h; sourceTree = "<group>"; };
 		129B07521D0AAAB5000C0276 /* NearByCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NearByCell.m; sourceTree = "<group>"; };
-		12DB01A71D0E312300E33359 /* ChatCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatCell.h; sourceTree = "<group>"; };
-		12DB01A81D0E312300E33359 /* ChatCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatCell.m; sourceTree = "<group>"; };
 		12DB01B01D0E317700E33359 /* Chat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chat.h; sourceTree = "<group>"; };
 		12DB01B11D0E317700E33359 /* Chat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Chat.m; sourceTree = "<group>"; };
-		12DE5FA41CFD40DD009B315F /* MessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageCell.h; sourceTree = "<group>"; };
-		12DE5FA51CFD40DD009B315F /* MessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageCell.m; sourceTree = "<group>"; };
 		12DE5FA71CFD43A7009B315F /* Balloon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Balloon.h; sourceTree = "<group>"; };
 		12DE5FA81CFD43A7009B315F /* Balloon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Balloon.m; sourceTree = "<group>"; };
 		12DE5FB21CFEF58A009B315F /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
@@ -268,8 +273,6 @@
 				124928B11CF2E65A0038A2F3 /* ToggleButton.m */,
 				12DE5FA71CFD43A7009B315F /* Balloon.h */,
 				12DE5FA81CFD43A7009B315F /* Balloon.m */,
-				12DE5FA41CFD40DD009B315F /* MessageCell.h */,
-				12DE5FA51CFD40DD009B315F /* MessageCell.m */,
 				12DE5FB91D004443009B315F /* Progress.h */,
 				12DE5FBA1D004443009B315F /* Progress.m */,
 				12F0D70B1D06D53D00A37C40 /* MediaPlayer.h */,
@@ -287,10 +290,12 @@
 		129B07541D0AAABB000C0276 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
-				12DB01A71D0E312300E33359 /* ChatCell.h */,
-				12DB01A81D0E312300E33359 /* ChatCell.m */,
 				129B07511D0AAAB5000C0276 /* NearByCell.h */,
 				129B07521D0AAAB5000C0276 /* NearByCell.m */,
+				1235BC891D0FD30100E4AA27 /* ChatRight.h */,
+				1235BC8A1D0FD30100E4AA27 /* ChatRight.m */,
+				1235BC8C1D0FD30E00E4AA27 /* ChatLeft.h */,
+				1235BC8D1D0FD30E00E4AA27 /* ChatLeft.m */,
 			);
 			name = Cells;
 			sourceTree = "<group>";
@@ -298,6 +303,9 @@
 		12DE5FDF1D02BC1F009B315F /* File Manager */ = {
 			isa = PBXGroup;
 			children = (
+				1235BC921D0FF97B00E4AA27 /* NSDateTimeAgo.bundle */,
+				1235BC8F1D0FF82500E4AA27 /* NSDate+TimeAgo.h */,
+				1235BC901D0FF82500E4AA27 /* NSDate+TimeAgo.m */,
 				12DE5FE01D02BC79009B315F /* FileSystem.h */,
 				12DE5FE11D02BC79009B315F /* FileSystem.m */,
 				12DE5FE31D02D523009B315F /* NSMutableDictionary+Bullet.h */,
@@ -495,6 +503,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				12F7419A1CE4B97100E8267A /* LaunchScreen.storyboard in Resources */,
+				1235BC931D0FF97B00E4AA27 /* NSDateTimeAgo.bundle in Resources */,
 				12F741971CE4B97100E8267A /* Assets.xcassets in Resources */,
 				12F741951CE4B97100E8267A /* Main.storyboard in Resources */,
 			);
@@ -526,14 +535,15 @@
 				124928871CF003420038A2F3 /* CachedFile.m in Sources */,
 				12F741F51CE59C7F00E8267A /* MenuCell.m in Sources */,
 				12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */,
-				12DE5FA61CFD40DD009B315F /* MessageCell.m in Sources */,
 				12F741EF1CE593A500E8267A /* Menu.m in Sources */,
 				1296A7AC1D03E0CA00E44642 /* Profile.m in Sources */,
 				12DE5FB81CFFB1A2009B315F /* Preview.m in Sources */,
 				12F0D7101D092F8600A37C40 /* MediaView.m in Sources */,
+				1235BC911D0FF82500E4AA27 /* NSDate+TimeAgo.m in Sources */,
 				12DE5FE21D02BC79009B315F /* FileSystem.m in Sources */,
 				124928B21CF2E65A0038A2F3 /* ToggleButton.m in Sources */,
 				12F741D11CE56B3400E8267A /* FloatingDrawerView.m in Sources */,
+				1235BC8B1D0FD30100E4AA27 /* ChatRight.m in Sources */,
 				12DE5FE51D02D523009B315F /* NSMutableDictionary+Bullet.m in Sources */,
 				12F0D70D1D06D53D00A37C40 /* MediaPlayer.m in Sources */,
 				1296A7A91D03BB5500E44642 /* Notifications.m in Sources */,
@@ -544,13 +554,13 @@
 				12F0D7191D0A7C6100A37C40 /* NearBy.m in Sources */,
 				12F741D21CE56B3400E8267A /* FloatingDrawerViewController.m in Sources */,
 				124928B91CF2ED810038A2F3 /* UIButton+Badge.m in Sources */,
-				12DB01A91D0E312300E33359 /* ChatCell.m in Sources */,
 				1296A7A31D03B34000E44642 /* BaseCollections.m in Sources */,
 				12DE5FA91CFD43A7009B315F /* Balloon.m in Sources */,
 				124928B81CF2ED810038A2F3 /* UIBarButtonItem+Badge.m in Sources */,
 				126AF40B1CEDAE0E00E3ED67 /* IndentedLabel.m in Sources */,
 				125AEF3C1CF9F08300553475 /* SimulatedUsers.m in Sources */,
 				12F0D7131D0A3B8800A37C40 /* Signup.m in Sources */,
+				1235BC8E1D0FD30E00E4AA27 /* ChatLeft.m in Sources */,
 				129B07531D0AAAB5000C0276 /* NearByCell.m in Sources */,
 				1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */,
 				12F741DA1CE56F4300E8267A /* MainController.m in Sources */,

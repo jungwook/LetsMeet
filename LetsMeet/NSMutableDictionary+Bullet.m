@@ -21,30 +21,33 @@
     return bullet;
 }
 
-+ (instancetype)bulletWithPhoto:(PFFile*)file
++ (instancetype)bulletWithPhoto:(NSString*)filename thumbnail:(NSString *)thumbnail
 {
     Bullet* bullet = [Bullet new];
     bullet.bulletType = kBulletTypePhoto;
-    bullet.fileName = file.name;
-    bullet.fileURL = file.url;
+    bullet.mediaFile = filename;
+    bullet.mediaThumbnailFile = thumbnail;
+    bullet.message = [[self bulletTypeStringForType:bullet.bulletType] stringByAppendingString:@" 메시지"];
     return bullet;
 }
 
-+ (instancetype)bulletWithVideo:(PFFile*)file
++ (instancetype)bulletWithVideo:(NSString*)filename thumbnail:(NSString *)thumbnail
 {
     Bullet* bullet = [Bullet new];
     bullet.bulletType = kBulletTypeVideo;
-    bullet.fileName = file.name;
-    bullet.fileURL = file.url;
+    bullet.mediaFile = filename;
+    bullet.mediaThumbnailFile = thumbnail;
+    bullet.message = [[self bulletTypeStringForType:bullet.bulletType] stringByAppendingString:@" 메시지"];
     return bullet;
 }
 
-+ (instancetype)bulletWithAudio:(PFFile*)file
++ (instancetype)bulletWithAudio:(NSString*)filename thumbnail:(NSString *)thumbnail
 {
     Bullet* bullet = [Bullet new];
     bullet.bulletType = kBulletTypeAudio;
-    bullet.fileName = file.name;
-    bullet.fileURL = file.url;
+    bullet.mediaFile = filename;
+    bullet.mediaThumbnailFile = thumbnail;
+    bullet.message = [[self bulletTypeStringForType:bullet.bulletType] stringByAppendingString:@" 메시지"];
     return bullet;
 }
 
@@ -105,7 +108,7 @@
     return [Bullet bulletTypeStringForType:self.bulletType];
 }
 
-- (NSString*) defaultNameForBulletType
+- (NSString*) defaultFileNameForBulletType
 {
     switch (self.bulletType) {
         case kBulletTypePhoto:
@@ -157,37 +160,26 @@
     [self setObject:message forKey:@"message"];
 }
 
-- (NSString *)mediaInfo
+- (NSString *) mediaFile
 {
-    return [self objectForKey:@"mediaInfo"];
+    return [self objectForKey:@"mediaFile"];
 }
 
-- (void)setMediaInfo:(NSString *)mediaInfo
+-(void)setMediaFile:(NSString *)mediaFile
 {
-    ASSERTNOTNULL(mediaInfo);
-    [self setObject:mediaInfo forKey:@"mediaInfo"];
+    ASSERTNOTNULL(mediaFile);
+    [self setObject:mediaFile forKey:@"mediaFile"];
 }
 
-- (NSString *)fileName
+- (NSString *)mediaThumbnailFile
 {
-    return [self objectForKey:@"fileName"];
+    return [self objectForKey:@"mediaThumbnailFile"];
 }
 
-- (void)setFileName:(NSString *)fileName
+- (void)setMediaThumbnailFile:(NSString *)mediaThumbnailFile
 {
-    ASSERTNOTNULL(fileName);
-    [self setObject:fileName forKey:@"fileName"];
-}
-
-- (NSString *)fileURL
-{
-    return [self objectForKey:@"fileURL"];
-}
-
-- (void)setFileURL:(NSString *)fileURL
-{
-    ASSERTNOTNULL(fileURL);
-    [self setObject:fileURL forKey:@"fileURL"];
+    ASSERTNOTNULL(mediaThumbnailFile);
+    [self setObject:mediaThumbnailFile forKey:@"mediaThumbnailFile"];
 }
 
 - (NSDate *)createdAt
@@ -263,11 +255,6 @@
     }
 }
 
-- (BOOL)isDataAvailable
-{
-    return [self objectForKey:@"data"] ? YES : NO;
-}
-
 - (BulletObject *)object
 {
     BulletObject *object = [BulletObject object];
@@ -278,13 +265,14 @@
     if (self.message)
         object.message = self.message;
     
-    if (self.mediaInfo)
-        object.mediaInfo = self.mediaInfo;
-    
     object.bulletType = self.bulletType;
     object.isSyncFromUser = self.isSyncFromUser;
     object.isSyncToUser = self.isSyncToUser;
-    object.isRead = self.isRead;
+    object.mediaFile = self.mediaFile;
+    object.mediaThumbnailFile = self.mediaThumbnailFile;
+    
+    //  object.isRead = self.isRead;
+    //  NOT USING isRead ON THE PERSISTENCE LAYER
     
     return object;
 }
@@ -296,9 +284,12 @@
 @dynamic toUser;
 @dynamic bulletType;
 @dynamic message;
-@dynamic file;
-@dynamic mediaInfo;
-@dynamic isSyncToUser, isSyncFromUser, isRead;
+@dynamic isSyncToUser;
+@dynamic isSyncFromUser;
+@dynamic mediaThumbnailFile;
+@dynamic mediaFile;
+
+//@dynamic isRead;
 
 #define IOTE(__X__) if (self.__X__) bullet.__X__ = self.__X__
 #define IOTU(__X__, __Y__) if (self.__X__) bullet.__Y__ = self.__X__.objectId
@@ -313,18 +304,13 @@
     IOTE(updatedAt);
     IOTU(fromUser, fromUserId);
     IOTU(toUser, toUserId);
-    if (self.file) {
-        bullet.fileURL = self.file.url;
-        bullet.fileName = self.file.name;
-        
-        // ACTUAL LOADING OF THE THUMBNAIL WILL HAPPEN FROM WIHTIN THE FILESYSTEM ENGINE
-    }
+    IOTE(mediaFile);
+    IOTE(mediaThumbnailFile);
     IOTE(message);
-    IOTE(mediaInfo);
     bullet.isSyncToUser = self.isSyncToUser;
     bullet.isSyncFromUser = self.isSyncFromUser;
     bullet.bulletType = self.bulletType;
-    bullet.isRead = self.isRead;
+    bullet.isRead = NO;
     
     return bullet;
 }

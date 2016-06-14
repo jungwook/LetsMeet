@@ -11,19 +11,54 @@
 #import "RefreshControl.h"
 #import "FileSystem.h"
 #import "Chat.h"
+#import "Notifications.h"
 
 @interface NearBy ()
 @property (nonatomic, weak) User *me;
 @property (nonatomic, strong) NSArray* users;
 @property (nonatomic, strong) FileSystem *system;
 @property (nonatomic, strong) RefreshControl *refresh;
+@property (nonatomic, strong) Notifications *notifications;
 @end
 
 @implementation NearBy
 
 static NSString * const reuseIdentifier = @"NearByCell";
 
+- (void)awakeFromNib
+{
+    __LF;
+    self.notifications = [Notifications notificationWithMessage:^(id bullet) {
+        [self refreshContents];
+    } broadcast:^(id senderId, NSString *message, NSTimeInterval duration) {
+        
+    } refresh:nil];
+}
+
+- (void)refreshContents
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.collectionView reloadData];
+    });
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    __LF;
+    [super viewWillAppear:animated];
+    [self.notifications on];
+    [self refreshContents];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    __LF
+    [super viewWillDisappear:animated];
+    [self.notifications off];
+}
+
 - (void)viewDidLoad {
+    __LF
     [super viewDidLoad];
     [self setCellSpacing];
     self.me = [User me];
@@ -54,7 +89,7 @@ static NSString * const reuseIdentifier = @"NearByCell";
         NSLog(@"Loaded %ld users near me", users.count);
         _users = [NSArray arrayWithArray:users];
         [self.refresh endRefreshing];
-        [self.collectionView reloadData];
+        [self refreshContents];
     }];
 }
 

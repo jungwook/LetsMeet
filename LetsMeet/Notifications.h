@@ -10,9 +10,13 @@
 
 typedef void(^BroadcastBlock)(id senderId, NSString* message, NSTimeInterval duration);
 typedef void(^BulletBlock)(id bullet);
+typedef void(^RefreshBadgeBlock)();
 
 @interface Notifications : NSObject
 - (void)setBulletAction:(BulletBlock)bulletAction;
 - (void)setBroadcastAction:(BroadcastBlock)broadcastAction;
-+ (instancetype) notificationWithMessage:(BulletBlock)block broadcast:(BroadcastBlock)broadcast;
+- (void)setRefreshBadgeAction:(RefreshBadgeBlock)refreshBadgeAction;
++ (instancetype) notificationWithMessage:(BulletBlock)block broadcast:(BroadcastBlock)broadcast refresh:(RefreshBadgeBlock)refresh;
+- (void)off;
+- (void)on;
 @end

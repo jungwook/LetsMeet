@@ -40,7 +40,7 @@ typedef void (^UsersArrayBlock)(NSArray<User*>*users);
  The 'add:(NSMutableDictionary*)message for:(id)userId mine:(BOOL)mine' method adds a new message to the system to user with userId. Saves the internal file and sends a push notification depending on whether it's mine (BOOL).
  **/
 
-- (void) add:(Bullet*)message for:(id)userId thumbnail:(NSData*)thumbnail originalData:(NSData*)originalData;
+- (void)add:(Bullet *)bullet for:(id)userId;
 
 /**
  Looks for users near the currentUser's location through the UsersArrayBlock block.
