@@ -478,8 +478,8 @@ Hello</string>
                                                         <action selector="editPhoto:" destination="HNa-PN-MV6" eventType="touchUpInside" id="8J6-jA-xgV"/>
                                                     </connections>
                                                 </button>
-                                                <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" misplaced="YES" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="CAx-g1-ATM">
-                                                    <rect key="frame" x="0.0" y="177" width="320" height="2"/>
+                                                <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="CAx-g1-ATM">
+                                                    <rect key="frame" x="0.0" y="176" width="320" height="2"/>
                                                 </progressView>
                                             </subviews>
                                             <constraints>
