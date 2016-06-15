@@ -19,6 +19,7 @@
 		1235BC8E1D0FD30E00E4AA27 /* ChatLeft.m in Sources */ = {isa = PBXBuildFile; fileRef = 1235BC8D1D0FD30E00E4AA27 /* ChatLeft.m */; };
 		1235BC911D0FF82500E4AA27 /* NSDate+TimeAgo.m in Sources */ = {isa = PBXBuildFile; fileRef = 1235BC901D0FF82500E4AA27 /* NSDate+TimeAgo.m */; };
 		1235BC931D0FF97B00E4AA27 /* NSDateTimeAgo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 1235BC921D0FF97B00E4AA27 /* NSDateTimeAgo.bundle */; };
+		1235BC991D11229600E4AA27 /* PhotoViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1235BC981D11229600E4AA27 /* PhotoViewer.m */; };
 		124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928831CEFF7F70038A2F3 /* ImagePicker.m */; };
 		124928871CF003420038A2F3 /* CachedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928861CF003420038A2F3 /* CachedFile.m */; };
 		1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928891CF0176C0038A2F3 /* ListPicker.m */; };
@@ -106,6 +107,8 @@
 		1235BC8F1D0FF82500E4AA27 /* NSDate+TimeAgo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+TimeAgo.h"; sourceTree = "<group>"; };
 		1235BC901D0FF82500E4AA27 /* NSDate+TimeAgo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+TimeAgo.m"; sourceTree = "<group>"; };
 		1235BC921D0FF97B00E4AA27 /* NSDateTimeAgo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = NSDateTimeAgo.bundle; sourceTree = "<group>"; };
+		1235BC971D11229600E4AA27 /* PhotoViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoViewer.h; sourceTree = "<group>"; };
+		1235BC981D11229600E4AA27 /* PhotoViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoViewer.m; sourceTree = "<group>"; };
 		124928821CEFF7F70038A2F3 /* ImagePicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePicker.h; sourceTree = "<group>"; };
 		124928831CEFF7F70038A2F3 /* ImagePicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImagePicker.m; sourceTree = "<group>"; };
 		124928851CF003420038A2F3 /* CachedFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CachedFile.h; sourceTree = "<group>"; };
@@ -288,6 +291,8 @@
 				12F0D7151D0A773000A37C40 /* TextFieldAlert.m */,
 				120142EC1D1042AD00D66905 /* EXPhotoViewer.h */,
 				120142ED1D1042AD00D66905 /* EXPhotoViewer.m */,
+				1235BC971D11229600E4AA27 /* PhotoViewer.h */,
+				1235BC981D11229600E4AA27 /* PhotoViewer.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -541,6 +546,7 @@
 				12F741F51CE59C7F00E8267A /* MenuCell.m in Sources */,
 				12F7418F1CE4B97100E8267A /* AppDelegate.m in Sources */,
 				12F741EF1CE593A500E8267A /* Menu.m in Sources */,
+				1235BC991D11229600E4AA27 /* PhotoViewer.m in Sources */,
 				1296A7AC1D03E0CA00E44642 /* Profile.m in Sources */,
 				12DE5FB81CFFB1A2009B315F /* Preview.m in Sources */,
 				12F0D7101D092F8600A37C40 /* MediaView.m in Sources */,

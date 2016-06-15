@@ -112,10 +112,10 @@
 
 - (void) timeKeep
 {
-    __LF
     static int count = 0;
     
     if ((++count)%10 == 0  && self.isSimulator) {
+        __LF
         [self fetchOutstandingBullets];
     }
 }
@@ -145,8 +145,6 @@
 
 - (NSArray*) messagesWith:(id)userId
 {
-    __LF
-
     NSSortDescriptor *sd = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES];
     return [[self.bullets objectForKey:userId] sortedArrayUsingDescriptors:@[sd]];
 }
@@ -164,7 +162,7 @@
 
     NSError *error = nil;
 
-    NSLog(@"LOADING ALL USER MESSAGES");
+//    NSLog(@"LOADING ALL USER MESSAGES");
     
     NSArray *fileURLs = [self.manager contentsOfDirectoryAtURL:self.messagesDirectoryPath includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:&error];
     
@@ -174,8 +172,8 @@
         
         NSMutableArray *bullets = [NSMutableArray arrayWithContentsOfURL:url];
         [self.bullets setObject:bullets ? bullets : [NSMutableArray array] forKey:userId];
-        NSLog(@"==> LOADED MESSAGES %ld FOR USER %@", bullets.count, userId );
-        NSLog(@"MESSAGE %@", bullets);
+//        NSLog(@"==> LOADED MESSAGES %ld FOR USER %@", bullets.count, userId );
+//        NSLog(@"MESSAGE %@", bullets);
     }];
 }
 

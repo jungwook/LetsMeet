@@ -15,19 +15,25 @@
 #import "Notifications.h"
 #import "S3File.h"
 
+#define kInitialTextViewHeight 34
+#define kNavigationBarHeight 64
+
 @interface Chat ()
 {
-    CGRect keyboardEndFrameWindow;
-    double keyboardTransitionDuration;
-    UIViewAnimationCurve keyboardTransitionAnimationCurve;
 }
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIView *bar;
 
-@property (strong, nonatomic) UITextView *messageView;
+@property (weak, nonatomic) IBOutlet UITextView *messageView;
+//@property (strong, nonatomic) UITextView *messageView;
 @property (nonatomic) CGFloat textViewHeight;
 @property (nonatomic, strong) FileSystem* system;
 @property (nonatomic, strong) Notifications* notifications;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *barTop;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *barBottom;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageTop;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageBottom;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *barHeight;
 @end
 
 @implementation Chat
@@ -37,6 +43,7 @@
     self = [super initWithCoder:aDecoder];
     if (self) {
         self.system = [FileSystem new];
+        self.textViewHeight = kInitialTextViewHeight;
     }
     return self;
 }
@@ -45,37 +52,31 @@
 {
     __LF
     _user = user;
+    self.navigationItem.title = user.nickname;
     self.notifications = [Notifications notificationWithMessage:^(id bullet) {
         [self.system readUnreadBulletsWithUserId:self.user.objectId];
-        [self refreshContents];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.tableView reloadData];
+            [self scrollToBottomAnimated:YES];
+        });
     } broadcast:^(id senderId, NSString *message, NSTimeInterval duration) {
         
     } refresh:nil];
     [self.system readUnreadBulletsWithUserId:self.user.objectId];
 }
 
-- (void) scrollToBottomAnimated:(BOOL)animated
-{
-    const NSInteger section = 0;
-    NSInteger count = [self tableView:self.tableView numberOfRowsInSection:section];
-    if (count>0) {
-        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:count-1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:animated];
-    }
-}
-
-- (void)refreshContents
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.tableView reloadData];
-        [self scrollToBottomAnimated:YES];
-    });
-}
-
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     [self.notifications on];
-    [self refreshContents];
+    [self.tableView reloadData];
+    [self scrollToBottomAnimated:NO];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [self scrollToBottomAnimated:YES];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -86,18 +87,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.tableView.delegate = self;
-    self.tableView.dataSource = self;
-    if (!self.messageView) {
-        float m = self.bar.frame.size.height+30;
-        float h = keyboardEndFrameWindow.origin.y-m;
-        [self.bar setFrame:CGRectMake(self.bar.frame.origin.x, h, self.bar.frame.size.width, m)];
-        [self.tableView setFrame:CGRectMake(self.tableView.frame.origin.x, 0, self.tableView.frame.size.width, h)];
-        [self addTextView];
-    }
     [self addObservers];
-    [self.tableView reloadData];
-    [self scrollToBottomAnimated:NO];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -135,13 +125,13 @@
     switch (type) {
         case kBulletTypePhoto:
         case kBulletTypeVideo: {
-            return 240+16;
+            return 240+30; // FROM 15 + 15
         }
             break;
         case kBulletTypeText: {
             UIFont *font = [UIFont boldSystemFontOfSize:17];
             CGRect rect = rectForString(bullet.message, font, 280);
-            return rect.size.height + 40;
+            return rect.size.height + 56; // FROM 41 + 15
         }
             break;
         default:
@@ -150,52 +140,24 @@
     return 40;
 }
 
-#define LEFTBUTSIZE 45
-#define TOPINSET 8
-
-- (void) addTextView
-{
-    CGSize size = self.bar.frame.size;
-    self.messageView = [[UITextView alloc] initWithFrame:CGRectMake(LEFTBUTSIZE+TOPINSET, TOPINSET, size.width-2*(LEFTBUTSIZE+TOPINSET), size.height-2*TOPINSET)];
-    self.messageView.delegate = self;
-    self.messageView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
-    self.messageView.font = [UIFont systemFontOfSize:16];
-    self.messageView.backgroundColor = [UIColor whiteColor];
-    self.textViewHeight = 30;
-    self.messageView.keyboardType = UIKeyboardTypeDefault;
-    self.messageView.autocorrectionType = UITextAutocorrectionTypeNo;
-    self.messageView.returnKeyType = UIReturnKeyNext;
-    self.messageView.enablesReturnKeyAutomatically = YES;
-    self.messageView.layer.cornerRadius = 2.0;
-    self.messageView.layer.borderWidth = 0.5;
-    self.messageView.layer.borderColor =  [UIColor colorWithRed:200.0/255.0 green:200.0/255.0 blue:205.0/255.0 alpha:1.0].CGColor;
-    
-    [self.bar addSubview:self.messageView];
-}
-
 - (void) dealloc
 {
     [self removeObservers];
 }
 
-- (void)doEndEditingEvent:(NSString *)string
-{
-    __LF
-}
-
 - (void)clearTextView
 {
     self.messageView.text = @"";
-    self.textViewHeight = 30;
+    self.textViewHeight = kInitialTextViewHeight;
+    [self doKeyBoardEvent:nil];
 }
 
 - (IBAction)sendMessage:(id)sender {
     __LF
-
-    Bullet* bullet = [Bullet bulletWithText:self.messageView.text];
+    NSString *string = [self.messageView.text stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    Bullet* bullet = [Bullet bulletWithText:string];
     [self.system add:bullet for:self.user.objectId];
     [self clearTextView];
-    [self keyBoardEventWithRefresh:YES];
 }
 
 - (IBAction)sendMedia:(id)sender {
@@ -289,7 +251,6 @@
     Bullet* bullet = [Bullet bulletWithPhoto:mediaFile thumbnail:thumbnailFile];
     [self.system add:bullet for:self.user.objectId];
     [self clearTextView];
-    [self keyBoardEventWithRefresh:YES];
 }
 
 NSString* randomObjectId();
@@ -319,6 +280,9 @@ NSString* randomObjectId();
             mediaFile = [S3File saveMovieData:videoData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
                 if (succeeded) {
                     NSLog(@"UPLOADED VIDEO TO:%@", file);
+                    Bullet* bullet = [Bullet bulletWithVideo:mediaFile thumbnail:thumbnailFile];
+                    [self.system add:bullet for:self.user.objectId];
+                    [self clearTextView];
                 }
                 else {
                     NSLog(@"ERROR:%@", error.localizedDescription);
@@ -326,10 +290,6 @@ NSString* randomObjectId();
                 [[NSFileManager defaultManager] removeItemAtURL:outputURL error:nil];
             } progress:nil];
         }
-        Bullet* bullet = [Bullet bulletWithVideo:mediaFile thumbnail:thumbnailFile];
-        [self.system add:bullet for:self.user.objectId];
-        [self clearTextView];
-        [self keyBoardEventWithRefresh:YES];
      }];
 }
 
@@ -360,22 +320,10 @@ NSString* randomObjectId();
     
 }
 
-
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
-
 
 - (void) addObservers
 {
@@ -384,10 +332,6 @@ NSString* randomObjectId();
                                                  name:UIKeyboardWillChangeFrameNotification
                                                object:nil];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(doEndEditingEvent:)
-                                                 name:UITextViewTextDidEndEditingNotification
-                                               object:nil];
 }
 
 - (void) removeObservers
@@ -395,19 +339,57 @@ NSString* randomObjectId();
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:UIKeyboardWillChangeFrameNotification
                                                   object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UITextViewTextDidEndEditingNotification
-                                                  object:nil];
 }
+
+#define Height(__X__) __X__.bounds.size.height
+
 
 - (void)doKeyBoardEvent:(NSNotification *)notification
 {
-    __LF
-    [[notification.userInfo valueForKey:UIKeyboardFrameEndUserInfoKey] getValue: &keyboardEndFrameWindow];
-    [[notification.userInfo valueForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&keyboardTransitionDuration];
-    [[notification.userInfo valueForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&keyboardTransitionAnimationCurve];
-    
-    [self keyBoardEventWithRefresh:YES];
+    static CGRect keyboardEndFrameWindow;
+    static CGRect keyboardBeginFrameWindow;
+    static double keyboardTransitionDuration;
+    static UIViewAnimationCurve keyboardTransitionAnimationCurve;
+
+    if (notification) {
+        [[notification.userInfo valueForKey:UIKeyboardFrameBeginUserInfoKey] getValue: &keyboardBeginFrameWindow];
+        [[notification.userInfo valueForKey:UIKeyboardFrameEndUserInfoKey] getValue: &keyboardEndFrameWindow];
+        [[notification.userInfo valueForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&keyboardTransitionDuration];
+        [[notification.userInfo valueForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&keyboardTransitionAnimationCurve];
+    }
+
+    self.messageView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        CGSize kbSize = keyboardBeginFrameWindow.size;
+        BOOL isUp = (keyboardBeginFrameWindow.origin.y > keyboardEndFrameWindow.origin.y);
+        UIEdgeInsets contentInsets = isUp ? UIEdgeInsetsMake(0.0, 0.0, kbSize.height, 0.0) : UIEdgeInsetsZero;
+        self.barBottom.constant = isUp ? kbSize.height : 0;
+        self.barHeight.constant = self.textViewHeight + self.messageTop.constant + self.messageBottom.constant;
+        
+        self.tableView.contentInset = contentInsets;
+        self.tableView.scrollIndicatorInsets = contentInsets;
+        [self.bar setNeedsUpdateConstraints];
+        
+        [UIView animateWithDuration:keyboardTransitionDuration delay:0.0f options:(keyboardTransitionAnimationCurve << 16) animations:^{
+            [self.bar layoutIfNeeded];
+            [self moveDownTextView:self.messageView];
+        } completion:^(BOOL finished) {
+            [self scrollToBottomAnimated:YES];
+        }];
+    });
+}
+
+- (void) moveDownTextView:(UITextView*)textView
+{
+    if (![textView.text isEqualToString:@""]) {
+        [textView setContentOffset:CGPointMake(0.0, textView.contentSize.height - Height(textView)) animated:NO];
+    }
+}
+
+- (void) scrollToBottomAnimated:(BOOL)animated
+{
+    [self.tableView scrollRectToVisible:CGRectMake(0, self.tableView.contentSize.height-1, 1, 1) animated:animated];
 }
 
 
@@ -416,45 +398,11 @@ NSString* randomObjectId();
     [self.messageView resignFirstResponder];
 }
 
-- (void)keyBoardEventWithRefresh:(BOOL)refresh
-{
-    __LF
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [UIView beginAnimations:nil context:NULL];
-        [UIView setAnimationCurve:keyboardTransitionAnimationCurve];
-        [UIView setAnimationBeginsFromCurrentState:YES];
-        [UIView setAnimationDuration:keyboardTransitionDuration];
-        
-        float m = self.bar.frame.size.height;
-        m = self.textViewHeight + 18;
-        float h = keyboardEndFrameWindow.origin.y-m;
-        [self.bar setFrame:CGRectMake(self.bar.frame.origin.x, h, self.bar.frame.size.width, m)];
-        [self.tableView setFrame:CGRectMake(self.tableView.frame.origin.x, 0, self.tableView.frame.size.width, h)];
-        [UIView commitAnimations];
-        CGPoint offsetPoint = CGPointMake(0.0, self.messageView.contentSize.height - self.messageView.bounds.size.height);
-        [self.messageView setContentOffset:offsetPoint animated:YES];
-        
-        if (refresh) {
-            [self refreshContents];
-        }
-    });
-}
-
 - (void)textViewDidChange:(UITextView *)textView
 {
-    __LF
     CGRect rect = rectForString([textView.text stringByAppendingString:@"x"], textView.font, textView.frame.size.width);
-    self.textViewHeight = MIN(200, MAX(rect.size.height+12,30));
-    [self keyBoardEventWithRefresh:NO];
+    self.textViewHeight = MIN(200, MAX(rect.size.height+16, kInitialTextViewHeight));
+    [self doKeyBoardEvent:nil];
 }
-
-- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
-{
-    if ([text isEqualToString:@"\n"]) {
-        [self keyBoardEventWithRefresh:YES];
-    }
-    return YES;
-}
-
 
 @end

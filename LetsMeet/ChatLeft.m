@@ -10,18 +10,20 @@
 #import "Balloon.h"
 #import "S3File.h"
 #import "NSDate+TimeAgo.h"
-#import "EXPhotoViewer.h"
+#import "PhotoViewer.h"
 
 @interface ChatLeft()
 @property (weak, nonatomic) IBOutlet Balloon *balloon;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *spacing;
-@property (weak, nonatomic) IBOutlet UILabel *dateLabel;
 @property (weak, nonatomic) IBOutlet UIView *photoView;
+@property (weak, nonatomic) IBOutlet UILabel *dateLabel;
 @property (weak, nonatomic) IBOutlet UILabel *messageLabel;
-@property (weak, nonatomic) IBOutlet UIImageView *thumbnailView;
+@property (weak, nonatomic) IBOutlet UIView *thumbnailView;
 @property (weak, nonatomic) IBOutlet UIImageView *playView;
+@property (nonatomic) BulletTypes mediaType;
+@property (nonatomic) ProfileMediaTypes profileMediaType;
 @property (nonatomic, strong) id mediaFile;
-@property (nonatomic) BulletTypes bulletType;
+@property (nonatomic, strong) id profileMediaFile;
 @property (nonatomic, strong) id messageId;
 @end
 
@@ -31,40 +33,43 @@
     [super awakeFromNib];
     [self.balloon setIsMine:NO];
     
-    self.photoView.layer.cornerRadius = 2.0f;
+    self.photoView.layer.cornerRadius = 20.f;
     self.photoView.layer.masksToBounds = YES;
     self.thumbnailView.layer.contentsGravity = kCAGravityResizeAspectFill;
-
+    
     if (![self.photoView.gestureRecognizers count]) {
         [self.photoView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedPhotoView:)]];
     }
     
     self.thumbnailView.userInteractionEnabled = YES;
     if (![self.thumbnailView.gestureRecognizers count]) {
-        [self.thumbnailView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self.thumbnailView action:@selector(tappedThumbnailView:)]];
+        [self.thumbnailView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedThumbnailView:)]];
     } else {
         NSLog(@"GESTURES:%@", self.thumbnailView.gestureRecognizers);
     }
 
 }
 
-- (void) tappedPhotoView:(id)sender
+- (void) tappedPhotoView:(UITapGestureRecognizer*)tap
 {
     NSLog(@"Tapped Photo");
+    [PhotoViewer showMediaFromView:tap.view filename:self.profileMediaFile isPhoto:(self.profileMediaType == kProfileMediaPhoto)];
 }
 
-- (void) tappedThumbnailView:(id)sender
+- (void) tappedThumbnailView:(UITapGestureRecognizer*)tap
 {
-    NSLog(@"Tapped Thumbnail");
-    if (self.bulletType==kBulletTypePhoto) {
-        [EXPhotoViewer showImageFrom:sender];
-    }
+    NSLog(@"Tapped Thumbnail:%@", tap);
+    [PhotoViewer showMediaFromView:tap.view filename:self.mediaFile isPhoto:(self.mediaType == kBulletTypePhoto)];
 }
 
 - (void)setMessage:(Bullet *)message user:(User*)user tableView:(UITableView*)tableView
 {
     _messageId = message.objectId;
-    _bulletType = message.bulletType;
+    
+    _profileMediaType = user.profileMediaType;
+    _profileMediaFile = user.profileMedia;
+    
+    _mediaType = message.bulletType;
     _mediaFile = message.mediaFile;
     
     self.dateLabel.text = message.createdAt.timeAgo;
@@ -120,11 +125,11 @@
     });
 }
 
-
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
-
+    
     // Configure the view for the selected state
 }
+
 
 @end

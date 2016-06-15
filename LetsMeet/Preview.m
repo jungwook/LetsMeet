@@ -33,8 +33,6 @@
         f.origin.y = -64.0f;
     v.frame = f;
 }
-
-
 @end
 
 @interface Preview () <UIScrollViewDelegate>
