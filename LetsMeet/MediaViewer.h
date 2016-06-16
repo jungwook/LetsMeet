@@ -1,5 +1,5 @@
 //
-//  PhotoViewer.h
+//  MediaViewer.h
 //  LetsMeet
 //
 //  Created by 한정욱 on 2016. 6. 15..
@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface PhotoViewer : UIView
+@interface MMediaView : UIView
+@end
+
+@interface MediaViewer : UIView
 + (void)showMediaFromView:(UIView*)view filename:(id)filename isPhoto:(BOOL)isPhoto;
 @end

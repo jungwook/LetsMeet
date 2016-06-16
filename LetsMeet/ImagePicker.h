@@ -17,7 +17,7 @@ typedef NS_OPTIONS(NSUInteger, ImagePickerMediaType) {
     kImagePickerMediaVoice                  = 1 << 2,
 };
 
-typedef void (^ImagePickerBlock)(id data, BulletTypes type, NSString* sizeString, NSURL *url);
+typedef void (^ImagePickerBlock)(id data, MediaTypes type, NSString* sizeString, NSURL *url);
 
 @interface ImagePicker : UIImagePickerController <UIImagePickerControllerDelegate, UIAlertViewDelegate, UINavigationControllerDelegate>
 - (instancetype)initWithParentViewController:(UIViewController*)parent

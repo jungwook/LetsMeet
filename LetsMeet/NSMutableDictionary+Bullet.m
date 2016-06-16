@@ -16,7 +16,7 @@
 + (instancetype)bulletWithText:(NSString *)text
 {
     Bullet* bullet = [Bullet new];
-    bullet.bulletType = kBulletTypeText;
+    bullet.mediaType = kMediaTypeText;
     bullet.message = text;
     return bullet;
 }
@@ -24,30 +24,30 @@
 + (instancetype)bulletWithPhoto:(NSString*)filename thumbnail:(NSString *)thumbnail
 {
     Bullet* bullet = [Bullet new];
-    bullet.bulletType = kBulletTypePhoto;
+    bullet.mediaType = kMediaTypePhoto;
     bullet.mediaFile = filename;
     bullet.mediaThumbnailFile = thumbnail;
-    bullet.message = [[self bulletTypeStringForType:bullet.bulletType] stringByAppendingString:@" 메시지"];
+    bullet.message = [[self mediaTypeStringForType:bullet.mediaType] stringByAppendingString:@" 메시지"];
     return bullet;
 }
 
 + (instancetype)bulletWithVideo:(NSString*)filename thumbnail:(NSString *)thumbnail
 {
     Bullet* bullet = [Bullet new];
-    bullet.bulletType = kBulletTypeVideo;
+    bullet.mediaType = kMediaTypeVideo;
     bullet.mediaFile = filename;
     bullet.mediaThumbnailFile = thumbnail;
-    bullet.message = [[self bulletTypeStringForType:bullet.bulletType] stringByAppendingString:@" 메시지"];
+    bullet.message = [[self mediaTypeStringForType:bullet.mediaType] stringByAppendingString:@" 메시지"];
     return bullet;
 }
 
 + (instancetype)bulletWithAudio:(NSString*)filename thumbnail:(NSString *)thumbnail
 {
     Bullet* bullet = [Bullet new];
-    bullet.bulletType = kBulletTypeAudio;
+    bullet.mediaType = kMediaTypeAudio;
     bullet.mediaFile = filename;
     bullet.mediaThumbnailFile = thumbnail;
-    bullet.message = [[self bulletTypeStringForType:bullet.bulletType] stringByAppendingString:@" 메시지"];
+    bullet.message = [[self mediaTypeStringForType:bullet.mediaType] stringByAppendingString:@" 메시지"];
     return bullet;
 }
 
@@ -98,55 +98,55 @@
     [self setObject:toUserId forKey:@"toUser"];
 }
 
-- (BulletTypes)bulletType
+- (MediaTypes)mediaType
 {
-    return [[self objectForKey:@"bulletType"] integerValue];
+    return [[self objectForKey:@"mediaType"] integerValue];
 }
 
-- (NSString*)bulletTypeString
+- (NSString*)mediaTypeString
 {
-    return [Bullet bulletTypeStringForType:self.bulletType];
+    return [Bullet mediaTypeStringForType:self.mediaType];
 }
 
-- (NSString*) defaultFileNameForBulletType
+- (NSString*) defaultFileNameForMediaType
 {
-    switch (self.bulletType) {
-        case kBulletTypePhoto:
+    switch (self.mediaType) {
+        case kMediaTypePhoto:
             return @"photo.jpg";
-        case kBulletTypeVideo:
+        case kMediaTypeVideo:
             return @"video.mov";
-        case kBulletTypeAudio:
+        case kMediaTypeAudio:
             return @"audio.wav";
-        case kBulletTypeURL:
-        case kBulletTypeNone:
-        case kBulletTypeText:
+        case kMediaTypeURL:
+        case kMediaTypeNone:
+        case kMediaTypeText:
         default:
             return @"None";
     }
 }
 
-+ (NSString*)bulletTypeStringForType:(BulletTypes)bulletType
++ (NSString*)mediaTypeStringForType:(MediaTypes)mediaType
 {
-    switch (bulletType) {
-        case kBulletTypeText:
+    switch (mediaType) {
+        case kMediaTypeText:
             return @"Text";
-        case kBulletTypePhoto:
+        case kMediaTypePhoto:
             return @"Photo";
-        case kBulletTypeVideo:
+        case kMediaTypeVideo:
             return @"Video";
-        case kBulletTypeAudio:
+        case kMediaTypeAudio:
             return @"Audio";
-        case kBulletTypeURL:
+        case kMediaTypeURL:
             return @"URL";
-        case kBulletTypeNone:
+        case kMediaTypeNone:
         default:
             return @"None";
     }
 }
 
--(void)setBulletType:(BulletTypes)bulletType
+-(void)setMediaType:(MediaTypes)mediaType
 {
-    [self setObject:@(bulletType) forKey:@"bulletType"];
+    [self setObject:@(mediaType) forKey:@"mediaType"];
 }
 
 -(NSString *)message
@@ -265,7 +265,7 @@
     if (self.message)
         object.message = self.message;
     
-    object.bulletType = self.bulletType;
+    object.mediaType = self.mediaType;
     object.isSyncFromUser = self.isSyncFromUser;
     object.isSyncToUser = self.isSyncToUser;
     object.mediaFile = self.mediaFile;
@@ -282,7 +282,7 @@
 @implementation BulletObject
 @dynamic fromUser;
 @dynamic toUser;
-@dynamic bulletType;
+@dynamic mediaType;
 @dynamic message;
 @dynamic isSyncToUser;
 @dynamic isSyncFromUser;
@@ -309,7 +309,7 @@
     IOTE(message);
     bullet.isSyncToUser = self.isSyncToUser;
     bullet.isSyncFromUser = self.isSyncFromUser;
-    bullet.bulletType = self.bulletType;
+    bullet.mediaType = self.mediaType;
     bullet.isRead = NO;
     
     return bullet;
@@ -326,27 +326,27 @@
 
 - (BOOL)isTextMessage
 {
-    return (self.bulletType == kBulletTypeText);
+    return (self.mediaType == kMediaTypeText);
 }
 
 - (BOOL)isPhotoMessage
 {
-    return (self.bulletType == kBulletTypePhoto);
+    return (self.mediaType == kMediaTypePhoto);
 }
 
 - (BOOL)isAudioMessage
 {
-    return (self.bulletType == kBulletTypeAudio);
+    return (self.mediaType == kMediaTypeAudio);
 }
 
 -(BOOL)isVideoMessage
 {
-    return (self.bulletType == kBulletTypeVideo);
+    return (self.mediaType == kMediaTypeVideo);
 }
 
 -(BOOL)isURLMessage
 {
-    return (self.bulletType == kBulletTypeURL);
+    return (self.mediaType == kMediaTypeURL);
 }
 
 @end

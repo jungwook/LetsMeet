@@ -9,13 +9,13 @@
 #import <Foundation/Foundation.h>
 #import "FileSystem.h"
 
-typedef NS_OPTIONS(NSUInteger, BulletTypes) {
-    kBulletTypeNone = 0,
-    kBulletTypeText,
-    kBulletTypePhoto,
-    kBulletTypeVideo,
-    kBulletTypeAudio,
-    kBulletTypeURL
+typedef NS_OPTIONS(NSUInteger, MediaTypes) {
+    kMediaTypeNone = 0,
+    kMediaTypeText,
+    kMediaTypePhoto,
+    kMediaTypeVideo,
+    kMediaTypeAudio,
+    kMediaTypeURL
 };
 
 @class Progress;
@@ -50,7 +50,7 @@ typedef NSMutableDictionary Bullet;
 @property (nonatomic, assign) NSString* message;
 @property (nonatomic, assign) NSDate* createdAt;
 @property (nonatomic, assign) NSDate* updatedAt;
-@property (nonatomic) BulletTypes bulletType;
+@property (nonatomic) MediaTypes mediaType;
 @property (nonatomic) BOOL isSyncFromUser;
 @property (nonatomic) BOOL isSyncToUser;
 @property (nonatomic) BOOL isRead;
@@ -58,9 +58,9 @@ typedef NSMutableDictionary Bullet;
 @property (nonatomic, assign) NSString* mediaThumbnailFile;
 
 - (BOOL) isFromMe;
-+ (NSString*) bulletTypeStringForType:(BulletTypes)bulletType;
-- (NSString*) bulletTypeString;
-- (NSString*) defaultFileNameForBulletType;
++ (NSString*) mediaTypeStringForType:(MediaTypes)mediaType;
+- (NSString*) mediaTypeString;
+- (NSString*) defaultFileNameForMediaType;
 
 + (instancetype) bulletWithBullet:(Bullet*)newDic;
 + (instancetype) bulletWithText:(NSString*)text;
@@ -79,7 +79,7 @@ typedef NSMutableDictionary Bullet;
 @property (retain) NSString *message;
 @property (retain) NSString *mediaFile;
 @property (retain) NSString *mediaThumbnailFile;
-@property BulletTypes bulletType;
+@property MediaTypes mediaType;
 @property BOOL isSyncFromUser;
 @property BOOL isSyncToUser;
 //@property BOOL isRead;

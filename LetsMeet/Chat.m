@@ -120,15 +120,15 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     Bullet *bullet = [[self.system messagesWith:self.user.objectId] objectAtIndex:indexPath.row];
-    BulletTypes type = bullet.bulletType;
+    MediaTypes type = bullet.mediaType;
     
     switch (type) {
-        case kBulletTypePhoto:
-        case kBulletTypeVideo: {
+        case kMediaTypePhoto:
+        case kMediaTypeVideo: {
             return 240+30; // FROM 15 + 15
         }
             break;
-        case kBulletTypeText: {
+        case kMediaTypeText: {
             UIFont *font = [UIFont boldSystemFontOfSize:17];
             CGRect rect = rectForString(bullet.message, font, 280);
             return rect.size.height + 56; // FROM 41 + 15

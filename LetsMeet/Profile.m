@@ -184,7 +184,7 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
     return [UIImage imageWithCGImage:image.CGImage scale:1.0f orientation:orientation];
 }
 
-- (void) treatVideoOfType:(BulletTypes)type url:(NSURL*)url thumbnail:(NSData*)thumbnail
+- (void) treatVideoOfType:(MediaTypes)type url:(NSURL*)url thumbnail:(NSData*)thumbnail
 {
     NSURL *outputURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"profile_video.mov"];
     
@@ -229,13 +229,13 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
 - (IBAction)editPhoto:(id)sender {
     [self.mediaView pause];
     
-    [ImagePicker proceedWithParentViewController:self photoSelectedBlock:^(id data, BulletTypes type, NSString *sizeString, NSURL *url) {
-        if (type == kBulletTypePhoto) {
+    [ImagePicker proceedWithParentViewController:self photoSelectedBlock:^(id data, MediaTypes type, NSString *sizeString, NSURL *url) {
+        if (type == kMediaTypePhoto) {
             id orig = compressedImageData(data, 1024);
             id thumb = compressedImageData(data, 100);
             [self save:self.me orig:orig thumb:thumb];
         }
-        else if (type == kBulletTypeVideo) {
+        else if (type == kMediaTypeVideo) {
             [self treatVideoOfType:type url:url thumbnail:data];
         }
     } cancelBlock:nil];

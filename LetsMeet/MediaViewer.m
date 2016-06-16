@@ -1,13 +1,51 @@
 //
-//  PhotoViewer.m
+//  MediaViewer.m
 //  LetsMeet
 //
 //  Created by 한정욱 on 2016. 6. 15..
 //  Copyright © 2016년 SMARTLY CO. All rights reserved.
 //
 
-#import "PhotoViewer.h"
+#import "MediaViewer.h"
 #import "S3File.h"
+#import "NSMutableDictionary+Bullet.h"
+
+@interface MMediaView()
+@property (nonatomic, strong) UITapGestureRecognizer *tapGesture;
+@property (nonatomic, strong) id mediaFile;
+@property (nonatomic) MediaTypes mediaType;
+@end
+
+@implementation MMediaView
+- (instancetype) initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        [self initialize];
+    }
+    return self;
+}
+
+- (instancetype) init
+{
+    self = [super init];
+    if (self) {
+        [self initialize];
+    }
+    return self;
+}
+
+- (void) initialize
+{
+    self.tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapped:)];
+}
+
+- (void) tapped:(UITapGestureRecognizer*) gesture
+{
+//    [MediaViewer showMediaFromView:tap.view filename:self.profileMediaFile isPhoto:(self.profileMediaType == kProfileMediaPhoto)];
+}
+
+@end
 
 @interface CenterView : UIScrollView
 @end
@@ -37,7 +75,7 @@
 @end
 
 
-@interface PhotoViewer() <UIScrollViewDelegate>
+@interface MediaViewer() <UIScrollViewDelegate>
 @property (nonatomic, strong) id mediaFile;
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIImageView *imageView;
@@ -49,11 +87,11 @@
 @property (nonatomic) CGFloat zoom;
 @end
 
-@implementation PhotoViewer
+@implementation MediaViewer
 
 + (void)showMediaFromView:(UIView *)view filename:(id)filename isPhoto:(BOOL)isPhoto
 {
-    [[PhotoViewer new] showMediaFromView:view filename:filename isPhoto:isPhoto];
+    [[MediaViewer new] showMediaFromView:view filename:filename isPhoto:isPhoto];
 }
 
 - (void) dealloc

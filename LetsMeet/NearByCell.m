@@ -104,8 +104,8 @@
     if (animate) {
         [UIView animateWithDuration:0.2 animations:^{
             self.photoView.alpha = 0.0f;
-        } completion:^(BOOL finished) {
             self.photoView.layer.contents = (id) [UIImage imageWithData:data].CGImage;
+        } completion:^(BOOL finished) {
             [UIView animateWithDuration:0.1f animations:^{
                 self.photoView.alpha = 1.0f;
             }];

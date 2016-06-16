@@ -156,14 +156,14 @@
     return [self.usersPath path];
 }
 
+#define FIXBULLETTYPEISSUE
+
 - (void)load
 {
     __LF
 
     NSError *error = nil;
 
-//    NSLog(@"LOADING ALL USER MESSAGES");
-    
     NSArray *fileURLs = [self.manager contentsOfDirectoryAtURL:self.messagesDirectoryPath includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:&error];
     
     [fileURLs enumerateObjectsUsingBlock:^(NSURL* _Nonnull url, NSUInteger idx, BOOL * _Nonnull stop)
@@ -171,10 +171,19 @@
         NSString *userId = [url lastPathComponent];
         
         NSMutableArray *bullets = [NSMutableArray arrayWithContentsOfURL:url];
+        
+#ifdef FIXBULLETTYPEISSUE
+        [bullets enumerateObjectsUsingBlock:^(Bullet*  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            obj.mediaType = [obj[@"bulletType"] integerValue];
+        }];
+#endif
+        
         [self.bullets setObject:bullets ? bullets : [NSMutableArray array] forKey:userId];
-//        NSLog(@"==> LOADED MESSAGES %ld FOR USER %@", bullets.count, userId );
-//        NSLog(@"MESSAGE %@", bullets);
     }];
+    
+#ifdef FIXBULLETTYPEISSUE
+    [self save];
+#endif
 }
 
 - (BOOL)save
