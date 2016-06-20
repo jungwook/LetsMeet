@@ -1,14 +1,14 @@
 //
-//  MediaView.m
+//  ProfileView.m
 //  LetsMeet
 //
 //  Created by 한정욱 on 2016. 6. 9..
 //  Copyright © 2016년 SMARTLY CO. All rights reserved.
 //
 
-#import "MediaView.h"
+#import "ProfileView.h"
 
-@interface MediaView()
+@interface ProfileView()
 @property (nonatomic, strong) AVPlayerItem *playerItem;
 @property (nonatomic, strong) AVPlayer *player;
 @property (nonatomic, strong) AVPlayerLayer *playerLayer;
@@ -22,7 +22,7 @@
 
 #define S3LOCATION @"http://parsekr.s3.ap-northeast-2.amazonaws.com/"
 
-@implementation MediaView
+@implementation ProfileView
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
 {

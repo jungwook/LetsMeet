@@ -46,45 +46,48 @@
     [self setMask];
 }
 
+#define CPM(__X__,__Y__) CGPointMake(__X__, __Y__)
+
 - (void) setMask
 {
-    const CGFloat is = 10, inset = is / 2;
+    const CGFloat i1 = 5.0f, i2 = 5.0f, i3 = 7.0f;
     CGRect rect = self.frame;
-    CAShapeLayer *hexagonMask = [CAShapeLayer layer];
-    UIBezierPath *hexagonPath = [UIBezierPath bezierPath];
+    CAShapeLayer *mask = [CAShapeLayer layer];
+    
+    UIBezierPath *path = [UIBezierPath bezierPath];
     CGFloat w = rect.size.width, h=rect.size.height;
+    CGFloat l = 0, r = w, t = 0, b = h;
     
-    const CGPoint points[] = {
-        self.isMine ? CGPointMake(0, is) :          CGPointMake(inset, is),
-        self.isMine ? CGPointMake(is, 0) :          CGPointMake(inset+is, 0),
-        self.isMine ? CGPointMake(w-is-inset, 0) :  CGPointMake(w-is, 0),
-        self.isMine ? CGPointMake(w-inset, is) :    CGPointMake(w, is),
-        self.isMine ? CGPointMake(w-inset, h-is) :  CGPointMake(w, h-is),
-        self.isMine ? CGPointMake(w, h) :           CGPointMake(w-is, h),
-        self.isMine ? CGPointMake(is, h) :          CGPointMake(0, h),
-        self.isMine ? CGPointMake(0, h-is) :        CGPointMake(inset, h-is),
-        self.isMine ? CGPointMake(0, is) :          CGPointMake(inset, is),
-        self.isMine ? CGPointMake(is, 0) :          CGPointMake(inset+is,0),
-    };
-    const CGPoint anchor[] = {
-        self.isMine ? CGPointMake(0, 0) :           CGPointMake(inset, 0),
-        self.isMine ? CGPointMake(w-inset, 0) :     CGPointMake(w, 0),
-        self.isMine ? CGPointMake(w-inset, h) :     CGPointMake(w, h),
-        self.isMine ? CGPointMake(0, h) :           CGPointMake(inset, h),
-        self.isMine ? CGPointMake(0, 0) :           CGPointMake(inset, 0),
-    };
-    
-    for (int i=0; i<sizeof(points)/sizeof(CGPoint); i=i+2) {
-        if (i==0) {
-            [hexagonPath moveToPoint:CGPointMake(points[i].x, points[i].y)];
-        } else {
-            [hexagonPath addLineToPoint:CGPointMake(points[i].x, points[i].y)];
-        }
-        [hexagonPath addQuadCurveToPoint:CGPointMake(points[i+1].x, points[i+1].y) controlPoint:CGPointMake(anchor[i/2].x, anchor[i/2].y)];
+    if (self.isMine) {
+        [path moveToPoint:CPM(l, i1)];
+        [path addQuadCurveToPoint:CPM(i1, t) controlPoint:CPM(l, t)];
+        [path addLineToPoint:CPM(r-i1-i2, t)];
+        [path addQuadCurveToPoint:CPM(r-i2, i1) controlPoint:CPM(r-i2, t)];
+        [path addLineToPoint:CPM(r-i2, i3)];
+        [path addLineToPoint:CPM(r, i3)];
+        [path addLineToPoint:CPM(r-i2, i3+i2)];
+        [path addLineToPoint:CPM(r-i2, b-i1)];
+        [path addQuadCurveToPoint:CPM(r-i2-i1, b) controlPoint:CPM(r-i2, b)];
+        [path addLineToPoint:CPM(i1, b)];
+        [path addQuadCurveToPoint:CPM(l, b-i1) controlPoint:CPM(l, b)];
+        [path addLineToPoint:CPM(l, i1)];
     }
-    
-    hexagonMask.path = hexagonPath.CGPath;
-    self.layer.mask = hexagonMask;
+    else {
+        [path moveToPoint:CPM(l+i2, i1)];
+        [path addQuadCurveToPoint:CPM(l+i2+i1, t) controlPoint:CPM(l+i2, t)];
+        [path addLineToPoint:CPM(r-i1, t)];
+        [path addQuadCurveToPoint:CPM(r, i1) controlPoint:CPM(r, t)];
+        [path addLineToPoint:CPM(r, b-i1)];
+        [path addQuadCurveToPoint:CPM(r-i1, b) controlPoint:CPM(r, b)];
+        [path addLineToPoint:CPM(l+i1+i2, b)];
+        [path addQuadCurveToPoint:CPM(l+i2, b-i1) controlPoint:CPM(l+i2, b)];
+        [path addLineToPoint:CPM(l+i2, i3+i2)];
+        [path addLineToPoint:CPM(l, i3)];
+        [path addLineToPoint:CPM(l+i2, i3)];
+        [path addLineToPoint:CPM(l+i2, i1)];
+    }
+    mask.path = path.CGPath;
+    self.layer.mask = mask;
 }
 
 @end

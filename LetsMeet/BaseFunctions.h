@@ -19,3 +19,5 @@ float       Heading(PFUser* from, PFUser* to);
 CGRect      hiveToFrame(CGPoint hive, CGFloat radius, CGFloat inset, CGPoint center);
 CGRect      rectForString(NSString *string, UIFont *font, CGFloat maxWidth);
 NSData*     compressedImageData(NSData* data, CGFloat width);
+MediaTypes  mediaTypeFromProfileMediaTypes(ProfileMediaTypes type);
+NSString*   randomObjectId();

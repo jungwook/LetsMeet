@@ -7,8 +7,13 @@
 //
 
 #import "FileSystem.h"
-//#import "CachedFile.h"
 #import "Signup.h"
+
+#define CHATFILEEXTENSION @".ChatFile"
+#define OBJECTIDSTORE @"ObjectIdStore"
+#define SYSTEM_PATH_COMPONENT @"Engine"
+#define SYSTEM_USER_PATH_COMPONENT @"Users"
+#define SYSTEM_MESSAGES_PATH_COMPONENT @"Messages"
 
 @interface ObjectIdStore : NSObject
 + (BOOL) addObjectId:(id)objectId;
@@ -79,15 +84,16 @@
     return self;
 }
 
+
 - (void) initializeSystem
 {
     __LF
     NSError *error = nil;
     
     self.applicationPath = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-    self.systemPath = [self.applicationPath URLByAppendingPathComponent:@"Engine"];
-    self.usersPath = [self.systemPath URLByAppendingPathComponent:@"Users"];
-    self.messagesDirectoryPath = [self.systemPath URLByAppendingPathComponent:@"Messages"];
+    self.systemPath = [self.applicationPath URLByAppendingPathComponent:SYSTEM_PATH_COMPONENT];
+    self.usersPath = [self.systemPath URLByAppendingPathComponent:SYSTEM_USER_PATH_COMPONENT];
+    self.messagesDirectoryPath = [self.systemPath URLByAppendingPathComponent:SYSTEM_MESSAGES_PATH_COMPONENT];
     self.manager = [NSFileManager defaultManager];
     self.bullets = [NSMutableDictionary dictionary];
     
@@ -157,6 +163,7 @@
 }
 
 #define FIXBULLETTYPEISSUE
+#undef FIXBULLETTYPEISSUE
 
 - (void)load
 {
@@ -168,17 +175,22 @@
     
     [fileURLs enumerateObjectsUsingBlock:^(NSURL* _Nonnull url, NSUInteger idx, BOOL * _Nonnull stop)
     {
-        NSString *userId = [url lastPathComponent];
-        
-        NSMutableArray *bullets = [NSMutableArray arrayWithContentsOfURL:url];
-        
+        NSString *filename = [url lastPathComponent];
+        if ([filename containsString:CHATFILEEXTENSION]) {
+            NSString *userId = [filename stringByReplacingOccurrencesOfString:CHATFILEEXTENSION withString:@""];
+            NSMutableArray *bullets = [NSMutableArray arrayWithContentsOfURL:url];
+            
 #ifdef FIXBULLETTYPEISSUE
-        [bullets enumerateObjectsUsingBlock:^(Bullet*  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            obj.mediaType = [obj[@"bulletType"] integerValue];
-        }];
+            [bullets enumerateObjectsUsingBlock:^(Bullet*  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                obj.mediaType = [obj[@"bulletType"] integerValue];
+            }];
 #endif
+            [self.bullets setObject:bullets ? bullets : [NSMutableArray array] forKey:userId];
+        }
+        else {
+            
+        }
         
-        [self.bullets setObject:bullets ? bullets : [NSMutableArray array] forKey:userId];
     }];
     
 #ifdef FIXBULLETTYPEISSUE
@@ -201,7 +213,8 @@
     __LF
 
     @synchronized (self.lock) {
-        NSURL *userMessagesPath = [self.messagesDirectoryPath URLByAppendingPathComponent:userId];
+        NSString *filename = [userId stringByAppendingString:CHATFILEEXTENSION];
+        NSURL *userMessagesPath = [self.messagesDirectoryPath URLByAppendingPathComponent:filename];
         return [[self bulletsWith:userId] writeToURL:userMessagesPath atomically:YES];
     };
 }
@@ -230,6 +243,7 @@
 - (void)add:(Bullet *)bullet for:(id)userId
 {
     __LF
+    
     bullet.isRead = NO;
     bullet.isSyncFromUser = YES;
     bullet.isSyncToUser = [bullet isFromMe];
@@ -241,12 +255,15 @@
             bullet.objectId = object.objectId;
             bullet.createdAt = object.createdAt;
             bullet.updatedAt = object.updatedAt;
-            
-            NSLog(@"ADDING BULLET:%@", bullet);
             [[self bulletsWith:userId] addObject:bullet];
-            [self saveUser:userId];
-            [self notifySystemOfNewMessage:bullet];
-            [self sendPushMessage:bullet.message messageId:bullet.objectId toUserId:bullet.toUserId];
+            BOOL ret = [self saveUser:userId];
+            if (ret) {
+                [self notifySystemOfNewMessage:bullet];
+                [self sendPushMessage:bullet.message messageId:bullet.objectId toUserId:bullet.toUserId];
+            }
+            else {
+                NSLog(@"ERROR: Could not save local repository file. Probably due to non-serializable objects in the bullet");
+            }
         }
     }];
 }
@@ -578,21 +595,6 @@ The - (void) initLocationServices method initializes the location management sys
     }
 }
 
-NSString* randomObjectId()
-{
-    int length = 8;
-    char *base62chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    
-    NSString *code = @"";
-    
-    for (int i=0; i<length; i++) {
-        int rand = arc4random_uniform(36);
-        code = [code stringByAppendingString:[NSString stringWithFormat:@"%c", base62chars[rand]]];
-    }
-    
-    return code;
-}
-
 + (NSString *) objectId {
     FileSystem *system = [FileSystem new];
     
@@ -639,12 +641,13 @@ NSString* randomObjectId()
     return sharedFile;
 }
 
+
 - (instancetype)initOnce
 {
     __LF
     self = [super init];
     if (self) {
-        self.systemPath = [[[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"Engine"] URLByAppendingPathComponent:@"ObjectIdStore"];
+        self.systemPath = [[[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:SYSTEM_PATH_COMPONENT] URLByAppendingPathComponent:OBJECTIDSTORE];
         self.objectIdSet = [NSMutableSet setWithArray:[NSArray arrayWithContentsOfURL:self.systemPath]];
         self.lock = [NSObject new]; //MUTEX LOCK
     }

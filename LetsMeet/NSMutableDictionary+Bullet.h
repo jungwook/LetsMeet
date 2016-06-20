@@ -39,7 +39,7 @@ typedef void (^NewUserBlock)(User* me);
 #define kJPEGCompressionMedium 0.4f
 #define kJPEGCompressionDefault 0.6f
 #define kJPEGCompressionFull 1.0f
-#define kThumbnailWidth 230.0f
+#define kThumbnailWidth 240.0f
 
 typedef NSMutableDictionary Bullet;
 
@@ -50,7 +50,9 @@ typedef NSMutableDictionary Bullet;
 @property (nonatomic, assign) NSString* message;
 @property (nonatomic, assign) NSDate* createdAt;
 @property (nonatomic, assign) NSDate* updatedAt;
-@property (nonatomic) MediaTypes mediaType;
+@property (nonatomic, assign) MediaTypes mediaType;
+@property (nonatomic, assign) CGSize mediaSize;
+@property (nonatomic) BOOL realMedia;
 @property (nonatomic) BOOL isSyncFromUser;
 @property (nonatomic) BOOL isSyncToUser;
 @property (nonatomic) BOOL isRead;
@@ -64,9 +66,9 @@ typedef NSMutableDictionary Bullet;
 
 + (instancetype) bulletWithBullet:(Bullet*)newDic;
 + (instancetype) bulletWithText:(NSString*)text;
-+ (instancetype) bulletWithPhoto:(NSString*)filename thumbnail:(NSString*)thumbnail;
-+ (instancetype) bulletWithVideo:(NSString*)filename thumbnail:(NSString*)thumbnail;
-+ (instancetype) bulletWithAudio:(NSString*)filename thumbnail:(NSString*)thumbnail;
++ (instancetype) bulletWithPhoto:(NSString*)filename thumbnail:(NSString*)thumbnail mediaSize:(CGSize)size realMedia:(BOOL)realMedia;
++ (instancetype) bulletWithVideo:(NSString*)filename thumbnail:(NSString*)thumbnail mediaSize:(CGSize)size realMedia:(BOOL)realMedia;
++ (instancetype) bulletWithAudio:(NSString*)filename thumbnail:(NSString*)thumbnail realMedia:(BOOL)realMedia;
 
 - (BulletObject*) object;
 @end
@@ -79,16 +81,12 @@ typedef NSMutableDictionary Bullet;
 @property (retain) NSString *message;
 @property (retain) NSString *mediaFile;
 @property (retain) NSString *mediaThumbnailFile;
+@property CGFloat mediaWidth, mediaHeight;
 @property MediaTypes mediaType;
 @property BOOL isSyncFromUser;
 @property BOOL isSyncToUser;
-//@property BOOL isRead;
+@property BOOL realMedia;
 
-- (BOOL) isTextMessage;
-- (BOOL) isPhotoMessage;
-- (BOOL) isVideoMessage;
-- (BOOL) isAudioMessage;
-- (BOOL) isURLMessage;
 - (BOOL) isFromMe;
 - (Bullet*) bullet;
 @end

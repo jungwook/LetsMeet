@@ -1,5 +1,5 @@
 //
-//  MediaView.h
+//  ProfileView.h
 //  LetsMeet
 //
 //  Created by 한정욱 on 2016. 6. 9..
@@ -12,7 +12,7 @@
 
 typedef void(^FrameChangedBlock)(CGSize size);
 
-@interface MediaView : UIView
+@interface ProfileView : UIView
 - (void) setMediaFromUser:(User*)user;
 - (void) setMediaFromUser:(User*)user frameBlock:(FrameChangedBlock)frameBlock;
 - (void) setPlayerItemURL:(NSURL *)url;

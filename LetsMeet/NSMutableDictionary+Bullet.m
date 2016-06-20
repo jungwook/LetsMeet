@@ -21,33 +21,38 @@
     return bullet;
 }
 
-+ (instancetype)bulletWithPhoto:(NSString*)filename thumbnail:(NSString *)thumbnail
++ (instancetype)bulletWithPhoto:(NSString*)filename thumbnail:(NSString *)thumbnail mediaSize:(CGSize)size realMedia:(BOOL)realMedia
 {
     Bullet* bullet = [Bullet new];
     bullet.mediaType = kMediaTypePhoto;
     bullet.mediaFile = filename;
     bullet.mediaThumbnailFile = thumbnail;
     bullet.message = [[self mediaTypeStringForType:bullet.mediaType] stringByAppendingString:@" 메시지"];
+    bullet.mediaSize = size;
+    bullet.realMedia = realMedia;
     return bullet;
 }
 
-+ (instancetype)bulletWithVideo:(NSString*)filename thumbnail:(NSString *)thumbnail
++ (instancetype)bulletWithVideo:(NSString*)filename thumbnail:(NSString *)thumbnail mediaSize:(CGSize)size realMedia:(BOOL)realMedia
 {
     Bullet* bullet = [Bullet new];
     bullet.mediaType = kMediaTypeVideo;
     bullet.mediaFile = filename;
     bullet.mediaThumbnailFile = thumbnail;
     bullet.message = [[self mediaTypeStringForType:bullet.mediaType] stringByAppendingString:@" 메시지"];
+    bullet.mediaSize = size;
+    bullet.realMedia = realMedia;
     return bullet;
 }
 
-+ (instancetype)bulletWithAudio:(NSString*)filename thumbnail:(NSString *)thumbnail
++ (instancetype)bulletWithAudio:(NSString*)filename thumbnail:(NSString *)thumbnail realMedia:(BOOL)realMedia
 {
     Bullet* bullet = [Bullet new];
     bullet.mediaType = kMediaTypeAudio;
     bullet.mediaFile = filename;
     bullet.mediaThumbnailFile = thumbnail;
     bullet.message = [[self mediaTypeStringForType:bullet.mediaType] stringByAppendingString:@" 메시지"];
+    bullet.realMedia = realMedia;
     return bullet;
 }
 
@@ -142,6 +147,30 @@
         default:
             return @"None";
     }
+}
+
+- (void)setMediaSize:(CGSize)mediaSize
+{
+    [self setObject:@(mediaSize.width) forKey:@"mediaWidth"];
+    [self setObject:@(mediaSize.height) forKey:@"mediaHeight"];
+}
+
+- (CGSize)mediaSize
+{
+    CGFloat height = [[self objectForKey:@"mediaHeight"] floatValue];
+    CGFloat width = [[self objectForKey:@"mediaWidth"] floatValue];
+    
+    return CGSizeMake(width, height);
+}
+
+- (void)setRealMedia:(BOOL)realMedia
+{
+    [self setObject:@(realMedia) forKey:@"realMedia"];
+}
+
+- (BOOL)realMedia
+{
+    return [[self objectForKey:@"realMedia"] boolValue];
 }
 
 -(void)setMediaType:(MediaTypes)mediaType
@@ -270,9 +299,9 @@
     object.isSyncToUser = self.isSyncToUser;
     object.mediaFile = self.mediaFile;
     object.mediaThumbnailFile = self.mediaThumbnailFile;
-    
-    //  object.isRead = self.isRead;
-    //  NOT USING isRead ON THE PERSISTENCE LAYER
+    object.mediaHeight = self.mediaSize.height;
+    object.mediaWidth = self.mediaSize.width;
+    object.realMedia = self.realMedia;
     
     return object;
 }
@@ -288,8 +317,8 @@
 @dynamic isSyncFromUser;
 @dynamic mediaThumbnailFile;
 @dynamic mediaFile;
-
-//@dynamic isRead;
+@dynamic realMedia;
+@dynamic mediaWidth, mediaHeight;
 
 #define IOTE(__X__) if (self.__X__) bullet.__X__ = self.__X__
 #define IOTU(__X__, __Y__) if (self.__X__) bullet.__Y__ = self.__X__.objectId
@@ -307,6 +336,8 @@
     IOTE(mediaFile);
     IOTE(mediaThumbnailFile);
     IOTE(message);
+    bullet.mediaSize = CGSizeMake(self.mediaWidth, self.mediaHeight);
+    bullet.realMedia = self.realMedia;
     bullet.isSyncToUser = self.isSyncToUser;
     bullet.isSyncFromUser = self.isSyncFromUser;
     bullet.mediaType = self.mediaType;
@@ -322,31 +353,6 @@
 - (BOOL)isFromMe
 {
     return [self.fromUser.objectId isEqualToString:[PFUser currentUser].objectId];
-}
-
-- (BOOL)isTextMessage
-{
-    return (self.mediaType == kMediaTypeText);
-}
-
-- (BOOL)isPhotoMessage
-{
-    return (self.mediaType == kMediaTypePhoto);
-}
-
-- (BOOL)isAudioMessage
-{
-    return (self.mediaType == kMediaTypeAudio);
-}
-
--(BOOL)isVideoMessage
-{
-    return (self.mediaType == kMediaTypeVideo);
-}
-
--(BOOL)isURLMessage
-{
-    return (self.mediaType == kMediaTypeURL);
 }
 
 @end

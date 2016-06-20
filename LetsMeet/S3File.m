@@ -38,8 +38,6 @@
     [[S3File file] getDataFromFile:filename completedBlock:block progressBlock:progress];
 }
 
-NSString* randomObjectId();
-
 - (void) getDataFromFile:(id)filename completedBlock:(S3GetBlock)block progressBlock:(S3ProgressBlock)progress
 {
     if (!filename) {

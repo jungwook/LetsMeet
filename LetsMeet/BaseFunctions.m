@@ -110,6 +110,10 @@ NSData* compressedImageData(NSData* data, CGFloat width)
 
 CGRect rectForString(NSString *string, UIFont *font, CGFloat maxWidth)
 {
+    const CGFloat inset = 8.0f;
+    const CGFloat insetInsideBalloonWidth = inset*3;
+    const CGFloat insetInsideBalloonHeight = inset*2;
+    
     string = [string stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     CGRect rect = CGRectIntegral([string boundingRectWithSize:CGSizeMake(maxWidth, 0)
                                                       options:NSStringDrawingUsesLineFragmentOrigin
@@ -117,5 +121,38 @@ CGRect rectForString(NSString *string, UIFont *font, CGFloat maxWidth)
                                                                 NSFontAttributeName: font,
                                                                 } context:nil]);
     
+    rect = CGRectMake(0, 0, rect.size.width+insetInsideBalloonWidth, rect.size.height+insetInsideBalloonHeight);
     return rect;
 }
+
+MediaTypes mediaTypeFromProfileMediaTypes(ProfileMediaTypes type)
+{
+    switch (type) {
+        case kProfileMediaPhoto:
+            return kMediaTypePhoto;
+            
+        case kProfileMediaVideo:
+            return kMediaTypeVideo;
+            
+        default:
+            return kMediaTypeNone;
+    }
+}
+
+NSString* randomObjectId()
+{
+    int length = 8;
+    char *base62chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    
+    NSString *code = @"";
+    
+    for (int i=0; i<length; i++) {
+        int rand = arc4random_uniform(36);
+        code = [code stringByAppendingString:[NSString stringWithFormat:@"%c", base62chars[rand]]];
+    }
+    
+    return code;
+}
+
+
+

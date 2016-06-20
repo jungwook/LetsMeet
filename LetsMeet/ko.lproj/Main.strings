@@ -1,0 +1,93 @@
+
+/* Class = "UILabel"; text = "nickname"; ObjectID = "2CM-zV-QyA"; */
+"2CM-zV-QyA.text" = "nickname";
+
+/* Class = "UILabel"; text = "미디어 메시지"; ObjectID = "6qR-Er-Yf2"; */
+"6qR-Er-Yf2.text" = "미디어 메시지";
+
+/* Class = "UITextField"; placeholder = "e.g. 여자"; ObjectID = "9Kg-EN-tI9"; */
+"9Kg-EN-tI9.placeholder" = "e.g. 여자";
+
+/* Class = "UINavigationItem"; title = "Inbox"; ObjectID = "AZN-fc-GSm"; */
+"AZN-fc-GSm.title" = "Inbox";
+
+/* Class = "UITableViewSection"; headerTitle = "PROFILE"; ObjectID = "Aga-Ie-ce7"; */
+"Aga-Ie-ce7.headerTitle" = "PROFILE";
+
+/* Class = "UINavigationItem"; title = "Profile"; ObjectID = "ERH-QU-Yxz"; */
+"ERH-QU-Yxz.title" = "Profile";
+
+/* Class = "UINavigationItem"; title = "Nearby"; ObjectID = "IFr-xP-euy"; */
+"IFr-xP-euy.title" = "Nearby";
+
+/* Class = "UILabel"; text = "Label\nHello"; ObjectID = "IlY-6r-npv"; */
+"IlY-6r-npv.text" = "Label\nHello";
+
+/* Class = "UITableViewSection"; headerTitle = "POINTS"; ObjectID = "LJ4-fr-RcA"; */
+"LJ4-fr-RcA.headerTitle" = "POINTS";
+
+/* Class = "UITableViewController"; title = "Inbox"; ObjectID = "Mtf-PS-JYY"; */
+"Mtf-PS-JYY.title" = "Inbox";
+
+/* Class = "UILabel"; text = "여자"; ObjectID = "Mv7-Iq-Fmy"; */
+"Mv7-Iq-Fmy.text" = "여자";
+
+/* Class = "UIButton"; normalTitle = "EDIT"; ObjectID = "RWM-cd-uwh"; */
+"RWM-cd-uwh.normalTitle" = "EDIT";
+
+/* Class = "UILabel"; text = "<1km"; ObjectID = "SVa-UY-PES"; */
+"SVa-UY-PES.text" = "<1km";
+
+/* Class = "UIButton"; normalTitle = "전송"; ObjectID = "Tnm-1h-th9"; */
+"Tnm-1h-th9.normalTitle" = "전송";
+
+/* Class = "UILabel"; text = "1"; ObjectID = "Uql-kl-ufN"; */
+"Uql-kl-ufN.text" = "1";
+
+/* Class = "UILabel"; text = "1000 pts"; ObjectID = "WMC-4b-iUC"; */
+"WMC-4b-iUC.text" = "1000 pts";
+
+/* Class = "UILabel"; text = "sosleek"; ObjectID = "XW2-MQ-T7y"; */
+"XW2-MQ-T7y.text" = "sosleek";
+
+/* Class = "UITextField"; placeholder = "30대"; ObjectID = "Xw7-Qn-UXe"; */
+"Xw7-Qn-UXe.placeholder" = "30대";
+
+/* Class = "UILabel"; text = "미디어 메시지"; ObjectID = "baR-d3-B8i"; */
+"baR-d3-B8i.text" = "미디어 메시지";
+
+/* Class = "UILabel"; text = "100h"; ObjectID = "f3j-K4-tGi"; */
+"f3j-K4-tGi.text" = "100h";
+
+/* Class = "UIButton"; normalTitle = "충전"; ObjectID = "gdG-8O-2bi"; */
+"gdG-8O-2bi.normalTitle" = "충전";
+
+/* Class = "UILabel"; text = "intro"; ObjectID = "grg-qV-zmw"; */
+"grg-qV-zmw.text" = "intro";
+
+/* Class = "UITextField"; placeholder = "만나요!"; ObjectID = "h7j-VL-XeK"; */
+"h7j-VL-XeK.placeholder" = "만나요!";
+
+/* Class = "UILabel"; text = "2016. 6. 23 (토요일)"; ObjectID = "iaO-Nu-vfa"; */
+"iaO-Nu-vfa.text" = "2016. 6. 23 (토요일)";
+
+/* Class = "UILabel"; text = "<1km"; ObjectID = "n9a-Gc-1Z3"; */
+"n9a-Gc-1Z3.text" = "<1km";
+
+/* Class = "UILabel"; text = "2016. 6. 23 (토요일)"; ObjectID = "oYX-uB-MPO"; */
+"oYX-uB-MPO.text" = "2016. 6. 23 (토요일)";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "qIg-fm-zoy"; */
+"qIg-fm-zoy.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = "40대"; ObjectID = "rTr-n3-dBH"; */
+"rTr-n3-dBH.text" = "40대";
+
+/* Class = "UILabel"; text = "1"; ObjectID = "rtX-i6-Flb"; */
+"rtX-i6-Flb.text" = "1";
+
+/* Class = "UITableViewSection"; headerTitle = "POINTS"; ObjectID = "uOy-gL-Esq"; */
+"uOy-gL-Esq.headerTitle" = "POINTS";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "wS0-wM-Iio"; */
+"wS0-wM-Iio.text" = "Label";

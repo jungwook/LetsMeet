@@ -7,10 +7,22 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "S3File.h"
 
-@interface MMediaView : UIView
+typedef BOOL(^ShouldRefreshBlock)(NSData * data, NSError * error, BOOL fromCache);
+
+@interface MediaView : UIView
+@property (nonatomic, strong) UIImage* image;
+
+- (void) loadMediaFromFile:(id)filename mediaType:(MediaTypes)mediaType completion:(S3GetBlock)block;
+- (void) loadMediaFromFile:(id)filename mediaType:(MediaTypes)mediaType shouldRefresh:(ShouldRefreshBlock)block;
+- (void) loadMediaFromMessage:(Bullet*)message completion:(S3GetBlock)block;
+- (void) loadMediaFromMessage:(Bullet*)message shouldRefresh:(ShouldRefreshBlock)block;
+- (void) loadMediaFromUser:(User*)user completion:(S3GetBlock)block;
+- (void) loadMediaFromUser:(User*)user shouldRefresh:(ShouldRefreshBlock)block;
+
 @end
 
 @interface MediaViewer : UIView
-+ (void)showMediaFromView:(UIView*)view filename:(id)filename isPhoto:(BOOL)isPhoto;
++ (void)showMediaFromView:(UIView*)view filename:(id)filename mediaType:(MediaTypes)mediaType;
 @end

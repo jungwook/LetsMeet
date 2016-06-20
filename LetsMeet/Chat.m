@@ -16,7 +16,10 @@
 #import "S3File.h"
 
 #define kInitialTextViewHeight 34
+#define kMaxTextViewHeight 200
 #define kNavigationBarHeight 64
+#define photoViewHeight 40
+#define balloonOffet 8
 
 @interface Chat ()
 {
@@ -25,7 +28,6 @@
 @property (weak, nonatomic) IBOutlet UIView *bar;
 
 @property (weak, nonatomic) IBOutlet UITextView *messageView;
-//@property (strong, nonatomic) UITextView *messageView;
 @property (nonatomic) CGFloat textViewHeight;
 @property (nonatomic, strong) FileSystem* system;
 @property (nonatomic, strong) Notifications* notifications;
@@ -63,6 +65,10 @@
         
     } refresh:nil];
     [self.system readUnreadBulletsWithUserId:self.user.objectId];
+    
+    [[self.system messagesWith:self.user.objectId] enumerateObjectsUsingBlock:^(Bullet*  _Nonnull msg, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSLog(@"Message:%@", msg.objectId);
+    }];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -125,19 +131,21 @@
     switch (type) {
         case kMediaTypePhoto:
         case kMediaTypeVideo: {
-            return 240+30; // FROM 15 + 15
+            if (bullet.mediaSize.width) {
+                CGFloat height = balloonOffet + 2 * balloonOffet + kThumbnailWidth * bullet.mediaSize.height / bullet.mediaSize.width;
+                return height;
+            }
+            else {
+                return kThumbnailWidth;
+            }
         }
-            break;
         case kMediaTypeText: {
-            UIFont *font = [UIFont boldSystemFontOfSize:17];
-            CGRect rect = rectForString(bullet.message, font, 280);
-            return rect.size.height + 56; // FROM 41 + 15
+            CGRect rect = rectForString(bullet.message, self.messageView.font, kThumbnailWidth);
+            return MAX(rect.size.height + balloonOffet + balloonOffet*2, photoViewHeight+balloonOffet);
         }
-            break;
         default:
-            break;
+            return photoViewHeight+balloonOffet;
     }
-    return 40;
 }
 
 - (void) dealloc
@@ -215,20 +223,27 @@
     NSURL *url = (NSURL*)[info objectForKey:UIImagePickerControllerMediaURL];
     
     if (CFStringCompare ((CFStringRef) mediaType, kUTTypeImage, 0) == kCFCompareEqualTo) {
-        [self handlePhoto:info url:url];
+        [self handlePhoto:info url:url source:picker.sourceType];
     }
     else if (CFStringCompare ((CFStringRef) mediaType, kUTTypeMovie, 0)== kCFCompareEqualTo) {
-        [self handleVideo:info url:url];
+        [self handleVideo:info url:url source:picker.sourceType];
     }
 
     [picker dismissViewControllerAnimated:YES completion:nil];
 }
+/*
+ typedef NS_ENUM(NSInteger, UIImagePickerControllerSourceType) {
+ UIImagePickerControllerSourceTypePhotoLibrary,
+ UIImagePickerControllerSourceTypeCamera,
+ UIImagePickerControllerSourceTypeSavedPhotosAlbum
+ } __TVOS_PROHIBITED;
 
-- (void) handlePhoto:(NSDictionary<NSString*, id>*)info url:(NSURL*)url
+ */
+- (void) handlePhoto:(NSDictionary<NSString*, id>*)info url:(NSURL*)url source:(UIImagePickerControllerSourceType)sourceType
 {
     UIImage *image = (UIImage *) [info objectForKey:UIImagePickerControllerEditedImage];
     NSData *imageData = UIImageJPEGRepresentation(image, 1.0);
-    NSData *thumbnailData = compressedImageData(imageData, 240);
+    NSData *thumbnailData = compressedImageData(imageData, kThumbnailWidth);
     
     NSString *thumbnailFile = [S3File saveImageData:thumbnailData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
         if (succeeded) {
@@ -247,18 +262,20 @@
             NSLog(@"ERROR:%@", error.localizedDescription);
         }
     } progress:nil];
+    
+    NSLog(@"source type:%ld", sourceType);
 
-    Bullet* bullet = [Bullet bulletWithPhoto:mediaFile thumbnail:thumbnailFile];
+    Bullet* bullet = [Bullet bulletWithPhoto:mediaFile thumbnail:thumbnailFile mediaSize:image.size  realMedia:(sourceType == UIImagePickerControllerSourceTypeCamera)];
     [self.system add:bullet for:self.user.objectId];
     [self clearTextView];
 }
 
-NSString* randomObjectId();
-
-- (void) handleVideo:(NSDictionary<NSString*, id>*)info url:(NSURL*)url
+- (void) handleVideo:(NSDictionary<NSString*, id>*)info url:(NSURL*)url source:(UIImagePickerControllerSourceType)sourceType
 {
     AVAsset *asset = [AVAsset assetWithURL:url];
-    NSData *thumbnailData = compressedImageData(UIImageJPEGRepresentation([self thumbnailFromVideoAsset:asset], kJPEGCompressionFull), 240);
+    UIImage *thumbnailImage = [self thumbnailFromVideoAsset:asset source:sourceType];
+    NSData *thumbnailData = compressedImageData(UIImageJPEGRepresentation(thumbnailImage, kJPEGCompressionFull), kThumbnailWidth);
+    
     NSString *thumbnailFile = [S3File saveImageData:thumbnailData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
         if (succeeded) {
             NSLog(@"UPLOADED THUMBNAIL TO:%@", file);
@@ -279,8 +296,10 @@ NSString* randomObjectId();
             
             mediaFile = [S3File saveMovieData:videoData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
                 if (succeeded) {
-                    NSLog(@"UPLOADED VIDEO TO:%@", file);
-                    Bullet* bullet = [Bullet bulletWithVideo:mediaFile thumbnail:thumbnailFile];
+                    NSLog(@"source type:%ld", sourceType);
+
+                    Bullet* bullet = [Bullet bulletWithVideo:mediaFile thumbnail:thumbnailFile mediaSize:thumbnailImage.size realMedia:(sourceType == UIImagePickerControllerSourceTypeCamera)];
+                    NSLog(@"UPLOADED VIDEO TO:%@ %@", file, bullet);
                     [self.system add:bullet for:self.user.objectId];
                     [self clearTextView];
                 }
@@ -296,7 +315,7 @@ NSString* randomObjectId();
 - (void)convertVideoToLowQuailtyWithInputURL:(NSURL*)inputURL outputURL:(NSURL*)outputURL handler:(void (^)(AVAssetExportSession*))handler {
     [[NSFileManager defaultManager] removeItemAtURL:outputURL error:nil];
     AVURLAsset *asset = [AVURLAsset URLAssetWithURL:inputURL options:nil];
-    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:asset presetName:AVAssetExportPreset640x480];
+    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:asset presetName:AVAssetExportPreset1920x1080]; 
     exportSession.outputURL = outputURL;
     exportSession.outputFileType = AVFileTypeQuickTimeMovie;
     [exportSession exportAsynchronouslyWithCompletionHandler:^(void) {
@@ -304,16 +323,15 @@ NSString* randomObjectId();
     }];
 }
 
-
-- (UIImage*) thumbnailFromVideoAsset:(AVAsset*)asset
+- (UIImage*) thumbnailFromVideoAsset:(AVAsset*)asset source:(UIImagePickerControllerSourceType)sourceType
 {
+    __LF
     AVAssetImageGenerator *generateImg = [[AVAssetImageGenerator alloc] initWithAsset:asset];
     generateImg.appliesPreferredTrackTransform = YES;
-    UIImage *thumbnail = [[UIImage alloc] initWithCGImage:[generateImg copyCGImageAtTime:CMTimeMake(1, 1) actualTime:NULL error:nil]];
     
+    UIImage *thumbnail = [[UIImage alloc] initWithCGImage:[generateImg copyCGImageAtTime:CMTimeMake(1, 1) actualTime:NULL error:nil]];
     return thumbnail;
 }
-
 
 - (void) selectAudioMedia
 {
@@ -363,7 +381,8 @@ NSString* randomObjectId();
     dispatch_async(dispatch_get_main_queue(), ^{
         CGSize kbSize = keyboardBeginFrameWindow.size;
         BOOL isUp = (keyboardBeginFrameWindow.origin.y > keyboardEndFrameWindow.origin.y);
-        UIEdgeInsets contentInsets = isUp ? UIEdgeInsetsMake(0.0, 0.0, kbSize.height, 0.0) : UIEdgeInsetsZero;
+        UIEdgeInsets zeroInsets = UIEdgeInsetsMake(kNavigationBarHeight, 0, 0, 0);
+        UIEdgeInsets contentInsets = isUp ? UIEdgeInsetsMake(kNavigationBarHeight, 0.0, kbSize.height, 0.0) : zeroInsets;
         self.barBottom.constant = isUp ? kbSize.height : 0;
         self.barHeight.constant = self.textViewHeight + self.messageTop.constant + self.messageBottom.constant;
         
@@ -400,8 +419,13 @@ NSString* randomObjectId();
 
 - (void)textViewDidChange:(UITextView *)textView
 {
-    CGRect rect = rectForString([textView.text stringByAppendingString:@"x"], textView.font, textView.frame.size.width);
-    self.textViewHeight = MIN(200, MAX(rect.size.height+16, kInitialTextViewHeight));
+    CGRect rect = CGRectIntegral([textView.text boundingRectWithSize:CGSizeMake(textView.frame.size.width, 0)
+                                                             options:NSStringDrawingUsesLineFragmentOrigin
+                                                          attributes:@{
+                                                                       NSFontAttributeName: textView.font,
+                                                                       } context:nil]);
+
+    self.textViewHeight = MIN(kMaxTextViewHeight, MAX(rect.size.height+balloonOffet*2.f, kInitialTextViewHeight));
     [self doKeyBoardEvent:nil];
 }
 

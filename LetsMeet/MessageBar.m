@@ -142,14 +142,16 @@
     [self.textView becomeFirstResponder];
 }
 
-
-
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
 {
     if ([text isEqualToString:@"\n"]) {
         NSString *string = textView.text;
         
-        CGRect rect = rectForString(string, textView.font, textView.frame.size.width);
+        CGRect rect = CGRectIntegral([string boundingRectWithSize:CGSizeMake(textView.frame.size.width, 0)
+                                                          options:NSStringDrawingUsesLineFragmentOrigin
+                                                       attributes:@{
+                                                                    NSFontAttributeName: textView.font,
+                                                                    } context:nil]);
         CGRect tvfr = textView.frame;
         NSLog(@"RECT:%@", NSStringFromCGRect(rect));
         

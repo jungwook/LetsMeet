@@ -7,16 +7,17 @@
 //
 
 #import "MediaViewer.h"
-#import "S3File.h"
 #import "NSMutableDictionary+Bullet.h"
 
-@interface MMediaView()
+@interface MediaView()
 @property (nonatomic, strong) UITapGestureRecognizer *tapGesture;
 @property (nonatomic, strong) id mediaFile;
 @property (nonatomic) MediaTypes mediaType;
+@property (nonatomic, strong) UIProgressView* progress;
 @end
 
-@implementation MMediaView
+@implementation MediaView
+
 - (instancetype) initWithCoder:(NSCoder *)aDecoder
 {
     self = [super initWithCoder:aDecoder];
@@ -38,11 +39,121 @@
 - (void) initialize
 {
     self.tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapped:)];
+    self.progress = [UIProgressView new];
 }
 
 - (void) tapped:(UITapGestureRecognizer*) gesture
 {
-//    [MediaViewer showMediaFromView:tap.view filename:self.profileMediaFile isPhoto:(self.profileMediaType == kProfileMediaPhoto)];
+    [MediaViewer showMediaFromView:self filename:self.mediaFile mediaType:self.mediaType];
+}
+
+- (void)setImage:(UIImage *)image
+{
+    _image = image;
+    
+    self.layer.contents = (id) image.CGImage;
+    self.layer.contentsGravity = kCAGravityResizeAspectFill;
+    self.layer.masksToBounds = YES;
+}
+
+- (UIImage*) imageFromFile:(id)filename mediaType:(MediaTypes)mediaType
+{
+    switch (mediaType) {
+        case kMediaTypeURL:
+            return nil;
+        case kMediaTypeNone:
+            return nil;
+        default:
+            return nil;
+    }
+}
+
+- (void)loadMediaFromFile:(id)filename mediaType:(MediaTypes)mediaType completion:(S3GetBlock)block
+{
+    switch (mediaType) {
+        case kMediaTypeAudio:
+        case kMediaTypeVideo:
+        case kMediaTypePhoto: {
+            self.progress.progress = 0;
+            [S3File getDataFromFile:filename completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
+                if (block) {
+                    block(data, error, fromCache);
+                }
+                self.progress.progress = 1.0f;
+            } progressBlock:^(int percentDone) {
+                self.progress.progress = percentDone / 100.0f;
+            }];
+        }
+            break;
+
+        case kMediaTypeNone:
+        case kMediaTypeURL:
+        {
+            if (block) {
+                UIImage *image = [self imageFromFile:filename mediaType:mediaType]; // create URL Image
+                NSData *data = UIImageJPEGRepresentation(image, kJPEGCompressionFull);
+                block(data, nil, YES);
+            }
+        }
+            break;
+        case kMediaTypeText:
+            if (block) {
+                block(nil, nil, YES);
+            }
+            break;
+    }
+}
+
+- (UIImage*) postProcessImage:(UIImage*)image mediaType:(MediaTypes)mediaType
+{
+    switch (mediaType) {
+        case kMediaTypeVideo:
+        {
+            //ADD VIDEO MARKET TO IMAGE
+        }
+            return image;
+            
+        default:
+            return image;
+    }
+}
+
+- (void)loadMediaFromFile:(id)filename mediaType:(MediaTypes)mediaType shouldRefresh:(ShouldRefreshBlock)block
+{
+    [self loadMediaFromFile:filename mediaType:mediaType completion:^(NSData *data, NSError *error, BOOL fromCache) {
+        BOOL ret = NO;
+        if (block) {
+            ret = block(data, error, fromCache);
+        }
+        if (ret) {
+            [self setImage:[self postProcessImage:[UIImage imageWithData:data] mediaType:mediaType]];
+        }
+    }];
+}
+
+- (void)loadMediaFromMessage:(Bullet *)message completion:(S3GetBlock)block
+{
+    [self loadMediaFromFile:message.mediaFile mediaType:message.mediaType completion:block];
+}
+
+- (void)loadMediaFromMessage:(Bullet *)message shouldRefresh:(ShouldRefreshBlock)block
+{
+    BOOL hasThumbnail = NO;
+    if (message.mediaType == kMediaTypeVideo || message.mediaType == kMediaTypeAudio) {
+        hasThumbnail = YES;
+    }
+    
+    [self loadMediaFromFile:hasThumbnail ? message.mediaThumbnailFile : message.mediaFile mediaType:message.mediaType shouldRefresh:block];
+}
+
+- (void)loadMediaFromUser:(User *)user completion:(S3GetBlock)block
+{
+    [self loadMediaFromFile:user.profileMedia mediaType:(user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo completion:block];
+}
+
+- (void)loadMediaFromUser:(User *)user shouldRefresh:(ShouldRefreshBlock)block
+{
+    [self loadMediaFromFile:user.profileMedia mediaType:(user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo  shouldRefresh:block];
 }
 
 @end
@@ -89,9 +200,9 @@
 
 @implementation MediaViewer
 
-+ (void)showMediaFromView:(UIView *)view filename:(id)filename isPhoto:(BOOL)isPhoto
++ (void)showMediaFromView:(UIView *)view filename:(id)filename mediaType:(MediaTypes)mediaType
 {
-    [[MediaViewer new] showMediaFromView:view filename:filename isPhoto:isPhoto];
+    [[MediaViewer new] showMediaFromView:view filename:filename mediaType:mediaType];
 }
 
 - (void) dealloc
@@ -108,7 +219,7 @@
 
 #define S3LOCATION @"http://parsekr.s3.ap-northeast-2.amazonaws.com/"
 
-- (void) showMediaFromView:(UIView*)view filename:(id)filename isPhoto:(BOOL)isPhoto
+- (void) showMediaFromView:(UIView*)view filename:(id)filename mediaType:(MediaTypes)mediaType
 {
     self.alpha = 0.0f;
     self.mediaFile = filename;
@@ -119,31 +230,41 @@
     [UIView animateWithDuration:0.25 animations:^{
         self.alpha = 1.0f;
     } completion:^(BOOL finished) {
-        if (isPhoto) {
-            self.progress = [UIProgressView new];
-            self.progress.frame = CGRectMake( 50, bigFrame.size.height / 2, bigFrame.size.width - 2* 50, 2);
-            self.progress.progress = 0.0f;
-            [self addSubview:self.progress];
-
-            [S3File getDataFromFile:self.mediaFile completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
-                self.progress.progress = 1.0f;
-                [self addGestureRecognizer:[self tapGestureRecognizer]];
-                [self setupScrollViewFromImage:[UIImage imageWithData:data]];
+        switch (mediaType) {
+            case kMediaTypePhoto:
+            {
+                self.progress = [UIProgressView new];
+                self.progress.frame = CGRectMake( 50, bigFrame.size.height / 2, bigFrame.size.width - 2* 50, 2);
+                self.progress.progress = 0.0f;
+                [self addSubview:self.progress];
                 
-                [UIView animateWithDuration:0.3 delay:0.5 options:UIViewAnimationOptionCurveEaseIn animations:^{
-                    self.imageView.alpha = 1.0f;
-                } completion:^(BOOL finished) {
-                    [self.progress removeFromSuperview];
+                [S3File getDataFromFile:self.mediaFile completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
+                    self.progress.progress = 1.0f;
+                    [self addGestureRecognizer:[self tapGestureRecognizer]];
+                    [self setupScrollViewFromImage:[UIImage imageWithData:data]];
+                    
+                    [UIView animateWithDuration:0.3 delay:0.5 options:UIViewAnimationOptionCurveEaseIn animations:^{
+                        self.imageView.alpha = 1.0f;
+                    } completion:^(BOOL finished) {
+                        [self.progress removeFromSuperview];
+                    }];
+                } progressBlock:^(int percentDone) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        self.progress.progress = percentDone / 100.0f;
+                    });
                 }];
-            } progressBlock:^(int percentDone) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    self.progress.progress = percentDone / 100.0f;
-                });
-            }];
-        }
-        else {
-            [self initializeVideoWithURL:[NSURL URLWithString:[S3LOCATION stringByAppendingString:self.mediaFile]]];
-            [self addGestureRecognizer:[self tapGestureRecognizer]];
+            }
+                break;
+                
+            case kMediaTypeVideo:
+            {
+                [self initializeVideoWithURL:[NSURL URLWithString:[S3LOCATION stringByAppendingString:self.mediaFile]]];
+                [self addGestureRecognizer:[self tapGestureRecognizer]];
+            }
+                break;
+                
+            default:
+                break;
         }
     }];
 }

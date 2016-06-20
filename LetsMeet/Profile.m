@@ -12,7 +12,7 @@
 #import "ListPicker.h"
 #import "CachedFile.h"
 #import "ImagePicker.h"
-#import "MediaView.h"
+#import "ProfileView.h"
 #import "S3File.h"
 #import "TextFieldAlert.h"
 
@@ -46,54 +46,12 @@
 @property (weak, nonatomic) IBOutlet UILabel *pointsLB;
 @property (weak, nonatomic) IBOutlet UIButton *editPhotoBut;
 @property (weak, nonatomic) IBOutlet UIView *gradientView;
-@property (weak, nonatomic) IBOutlet MediaView *mediaView;
+@property (weak, nonatomic) IBOutlet ProfileView *profileView;
 @property (weak, nonatomic) IBOutlet UIProgressView *progress;
 @property CGFloat photoHeight;
 
 @property (strong, nonatomic) User *me;
 @end
-
-
-@interface GradientView : UIView
-
-@end
-
-@implementation GradientView
-+(Class) layerClass {
-    return [CAGradientLayer class];
-}
-
-- (instancetype)initWithCoder:(NSCoder *)aDecoder
-{
-    self = [super initWithCoder:aDecoder];
-    if (self) {
-        ((CAGradientLayer*)self.layer).colors = [NSArray arrayWithObjects:
-                                                 (id)[UIColor colorWithWhite:0.0f alpha:0.20f].CGColor,
-                                                 (id)[UIColor colorWithWhite:0.0f alpha:0.07f].CGColor,
-                                                 (id)[UIColor colorWithWhite:0.0f alpha:0.03f].CGColor,
-                                                 (id)[UIColor colorWithWhite:0.0f alpha:0.0f].CGColor,
-                                                 (id)[UIColor colorWithWhite:0.0f alpha:0.0f].CGColor,
-                                                 (id)[UIColor colorWithWhite:0.0f alpha:0.1f].CGColor,
-                                                 (id)[UIColor colorWithWhite:0.0f alpha:0.17f].CGColor,
-                                                 (id)[UIColor colorWithWhite:0.0f alpha:0.4f].CGColor,
-                                                nil];
-        ((CAGradientLayer*)self.layer).locations = [NSArray arrayWithObjects:
-                                                    [NSNumber numberWithFloat:0.0f],
-                                                    [NSNumber numberWithFloat:0.1f],
-                                                    [NSNumber numberWithFloat:0.13f],
-                                                    [NSNumber numberWithFloat:0.3f],
-                                                    [NSNumber numberWithFloat:0.6f],
-                                                    [NSNumber numberWithFloat:0.83f],
-                                                    [NSNumber numberWithFloat:0.9f],
-                                                    [NSNumber numberWithFloat:1.0f],
-                                                   nil];
-        ((CAGradientLayer*)self.layer).cornerRadius = 2.0f;
-        ((CAGradientLayer*)self.layer).masksToBounds = YES;
-    }
-    return self;
-}
-@end
-
 
 @implementation Profile
 
@@ -156,9 +114,9 @@
             [self.me saveInBackground];
         }];
         
-        [self.mediaView setMediaFromUser:self.me frameBlock:^(CGSize size) {
+        [self.profileView setMediaFromUser:self.me frameBlock:^(CGSize size) {
             NSLog(@"REFRAMING:%@", NSStringFromCGSize(size));
-            self.photoHeight = size.width ? self.mediaView.frame.size.width * size.height / size.width + 20 : 400;
+            self.photoHeight = size.width ? self.profileView.frame.size.width * size.height / size.width + 20 : 400;
             [self.tableView reloadData];
         }];
     }
@@ -189,7 +147,7 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
     NSURL *outputURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"profile_video.mov"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.mediaView setPlayerItemURL:url];
+        [self.profileView setPlayerItemURL:url];
     });
     
     NSData *thumb = compressedImageData(thumbnail, 100);
@@ -227,7 +185,7 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
 }
  
 - (IBAction)editPhoto:(id)sender {
-    [self.mediaView pause];
+    [self.profileView pause];
     
     [ImagePicker proceedWithParentViewController:self photoSelectedBlock:^(id data, MediaTypes type, NSString *sizeString, NSURL *url) {
         if (type == kMediaTypePhoto) {
@@ -247,7 +205,7 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
     user.profileMedia = [S3File saveProfileImageData:orig completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
         if (succeeded) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.mediaView setMediaFromUser:user];
+                [self.profileView setMediaFromUser:user];
             });
         }
     } progress:self.progress];
