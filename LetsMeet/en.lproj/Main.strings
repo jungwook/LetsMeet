@@ -20,9 +20,6 @@
 /* Class = "UINavigationItem"; title = "Profile"; ObjectID = "ERH-QU-Yxz"; */
 "ERH-QU-Yxz.title" = "Profile";
 
-/* Class = "UINavigationItem"; title = "Nearby"; ObjectID = "IFr-xP-euy"; */
-"IFr-xP-euy.title" = "Nearby";
-
 /* Class = "UILabel"; text = "Label\nHello"; ObjectID = "IlY-6r-npv"; */
 "IlY-6r-npv.text" = "Label\nHello";
 
@@ -60,10 +57,10 @@
 "YMy-i1-b7S.text" = "희라";
 
 /* Class = "UISegmentedControl"; Ynb-dm-JWM.segmentTitles[0] = "Distance"; ObjectID = "Ynb-dm-JWM"; */
-"Ynb-dm-JWM.segmentTitles[0]" = "거리순";
+"Ynb-dm-JWM.segmentTitles[0]" = "Distance";
 
 /* Class = "UISegmentedControl"; Ynb-dm-JWM.segmentTitles[1] = "Time"; ObjectID = "Ynb-dm-JWM"; */
-"Ynb-dm-JWM.segmentTitles[1]" = "시간순";
+"Ynb-dm-JWM.segmentTitles[1]" = "Time";
 
 /* Class = "UILabel"; text = "미디어 메시지"; ObjectID = "baR-d3-B8i"; */
 "baR-d3-B8i.text" = "미디어 메시지";
@@ -80,14 +77,14 @@
 /* Class = "UITextField"; placeholder = "만나요!"; ObjectID = "h7j-VL-XeK"; */
 "h7j-VL-XeK.placeholder" = "만나요!";
 
-/* Class = "UILabel"; text = "2016. 6. 23 (토요일)"; ObjectID = "iaO-Nu-vfa"; */
-"iaO-Nu-vfa.text" = "2016. 6. 23 (토요일)";
+/* Class = "UILabel"; text = "2일전"; ObjectID = "iaO-Nu-vfa"; */
+"iaO-Nu-vfa.text" = "2일전";
 
 /* Class = "UILabel"; text = "<1km"; ObjectID = "n9a-Gc-1Z3"; */
 "n9a-Gc-1Z3.text" = "<1km";
 
-/* Class = "UILabel"; text = "2016. 6. 23 (토요일)"; ObjectID = "oYX-uB-MPO"; */
-"oYX-uB-MPO.text" = "2016. 6. 23 (토요일)";
+/* Class = "UILabel"; text = "10분전"; ObjectID = "oYX-uB-MPO"; */
+"oYX-uB-MPO.text" = "10분전";
 
 /* Class = "UIButton"; normalTitle = "Button"; ObjectID = "qIg-fm-zoy"; */
 "qIg-fm-zoy.normalTitle" = "Button";

@@ -111,8 +111,8 @@ NSData* compressedImageData(NSData* data, CGFloat width)
 CGRect rectForString(NSString *string, UIFont *font, CGFloat maxWidth)
 {
     const CGFloat inset = 8.0f;
-    const CGFloat insetInsideBalloonWidth = inset*3;
-    const CGFloat insetInsideBalloonHeight = inset*2;
+    const CGFloat insetInsideBalloonWidth = inset*2+7;
+    const CGFloat insetInsideBalloonHeight = inset*1.0f;
     
     string = [string stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     CGRect rect = CGRectIntegral([string boundingRectWithSize:CGSizeMake(maxWidth, 0)
@@ -121,7 +121,7 @@ CGRect rectForString(NSString *string, UIFont *font, CGFloat maxWidth)
                                                                 NSFontAttributeName: font,
                                                                 } context:nil]);
     
-    rect = CGRectMake(0, 0, rect.size.width+insetInsideBalloonWidth, rect.size.height+insetInsideBalloonHeight);
+    rect = CGRectMake(0, 0, rect.size.width+insetInsideBalloonWidth, rect.size.height+insetInsideBalloonHeight+5);
     return rect;
 }
 

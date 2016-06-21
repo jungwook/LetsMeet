@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "MessageBar.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 
 @interface Chat : UIViewController <UITextViewDelegate, UITableViewDelegate, UITableViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate>

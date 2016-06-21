@@ -79,7 +79,7 @@ static NSString * const reuseIdentifier = @"NearByCell";
     CGFloat availableWidthForCells = CGRectGetWidth(self.collectionView.frame) - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * (kCellsPerRow - 1);
     
     CGFloat cellWidth = availableWidthForCells / kCellsPerRow;
-    CGFloat cellHeight = 115.f;
+    CGFloat cellHeight = 60.0f;
     flowLayout.itemSize = CGSizeMake(cellWidth, cellHeight);
 }
 

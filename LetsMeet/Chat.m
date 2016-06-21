@@ -9,7 +9,6 @@
 #import "Chat.h"
 #import "ChatRight.h"
 #import "ChatLeft.h"
-#import "MessageBar.h"
 #import "NSMutableDictionary+Bullet.h"
 #import "FileSystem.h"
 #import "Notifications.h"
@@ -91,9 +90,11 @@
     [self.notifications off];
 }
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     [self addObservers];
+    [self setupTableInsetsOnFirstLoad];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -111,14 +112,23 @@
 {
     Bullet *bullet = [[self.system messagesWith:self.user.objectId] objectAtIndex:indexPath.row];
     
+    BOOL consecutive = NO;
+    
+    if (indexPath.row > 0) {
+        Bullet *prev = [[self.system messagesWith:self.user.objectId] objectAtIndex:indexPath.row-1];
+        if ([bullet.fromUserId isEqualToString:prev.fromUserId]) {
+            consecutive = YES;
+        }
+    }
+    
     if (bullet.isFromMe) {
         ChatRight *cell = [tableView dequeueReusableCellWithIdentifier:@"ChatRight" forIndexPath:indexPath];
-        [cell setMessage:bullet user:[User me] tableView:self.tableView];
+        [cell setMessage:bullet user:[User me] tableView:self.tableView isConsecutive:consecutive];
         return cell;
     }
     else {
         ChatLeft *cell = [tableView dequeueReusableCellWithIdentifier:@"ChatLeft" forIndexPath:indexPath];
-        [cell setMessage:bullet user:self.user tableView:self.tableView];
+        [cell setMessage:bullet user:self.user tableView:self.tableView isConsecutive:consecutive];
         return cell;
     }
 }
@@ -128,11 +138,20 @@
     Bullet *bullet = [[self.system messagesWith:self.user.objectId] objectAtIndex:indexPath.row];
     MediaTypes type = bullet.mediaType;
     
+    BOOL consecutive = NO;
+    
+    if (indexPath.row > 0) {
+        Bullet *prev = [[self.system messagesWith:self.user.objectId] objectAtIndex:indexPath.row-1];
+        if ([bullet.fromUserId isEqualToString:prev.fromUserId]) {
+            consecutive = YES;
+        }
+    }
+
     switch (type) {
         case kMediaTypePhoto:
         case kMediaTypeVideo: {
             if (bullet.mediaSize.width) {
-                CGFloat height = balloonOffet + 2 * balloonOffet + kThumbnailWidth * bullet.mediaSize.height / bullet.mediaSize.width;
+                CGFloat height = balloonOffet - 4 + kThumbnailWidth * bullet.mediaSize.height / bullet.mediaSize.width;
                 return height;
             }
             else {
@@ -140,8 +159,8 @@
             }
         }
         case kMediaTypeText: {
-            CGRect rect = rectForString(bullet.message, self.messageView.font, kThumbnailWidth);
-            return MAX(rect.size.height + balloonOffet + balloonOffet*2, photoViewHeight+balloonOffet);
+            CGRect rect = rectForString(bullet.message, self.messageView.font, kTextMessageWidth);
+            return rect.size.height;
         }
         default:
             return photoViewHeight+balloonOffet;
@@ -231,14 +250,7 @@
 
     [picker dismissViewControllerAnimated:YES completion:nil];
 }
-/*
- typedef NS_ENUM(NSInteger, UIImagePickerControllerSourceType) {
- UIImagePickerControllerSourceTypePhotoLibrary,
- UIImagePickerControllerSourceTypeCamera,
- UIImagePickerControllerSourceTypeSavedPhotosAlbum
- } __TVOS_PROHIBITED;
 
- */
 - (void) handlePhoto:(NSDictionary<NSString*, id>*)info url:(NSURL*)url source:(UIImagePickerControllerSourceType)sourceType
 {
     UIImage *image = (UIImage *) [info objectForKey:UIImagePickerControllerEditedImage];
@@ -381,7 +393,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         CGSize kbSize = keyboardBeginFrameWindow.size;
         BOOL isUp = (keyboardBeginFrameWindow.origin.y > keyboardEndFrameWindow.origin.y);
-        UIEdgeInsets zeroInsets = UIEdgeInsetsMake(kNavigationBarHeight, 0, 0, 0);
+        UIEdgeInsets zeroInsets = UIEdgeInsetsMake(kNavigationBarHeight+6, 0, 0, 0);
         UIEdgeInsets contentInsets = isUp ? UIEdgeInsetsMake(kNavigationBarHeight, 0.0, kbSize.height, 0.0) : zeroInsets;
         self.barBottom.constant = isUp ? kbSize.height : 0;
         self.barHeight.constant = self.textViewHeight + self.messageTop.constant + self.messageBottom.constant;
@@ -397,6 +409,13 @@
             [self scrollToBottomAnimated:YES];
         }];
     });
+}
+
+- (void) setupTableInsetsOnFirstLoad
+{
+    UIEdgeInsets zeroInsets = UIEdgeInsetsMake(6, 0, 0, 0);
+    self.tableView.contentInset = zeroInsets;
+    self.tableView.scrollIndicatorInsets = zeroInsets;
 }
 
 - (void) moveDownTextView:(UITextView*)textView

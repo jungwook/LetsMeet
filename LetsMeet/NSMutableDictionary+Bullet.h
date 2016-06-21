@@ -39,7 +39,8 @@ typedef void (^NewUserBlock)(User* me);
 #define kJPEGCompressionMedium 0.4f
 #define kJPEGCompressionDefault 0.6f
 #define kJPEGCompressionFull 1.0f
-#define kThumbnailWidth 240.0f
+#define kThumbnailWidth 100.0f
+#define kTextMessageWidth 220.0f
 
 typedef NSMutableDictionary Bullet;
 

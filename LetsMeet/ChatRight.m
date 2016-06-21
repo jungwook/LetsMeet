@@ -41,10 +41,10 @@
     self.photoView.layer.cornerRadius = 20.f;
     self.photoView.layer.masksToBounds = YES;
     self.thumbnailView.layer.contentsGravity = kCAGravityResizeAspect;
-    self.playView.layer.shadowColor = [UIColor blackColor].CGColor;
-    self.playView.layer.shadowOffset = CGSizeZero;
-    self.playView.layer.shadowRadius = 2.0f;
-    self.playView.layer.shadowOpacity = 0.3;
+    self.realIcon.layer.shadowColor = [UIColor blackColor].CGColor;
+    self.realIcon.layer.shadowOffset = CGSizeZero;
+    self.realIcon.layer.shadowRadius = 2.0f;
+    self.realIcon.layer.shadowOpacity = 0.3;
 
     if (![self.photoView.gestureRecognizers count]) {
         [self.photoView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedPhotoView:)]];
@@ -69,52 +69,51 @@
     [MediaViewer showMediaFromView:tap.view filename:self.mediaFile mediaType:self.mediaType];
 }
 
-- (void)setMessage:(Bullet *)message user:(User*)user tableView:(UITableView*)tableView
+- (void)setMessage:(Bullet *)message user:(User*)user tableView:(UITableView*)tableView isConsecutive:(BOOL)consecutive
 {
     _messageId = message.objectId;
-    
     _profileMediaType = user.profileMediaType;
     _profileMediaFile = user.profileMedia;
-    
     _mediaType = message.mediaType;
     _mediaFile = message.mediaFile;
-
+    
     self.dateLabel.text = message.createdAt.timeAgo;
     self.nicknameLabel.text = user.nickname;
+    self.nicknameLabel.hidden = consecutive;
+    self.photoView.hidden = consecutive;
     
     [S3File getDataFromFile:user.thumbnail completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
         if (!error) {
             self.photoView.layer.contents = (id) [UIImage imageWithData:data].CGImage;
         }
     } progressBlock:nil];
-
-    self.thumbnailView.hidden = YES;
+    
+    self.thumbnailView.alpha = 0.0;
     self.realIcon.hidden = YES;
+    
+    NSString *string = [message.message stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    self.messageLabel.text = string;
+    
+    CGFloat boxSize = 0;
     
     switch (message.mediaType) {
         case kMediaTypeText: {
-            NSString *string = [message.message stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-            CGRect rect = rectForString(string, [UIFont boldSystemFontOfSize:17], kThumbnailWidth);
-            self.spacing.constant = self.contentView.bounds.size.width-rect.size.width-(self.trailing.constant+CHATVIEWINSET+CHATVIEWINSET);
-            self.messageLabel.text = string;
+            CGRect rect = rectForString(string, self.messageLabel.font, kTextMessageWidth);
+            boxSize = rect.size.width;
         }
             break;
         case kMediaTypeVideo:
         case kMediaTypePhoto: {
             self.playView.hidden = (message.mediaType == kMediaTypePhoto);
             self.realIcon.hidden = !(message.realMedia);
+            boxSize = kThumbnailWidth;
             [S3File getDataFromFile:message.mediaThumbnailFile completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
                 if (!error) {
                     if (fromCache) {
-                        [self setupThumbnailImageWithData:data];
+                        [self setupThumbnailImageWithData:data animated:NO];
                     }
                     else {
-                        [[tableView visibleCells] enumerateObjectsUsingBlock:^(ChatRight* _Nonnull cell, NSUInteger idx, BOOL * _Nonnull stop) {
-                            if ([cell.messageId isEqualToString:self.messageId]) {
-                                *stop = YES;
-                                [self setupThumbnailImageWithData:data];
-                            }
-                        }];
+                        [self lazyUpdateData:data onTableView:tableView];
                     }
                 }
             } progressBlock:nil];
@@ -123,15 +122,31 @@
         default:
             break;
     }
+    self.spacing.constant = self.contentView.bounds.size.width-boxSize-(self.trailing.constant+CHATVIEWINSET*2);
+//    self.trailing.constant = consecutive ? 0 : 40 + CHATVIEWINSET*2;
 }
 
-- (void)setupThumbnailImageWithData:(NSData*) data
+- (void)lazyUpdateData:(NSData*)data onTableView:(UITableView*)tableView
 {
+    [[tableView visibleCells] enumerateObjectsUsingBlock:^(ChatRight* _Nonnull cell, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([cell.messageId isEqualToString:self.messageId]) {
+            *stop = YES;
+            [self setupThumbnailImageWithData:data animated:YES];
+        }
+    }];
+}
+
+- (void)setupThumbnailImageWithData:(NSData*)data animated:(BOOL) animated
+{
+    self.thumbnailView.alpha = animated ? 0.0f : 1.0f;
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.thumbnailView.hidden = NO;
         UIImage *thumbnailImage = [UIImage imageWithData:data];
-        self.spacing.constant = self.contentView.bounds.size.width-kThumbnailWidth-(self.trailing.constant+CHATVIEWINSET+CHATVIEWINSET);
         self.thumbnailView.layer.contents = (id) thumbnailImage.CGImage;
+        if (animated) {
+            [UIView animateWithDuration:0.25 animations:^{
+                self.thumbnailView.alpha = 1.0f;
+            }];
+        }
     });
 }
 

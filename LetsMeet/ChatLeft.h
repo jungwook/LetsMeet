@@ -9,6 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface ChatLeft : UITableViewCell
-- (void)setMessage:(Bullet *)message user:(User*)user tableView:(UITableView*)tableView;
+- (void)setMessage:(Bullet *)message user:(User*)user tableView:(UITableView*)tableView isConsecutive:(BOOL)consecutive;
 @end
 

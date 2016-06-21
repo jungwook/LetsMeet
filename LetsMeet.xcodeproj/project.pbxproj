@@ -16,6 +16,7 @@
 		120142E81D08930B00D66905 /* S3File.m in Sources */ = {isa = PBXBuildFile; fileRef = 120142E71D08930B00D66905 /* S3File.m */; };
 		120142EE1D1042AD00D66905 /* EXPhotoViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 120142ED1D1042AD00D66905 /* EXPhotoViewer.m */; };
 		120A52381D17A75400EB8269 /* GradientView.m in Sources */ = {isa = PBXBuildFile; fileRef = 120A52371D17A75400EB8269 /* GradientView.m */; };
+		120A52411D18C28E00EB8269 /* Search.m in Sources */ = {isa = PBXBuildFile; fileRef = 120A52401D18C28E00EB8269 /* Search.m */; };
 		1235BC8B1D0FD30100E4AA27 /* ChatRight.m in Sources */ = {isa = PBXBuildFile; fileRef = 1235BC8A1D0FD30100E4AA27 /* ChatRight.m */; };
 		1235BC8E1D0FD30E00E4AA27 /* ChatLeft.m in Sources */ = {isa = PBXBuildFile; fileRef = 1235BC8D1D0FD30E00E4AA27 /* ChatLeft.m */; };
 		1235BC911D0FF82500E4AA27 /* NSDate+TimeAgo.m in Sources */ = {isa = PBXBuildFile; fileRef = 1235BC901D0FF82500E4AA27 /* NSDate+TimeAgo.m */; };
@@ -29,7 +30,6 @@
 		124928B81CF2ED810038A2F3 /* UIBarButtonItem+Badge.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928B51CF2ED810038A2F3 /* UIBarButtonItem+Badge.m */; };
 		124928B91CF2ED810038A2F3 /* UIButton+Badge.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928B71CF2ED810038A2F3 /* UIButton+Badge.m */; };
 		125AEF3C1CF9F08300553475 /* SimulatedUsers.m in Sources */ = {isa = PBXBuildFile; fileRef = 125AEF3B1CF9F08300553475 /* SimulatedUsers.m */; };
-		126AF3F61CEA983800E3ED67 /* MessageBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF3F51CEA983800E3ED67 /* MessageBar.m */; };
 		126AF40B1CEDAE0E00E3ED67 /* IndentedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF40A1CEDAE0E00E3ED67 /* IndentedLabel.m */; };
 		1296A7A31D03B34000E44642 /* BaseCollections.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A21D03B34000E44642 /* BaseCollections.m */; };
 		1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A51D03B3CA00E44642 /* BaseFunctions.m */; };
@@ -103,8 +103,10 @@
 		120142ED1D1042AD00D66905 /* EXPhotoViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXPhotoViewer.m; sourceTree = "<group>"; };
 		120A52361D17A75400EB8269 /* GradientView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GradientView.h; sourceTree = "<group>"; };
 		120A52371D17A75400EB8269 /* GradientView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GradientView.m; sourceTree = "<group>"; };
-		120A52391D17C2A700EB8269 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Main.strings; sourceTree = "<group>"; };
 		120A523A1D17C2A700EB8269 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		120A523E1D18C17600EB8269 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Main.strings; sourceTree = "<group>"; };
+		120A523F1D18C28E00EB8269 /* Search.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Search.h; sourceTree = "<group>"; };
+		120A52401D18C28E00EB8269 /* Search.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Search.m; sourceTree = "<group>"; };
 		1235BC891D0FD30100E4AA27 /* ChatRight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatRight.h; sourceTree = "<group>"; };
 		1235BC8A1D0FD30100E4AA27 /* ChatRight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatRight.m; sourceTree = "<group>"; };
 		1235BC8C1D0FD30E00E4AA27 /* ChatLeft.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatLeft.h; sourceTree = "<group>"; };
@@ -130,8 +132,6 @@
 		124928B71CF2ED810038A2F3 /* UIButton+Badge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+Badge.m"; sourceTree = "<group>"; };
 		125AEF3A1CF9F08300553475 /* SimulatedUsers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimulatedUsers.h; sourceTree = "<group>"; };
 		125AEF3B1CF9F08300553475 /* SimulatedUsers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimulatedUsers.m; sourceTree = "<group>"; };
-		126AF3F41CEA983800E3ED67 /* MessageBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageBar.h; sourceTree = "<group>"; };
-		126AF3F51CEA983800E3ED67 /* MessageBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageBar.m; sourceTree = "<group>"; };
 		126AF4091CEDAE0E00E3ED67 /* IndentedLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IndentedLabel.h; sourceTree = "<group>"; };
 		126AF40A1CEDAE0E00E3ED67 /* IndentedLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IndentedLabel.m; sourceTree = "<group>"; };
 		1296A7A11D03B34000E44642 /* BaseCollections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseCollections.h; sourceTree = "<group>"; };
@@ -264,8 +264,6 @@
 			children = (
 				12DE5FB61CFFB1A2009B315F /* Preview.h */,
 				12DE5FB71CFFB1A2009B315F /* Preview.m */,
-				126AF3F41CEA983800E3ED67 /* MessageBar.h */,
-				126AF3F51CEA983800E3ED67 /* MessageBar.m */,
 				12F741F31CE59C7F00E8267A /* MenuCell.h */,
 				12F741F41CE59C7F00E8267A /* MenuCell.m */,
 				126AF4091CEDAE0E00E3ED67 /* IndentedLabel.h */,
@@ -438,6 +436,8 @@
 				12F0D7181D0A7C6100A37C40 /* NearBy.m */,
 				12DB01B01D0E317700E33359 /* Chat.h */,
 				12DB01B11D0E317700E33359 /* Chat.m */,
+				120A523F1D18C28E00EB8269 /* Search.h */,
+				120A52401D18C28E00EB8269 /* Search.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -568,7 +568,6 @@
 				12F7418C1CE4B97100E8267A /* main.m in Sources */,
 				124928AF1CF2CD370038A2F3 /* RefreshControl.m in Sources */,
 				12DE5FBB1D004443009B315F /* Progress.m in Sources */,
-				126AF3F61CEA983800E3ED67 /* MessageBar.m in Sources */,
 				12F0D7191D0A7C6100A37C40 /* NearBy.m in Sources */,
 				12F741D21CE56B3400E8267A /* FloatingDrawerViewController.m in Sources */,
 				120142EE1D1042AD00D66905 /* EXPhotoViewer.m in Sources */,
@@ -586,6 +585,7 @@
 				12F0D7161D0A773000A37C40 /* TextFieldAlert.m in Sources */,
 				12F741D01CE56B3400E8267A /* FloatingDrawerSpringAnimator.m in Sources */,
 				120142E81D08930B00D66905 /* S3File.m in Sources */,
+				120A52411D18C28E00EB8269 /* Search.m in Sources */,
 				1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */,
 				120A52381D17A75400EB8269 /* GradientView.m in Sources */,
 				124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */,
@@ -600,7 +600,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				12F741941CE4B97100E8267A /* Base */,
-				120A52391D17C2A700EB8269 /* ko */,
+				120A523E1D18C17600EB8269 /* ko */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";

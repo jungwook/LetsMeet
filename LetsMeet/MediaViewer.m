@@ -196,6 +196,7 @@
 @property (nonatomic, strong) AVPlayerLayer *playerLayer;
 @property (nonatomic, strong) UIView* playerView;
 @property (nonatomic) CGFloat zoom;
+@property (nonatomic) BOOL alive;
 @end
 
 @implementation MediaViewer
@@ -215,6 +216,7 @@
     self.player = nil;
     self.playerLayer = nil;
     self.playerView = nil;
+    self.alive = YES;
 }
 
 #define S3LOCATION @"http://parsekr.s3.ap-northeast-2.amazonaws.com/"
@@ -282,9 +284,23 @@
 - (void)playerItemStalled:(NSNotification *)notification
 {
     __LF
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    [self restartPlayingIfLikelyToKeepUp];
+}
+
+- (void) restartPlayingIfLikelyToKeepUp
+{
+    __LF
+    if (!self.alive)
+        return;
+    
+    if (self.playerItem.playbackLikelyToKeepUp) {
         [self.player play];
-    });
+    }
+    else {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self restartPlayingIfLikelyToKeepUp];
+        });
+    }
 }
 
 - (void) initializeVideoWithURL:(NSURL*)url
@@ -340,6 +356,7 @@
 
 - (void) killThisView
 {
+    self.alive = NO;
     if (self.playerItem) {
         [self.player pause];
         [self.playerItem removeObserver:self forKeyPath:@"status"];
