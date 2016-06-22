@@ -6,13 +6,13 @@
 //  Copyright © 2016년 SMARTLY CO. All rights reserved.
 //
 
-#import "Welcome.h"
+#import "SignUp.h"
 #import "ListPicker.h"
 
 @interface SignUp ()
+@property (nonatomic, strong) UIVisualEffectView *blurView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *space;
 @property (weak, nonatomic) IBOutlet UIView *pane;
-@property (nonatomic, strong) UIVisualEffectView *blurView;
 @property (weak, nonatomic) IBOutlet UITextField *nickname;
 @property (weak, nonatomic) IBOutlet UITextField *intro;
 @property (weak, nonatomic) IBOutlet UITextField *age;

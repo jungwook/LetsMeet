@@ -10,7 +10,7 @@
 #import "FloatingDrawerSpringAnimator.h"
 #import "CachedFile.h"
 #import "ListPicker.h"
-#import "Welcome.h"
+#import "SignUp.h"
 
 @interface MainController ()
 @end

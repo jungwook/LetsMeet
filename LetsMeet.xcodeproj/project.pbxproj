@@ -32,7 +32,7 @@
 		124928B91CF2ED810038A2F3 /* UIButton+Badge.m in Sources */ = {isa = PBXBuildFile; fileRef = 124928B71CF2ED810038A2F3 /* UIButton+Badge.m */; };
 		125AEF3C1CF9F08300553475 /* SimulatedUsers.m in Sources */ = {isa = PBXBuildFile; fileRef = 125AEF3B1CF9F08300553475 /* SimulatedUsers.m */; };
 		126AF40B1CEDAE0E00E3ED67 /* IndentedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF40A1CEDAE0E00E3ED67 /* IndentedLabel.m */; };
-		12805E6E1D1AB5B40082A95D /* Welcome.m in Sources */ = {isa = PBXBuildFile; fileRef = 12805E6D1D1AB5B40082A95D /* Welcome.m */; };
+		12805E6E1D1AB5B40082A95D /* SignUp.m in Sources */ = {isa = PBXBuildFile; fileRef = 12805E6D1D1AB5B40082A95D /* SignUp.m */; };
 		1296A7A31D03B34000E44642 /* BaseCollections.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A21D03B34000E44642 /* BaseCollections.m */; };
 		1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A51D03B3CA00E44642 /* BaseFunctions.m */; };
 		1296A7A91D03BB5500E44642 /* Notifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A81D03BB5500E44642 /* Notifications.m */; };
@@ -137,8 +137,8 @@
 		125AEF3B1CF9F08300553475 /* SimulatedUsers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimulatedUsers.m; sourceTree = "<group>"; };
 		126AF4091CEDAE0E00E3ED67 /* IndentedLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IndentedLabel.h; sourceTree = "<group>"; };
 		126AF40A1CEDAE0E00E3ED67 /* IndentedLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IndentedLabel.m; sourceTree = "<group>"; };
-		12805E6C1D1AB5B40082A95D /* Welcome.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Welcome.h; sourceTree = "<group>"; };
-		12805E6D1D1AB5B40082A95D /* Welcome.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Welcome.m; sourceTree = "<group>"; };
+		12805E6C1D1AB5B40082A95D /* SignUp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignUp.h; sourceTree = "<group>"; };
+		12805E6D1D1AB5B40082A95D /* SignUp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignUp.m; sourceTree = "<group>"; };
 		1296A7A11D03B34000E44642 /* BaseCollections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseCollections.h; sourceTree = "<group>"; };
 		1296A7A21D03B34000E44642 /* BaseCollections.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseCollections.m; sourceTree = "<group>"; };
 		1296A7A41D03B3CA00E44642 /* BaseFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseFunctions.h; sourceTree = "<group>"; };
@@ -441,8 +441,8 @@
 				120A52401D18C28E00EB8269 /* Search.m */,
 				120A52421D1907EF00EB8269 /* UsersTableBase.h */,
 				120A52431D1907EF00EB8269 /* UsersTableBase.m */,
-				12805E6C1D1AB5B40082A95D /* Welcome.h */,
-				12805E6D1D1AB5B40082A95D /* Welcome.m */,
+				12805E6C1D1AB5B40082A95D /* SignUp.h */,
+				12805E6D1D1AB5B40082A95D /* SignUp.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -572,7 +572,7 @@
 				1296A7A91D03BB5500E44642 /* Notifications.m in Sources */,
 				12F7418C1CE4B97100E8267A /* main.m in Sources */,
 				124928AF1CF2CD370038A2F3 /* RefreshControl.m in Sources */,
-				12805E6E1D1AB5B40082A95D /* Welcome.m in Sources */,
+				12805E6E1D1AB5B40082A95D /* SignUp.m in Sources */,
 				12DE5FBB1D004443009B315F /* Progress.m in Sources */,
 				12F0D7191D0A7C6100A37C40 /* NearBy.m in Sources */,
 				12F741D21CE56B3400E8267A /* FloatingDrawerViewController.m in Sources */,
