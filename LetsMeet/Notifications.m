@@ -13,23 +13,40 @@
 @property (nonatomic, strong) BroadcastBlock broadcastAction;
 @property (nonatomic, strong) RefreshBadgeBlock refreshBadgeAction;
 @property (nonatomic, strong) NSNumber *turnedOn;
+@property (nonatomic, strong) NSMutableDictionary *actions;
 @end
 
 @implementation Notifications
+
++ (instancetype) notification
+{
+    return [[Notifications alloc] init];
+}
 
 + (instancetype) notificationWithMessage:(BulletBlock)block broadcast:(BroadcastBlock)broadcast refresh:(RefreshBadgeBlock)refresh
 {
     return [[Notifications alloc] initWithMessage:block broadcast:broadcast refresh:refresh];
 }
 
-- (instancetype)initWithMessage:(BulletBlock)block broadcast:(BroadcastBlock)broadcast refresh:(RefreshBadgeBlock)refresh
+- (instancetype)init
 {
     __LF
     self = [super init];
     if (self) {
+        self.actions = [NSMutableDictionary dictionary];
+    }
+    return self;
+}
+
+- (instancetype)initWithMessage:(BulletBlock)block broadcast:(BroadcastBlock)broadcast refresh:(RefreshBadgeBlock)refresh
+{
+    __LF
+    self = [self init];
+    if (self) {
         self.bulletAction = block;
         self.broadcastAction = broadcast;
         self.refreshBadgeAction = refresh;
+        self.actions = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -38,6 +55,40 @@
 {
     __LF
     [self off];
+}
+
+- (void)notify:(id)notification object:(id)object
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:notification object:object];
+}
+
+- (void)setNotification:(id)notification forAction:(ActionBlock)notificationActionBlock;
+{
+    if (notification && notificationActionBlock) {
+        [self.actions setObject:notificationActionBlock forKey:notification];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(notify:)
+                                                     name:notification
+                                                   object:nil];
+    }
+}
+
+- (void)removeNotification:(id)notification
+{
+    if (notification) {
+        [self.actions removeObjectForKey:notification];
+        [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                        name:notification
+                                                      object:nil];
+    }
+}
+
+- (void) notify:(NSNotification*)notification
+{
+    ActionBlock action = [self.actions objectForKey:notification.name];
+    if (action) {
+        action(notification.object);
+    }
 }
 
 - (void) newBroadcast:(NSNotification*)userInfo
@@ -76,6 +127,7 @@
         }
     });
 }
+
 
 - (void)on
 {

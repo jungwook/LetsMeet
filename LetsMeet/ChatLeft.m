@@ -38,7 +38,7 @@
     [super awakeFromNib];
     [self.balloon setIsMine:NO];
     
-    self.photoView.layer.cornerRadius = 20.f;
+    self.photoView.layer.cornerRadius = 14.f;
     self.photoView.layer.masksToBounds = YES;
     self.thumbnailView.layer.contentsGravity = kCAGravityResizeAspect;
     self.realIcon.layer.shadowColor = [UIColor blackColor].CGColor;

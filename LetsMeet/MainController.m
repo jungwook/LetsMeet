@@ -9,6 +9,8 @@
 #import "MainController.h"
 #import "FloatingDrawerSpringAnimator.h"
 #import "CachedFile.h"
+#import "ListPicker.h"
+#import "Welcome.h"
 
 @interface MainController ()
 @end
@@ -18,8 +20,61 @@
 - (void)viewDidLoad {
     __LF
     [super viewDidLoad];
-    [self subscribeToChannelCurrentUser];
-    [self initializeMainViewController];
+    self.backgroundImage = [UIImage imageNamed:@"bg"];
+}
+
+- (void)checkLoginStatusAndProceed
+{
+    [PFUser logOut];
+    
+    User *user = [User me];
+    if (user) {
+        [user fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+            [FileSystem new];
+            [self initializeMainViewController];
+        }];
+    }
+    else {
+        [self performSegueWithIdentifier:@"SignUp" sender:^(SignUp* signup, id nickname, id intro, id age, id sex){
+            NSLog(@"nickname:%@", nickname);
+            
+            User *user = [User object];
+            id usernameAndPassword = [FileSystem objectId];
+            user.username = usernameAndPassword;
+            user.password = usernameAndPassword;
+            user.nickname = nickname;
+            user.age = age;
+            user.intro = intro;
+            [user setSexFromString:sex];
+            
+            [user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+                if (succeeded) {
+                    [PFUser logInWithUsernameInBackground:user.username password:user.password block:^(PFUser * _Nullable user, NSError * _Nullable error) {
+                        if (!error) {
+                            [signup dismissViewControllerAnimated:YES completion:nil];
+                            [self subscribeToChannelCurrentUser];
+                            [FileSystem new];
+                            [self initializeMainViewController];
+                        }
+                        else {
+                            [signup setInfo:[NSString stringWithFormat:@"Some error occured:%@", error.localizedDescription]];
+                        }
+                    }];
+                }
+                else {
+                    [signup setInfo:[NSString stringWithFormat:@"Some error occured:%@", error.localizedDescription]];
+                }
+            }];
+        }];
+    }
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    __LF
+    SignUp *vc = segue.destinationViewController;
+    vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    vc.completionBlock = sender;
 }
 
 - (BOOL)initializeViewControllers {
@@ -56,7 +111,8 @@
 }
 
 -(void)viewDidAppear:(BOOL)animated
-{ 
+{
+    [self checkLoginStatusAndProceed];
 }
 
 - (void) subscribeToChannelCurrentUser
@@ -97,7 +153,6 @@
         self.leftViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"LeftMenu"];
         self.centerViewController = self.screens[@"Search"][@"screen"];
         self.animator = [[FloatingDrawerSpringAnimator alloc] init];
-        self.backgroundImage = [UIImage imageNamed:@"bg"];
 
         [AppDelegate globalDelegate].mainMenu = self;
     }

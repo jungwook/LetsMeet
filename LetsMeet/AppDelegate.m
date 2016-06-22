@@ -36,7 +36,7 @@
     
     [self registerForNotifications:application launchOptions:launchOptions];
     [self setDefaultsForACL];
-    self.system = [FileSystem new];
+    
     return YES;
 }
 

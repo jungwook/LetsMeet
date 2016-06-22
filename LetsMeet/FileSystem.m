@@ -7,7 +7,7 @@
 //
 
 #import "FileSystem.h"
-#import "Signup.h"
+//#import "Signup.h"
 
 #define CHATFILEEXTENSION @".ChatFile"
 #define OBJECTIDSTORE @"ObjectIdStore"
@@ -53,33 +53,8 @@
     __LF
     self = [super init];
     if (self) {
-//        [PFUser logOut];
-        
+        [self initializeSystem];
         self.lock = [NSObject new]; //MUTEX LOCK
-        self.me = [User me];
-        
-        if (self.me) {
-            [self.me fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
-                if (error) {
-                    NSLog(@"ERROR FETCHING:%@", error.localizedDescription);
-                    [PFUser logInWithUsernameInBackground:@"희라" password:@"희라" block:^(PFUser * _Nullable user, NSError * _Nullable error) {
-                        if (!error) {
-                            [self initializeSystem];
-                        }
-                        else {
-                            NSLog(@"ERROR LOGIN IN:%@", error.localizedDescription);
-                        }
-                    }];
-                }
-                else {
-                    [self initializeSystem];
-                }
-            }];
-        }
-        else {
-            [User createMe];
-            [self initializeSystem];
-        }
     }
     return self;
 }
@@ -106,14 +81,14 @@
     }
     
     [self load];
-    
-//    [self save];
     [self initLocationServices];
     self.timeKeeper = [NSTimer scheduledTimerWithTimeInterval:5.0f
                                                        target:self
                                                      selector:@selector(timeKeep)
                                                      userInfo:nil
                                                       repeats:YES];
+    
+    
 }
 
 - (void) timeKeep
@@ -161,6 +136,7 @@
 
     return [self.usersPath path];
 }
+
 
 #define FIXBULLETTYPEISSUE
 #undef FIXBULLETTYPEISSUE

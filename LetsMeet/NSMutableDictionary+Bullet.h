@@ -112,6 +112,8 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
     kProfileMediaVideo
 };
 
+typedef void(^CreateMeCompletionBlock)(void);
+
 @interface User : PFUser<PFSubclassing>
 @property (retain) NSString* nickname;
 @property (retain) PFGeoPoint* location;
@@ -126,10 +128,11 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
 @property SexTypes sex;
 
 + (instancetype) me;
-+ (void) createMe;
++ (void) createMeWithCompletionBlock:(CreateMeCompletionBlock)block;
 - (void) removeMe;
 - (NSString*) sexString;
 - (BOOL) profileIsVideo;
 - (BOOL) profileIsPhoto;
+- (void) setSexFromString:(NSString*)sex;
 @end
 

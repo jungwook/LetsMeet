@@ -385,7 +385,7 @@
     }
 }
 
-+ (void) createMe
++ (void) createMeWithCompletionBlock:(CreateMeCompletionBlock)block
 {
     __LF
     User *user = [User me];
@@ -397,19 +397,34 @@
     user.username = username;
     user.password = username;
     
-    BOOL succeeded = [user signUp];
-    if (succeeded) {
-        [PFUser logInWithUsername:username password:username];
-        PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-        if (!currentInstallation[@"user"]) {
-            currentInstallation[@"user"] = user;
-            [currentInstallation saveInBackground];
-            NSLog(@"CURRENT INSTALLATION: saving user to Installation");
+    [user signUp];
+    [PFUser logInWithUsernameInBackground:username password:username block:^(PFUser * _Nullable user, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"Error:%@", error.localizedDescription);
         }
         else {
-            NSLog(@"CURRENT INSTALLATION: Installation already has user. No need to set");
+            [user fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+                if (error) {
+                    NSLog(@"Error:%@", error.localizedDescription);
+                }
+                else {
+                    PFInstallation *currentInstallation = [PFInstallation currentInstallation];
+                    if (!currentInstallation[@"user"]) {
+                        currentInstallation[@"user"] = user;
+                        [currentInstallation saveInBackground];
+                        NSLog(@"CURRENT INSTALLATION: saving user to Installation");
+                    }
+                    else {
+                        NSLog(@"CURRENT INSTALLATION: Installation already has user. No need to set");
+                    }
+                    NSLog(@"User information fetched from server %@", [User me]);
+                    if (block) {
+                        block();
+                    }
+                }
+            }];
         }
-    }
+    }];
 }
 
 + (NSString*) uniqueUsername
@@ -426,6 +441,11 @@
     }
     
     return idString;
+}
+
+- (void)setSexFromString:(NSString *)sex
+{
+    self.sex = [sex isEqualToString:@"여자"] ? kSexFemale : kSexMale;
 }
 
 - (NSString*) sexString
