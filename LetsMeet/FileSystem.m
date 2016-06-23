@@ -30,9 +30,9 @@
 @property (nonatomic, strong) NSURL *messagesDirectoryPath;
 @property (nonatomic, strong) NSFileManager *manager;
 @property (nonatomic, strong) NSMutableDictionary *bullets;
-@property (nonatomic, weak) User* me;
+@property (nonatomic, strong) NSMutableDictionary *users;
 @property (nonatomic, strong) NSTimer *timeKeeper;
-
+@property (nonatomic) BOOL initialized;
 @property (nonatomic, strong) NSObject *lock;
 @end
 
@@ -53,12 +53,11 @@
     __LF
     self = [super init];
     if (self) {
-        [self initializeSystem];
         self.lock = [NSObject new]; //MUTEX LOCK
+        self.initialized = NO;
     }
     return self;
 }
-
 
 - (void) initializeSystem
 {
@@ -71,6 +70,9 @@
     self.messagesDirectoryPath = [self.systemPath URLByAppendingPathComponent:SYSTEM_MESSAGES_PATH_COMPONENT];
     self.manager = [NSFileManager defaultManager];
     self.bullets = [NSMutableDictionary dictionary];
+    self.users = [NSMutableDictionary dictionary];
+    self.currentLocation = [[CLLocation alloc] initWithLatitude:37.520884 longitude:127.028360];
+    [[User me] setLocation:self.location];
     
     BOOL ret = [self.manager createDirectoryAtURL:self.messagesDirectoryPath withIntermediateDirectories:YES attributes:nil error:&error];
     if (!ret) {
@@ -81,6 +83,7 @@
     }
     
     [self load];
+    // [self loadUsers];
     [self initLocationServices];
     self.timeKeeper = [NSTimer scheduledTimerWithTimeInterval:5.0f
                                                        target:self
@@ -88,7 +91,13 @@
                                                      userInfo:nil
                                                       repeats:YES];
     
-    
+    self.initialized = YES;
+    [self fetchOutstandingBullets];
+}
+
+- (User *)userWithId:(id)userId
+{
+    return [self.users objectForKey:userId];
 }
 
 - (void) timeKeep
@@ -101,7 +110,7 @@
     }
 }
 
-- (NSArray*)usersInTheSystem
+- (NSArray*)userIdsInTheSystem
 {
     __LF
 
@@ -138,9 +147,6 @@
 }
 
 
-#define FIXBULLETTYPEISSUE
-#undef FIXBULLETTYPEISSUE
-
 - (void)load
 {
     __LF
@@ -155,12 +161,6 @@
         if ([filename containsString:CHATFILEEXTENSION]) {
             NSString *userId = [filename stringByReplacingOccurrencesOfString:CHATFILEEXTENSION withString:@""];
             NSMutableArray *bullets = [NSMutableArray arrayWithContentsOfURL:url];
-            
-#ifdef FIXBULLETTYPEISSUE
-            [bullets enumerateObjectsUsingBlock:^(Bullet*  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                obj.mediaType = [obj[@"bulletType"] integerValue];
-            }];
-#endif
             [self.bullets setObject:bullets ? bullets : [NSMutableArray array] forKey:userId];
         }
         else {
@@ -168,17 +168,25 @@
         }
         
     }];
-    
-#ifdef FIXBULLETTYPEISSUE
-    [self save];
-#endif
+    [self loadUsersInTheSystem];
+}
+
+- (void)loadUsersInTheSystem
+{
+    PFQuery *query = [User query];
+    [query whereKey:@"objectId" containedIn:[self userIdsInTheSystem]];
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
+        [users enumerateObjectsUsingBlock:^(User* _Nonnull user, NSUInteger idx, BOOL * _Nonnull stop) {
+            [self.users setObject:user forKey:user.objectId];
+        }];
+    }];
 }
 
 - (BOOL)save
 {
     __LF
 
-    [self.usersInTheSystem enumerateObjectsUsingBlock:^(id _Nonnull userId, NSUInteger idx, BOOL * _Nonnull stop) {
+    [self.userIdsInTheSystem enumerateObjectsUsingBlock:^(id _Nonnull userId, NSUInteger idx, BOOL * _Nonnull stop) {
         [self saveUser:userId];
     }];
     return YES;
@@ -223,7 +231,7 @@
     bullet.isRead = NO;
     bullet.isSyncFromUser = YES;
     bullet.isSyncToUser = [bullet isFromMe];
-    bullet.fromUserId = self.me.objectId;
+    bullet.fromUserId = [User me].objectId;
     bullet.toUserId = userId;
     BulletObject *object = [bullet object];
     [object saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
@@ -278,12 +286,24 @@
     [userMessages addObject:bullet];
     
     // SET ISSYNCTOUSER TO YES SO THAT I DO NOT RELOAD THE SAME MESSAGE
-    BOOL mine = [object.toUser.objectId isEqualToString:self.me.objectId];
+    BOOL mine = [object.toUser.objectId isEqualToString:[User me].objectId];
     if (mine) {
         object.isSyncToUser = YES;
         [object saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
             if (succeeded) {
-                [self notifySystemOfNewMessage:bullet];
+                User *user = [self.users objectForKey:bullet.fromUserId];
+                if (!user) {
+                    PFQuery *query = [User query];
+                    [query whereKey:@"objectId" equalTo:bullet.fromUserId];
+                    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+                        User *user = [objects firstObject];
+                        [self.users setObject:user forKey:bullet.fromUserId];
+                        [self notifySystemOfNewMessage:bullet];
+                    }];
+                }
+                else {
+                    [self notifySystemOfNewMessage:bullet];
+                }
             }
         }];
     }
@@ -312,7 +332,7 @@
     [PFCloud callFunctionInBackground:@"sendPushToUser"
                        withParameters:@{
                                         @"recipientId": userId,
-                                        @"senderId":    self.me.objectId,
+                                        @"senderId":    [User me].objectId,
                                         @"message":     textToSend,
                                         @"messageId":   messageId,
                                         @"pushType":    @"pushTypeMessage"
@@ -353,12 +373,16 @@
 - (void) fetchOutstandingBullets
 {
     __LF
+    
+    if (!self.initialized) {
+        return;
+    }
 
     NSLog(@"Fetching Outstanding Bullets");
     NSPredicate *predicate = [NSPredicate predicateWithFormat:
                               @"( fromUser == %@ AND isSyncFromUser != true) OR (toUser == %@ AND isSyncToUser != true)",
-                              self.me,
-                              self.me];
+                              [User me],
+                              [User me]];
     
     
     PFQuery *query = [BulletObject queryWithPredicate:predicate];
@@ -373,6 +397,10 @@
 - (void) treatPushNotificationWith:(NSDictionary *)userInfo
 {
     __LF
+    
+    if (!self.initialized) {
+        return;
+    }
 
     FileSystem* system = [FileSystem new];
     if ([userInfo[@"pushType"] isEqualToString:@"pushTypeMessage"]) {
@@ -408,7 +436,7 @@
 {
     __LF
 
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"toUser == %@ AND isRead == NO", self.me.objectId];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"toUser == %@ AND isRead == NO", [User me].objectId];
     NSArray *unreadBullets = [[self bulletsWith:userId] filteredArrayUsingPredicate:predicate];
     [unreadBullets enumerateObjectsUsingBlock:^(Bullet* _Nonnull bullet, NSUInteger idx, BOOL * _Nonnull stop) {
         bullet.isRead = YES;
@@ -425,7 +453,7 @@
     __LF
 
     __block NSUInteger count = 0;
-    [[self usersInTheSystem] enumerateObjectsUsingBlock:^(id _Nonnull userId, NSUInteger idx, BOOL * _Nonnull stop) {
+    [[self userIdsInTheSystem] enumerateObjectsUsingBlock:^(id _Nonnull userId, NSUInteger idx, BOOL * _Nonnull stop) {
         count = count + [self unreadMessagesFromUser:userId];
     }];
     
@@ -437,7 +465,7 @@
 {
 //    __LF
 
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"toUser == %@ AND isRead == NO", self.me.objectId];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"toUser == %@ AND isRead == NO", [User me].objectId];
     return [[[self bulletsWith:userId] filteredArrayUsingPredicate:predicate] count];
 }
 
@@ -458,7 +486,7 @@
     __LF
     
     PFQuery *query = [User query];
-    [query whereKey:@"location" nearGeoPoint:self.me.location];
+    [query whereKey:@"location" nearGeoPoint:self.location];
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
         if (block)
             block(users);
@@ -470,15 +498,15 @@
     __LF
 
     PFQuery *query = [User query];
-    [query whereKey:@"location" nearGeoPoint:self.me.location];
+    [query whereKey:@"location" nearGeoPoint:self.location];
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
         if (block)
             block([users sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
                 PFGeoPoint *p1 = ((User*)obj1).location;
                 PFGeoPoint *p2 = ((User*)obj2).location;
 
-                CGFloat distanceA = [self.me.location distanceInKilometersTo:p1];
-                CGFloat distanceB = [self.me.location distanceInKilometersTo:p2];
+                CGFloat distanceA = [self.location distanceInKilometersTo:p1];
+                CGFloat distanceB = [self.location distanceInKilometersTo:p2];
                 
                 if (distanceA < distanceB) {
                     return NSOrderedAscending;
@@ -493,8 +521,6 @@
 
 - (PFGeoPoint*) location
 {
-    __LF
-
     return [PFGeoPoint geoPointWithLocation:self.currentLocation];
 }
 
@@ -544,10 +570,7 @@ The - (void) initLocationServices method initializes the location management sys
     CLLocation* location = [locations lastObject];
     self.currentLocation = location;
     
-    PFGeoPoint *geo = [PFGeoPoint geoPointWithLocation:location];
-    [self.me setObject:geo forKey:@"location"];
-    [self.me setObject:location.timestamp forKey:@"locationUpdatedAt"];
-    [self.me saveInBackground];
+    [[User me] setLocation:self.location];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
@@ -557,8 +580,6 @@ The - (void) initLocationServices method initializes the location management sys
     switch (status) {
         case kCLAuthorizationStatusDenied:
         case kCLAuthorizationStatusRestricted:
-            self.currentLocation = [[CLLocation alloc] initWithLatitude:37.520884 longitude:127.028360];
-            break;
         case kCLAuthorizationStatusNotDetermined:
             [self.locationManager requestAlwaysAuthorization];
             break;

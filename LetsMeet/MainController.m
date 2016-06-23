@@ -25,19 +25,22 @@
 
 - (void)checkLoginStatusAndProceed
 {
-    [PFUser logOut];
+//    [PFUser logOut];
     
     User *user = [User me];
     if (user) {
         [user fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
-            [FileSystem new];
-            [self initializeMainViewController];
+            if (!error) {
+                [[FileSystem new] initializeSystem];
+                [self initializeMainViewController];
+            }
+            else {
+                NSLog(@"ERROR:%@", error.localizedDescription);
+            }
         }];
     }
     else {
         [self performSegueWithIdentifier:@"SignUp" sender:^(SignUp* signup, id nickname, id intro, id age, id sex){
-            NSLog(@"nickname:%@", nickname);
-            
             User *user = [User object];
             id usernameAndPassword = [FileSystem objectId];
             user.username = usernameAndPassword;
@@ -45,6 +48,7 @@
             user.nickname = nickname;
             user.age = age;
             user.intro = intro;
+            user.isSimulated = NO;
             [user setSexFromString:sex];
             
             [user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
@@ -53,7 +57,7 @@
                         if (!error) {
                             [signup dismissViewControllerAnimated:YES completion:nil];
                             [self subscribeToChannelCurrentUser];
-                            [FileSystem new];
+                            [[FileSystem new] initializeSystem];
                             [self initializeMainViewController];
                         }
                         else {
@@ -128,7 +132,6 @@
         NSLog(@"CURRENT INSTALLATION: Installation already has user. No need to set");
     }
 }
-
 
 - (void)viewDidDisappear:(BOOL)animated
 {

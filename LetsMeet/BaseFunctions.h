@@ -21,3 +21,4 @@ CGRect      rectForString(NSString *string, UIFont *font, CGFloat maxWidth);
 NSData*     compressedImageData(NSData* data, CGFloat width);
 MediaTypes  mediaTypeFromProfileMediaTypes(ProfileMediaTypes type);
 NSString*   randomObjectId();
+NSString*   distanceString(double distance);

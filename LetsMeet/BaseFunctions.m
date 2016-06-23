@@ -154,5 +154,19 @@ NSString* randomObjectId()
     return code;
 }
 
+NSString* distanceString(double distance)
+{
+    if (distance > 500) {
+        return [NSString stringWithFormat:@"멀어요"];
+    }
+    else if (distance < 1.0f) {
+        return [NSString stringWithFormat:@"%.0fm", distance*1000];
+    }
+    else {
+        return [NSString stringWithFormat:@"%.0fkm", distance];
+    }
+}
+
+
 
 

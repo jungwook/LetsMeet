@@ -39,7 +39,8 @@ typedef void (^NewUserBlock)(User* me);
 #define kJPEGCompressionMedium 0.4f
 #define kJPEGCompressionDefault 0.6f
 #define kJPEGCompressionFull 1.0f
-#define kThumbnailWidth 100.0f
+
+#define kThumbnailWidth 140.0f
 #define kTextMessageWidth 220.0f
 
 typedef NSMutableDictionary Bullet;
@@ -112,8 +113,6 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
     kProfileMediaVideo
 };
 
-typedef void(^CreateMeCompletionBlock)(void);
-
 @interface User : PFUser<PFSubclassing>
 @property (retain) NSString* nickname;
 @property (retain) PFGeoPoint* location;
@@ -128,11 +127,11 @@ typedef void(^CreateMeCompletionBlock)(void);
 @property SexTypes sex;
 
 + (instancetype) me;
-+ (void) createMeWithCompletionBlock:(CreateMeCompletionBlock)block;
 - (void) removeMe;
 - (NSString*) sexString;
 - (BOOL) profileIsVideo;
 - (BOOL) profileIsPhoto;
 - (void) setSexFromString:(NSString*)sex;
+- (NSString*) sexImageName;
 @end
 

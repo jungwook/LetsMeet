@@ -10,10 +10,10 @@
 #import "NSMutableDictionary+Bullet.h"
 
 @interface MediaView()
-@property (nonatomic, strong) UITapGestureRecognizer *tapGesture;
 @property (nonatomic, strong) id mediaFile;
 @property (nonatomic) MediaTypes mediaType;
 @property (nonatomic, strong) UIProgressView* progress;
+@property (nonatomic, strong) UIButton* button;
 @end
 
 @implementation MediaView
@@ -36,15 +36,25 @@
     return self;
 }
 
+- (void)awakeFromNib
+{
+    self.button = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.button.frame = self.bounds;
+    [self.button addTarget:self action:@selector(tapped:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:self.button];
+}
+
 - (void) initialize
 {
-    self.tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapped:)];
     self.progress = [UIProgressView new];
 }
 
-- (void) tapped:(UITapGestureRecognizer*) gesture
+- (void) tapped:(id)sender
 {
-    [MediaViewer showMediaFromView:self filename:self.mediaFile mediaType:self.mediaType];
+    __LF
+    if (self.mediaType != kMediaTypeNone) {
+        [MediaViewer showMediaFromView:self filename:self.mediaFile mediaType:self.mediaType];
+    }
 }
 
 - (void)setImage:(UIImage *)image
@@ -70,6 +80,9 @@
 
 - (void)loadMediaFromFile:(id)filename mediaType:(MediaTypes)mediaType completion:(S3GetBlock)block
 {
+    self.mediaType = mediaType;
+    self.mediaFile = filename;
+    
     switch (mediaType) {
         case kMediaTypeAudio:
         case kMediaTypeVideo:
@@ -232,6 +245,7 @@
     [UIView animateWithDuration:0.25 animations:^{
         self.alpha = 1.0f;
     } completion:^(BOOL finished) {
+        [self addGestureRecognizer:[self tapGestureRecognizer]];
         switch (mediaType) {
             case kMediaTypePhoto:
             {
@@ -242,7 +256,6 @@
                 
                 [S3File getDataFromFile:self.mediaFile completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
                     self.progress.progress = 1.0f;
-                    [self addGestureRecognizer:[self tapGestureRecognizer]];
                     [self setupScrollViewFromImage:[UIImage imageWithData:data]];
                     
                     [UIView animateWithDuration:0.3 delay:0.5 options:UIViewAnimationOptionCurveEaseIn animations:^{
@@ -261,7 +274,6 @@
             case kMediaTypeVideo:
             {
                 [self initializeVideoWithURL:[NSURL URLWithString:[S3LOCATION stringByAppendingString:self.mediaFile]]];
-                [self addGestureRecognizer:[self tapGestureRecognizer]];
             }
                 break;
                 

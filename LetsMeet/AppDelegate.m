@@ -26,6 +26,8 @@
     [Originals registerSubclass];
     [User registerSubclass];
     
+    self.system = [FileSystem new];
+    
     [Parse initializeWithConfiguration:[ParseClientConfiguration configurationWithBlock:^(id<ParseMutableClientConfiguration> configuration) {
         configuration.applicationId = @"appLetsMeet";
         configuration.clientKey = @"clientLetsMeet";

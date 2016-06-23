@@ -33,6 +33,9 @@
 		125AEF3C1CF9F08300553475 /* SimulatedUsers.m in Sources */ = {isa = PBXBuildFile; fileRef = 125AEF3B1CF9F08300553475 /* SimulatedUsers.m */; };
 		126AF40B1CEDAE0E00E3ED67 /* IndentedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 126AF40A1CEDAE0E00E3ED67 /* IndentedLabel.m */; };
 		12805E6E1D1AB5B40082A95D /* SignUp.m in Sources */ = {isa = PBXBuildFile; fileRef = 12805E6D1D1AB5B40082A95D /* SignUp.m */; };
+		12805E801D1BD3840082A95D /* SearchCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 12805E7F1D1BD3840082A95D /* SearchCell.m */; };
+		12805E831D1BE96E0082A95D /* MediaPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 12805E821D1BE96E0082A95D /* MediaPicker.m */; };
+		12805E861D1BF7E10082A95D /* AudioPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 12805E851D1BF7E10082A95D /* AudioPicker.m */; };
 		1296A7A31D03B34000E44642 /* BaseCollections.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A21D03B34000E44642 /* BaseCollections.m */; };
 		1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A51D03B3CA00E44642 /* BaseFunctions.m */; };
 		1296A7A91D03BB5500E44642 /* Notifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A81D03BB5500E44642 /* Notifications.m */; };
@@ -139,6 +142,12 @@
 		126AF40A1CEDAE0E00E3ED67 /* IndentedLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IndentedLabel.m; sourceTree = "<group>"; };
 		12805E6C1D1AB5B40082A95D /* SignUp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignUp.h; sourceTree = "<group>"; };
 		12805E6D1D1AB5B40082A95D /* SignUp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignUp.m; sourceTree = "<group>"; };
+		12805E7E1D1BD3840082A95D /* SearchCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchCell.h; sourceTree = "<group>"; };
+		12805E7F1D1BD3840082A95D /* SearchCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchCell.m; sourceTree = "<group>"; };
+		12805E811D1BE96E0082A95D /* MediaPicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaPicker.h; sourceTree = "<group>"; };
+		12805E821D1BE96E0082A95D /* MediaPicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaPicker.m; sourceTree = "<group>"; };
+		12805E841D1BF7E10082A95D /* AudioPicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPicker.h; sourceTree = "<group>"; };
+		12805E851D1BF7E10082A95D /* AudioPicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioPicker.m; sourceTree = "<group>"; };
 		1296A7A11D03B34000E44642 /* BaseCollections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseCollections.h; sourceTree = "<group>"; };
 		1296A7A21D03B34000E44642 /* BaseCollections.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseCollections.m; sourceTree = "<group>"; };
 		1296A7A41D03B3CA00E44642 /* BaseFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseFunctions.h; sourceTree = "<group>"; };
@@ -299,6 +308,10 @@
 				1235BC981D11229600E4AA27 /* MediaViewer.m */,
 				120A52361D17A75400EB8269 /* GradientView.h */,
 				120A52371D17A75400EB8269 /* GradientView.m */,
+				12805E811D1BE96E0082A95D /* MediaPicker.h */,
+				12805E821D1BE96E0082A95D /* MediaPicker.m */,
+				12805E841D1BF7E10082A95D /* AudioPicker.h */,
+				12805E851D1BF7E10082A95D /* AudioPicker.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -312,6 +325,8 @@
 				1235BC8A1D0FD30100E4AA27 /* ChatRight.m */,
 				1235BC8C1D0FD30E00E4AA27 /* ChatLeft.h */,
 				1235BC8D1D0FD30E00E4AA27 /* ChatLeft.m */,
+				12805E7E1D1BD3840082A95D /* SearchCell.h */,
+				12805E7F1D1BD3840082A95D /* SearchCell.m */,
 			);
 			name = Cells;
 			sourceTree = "<group>";
@@ -560,9 +575,11 @@
 				12F741EF1CE593A500E8267A /* Menu.m in Sources */,
 				1235BC991D11229600E4AA27 /* MediaViewer.m in Sources */,
 				1296A7AC1D03E0CA00E44642 /* Profile.m in Sources */,
+				12805E801D1BD3840082A95D /* SearchCell.m in Sources */,
 				12DE5FB81CFFB1A2009B315F /* Preview.m in Sources */,
 				12F0D7101D092F8600A37C40 /* ProfileView.m in Sources */,
 				1235BC911D0FF82500E4AA27 /* NSDate+TimeAgo.m in Sources */,
+				12805E831D1BE96E0082A95D /* MediaPicker.m in Sources */,
 				12DE5FE21D02BC79009B315F /* FileSystem.m in Sources */,
 				124928B21CF2E65A0038A2F3 /* ToggleButton.m in Sources */,
 				12F741D11CE56B3400E8267A /* FloatingDrawerView.m in Sources */,
@@ -592,6 +609,7 @@
 				12F741D01CE56B3400E8267A /* FloatingDrawerSpringAnimator.m in Sources */,
 				120142E81D08930B00D66905 /* S3File.m in Sources */,
 				120A52411D18C28E00EB8269 /* Search.m in Sources */,
+				12805E861D1BF7E10082A95D /* AudioPicker.m in Sources */,
 				1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */,
 				120A52381D17A75400EB8269 /* GradientView.m in Sources */,
 				124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */,

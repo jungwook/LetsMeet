@@ -385,48 +385,6 @@
     }
 }
 
-+ (void) createMeWithCompletionBlock:(CreateMeCompletionBlock)block
-{
-    __LF
-    User *user = [User me];
-    if ([User me])
-        return;
-    
-    NSString *username = [User uniqueUsername];
-    user = [User user];
-    user.username = username;
-    user.password = username;
-    
-    [user signUp];
-    [PFUser logInWithUsernameInBackground:username password:username block:^(PFUser * _Nullable user, NSError * _Nullable error) {
-        if (error) {
-            NSLog(@"Error:%@", error.localizedDescription);
-        }
-        else {
-            [user fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
-                if (error) {
-                    NSLog(@"Error:%@", error.localizedDescription);
-                }
-                else {
-                    PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-                    if (!currentInstallation[@"user"]) {
-                        currentInstallation[@"user"] = user;
-                        [currentInstallation saveInBackground];
-                        NSLog(@"CURRENT INSTALLATION: saving user to Installation");
-                    }
-                    else {
-                        NSLog(@"CURRENT INSTALLATION: Installation already has user. No need to set");
-                    }
-                    NSLog(@"User information fetched from server %@", [User me]);
-                    if (block) {
-                        block();
-                    }
-                }
-            }];
-        }
-    }];
-}
-
 + (NSString*) uniqueUsername
 {
     __LF
@@ -461,6 +419,18 @@
 - (BOOL)profileIsVideo
 {
     return self.profileMediaType == kProfileMediaVideo ? YES : NO;
+}
+
+- (void) setLocation:(PFGeoPoint *)location
+{
+    [self setObject:location forKey:@"location"];
+    [self setObject:[NSDate date] forKey:@"locationUpdatedAt"];
+    [self saveInBackground];
+}
+
+- (NSString *)sexImageName
+{
+    return self.sex == kSexMale ? @"guy" : @"girl";
 }
 
 @end

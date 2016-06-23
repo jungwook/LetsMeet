@@ -20,6 +20,8 @@ typedef void (^UsersArrayBlock)(NSArray<User*>*users);
 @interface FileSystem : NSObject <CLLocationManagerDelegate>
 @property (nonatomic) BOOL isSimulator;
 
+- (PFGeoPoint*) location;
+
 /**
  Creates and returns a new objectId, checked for local uniqueness within the system.
  **/
@@ -34,7 +36,7 @@ typedef void (^UsersArrayBlock)(NSArray<User*>*users);
 - (BOOL) saveUser:(id)userId;
 - (BOOL) removeUser:(id)userId;
 - (NSArray*) messagesWith:(id)userId;
-- (NSArray*) usersInTheSystem;
+- (NSArray*) userIdsInTheSystem;
 
 /**
  The 'add:(NSMutableDictionary*)message for:(id)userId mine:(BOOL)mine' method adds a new message to the system to user with userId. Saves the internal file and sends a push notification depending on whether it's mine (BOOL).
@@ -50,6 +52,7 @@ typedef void (^UsersArrayBlock)(NSArray<User*>*users);
 /**
  The 'update:(NSMutableDictionary*)message for:(id)userId mine:(BOOL)mine' method updates an existing message in the system to user with userId based on the message's objectId. This method is intended to be used for lazy updates of photos or thumbnail images loaded from the network.
  **/
+- (User*) userWithId:(id)userId;
 - (void) update:(Bullet*)message for:(id)userId;
 - (NSUInteger) unreadMessages;
 - (void) readUnreadBulletsWithUserId:(id)userId;

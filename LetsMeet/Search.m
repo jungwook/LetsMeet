@@ -7,11 +7,13 @@
 //
 
 #import "Search.h"
+#import "SearchCell.h"
 #import "FileSystem.h"
 #import "RefreshControl.h"
 #import "Notifications.h"
 #import "S3File.h"
 #import "Chat.h"
+#import "MediaViewer.h"
 
 @interface Search ()
 @property (nonatomic, weak) User *me;
@@ -103,12 +105,23 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"SearchCell" forIndexPath:indexPath];
+    SearchCell *cell = [tableView dequeueReusableCellWithIdentifier:@"SearchCell" forIndexPath:indexPath];
+    User *user = [self.users objectAtIndex:indexPath.row];
+    
+    [cell setUser:user tableView:tableView];
+    return cell;
+}
+
+
+- (UITableViewCell *)tableView2:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"SearchCellBasic" forIndexPath:indexPath];
     User *user = [self.users objectAtIndex:indexPath.row];
     
     cell.textLabel.text = user.nickname;
     cell.detailTextLabel.text = user.intro;
-    cell.imageView.image = [UIImage imageNamed:@"guy"];
+    cell.imageView.image = [UIImage imageNamed:(user.sex == kSexMale) ? @"guy" : @"girl"];
+    cell.imageView.backgroundColor = [UIColor colorWithWhite:0.1 alpha:1.0];
+    
     cell.tag = indexPath.row;
     [S3File getDataFromFile:user.thumbnail completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
         UIImage *photo = [UIImage imageWithData:data];
