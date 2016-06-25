@@ -228,7 +228,7 @@ CGFloat ampAtIndex(NSUInteger index, NSData* data)
         [self pausePlayer];
     }
 }
-
+ 
 - (void)playPlayer
 {
     NSError *error = nil;
