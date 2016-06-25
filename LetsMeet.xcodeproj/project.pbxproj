@@ -35,7 +35,8 @@
 		12805E6E1D1AB5B40082A95D /* SignUp.m in Sources */ = {isa = PBXBuildFile; fileRef = 12805E6D1D1AB5B40082A95D /* SignUp.m */; };
 		12805E801D1BD3840082A95D /* SearchCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 12805E7F1D1BD3840082A95D /* SearchCell.m */; };
 		12805E831D1BE96E0082A95D /* MediaPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 12805E821D1BE96E0082A95D /* MediaPicker.m */; };
-		12805E861D1BF7E10082A95D /* AudioPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 12805E851D1BF7E10082A95D /* AudioPicker.m */; };
+		12805E881D1CACAB0082A95D /* AudioRecorder.xib in Resources */ = {isa = PBXBuildFile; fileRef = 12805E871D1CACAB0082A95D /* AudioRecorder.xib */; };
+		12805E8B1D1E3DD30082A95D /* AudioRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 12805E8A1D1E3DD30082A95D /* AudioRecorder.m */; };
 		1296A7A31D03B34000E44642 /* BaseCollections.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A21D03B34000E44642 /* BaseCollections.m */; };
 		1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A51D03B3CA00E44642 /* BaseFunctions.m */; };
 		1296A7A91D03BB5500E44642 /* Notifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A81D03BB5500E44642 /* Notifications.m */; };
@@ -146,8 +147,9 @@
 		12805E7F1D1BD3840082A95D /* SearchCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchCell.m; sourceTree = "<group>"; };
 		12805E811D1BE96E0082A95D /* MediaPicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaPicker.h; sourceTree = "<group>"; };
 		12805E821D1BE96E0082A95D /* MediaPicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaPicker.m; sourceTree = "<group>"; };
-		12805E841D1BF7E10082A95D /* AudioPicker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPicker.h; sourceTree = "<group>"; };
-		12805E851D1BF7E10082A95D /* AudioPicker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioPicker.m; sourceTree = "<group>"; };
+		12805E871D1CACAB0082A95D /* AudioRecorder.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AudioRecorder.xib; sourceTree = "<group>"; };
+		12805E891D1E3DD30082A95D /* AudioRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioRecorder.h; sourceTree = "<group>"; };
+		12805E8A1D1E3DD30082A95D /* AudioRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioRecorder.m; sourceTree = "<group>"; };
 		1296A7A11D03B34000E44642 /* BaseCollections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseCollections.h; sourceTree = "<group>"; };
 		1296A7A21D03B34000E44642 /* BaseCollections.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseCollections.m; sourceTree = "<group>"; };
 		1296A7A41D03B3CA00E44642 /* BaseFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseFunctions.h; sourceTree = "<group>"; };
@@ -310,8 +312,8 @@
 				120A52371D17A75400EB8269 /* GradientView.m */,
 				12805E811D1BE96E0082A95D /* MediaPicker.h */,
 				12805E821D1BE96E0082A95D /* MediaPicker.m */,
-				12805E841D1BF7E10082A95D /* AudioPicker.h */,
-				12805E851D1BF7E10082A95D /* AudioPicker.m */,
+				12805E891D1E3DD30082A95D /* AudioRecorder.h */,
+				12805E8A1D1E3DD30082A95D /* AudioRecorder.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -439,6 +441,7 @@
 			isa = PBXGroup;
 			children = (
 				12F741931CE4B97100E8267A /* Main.storyboard */,
+				12805E871D1CACAB0082A95D /* AudioRecorder.xib */,
 				129B07541D0AAABB000C0276 /* Cells */,
 				12F741D81CE56F4300E8267A /* MainController.h */,
 				12F741D91CE56F4300E8267A /* MainController.m */,
@@ -542,6 +545,7 @@
 				12F7419A1CE4B97100E8267A /* LaunchScreen.storyboard in Resources */,
 				1235BC931D0FF97B00E4AA27 /* NSDateTimeAgo.bundle in Resources */,
 				12F741971CE4B97100E8267A /* Assets.xcassets in Resources */,
+				12805E881D1CACAB0082A95D /* AudioRecorder.xib in Resources */,
 				12F741951CE4B97100E8267A /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -589,6 +593,7 @@
 				1296A7A91D03BB5500E44642 /* Notifications.m in Sources */,
 				12F7418C1CE4B97100E8267A /* main.m in Sources */,
 				124928AF1CF2CD370038A2F3 /* RefreshControl.m in Sources */,
+				12805E8B1D1E3DD30082A95D /* AudioRecorder.m in Sources */,
 				12805E6E1D1AB5B40082A95D /* SignUp.m in Sources */,
 				12DE5FBB1D004443009B315F /* Progress.m in Sources */,
 				12F0D7191D0A7C6100A37C40 /* NearBy.m in Sources */,
@@ -609,7 +614,6 @@
 				12F741D01CE56B3400E8267A /* FloatingDrawerSpringAnimator.m in Sources */,
 				120142E81D08930B00D66905 /* S3File.m in Sources */,
 				120A52411D18C28E00EB8269 /* Search.m in Sources */,
-				12805E861D1BF7E10082A95D /* AudioPicker.m in Sources */,
 				1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */,
 				120A52381D17A75400EB8269 /* GradientView.m in Sources */,
 				124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */,

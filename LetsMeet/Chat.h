@@ -9,6 +9,6 @@
 #import <UIKit/UIKit.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 
-@interface Chat : UIViewController <UITextViewDelegate, UITableViewDelegate, UITableViewDataSource>
+@interface Chat : UIViewController <UITextViewDelegate, UITableViewDelegate, UITableViewDataSource, AVAudioPlayerDelegate, AVAudioRecorderDelegate>
 @property (nonatomic, strong) User *user;
 @end

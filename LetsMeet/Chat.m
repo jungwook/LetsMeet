@@ -14,6 +14,7 @@
 #import "Notifications.h"
 #import "S3File.h"
 #import "MediaPicker.h"
+#import "AudioRecorder.h"
 
 #define kInitialTextViewHeight 34
 #define kMaxTextViewHeight 200
@@ -30,11 +31,13 @@
 @property (nonatomic) CGFloat textViewHeight;
 @property (nonatomic, strong) FileSystem* system;
 @property (nonatomic, strong) Notifications* notifications;
+@property (weak, nonatomic) IBOutlet UIView *audioView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *barTop;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *barBottom;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageTop;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageBottom;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *barHeight;
+@property (strong, nonatomic) AudioRecorder *audioRecorderView;
 @end
 
 @implementation Chat
@@ -51,7 +54,7 @@
 
 - (void)awakeFromNib
 {
-    
+    __LF
 }
 
 - (void)setUser:(User *)user
@@ -91,20 +94,47 @@
     [self.notifications off];
 }
 
+- (void)setupAudioRecorderView
+{
+    self.audioRecorderView = [[[NSBundle mainBundle] loadNibNamed:@"AudioRecorder" owner:self options:nil] firstObject];
+    [self.audioView addSubview:self.audioRecorderView];
+    self.audioRecorderView.frame = self.audioView.bounds;
+    self.audioRecorderView.layer.cornerRadius = self.audioRecorderView.frame.size.height / 2.f;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     [self addObservers];
     [self setupTableInsetsOnFirstLoad];
+    [self setupAudioRecorderView];
+}
+
+- (void)switchToAudio:(BOOL)toAudio
+{
+    [UIView animateWithDuration:0.25 animations:^{
+        self.audioView.alpha = toAudio;
+        self.audioRecorderView.alpha = toAudio;
+        self.messageView.alpha = !toAudio;
+    }];
 }
 
 - (IBAction)startRecording:(id)sender {
     __LF
+    [self switchToAudio:YES];
+    [self.audioRecorderView startRecording];
 }
 
 - (IBAction)stopRecording:(id)sender {
     __LF
+    
+    [self.audioRecorderView stopRecording];
 }
+
+//- (IBAction)sendAudio:(id)sender {
+//    [self switchToAudio:NO];
+//    [self pausePlayer];
+//}
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -200,8 +230,10 @@
     [self clearTextView];
 }
 
-- (IBAction)sendMedia:(id)sender {
+- (IBAction)sendMedia:(UIButton*)sender {
     __LF
+    
+    sender.selected = NO;
     if (![self.messageView.text isEqualToString:@""]) {
         [self sendMessage:nil];
     }
@@ -329,6 +361,7 @@
 - (IBAction)tappedOutside:(id)sender {
     __LF
     [self.messageView resignFirstResponder];
+    [self switchToAudio:NO];
 }
 
 - (void)textViewDidChange:(UITextView *)textView

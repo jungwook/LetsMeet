@@ -204,7 +204,6 @@
     return [S3File saveData:data named:nil extension:@".mov" group:@"ProfileMedia/" completedBlock:block progressBlock:progress];
 }
 
-
 + (NSString *)saveProfileMovieData:(NSData *)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress
 {
     return [S3File saveData:data named:@"profile" extension:@".mov" group:@"ProfileMedia/" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
