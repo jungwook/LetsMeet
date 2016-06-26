@@ -8,6 +8,7 @@
 
 #import "AudioPlayer.h"
 #import "DisplayLinkView.h"
+#import "S3File.h"
 
 @interface AudioPlayer()
 @property (weak, nonatomic) IBOutlet UIButton *playBut;
@@ -16,6 +17,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *sec1;
 @property (weak, nonatomic) IBOutlet UILabel *min1;
 @property (strong, nonatomic) AVAudioPlayer *player;
+@property (strong, nonatomic) CADisplayLink *playbackLink;
+@property (strong, nonatomic) NSString* audioFile;
 @end
 
 @implementation AudioPlayer
@@ -35,6 +38,7 @@
     __LF
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self translatesAutoresizingMaskIntoConstraints];
+    self.playBut.selected = NO;
 }
 
 - (void)layoutSubviews
@@ -43,23 +47,110 @@
     self.backgroundColor = self.superview.superview.backgroundColor;
 }
 
-- (void)setupAudioThumbnailData:(NSData*)thumbnail audioURL:(NSURL *)playURL
+- (void)setupAudioThumbnailData:(NSData*)thumbnail audioData:(NSData *)audioData
 {
     NSError *audioError = nil;
-
+    
     self.displayLink.isRecording = NO;
     self.displayLink.audioData = [NSMutableData dataWithData:thumbnail];
     [self.displayLink setNeedsDisplay];
     
-    self.player = [[AVAudioPlayer alloc] initWithContentsOfURL:playURL error:&audioError];
+    self.player = [[AVAudioPlayer alloc] initWithData:audioData error:&audioError];
+    self.player.delegate = self;
     if (audioError) {
-        NSLog(@"ERROR:%@[%@]", audioError.localizedDescription, playURL);
+        NSLog(@"ERROR:%@", audioError.localizedDescription);
     }
     [self updateTimerDisplayWithTime:self.player.duration];
+    [self.player prepareToPlay];
 }
 
-- (void)setupAudioThumbnailData:(NSData *)data
+- (void)setupAudioThumbnailData:(NSData *)thumbnail audioFile:(NSString *)audioFile
 {
+    self.audioFile = audioFile;
+    self.displayLink.isRecording = NO;
+    self.displayLink.audioData = [NSMutableData dataWithData:thumbnail];
+    [self.displayLink setNeedsDisplay];
+
+    self.player = nil;
+}
+
+- (void) updatePlayback
+{
+    static int count = 0;
+    
+    if (count++ % 5)
+        return;
+    
+    NSTimeInterval now = self.player.currentTime;
+    NSTimeInterval dur = self.player.duration;
+    
+    self.displayLink.progress = dur > 0 ? now / dur : 0;
+    [self updateTimerDisplayWithTime:self.player.currentTime];
+    [self.displayLink setNeedsDisplay];
+}
+
+- (void) startPlaybackLink
+{
+    self.playbackLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updatePlayback)];
+    [self.playbackLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+}
+
+- (void) stopPlaybackLink
+{
+    [self.playbackLink removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+    self.playbackLink = nil;
+}
+
+- (void) playPlayer
+{
+    if (self.player == nil) {
+        [S3File getDataFromFile:self.audioFile completedBlock:^(NSData *audioData, NSError *error, BOOL fromCache) {
+            NSError *audioError = nil;
+            
+            self.player = [[AVAudioPlayer alloc] initWithData:audioData error:&audioError];
+            self.player.delegate = self;
+            if (audioError) {
+                NSLog(@"ERROR:%@", audioError.localizedDescription);
+            }
+            else {
+                [self updateTimerDisplayWithTime:self.player.duration];
+                [self.player prepareToPlay];
+                self.playBut.selected = YES;
+                [self.player play];
+                [self startPlaybackLink];
+            }
+        } progressBlock:nil];
+    }
+    else {
+        [self updateTimerDisplayWithTime:self.player.duration];
+        self.playBut.selected = YES;
+        [self.player play];
+        [self startPlaybackLink];
+    }
+}
+
+- (void) pausePlayer
+{
+    self.playBut.selected = NO;
+    [self.player pause];
+    [self stopPlaybackLink];
+}
+
+- (IBAction)playOrPauseAudio:(UIButton*)sender {
+    sender.selected = !sender.selected;
+    if (sender.selected) {
+        [self playPlayer];
+    }
+    else {
+        [self pausePlayer];
+    }
+}
+
+- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
+{
+    [self.displayLink setProgress:0.0f];
+    [self.displayLink setNeedsDisplay];
+    [self pausePlayer];
 }
 
 - (void) updateTimerDisplayWithTime:(NSTimeInterval) time

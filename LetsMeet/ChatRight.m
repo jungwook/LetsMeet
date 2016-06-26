@@ -14,7 +14,6 @@
 #import "AudioPlayer.h"
 
 #define CHATVIEWINSET 8
-#define S3LOCATION @"http://parsekr.s3.ap-northeast-2.amazonaws.com/"
 
 @interface ChatRight()
 @property (weak, nonatomic) IBOutlet Balloon *balloon;
@@ -27,12 +26,12 @@
 @property (weak, nonatomic) IBOutlet UIImageView *playView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *trailing;
 @property (weak, nonatomic) IBOutlet UIImageView *realIcon;
-@property (weak, nonatomic) IBOutlet UIView *audioView;
 @property (nonatomic) MediaTypes mediaType;
 @property (nonatomic) ProfileMediaTypes profileMediaType;
 @property (nonatomic, strong) id mediaFile;
 @property (nonatomic, strong) id profileMediaFile;
 @property (nonatomic, strong) id messageId;
+@property (weak, nonatomic) IBOutlet UIView *audioView;
 @property (strong, nonatomic) AudioPlayer *audioPlayer;
 @end
 
@@ -61,7 +60,7 @@
         NSLog(@"GESTURES:%@", self.thumbnailView.gestureRecognizers);
     }
     
-    self.audioPlayer =[AudioPlayer audioPlayerOnView:self.audioView];
+    self.audioPlayer = [AudioPlayer audioPlayerOnView:self.audioView];
 }
 
 - (void) tappedPhotoView:(UITapGestureRecognizer*)tap
@@ -86,6 +85,7 @@
     self.nicknameLabel.text = user.nickname;
     self.nicknameLabel.hidden = consecutive;
     self.photoView.hidden = consecutive;
+    self.audioView.alpha = 0.0;
     
     [S3File getDataFromFile:user.thumbnail completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
         if (!error) {
@@ -95,7 +95,6 @@
     
     self.thumbnailView.alpha = 0.0;
     self.realIcon.hidden = YES;
-    self.audioView.hidden = YES;
     
     NSString *string = [message.message stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     self.messageLabel.text = string;
@@ -129,10 +128,15 @@
             self.playView.hidden = YES;
             self.realIcon.hidden = YES;
             self.audioView.hidden = NO;
-            boxSize = kThumbnailWidth*2.0f;
-            [S3File getDataFromFile:message.mediaThumbnailFile completedBlock:^(NSData *thumbnail, NSError *error, BOOL fromCache) {
+            boxSize = kThumbnailWidth*1.5f;
+            [S3File getDataFromFile:message.mediaThumbnailFile completedBlock:^(NSData *thumbnail, NSError *error, BOOL thumbnailFromCache) {
                 if (!error) {
-                    [self.audioPlayer setupAudioThumbnailData:thumbnail audioURL:[NSURL URLWithString:[S3LOCATION stringByAppendingString:self.mediaFile]]];
+                    [self.audioPlayer setupAudioThumbnailData:thumbnail audioFile:message.mediaFile];
+                    self.audioView.alpha = 1.0f;
+                }
+                else {
+                    NSLog(@"ERROR:%@", error.localizedDescription);
+                    self.audioView.alpha = 0.0f;
                 }
             } progressBlock:nil];
         }
@@ -170,5 +174,4 @@
         }
     });
 }
-
 @end

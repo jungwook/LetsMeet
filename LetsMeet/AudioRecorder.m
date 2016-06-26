@@ -24,7 +24,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *sec1;
 @property (weak, nonatomic) IBOutlet UILabel *min1;
 @property (weak, nonatomic) IBOutlet DisplayLinkView *equalizer;
-@property (nonatomic) NSTimeInterval playbackTime;
 @end
 
 
@@ -189,8 +188,6 @@
 
 - (void) startRecording
 {
-    self.playbackTime = 0;
-    
     [self pausePlayer];
     [self enablePlayBut:NO];
     [self.recorder record];
@@ -235,9 +232,6 @@
 
 - (void)pausePlayer
 {
-    self.playbackTime = self.player.currentTime;
-    NSLog(@"CURRENT:%f", self.playbackTime);
-    
     [self.player pause];
     [self selectPlayBut];
     [self stopPlaybackLink];

@@ -135,25 +135,29 @@
                         <constraint firstAttribute="height" constant="25" id="UAm-EC-29c"/>
                     </constraints>
                     <state key="normal" title="Button" image="play blue"/>
+                    <state key="selected" image="pause blue"/>
+                    <connections>
+                        <action selector="playOrPauseAudio:" destination="Kf5-xH-r3H" eventType="touchUpInside" id="yQh-0Y-qVw"/>
+                    </connections>
                 </button>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="9" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qg0-ru-CoK">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qg0-ru-CoK">
                     <rect key="frame" x="322" y="10" width="14" height="21"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="21" id="JzH-1e-arV"/>
                         <constraint firstAttribute="width" constant="14" id="ibn-BC-5tE"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
-                    <color key="textColor" red="0.050980392159999999" green="0.40000000000000002" blue="0.68235294120000001" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="textColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="9" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GgW-Ek-gkk">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GgW-Ek-gkk">
                     <rect key="frame" x="313" y="10" width="14" height="21"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="14" id="3WH-FM-pYC"/>
                         <constraint firstAttribute="height" constant="21" id="nT1-ot-NhX"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
-                    <color key="textColor" red="0.050980392159999999" green="0.40000000000000002" blue="0.68235294120000001" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="textColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=":" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="i2H-p9-kOg">
@@ -163,17 +167,17 @@
                         <constraint firstAttribute="height" constant="21" id="hGp-LD-3o0"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
-                    <color key="textColor" red="0.050980392159999999" green="0.40000000000000002" blue="0.68235294120000001" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="textColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="9" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xvw-lz-Xaz">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xvw-lz-Xaz">
                     <rect key="frame" x="297" y="10" width="14" height="21"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="14" id="Bpz-6u-jSo"/>
                         <constraint firstAttribute="height" constant="21" id="gek-KH-rGw"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
-                    <color key="textColor" red="0.050980392159999999" green="0.40000000000000002" blue="0.68235294120000001" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="textColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nHq-Ld-5mM" customClass="DisplayLinkView">
@@ -181,7 +185,7 @@
                     <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                 </view>
             </subviews>
-            <color key="backgroundColor" red="1" green="1" blue="0.40000000600000002" alpha="1" colorSpace="calibratedRGB"/>
+            <color key="backgroundColor" red="0.3921568627" green="0.3921568627" blue="0.3921568627" alpha="1" colorSpace="calibratedRGB"/>
             <constraints>
                 <constraint firstAttribute="bottom" secondItem="nHq-Ld-5mM" secondAttribute="bottom" constant="5" id="5Fj-CP-IIB"/>
                 <constraint firstItem="t2Z-10-f2t" firstAttribute="leading" secondItem="Kf5-xH-r3H" secondAttribute="leading" constant="8" id="6K5-jy-x8g"/>

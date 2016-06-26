@@ -24,6 +24,7 @@
 - (void)displayRecording
 {
     const CGFloat lineWidth = 5.f;
+    const CGFloat barWidth = 3.0f;
     const CGFloat offset = 0.5f;
     const CGFloat scale = 5;
     
@@ -39,7 +40,7 @@
     
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextSetStrokeColorWithColor(context, [[UIColor whiteColor] CGColor]);
-    CGContextSetLineWidth(context, lineWidth-1);
+    CGContextSetLineWidth(context, barWidth);
     for (NSUInteger i = start; i<w; i++) {
         CGFloat amp = ampAtIndex(i-start, small)*scale;
         CGFloat val = MAX(MIN(amp*h*offset, h*offset), 1.0f);
@@ -53,6 +54,7 @@
 - (void)displayPlayback
 {
     const CGFloat lineWidth = 5.f;
+    const CGFloat barWidth = 3.0f;
     const CGFloat offset = 0.5f;
     const CGFloat scale = 5;
     
@@ -63,7 +65,7 @@
     
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextSetStrokeColorWithColor(context, [[UIColor colorWithWhite:1.0 alpha:1.0] CGColor]);
-    CGContextSetLineWidth(context, lineWidth-1);
+    CGContextSetLineWidth(context, barWidth);
     
     BOOL passed = NO;
     
@@ -78,7 +80,7 @@
                 CGContextDrawPath(context, kCGPathStroke);
                 CGContextRef context = UIGraphicsGetCurrentContext();
                 CGContextSetStrokeColorWithColor(context, [[UIColor colorWithWhite:0.9 alpha:1.0] CGColor]);
-                CGContextSetLineWidth(context, lineWidth-1);
+                CGContextSetLineWidth(context, barWidth);
             }
         }
         CGContextMoveToPoint(context, i*lineWidth, 0.5*h - val);

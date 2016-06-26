@@ -8,7 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface AudioPlayer : UIView
-- (void)setupAudioThumbnailData:(NSData*)thumbnail audioURL:(NSURL*)playURL;
+@interface AudioPlayer : UIView <AVAudioPlayerDelegate>
+- (void)setupAudioThumbnailData:(NSData*)thumbnail audioData:(NSData*)audioData;
+- (void)setupAudioThumbnailData:(NSData*)thumbnail audioFile:(NSString*)audioFile;
 + (instancetype)audioPlayerOnView:(UIView*)view;
 @end

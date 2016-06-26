@@ -11,6 +11,7 @@
 #import "S3File.h"
 #import "NSDate+TimeAgo.h"
 #import "MediaViewer.h"
+#import "AudioPlayer.h"
 
 #define CHATVIEWINSET 8
 
@@ -30,6 +31,9 @@
 @property (nonatomic, strong) id mediaFile;
 @property (nonatomic, strong) id profileMediaFile;
 @property (nonatomic, strong) id messageId;
+@property (weak, nonatomic) IBOutlet UIView *audioView;
+@property (strong, nonatomic) AudioPlayer *audioPlayer;
+
 @end
 
 @implementation ChatLeft
@@ -46,7 +50,6 @@
     self.realIcon.layer.shadowRadius = 2.0f;
     self.realIcon.layer.shadowOpacity = 0.3;
 
-    
     if (![self.photoView.gestureRecognizers count]) {
         [self.photoView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedPhotoView:)]];
     }
@@ -58,6 +61,7 @@
         NSLog(@"GESTURES:%@", self.thumbnailView.gestureRecognizers);
     }
     
+    self.audioPlayer = [AudioPlayer audioPlayerOnView:self.audioView];
 }
 
 - (void) tappedPhotoView:(UITapGestureRecognizer*)tap
@@ -82,6 +86,7 @@
     self.nicknameLabel.text = user.nickname;
     self.nicknameLabel.hidden = consecutive;
     self.photoView.hidden = consecutive;
+    self.audioView.alpha = 0.0;
     
     [S3File getDataFromFile:user.thumbnail completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
         if (!error) {
@@ -95,17 +100,19 @@
     NSString *string = [message.message stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     self.messageLabel.text = string;
     
+    CGFloat boxSize = 0;
+    
     switch (message.mediaType) {
         case kMediaTypeText: {
             CGRect rect = rectForString(string, self.messageLabel.font, kTextMessageWidth);
-            self.spacing.constant = self.contentView.bounds.size.width-rect.size.width-(self.trailing.constant+CHATVIEWINSET+CHATVIEWINSET);
+            boxSize = rect.size.width;
         }
             break;
         case kMediaTypeVideo:
         case kMediaTypePhoto: {
             self.playView.hidden = (message.mediaType == kMediaTypePhoto);
             self.realIcon.hidden = !(message.realMedia);
-            self.spacing.constant = self.contentView.bounds.size.width-kThumbnailWidth-(self.trailing.constant+CHATVIEWINSET+CHATVIEWINSET);
+            boxSize = kThumbnailWidth;
             [S3File getDataFromFile:message.mediaThumbnailFile completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
                 if (!error) {
                     if (fromCache) {
@@ -118,9 +125,31 @@
             } progressBlock:nil];
         }
             break;
+        case kMediaTypeAudio: {
+            self.playView.hidden = YES;
+            self.realIcon.hidden = YES;
+            self.audioView.hidden = NO;
+            boxSize = kThumbnailWidth*1.5f;
+            [S3File getDataFromFile:message.mediaThumbnailFile completedBlock:^(NSData *thumbnail, NSError *error, BOOL thumbnailFromCache) {
+                if (!error) {
+                    [self.audioPlayer setupAudioThumbnailData:thumbnail audioFile:message.mediaFile];
+                    self.audioView.alpha = 1.0f;
+                }
+                else {
+                    NSLog(@"ERROR:%@", error.localizedDescription);
+                    self.audioView.alpha = 0.0f;
+                }
+            } progressBlock:nil];
+        }
+            break;
+        case kMediaTypeURL:
+            break;
+        case kMediaTypeNone:
+            break;
         default:
             break;
     }
+    self.spacing.constant = self.contentView.bounds.size.width-boxSize-(self.trailing.constant+CHATVIEWINSET*2);
 }
 
 - (void)lazyUpdateData:(NSData*)data onTableView:(UITableView*)tableView
