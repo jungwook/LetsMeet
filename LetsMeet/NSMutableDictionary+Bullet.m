@@ -45,14 +45,14 @@
     return bullet;
 }
 
-+ (instancetype)bulletWithAudio:(NSString*)filename thumbnail:(NSString *)thumbnail realMedia:(BOOL)realMedia
++ (instancetype)bulletWithAudio:(NSString*)filename thumbnail:(NSString *)thumbnail
 {
     Bullet* bullet = [Bullet new];
     bullet.mediaType = kMediaTypeAudio;
     bullet.mediaFile = filename;
     bullet.mediaThumbnailFile = thumbnail;
     bullet.message = [[self mediaTypeStringForType:bullet.mediaType] stringByAppendingString:@" 메시지"];
-    bullet.realMedia = realMedia;
+    bullet.realMedia = YES;
     return bullet;
 }
 

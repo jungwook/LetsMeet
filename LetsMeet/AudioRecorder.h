@@ -9,12 +9,14 @@
 #import <UIKit/UIKit.h>
 
 typedef void(^AudioRecorderErrorBlock)(void);
-typedef void(^AudioRecorderSendAudio)(NSURL *url);
+typedef void(^AudioRecorderSendAudioBlock)(NSData* thumbnail, NSData *original);
 
 @interface AudioRecorder : UIView <AVAudioRecorderDelegate, AVAudioPlayerDelegate, AVAudioSessionDelegate>
 @property (nonatomic, readonly) BOOL ready;
 @property (nonatomic, copy) AudioRecorderErrorBlock errorBlock;
-@property (nonatomic, copy) AudioRecorderSendAudio sendBlock;
+@property (nonatomic, copy) AudioRecorderSendAudioBlock sendBlock;
 - (void) startRecording;
 - (void) stopRecording;
+- (void) setErrorBlock:(AudioRecorderErrorBlock)errorBlock sendBlock:(AudioRecorderSendAudioBlock)sendBlock;
++ (instancetype) audioRecorderWithErrorBlock:(AudioRecorderErrorBlock)errorBlock sendBlock:(AudioRecorderSendAudioBlock)sendBlock onView:(UIView*)parent;
 @end

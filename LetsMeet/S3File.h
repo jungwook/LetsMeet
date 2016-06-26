@@ -33,5 +33,8 @@ typedef void (^S3ProgressBlock)(int percentDone);
 + (NSString*) saveImageData:(NSData*)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress;
 + (NSString*) saveMovieData:(NSData*)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress;
 
++ (NSString*) saveAudioData:(NSData*)data completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress;
++ (NSString*) saveAudioData:(NSData*)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress;
+
 
 @end

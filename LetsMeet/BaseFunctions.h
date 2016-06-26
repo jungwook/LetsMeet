@@ -22,3 +22,4 @@ NSData*     compressedImageData(NSData* data, CGFloat width);
 MediaTypes  mediaTypeFromProfileMediaTypes(ProfileMediaTypes type);
 NSString*   randomObjectId();
 NSString*   distanceString(double distance);
+CGFloat     ampAtIndex(NSUInteger index, NSData* data);

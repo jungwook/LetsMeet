@@ -7,66 +7,7 @@
 //
 
 #import "AudioRecorder.h"
-
-CGFloat ampAtIndex(NSUInteger index, NSData* data)
-{
-    static int c = 0;
-    
-    if (index >= data.length)
-        return 0;
-    
-    NSData *d = [data subdataWithRange:NSMakeRange(index, 1)];
-    [d getBytes:&c length:1];
-    CGFloat ret = ((CGFloat)c) / 256.0f;
-    return ret;
-}
-
-
-
-@interface DisplayLinkView : UIView
-@property (nonatomic, strong) NSMutableData *audioData;
-@end
-
-@implementation DisplayLinkView
-
-- (void)awakeFromNib
-{
-    self.backgroundColor = self.superview.backgroundColor;
-}
-
-- (void)drawRect:(CGRect)rect
-{
-    const CGFloat lineWidth = 5.f;
-    const CGFloat offset = 0.5f;
-    const CGFloat scale = 5;
-    const CGFloat left = 0;
-    const CGFloat right = 0;
-    
-    CGFloat w = (self.bounds.size.width-left-right)/lineWidth;
-    CGFloat h = self.bounds.size.height;
-    
-    NSUInteger l = self.audioData.length;
-    NSUInteger start = MAX(w - l, 0);
-    NSUInteger rangeStart = MAX(l - w, 0);
-    NSUInteger rangeLength = l - rangeStart;
-    
-    NSData *small = [self.audioData subdataWithRange:NSMakeRange(rangeStart, rangeLength)];
-    
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    CGContextSetStrokeColorWithColor(context, [[UIColor whiteColor] CGColor]);
-    CGContextSetLineWidth(context, lineWidth-1);
-    for (NSUInteger i = start; i<w; i++) {
-        CGFloat amp = ampAtIndex(i-start, small)*scale;
-        CGFloat val = MAX(MIN(amp*h*offset, h*offset), 1.0f);
-        
-        CGContextMoveToPoint(context, left+i*lineWidth, 0.5*h - val);
-        CGContextAddLineToPoint(context, left+i*lineWidth, 0.5*h + val);
-    }
-    CGContextDrawPath(context, kCGPathStroke);
-}
-
-@end
+#import "DisplayLinkView.h"
 
 @interface AudioRecorder()
 @property (weak, nonatomic) IBOutlet UIButton *playBut;
@@ -78,14 +19,28 @@ CGFloat ampAtIndex(NSUInteger index, NSData* data)
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *leading;
 @property (strong, nonatomic) NSURL *recordURL;
 @property (strong, nonatomic) CADisplayLink *displayLink;
+@property (strong, nonatomic) CADisplayLink *playbackLink;
 @property (weak, nonatomic) IBOutlet UILabel *sec2;
 @property (weak, nonatomic) IBOutlet UILabel *sec1;
 @property (weak, nonatomic) IBOutlet UILabel *min1;
 @property (weak, nonatomic) IBOutlet DisplayLinkView *equalizer;
+@property (nonatomic) NSTimeInterval playbackTime;
 @end
 
 
 @implementation AudioRecorder
+
++(instancetype)audioRecorderWithErrorBlock:(AudioRecorderErrorBlock)errorBlock sendBlock:(AudioRecorderSendAudioBlock)sendBlock onView:(UIView*)parent
+{
+    AudioRecorder *ar = [[[NSBundle mainBundle] loadNibNamed:@"AudioRecorder" owner:self options:nil] firstObject];
+    [ar setErrorBlock:errorBlock sendBlock:sendBlock];
+
+    [parent addSubview:ar];
+    ar.frame = parent.bounds;
+    ar.layer.cornerRadius = ar.frame.size.height / 2.f;
+
+    return ar;
+}
 
 - (void) sendBackError
 {
@@ -148,14 +103,28 @@ CGFloat ampAtIndex(NSUInteger index, NSData* data)
     _ready = YES;
 }
 
+- (void)setErrorBlock:(AudioRecorderErrorBlock)errorBlock sendBlock:(AudioRecorderSendAudioBlock)sendBlock
+{
+    self.errorBlock = errorBlock;
+    self.sendBlock = sendBlock;
+}
+
 - (void)awakeFromNib
 {
     __LF
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self translatesAutoresizingMaskIntoConstraints];
     [self initializeAVSessionAndRecorder];
-    self.layer.cornerRadius = self.layer.bounds.size.height / 2.f;
-    self.layer.masksToBounds = YES;
+    
+    UIView *backdrop = [UIView new];
+    backdrop.layer.cornerRadius = self.layer.bounds.size.height / 2.f;
+    backdrop.backgroundColor = self.backgroundColor;
+    backdrop.layer.masksToBounds = YES;
+    backdrop.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [backdrop translatesAutoresizingMaskIntoConstraints];
+    
+    [self insertSubview:backdrop atIndex:0];
+    self.equalizer.isRecording = YES;
 }
 
 - (void)layoutSubviews
@@ -187,7 +156,9 @@ CGFloat ampAtIndex(NSUInteger index, NSData* data)
 - (IBAction)sendAudio:(id)sender {
     [self pausePlayer];
     if (self.sendBlock) {
-        self.sendBlock(self.recordURL);
+        NSData *original = [NSData dataWithContentsOfURL:self.recordURL];
+        NSData *thumbnail = self.equalizer.audioData;
+        self.sendBlock(thumbnail, original);
     }
 }
 
@@ -204,12 +175,27 @@ CGFloat ampAtIndex(NSUInteger index, NSData* data)
     self.displayLink = nil;
 }
 
+- (void) startPlaybackLink
+{
+    self.playbackLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updatePlayback)];
+    [self.playbackLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+}
+
+- (void) stopPlaybackLink
+{
+    [self.playbackLink removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+    self.playbackLink = nil;
+}
+
 - (void) startRecording
 {
+    self.playbackTime = 0;
+    
     [self pausePlayer];
     [self enablePlayBut:NO];
     [self.recorder record];
     [self startDisplayLink];
+    [self.equalizer setIsRecording:YES];
 }
 
 - (void)stopRecording
@@ -217,6 +203,17 @@ CGFloat ampAtIndex(NSUInteger index, NSData* data)
     [self enablePlayBut:YES];
     [self.recorder stop];
     [self stopDisplayLink];
+    [self.equalizer setIsRecording:NO];
+
+    NSError *error = nil;
+    self.player = [[AVAudioPlayer alloc] initWithContentsOfURL:self.recordURL error:&error];
+    self.player.delegate = self;
+    if (!error) {
+        [self.player prepareToPlay];
+    }
+    else {
+        NSLog(@"ERROR:%@", error.localizedDescription);
+    }
 }
 
 - (IBAction)playPauseRecording:(UIButton*)sender {
@@ -231,34 +228,48 @@ CGFloat ampAtIndex(NSUInteger index, NSData* data)
  
 - (void)playPlayer
 {
-    NSError *error = nil;
-    
     [self selectPauseBut];
-    
-    self.player = [[AVAudioPlayer alloc] initWithContentsOfURL:self.recordURL error:&error];
-    self.player.delegate = self;
-    if (!error) {
-        [self.player play];
-    }
-    else {
-        NSLog(@"ERROR:%@", error.localizedDescription);
-    }
+    [self.player play];
+    [self startPlaybackLink];
 }
 
 - (void)pausePlayer
 {
+    self.playbackTime = self.player.currentTime;
+    NSLog(@"CURRENT:%f", self.playbackTime);
+    
     [self.player pause];
     [self selectPlayBut];
+    [self stopPlaybackLink];
 }
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
 {
     if (flag) {
         [self selectPlayBut];
+        [self.equalizer setProgress:1.0f];
+        [self.equalizer setNeedsDisplay];
+        [self stopPlaybackLink];
     }
 }
 
 #define resolution (2^(sizeof(unichar)*8))
+
+- (void) updatePlayback
+{
+    static int count = 0;
+    
+    if (count++ % 5)
+        return;
+    
+    
+    NSTimeInterval now = self.player.currentTime;
+    NSTimeInterval dur = self.player.duration;
+    
+    self.equalizer.progress = dur > 0 ? now / dur : 0;
+    [self updateTimerDisplayWithTime:self.player.currentTime];
+    [self.equalizer setNeedsDisplay];
+}
 
 - (void) updateDisplay
 {
@@ -272,8 +283,12 @@ CGFloat ampAtIndex(NSUInteger index, NSData* data)
     int ch = amp*256;
 
     [self.equalizer.audioData appendBytes:&ch length:1];
-    
-    NSTimeInterval time = self.recorder.currentTime;
+    [self updateTimerDisplayWithTime:self.recorder.currentTime];
+    [self.equalizer setNeedsDisplay];
+}
+
+- (void) updateTimerDisplayWithTime:(NSTimeInterval) time
+{
     NSUInteger minutes = ((NSUInteger)time / 60) % 60;
     NSUInteger seconds = ((NSUInteger)time) % 60;
     
@@ -283,8 +298,6 @@ CGFloat ampAtIndex(NSUInteger index, NSData* data)
     self.sec1.text = [NSString stringWithFormat:@"%ld", sec1];
     self.sec2.text = [NSString stringWithFormat:@"%ld", sec2];
     self.min1.text = [NSString stringWithFormat:@"%ld", minutes % 10];
-    
-    [self.equalizer setNeedsDisplay];
 }
 
 @end

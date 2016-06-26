@@ -167,6 +167,21 @@ NSString* distanceString(double distance)
     }
 }
 
+CGFloat ampAtIndex(NSUInteger index, NSData* data)
+{
+    static int c = 0;
+    
+    if (index >= data.length)
+        return 0;
+    
+    NSData *d = [data subdataWithRange:NSMakeRange(index, 1)];
+    [d getBytes:&c length:1];
+    CGFloat ret = ((CGFloat)c) / 256.0f;
+    return ret;
+}
+
+
+
 
 
 

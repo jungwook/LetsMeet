@@ -199,11 +199,6 @@
     return [S3File saveData:data named:nil extension:@".jpg" group:@"ProfileMedia/" completedBlock:block progressBlock:progress];
 }
 
-+ (NSString *)saveMovieData:(NSData *)data completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
-{
-    return [S3File saveData:data named:nil extension:@".mov" group:@"ProfileMedia/" completedBlock:block progressBlock:progress];
-}
-
 + (NSString *)saveProfileMovieData:(NSData *)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress
 {
     return [S3File saveData:data named:@"profile" extension:@".mov" group:@"ProfileMedia/" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
@@ -268,9 +263,14 @@
     }];
 }
 
++ (NSString *)saveMovieData:(NSData *)data completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
+{
+    return [S3File saveData:data named:nil extension:@".mov" group:@"ProfileMedia/" completedBlock:block progressBlock:progress];
+}
+
 + (NSString *)saveMovieData:(NSData *)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress
 {
-    return [S3File saveData:data named:nil extension:@".mov" group:@"ProfileMedia/" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+    return [S3File saveMovieData:data completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             progress.progress = 0.0f;
         });
@@ -283,4 +283,26 @@
         });
     }];
 }
+
++ (NSString *)saveAudioData:(NSData *)data completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
+{
+    return [S3File saveData:data named:nil extension:@".caf" group:@"AudioMedia/" completedBlock:block progressBlock:progress];
+}
+
++ (NSString *)saveAudioData:(NSData *)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress
+{
+    return [S3File saveAudioData:data completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            progress.progress = 0.0f;
+        });
+        if (block) {
+            block(file, succeeded, error);
+        }
+    } progressBlock:^(int percentDone) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            progress.progress = percentDone / 100.0f;
+        });
+    }];
+}
+
 @end

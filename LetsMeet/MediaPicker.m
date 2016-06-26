@@ -82,13 +82,10 @@
     
     NSLog(@"source type:%ld", sourceType);
     
-    Bullet* bullet = [Bullet bulletWithPhoto:mediaFile thumbnail:thumbnailFile mediaSize:image.size  realMedia:(sourceType == UIImagePickerControllerSourceTypeCamera)];
+    Bullet* bullet = [Bullet bulletWithPhoto:mediaFile thumbnail:thumbnailFile mediaSize:image.size realMedia:(sourceType == UIImagePickerControllerSourceTypeCamera)];
     if (self.completionBlock) {
         self.completionBlock(bullet);
     }
-//
-//    [self.system add:bullet for:self.user.objectId];
-//    [self clearTextView];
 }
 
 - (void) handleVideo:(NSDictionary<NSString*, id>*)info url:(NSURL*)url source:(UIImagePickerControllerSourceType)sourceType

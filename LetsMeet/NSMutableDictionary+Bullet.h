@@ -70,7 +70,7 @@ typedef NSMutableDictionary Bullet;
 + (instancetype) bulletWithText:(NSString*)text;
 + (instancetype) bulletWithPhoto:(NSString*)filename thumbnail:(NSString*)thumbnail mediaSize:(CGSize)size realMedia:(BOOL)realMedia;
 + (instancetype) bulletWithVideo:(NSString*)filename thumbnail:(NSString*)thumbnail mediaSize:(CGSize)size realMedia:(BOOL)realMedia;
-+ (instancetype) bulletWithAudio:(NSString*)filename thumbnail:(NSString*)thumbnail realMedia:(BOOL)realMedia;
++ (instancetype) bulletWithAudio:(NSString*)filename thumbnail:(NSString*)thumbnail;
 
 - (BulletObject*) object;
 @end

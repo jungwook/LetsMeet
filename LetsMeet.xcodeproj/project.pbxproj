@@ -15,6 +15,8 @@
 		120142E31D08802600D66905 /* AWSS3.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 120142DF1D08802600D66905 /* AWSS3.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		120142E81D08930B00D66905 /* S3File.m in Sources */ = {isa = PBXBuildFile; fileRef = 120142E71D08930B00D66905 /* S3File.m */; };
 		120142EE1D1042AD00D66905 /* EXPhotoViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 120142ED1D1042AD00D66905 /* EXPhotoViewer.m */; };
+		120142F11D1F952600D66905 /* AudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 120142F01D1F952600D66905 /* AudioPlayer.m */; };
+		120142F41D1F961500D66905 /* DisplayLinkView.m in Sources */ = {isa = PBXBuildFile; fileRef = 120142F31D1F961500D66905 /* DisplayLinkView.m */; };
 		120A52381D17A75400EB8269 /* GradientView.m in Sources */ = {isa = PBXBuildFile; fileRef = 120A52371D17A75400EB8269 /* GradientView.m */; };
 		120A52411D18C28E00EB8269 /* Search.m in Sources */ = {isa = PBXBuildFile; fileRef = 120A52401D18C28E00EB8269 /* Search.m */; };
 		120A52441D1907EF00EB8269 /* UsersTableBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 120A52431D1907EF00EB8269 /* UsersTableBase.m */; };
@@ -106,6 +108,10 @@
 		120142E71D08930B00D66905 /* S3File.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = S3File.m; sourceTree = "<group>"; };
 		120142EC1D1042AD00D66905 /* EXPhotoViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EXPhotoViewer.h; sourceTree = "<group>"; };
 		120142ED1D1042AD00D66905 /* EXPhotoViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EXPhotoViewer.m; sourceTree = "<group>"; };
+		120142EF1D1F952600D66905 /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
+		120142F01D1F952600D66905 /* AudioPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioPlayer.m; sourceTree = "<group>"; };
+		120142F21D1F961500D66905 /* DisplayLinkView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DisplayLinkView.h; sourceTree = "<group>"; };
+		120142F31D1F961500D66905 /* DisplayLinkView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisplayLinkView.m; sourceTree = "<group>"; };
 		120A52361D17A75400EB8269 /* GradientView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GradientView.h; sourceTree = "<group>"; };
 		120A52371D17A75400EB8269 /* GradientView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GradientView.m; sourceTree = "<group>"; };
 		120A523A1D17C2A700EB8269 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -314,6 +320,10 @@
 				12805E821D1BE96E0082A95D /* MediaPicker.m */,
 				12805E891D1E3DD30082A95D /* AudioRecorder.h */,
 				12805E8A1D1E3DD30082A95D /* AudioRecorder.m */,
+				120142F21D1F961500D66905 /* DisplayLinkView.h */,
+				120142F31D1F961500D66905 /* DisplayLinkView.m */,
+				120142EF1D1F952600D66905 /* AudioPlayer.h */,
+				120142F01D1F952600D66905 /* AudioPlayer.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -584,6 +594,7 @@
 				12F0D7101D092F8600A37C40 /* ProfileView.m in Sources */,
 				1235BC911D0FF82500E4AA27 /* NSDate+TimeAgo.m in Sources */,
 				12805E831D1BE96E0082A95D /* MediaPicker.m in Sources */,
+				120142F41D1F961500D66905 /* DisplayLinkView.m in Sources */,
 				12DE5FE21D02BC79009B315F /* FileSystem.m in Sources */,
 				124928B21CF2E65A0038A2F3 /* ToggleButton.m in Sources */,
 				12F741D11CE56B3400E8267A /* FloatingDrawerView.m in Sources */,
@@ -608,6 +619,7 @@
 				1235BC8E1D0FD30E00E4AA27 /* ChatLeft.m in Sources */,
 				129B07531D0AAAB5000C0276 /* NearByCell.m in Sources */,
 				1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */,
+				120142F11D1F952600D66905 /* AudioPlayer.m in Sources */,
 				12F741DA1CE56F4300E8267A /* MainController.m in Sources */,
 				12F0D7161D0A773000A37C40 /* TextFieldAlert.m in Sources */,
 				120A52441D1907EF00EB8269 /* UsersTableBase.m in Sources */,

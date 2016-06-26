@@ -96,10 +96,29 @@
 
 - (void)setupAudioRecorderView
 {
-    self.audioRecorderView = [[[NSBundle mainBundle] loadNibNamed:@"AudioRecorder" owner:self options:nil] firstObject];
-    [self.audioView addSubview:self.audioRecorderView];
-    self.audioRecorderView.frame = self.audioView.bounds;
-    self.audioRecorderView.layer.cornerRadius = self.audioRecorderView.frame.size.height / 2.f;
+    __LF
+    self.audioRecorderView = [AudioRecorder audioRecorderWithErrorBlock:^{
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"ERROR" message:@"" preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"UNDERSTOOD" style:UIAlertActionStyleDefault handler:nil]];
+        [self presentViewController:alert animated:YES completion:nil];
+    } sendBlock:^(NSData *thumbnail, NSData *original) {
+        [S3File saveAudioData:thumbnail completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+            if (succeeded) {
+                NSLog(@"SAVED THUMBNAIL AUDIO");
+                NSString *thumbnailFile = file;
+                [S3File saveAudioData:original completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+                    if (succeeded) {
+                        NSLog(@"SAVED ORIGINAL AUDIO");
+                        NSString *originalFile = file;
+                        Bullet* bullet = [Bullet bulletWithAudio:originalFile thumbnail:thumbnailFile];
+                        [self.system add:bullet for:self.user.objectId];
+                        [self clearTextView];
+                    }
+                } progressBlock:nil];
+            }
+        } progressBlock:nil];
+        [self switchToAudio:NO];
+    } onView:self.audioView];
 }
 
 - (void)viewDidLoad
@@ -130,11 +149,6 @@
     
     [self.audioRecorderView stopRecording];
 }
-
-//- (IBAction)sendAudio:(id)sender {
-//    [self switchToAudio:NO];
-//    [self pausePlayer];
-//}
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -202,6 +216,9 @@
             CGRect rect = rectForString(bullet.message, self.messageView.font, kTextMessageWidth);
             return rect.size.height;
         }
+        case kMediaTypeAudio: {
+            return photoViewHeight+balloonOffet;
+        }
         default:
             return photoViewHeight+balloonOffet;
     }
@@ -212,7 +229,7 @@
     [self removeObservers];
 }
 
-- (void)clearTextView
+- (void) clearTextView
 {
     self.messageView.text = @"";
     self.textViewHeight = kInitialTextViewHeight;

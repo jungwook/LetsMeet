@@ -11,8 +11,10 @@
 #import "S3File.h"
 #import "NSDate+TimeAgo.h"
 #import "MediaViewer.h"
+#import "AudioPlayer.h"
 
 #define CHATVIEWINSET 8
+#define S3LOCATION @"http://parsekr.s3.ap-northeast-2.amazonaws.com/"
 
 @interface ChatRight()
 @property (weak, nonatomic) IBOutlet Balloon *balloon;
@@ -25,11 +27,13 @@
 @property (weak, nonatomic) IBOutlet UIImageView *playView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *trailing;
 @property (weak, nonatomic) IBOutlet UIImageView *realIcon;
+@property (weak, nonatomic) IBOutlet UIView *audioView;
 @property (nonatomic) MediaTypes mediaType;
 @property (nonatomic) ProfileMediaTypes profileMediaType;
 @property (nonatomic, strong) id mediaFile;
 @property (nonatomic, strong) id profileMediaFile;
 @property (nonatomic, strong) id messageId;
+@property (strong, nonatomic) AudioPlayer *audioPlayer;
 @end
 
 @implementation ChatRight
@@ -56,7 +60,8 @@
     } else {
         NSLog(@"GESTURES:%@", self.thumbnailView.gestureRecognizers);
     }
-
+    
+    self.audioPlayer =[AudioPlayer audioPlayerOnView:self.audioView];
 }
 
 - (void) tappedPhotoView:(UITapGestureRecognizer*)tap
@@ -90,6 +95,7 @@
     
     self.thumbnailView.alpha = 0.0;
     self.realIcon.hidden = YES;
+    self.audioView.hidden = YES;
     
     NSString *string = [message.message stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     self.messageLabel.text = string;
@@ -119,11 +125,26 @@
             } progressBlock:nil];
         }
             break;
+        case kMediaTypeAudio: {
+            self.playView.hidden = YES;
+            self.realIcon.hidden = YES;
+            self.audioView.hidden = NO;
+            boxSize = kThumbnailWidth*2.0f;
+            [S3File getDataFromFile:message.mediaThumbnailFile completedBlock:^(NSData *thumbnail, NSError *error, BOOL fromCache) {
+                if (!error) {
+                    [self.audioPlayer setupAudioThumbnailData:thumbnail audioURL:[NSURL URLWithString:[S3LOCATION stringByAppendingString:self.mediaFile]]];
+                }
+            } progressBlock:nil];
+        }
+            break;
+        case kMediaTypeURL:
+            break;
+        case kMediaTypeNone:
+            break;
         default:
             break;
     }
     self.spacing.constant = self.contentView.bounds.size.width-boxSize-(self.trailing.constant+CHATVIEWINSET*2);
-//    self.trailing.constant = consecutive ? 0 : 40 + CHATVIEWINSET*2;
 }
 
 - (void)lazyUpdateData:(NSData*)data onTableView:(UITableView*)tableView
