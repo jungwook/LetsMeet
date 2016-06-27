@@ -10,7 +10,8 @@
 
 @interface Balloon()
 @property (nonatomic, strong) UIFont *font;
-
+@property (nonatomic, strong) UIImageView *imageView;
+@property (nonatomic, strong) UIImage* imageLeft, *imageRight;
 @end
 
 @implementation Balloon
@@ -28,8 +29,22 @@
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
+//        UIEdgeInsets capsRight = UIEdgeInsetsMake(14, 10, 14, 14);
+//        UIEdgeInsets capsLeft = UIEdgeInsetsMake(14, 14, 14, 10);
+//        self.imageRight = [[UIImage imageNamed:@"messageRight"] resizableImageWithCapInsets:capsRight];
+//        self.imageLeft = [[UIImage imageNamed:@"messageLeft"] resizableImageWithCapInsets:capsLeft];
+        
     }
     return self;
+}
+
+- (void)awakeFromNib
+{
+//    if (!self.imageView) {
+//        self.backgroundColor = [UIColor clearColor];
+//        self.imageView = [UIImageView new];
+//        [self insertSubview:self.imageView atIndex:0];
+//    }
 }
 
 - (void)setIsMine:(BOOL)isMine
@@ -50,6 +65,14 @@
 
 - (void) setMask
 {
+    /*
+     __LF
+    
+    [self.imageView setImage:self.isMine ? self.imageRight : self.imageLeft];
+    self.imageView.frame = self.bounds;
+    return;
+    */
+    
     const CGFloat i1 = 5.0f, i2 = 5.0f, i3 = 7.0f;
     CGRect rect = self.frame;
     CAShapeLayer *mask = [CAShapeLayer layer];

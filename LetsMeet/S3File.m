@@ -8,6 +8,12 @@
 
 #import "S3File.h"
 
+@interface S3File ()
+@property (nonatomic, strong) NSTimer *backgroundTimer;
+@property (nonatomic, strong) NSMutableArray *tasks;
+@end
+
+
 @implementation S3File
 
 + (instancetype) file
@@ -24,8 +30,22 @@
 {
     self = [super init];
     if (self) {
+        self.tasks = [NSMutableArray array];
+        self.backgroundTimer = [NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(backgroundTask) userInfo:nil repeats:YES];
     }
     return self;
+}
+
+- (void) backgroundTask
+{
+    while (self.tasks.count) {
+        id task = nil;
+        @synchronized (self.tasks) {
+            task = [self.tasks lastObject];
+            [self.tasks removeLastObject];
+        }
+        [self getInternalDataFromFile:task[@"key"] completedBlock:task[@"completeBlock"] progressBlock:task[@"progressBlock"]];
+    }
 }
 
 + (id)objectForKey:(id)key
@@ -39,6 +59,39 @@
 }
 
 - (void) getDataFromFile:(id)filename completedBlock:(S3GetBlock)block progressBlock:(S3ProgressBlock)progress
+{
+    __LF
+    if (filename) {
+        NSData *data = [self objectForKey:filename];
+        if (data) {
+            if (block) {
+                if (progress) {
+                    progress(100);
+                }
+                block(data, nil, YES);
+            }
+            return;
+        }
+        else {
+            NSMutableDictionary *task = [NSMutableDictionary dictionary];
+            if (filename) {
+                [task setObject:filename forKey:@"key"];
+            }
+            if (block) {
+                [task setObject:block forKey:@"completeBlock"];
+            }
+            if (progress) {
+                [task setObject:progress forKey:@"progressBlock"];
+            }
+            
+            @synchronized (self.tasks) {
+                [self.tasks addObject:task];
+            }
+        }
+    }
+}
+
+- (void) getInternalDataFromFile:(id)filename completedBlock:(S3GetBlock)block progressBlock:(S3ProgressBlock)progress
 {
     if (!filename) {
         if (block) {
