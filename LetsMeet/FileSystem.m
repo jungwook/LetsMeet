@@ -112,8 +112,6 @@
 
 - (NSArray*)userIdsInTheSystem
 {
-    __LF
-
     return [self.bullets allKeys];
 }
 
@@ -141,16 +139,12 @@
 
 - (NSString*)usersFilename
 {
-    __LF
-
     return [self.usersPath path];
 }
 
 
 - (void)load
 {
-    __LF
-
     NSError *error = nil;
 
     NSArray *fileURLs = [self.manager contentsOfDirectoryAtURL:self.messagesDirectoryPath includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:&error];
@@ -184,8 +178,6 @@
 
 - (BOOL)save
 {
-    __LF
-
     [self.userIdsInTheSystem enumerateObjectsUsingBlock:^(id _Nonnull userId, NSUInteger idx, BOOL * _Nonnull stop) {
         [self saveUser:userId];
     }];
@@ -194,8 +186,6 @@
 
 - (BOOL)saveUser:(id)userId
 {
-    __LF
-
     @synchronized (self.lock) {
         NSString *filename = [userId stringByAppendingString:CHATFILEEXTENSION];
         NSURL *userMessagesPath = [self.messagesDirectoryPath URLByAppendingPathComponent:filename];
@@ -205,7 +195,6 @@
 
 - (BOOL)removeUser:(id)userId
 {
-    __LF
     @synchronized (self.lock) {
         NSError *error = nil;
         
@@ -226,8 +215,6 @@
 
 - (void)add:(Bullet *)bullet for:(id)userId
 {
-    __LF
-    
     bullet.isRead = NO;
     bullet.isSyncFromUser = YES;
     bullet.isSyncToUser = [bullet isFromMe];
@@ -254,8 +241,6 @@
 
 - (void) update:(Bullet *)message for:(id)userId
 {
-    __LF
-
     NSMutableArray *userMessages = [self bulletsWith:userId];
     
     [userMessages enumerateObjectsUsingBlock:^(Bullet* _Nonnull bullet, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -272,8 +257,6 @@
 
 - (void)addMessageFromObject:(BulletObject*) object
 {
-    __LF
-
     Bullet *bullet = [object bullet];
     
     NSLog(@"BULLET RECEIVED:%@", bullet);
@@ -311,8 +294,6 @@
 
 - (void)addMessageFromObjectId:(id)objectId
 {
-    __LF
-
     BulletObject *object = [BulletObject objectWithoutDataWithObjectId:objectId];
     [object fetchInBackgroundWithBlock:^(PFObject * _Nullable obj, NSError * _Nullable error) {
         [self addMessageFromObject:object];
@@ -321,7 +302,6 @@
 
 - (void) sendPushMessage:textToSend messageId:(id)messageId toUserId:(id)userId
 {
-    __LF
     const NSInteger maxLength = 100;
     NSUInteger length = [textToSend length];
     if (length >= maxLength) {
@@ -349,8 +329,6 @@
 
 + (void) sendBroadcastMessage:(NSString*)message duration:(NSNumber*)duration
 {
-    __LF
-
     User *me = [User me];
     
     [PFCloud callFunctionInBackground:@"broadcastMessage"
@@ -372,8 +350,6 @@
 
 - (void) fetchOutstandingBullets
 {
-    __LF
-    
     if (!self.initialized) {
         return;
     }
@@ -396,8 +372,6 @@
 
 - (void) treatPushNotificationWith:(NSDictionary *)userInfo
 {
-    __LF
-    
     if (!self.initialized) {
         return;
     }
@@ -413,29 +387,21 @@
 
 - (void) notifySystemToRefreshBadge
 {
-    __LF
-    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NotifySystemToRefreshBadge" object:nil];
 }
 
 - (void) notifySystemOfBroadcast:(id)userInfo
 {
-    __LF
-
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NotifySystemOfBroadcast" object:userInfo];
 }
 
 - (void) notifySystemOfNewMessage:(id)bullet
 {
-    __LF
-
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NotifySystemOfNewMessage" object:bullet];
 }
 
 - (void) readUnreadBulletsWithUserId:(id)userId
 {
-    __LF
-
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"toUser == %@ AND isRead == NO", [User me].objectId];
     NSArray *unreadBullets = [[self bulletsWith:userId] filteredArrayUsingPredicate:predicate];
     [unreadBullets enumerateObjectsUsingBlock:^(Bullet* _Nonnull bullet, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -450,29 +416,22 @@
 
 - (NSUInteger) unreadMessages
 {
-    __LF
-
     __block NSUInteger count = 0;
     [[self userIdsInTheSystem] enumerateObjectsUsingBlock:^(id _Nonnull userId, NSUInteger idx, BOOL * _Nonnull stop) {
         count = count + [self unreadMessagesFromUser:userId];
     }];
     
-    NSLog(@"UNREAD COUNT:%ld", count);
     return count;
 }
 
 - (NSUInteger) unreadMessagesFromUser:(id)userId
 {
-//    __LF
-
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"toUser == %@ AND isRead == NO", [User me].objectId];
     return [[[self bulletsWith:userId] filteredArrayUsingPredicate:predicate] count];
 }
 
 - (void) resetInstallationBadge
 {
-    __LF
-
     NSUInteger count = [self unreadMessages];
     PFInstallation *install = [PFInstallation currentInstallation];
     if (install.badge != count) {
@@ -483,8 +442,6 @@
 
 - (void)usersNearMeInBackground:(UsersArrayBlock)block
 {
-    __LF
-    
     PFQuery *query = [User query];
     [query whereKey:@"location" nearGeoPoint:self.location];
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
@@ -495,8 +452,6 @@
 
 - (void)usersNearMeInBackground2:(UsersArrayBlock)block
 {
-    __LF
-
     PFQuery *query = [User query];
     [query whereKey:@"location" nearGeoPoint:self.location];
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {

@@ -56,7 +56,7 @@
     CGRect rect = self.frame;
     CGFloat w = rect.size.width, h=rect.size.height;
     
-    CGFloat i = w < 43 ? MIN(w/2.3, 18) : 19, j = 7.0f, k = 10.0f;
+    CGFloat i = w < 43 ? MIN(w/2.3, 18) : 19, j = 10.0f, k = 13.0f;
     CAShapeLayer *mask = [CAShapeLayer layer];
     
     UIBezierPath *path = [UIBezierPath bezierPath];

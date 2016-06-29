@@ -37,17 +37,15 @@
     return self;
 }
 
-- (void)awakeFromNib
-{
-    self.button = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.button.frame = self.bounds;
-    [self.button addTarget:self action:@selector(tapped:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:self.button];
-}
-
 - (void) initialize
 {
     self.progress = [UIProgressView new];
+    self.button = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.button.frame = self.bounds;
+    [self.button addTarget:self action:@selector(tapped:) forControlEvents:UIControlEventTouchUpInside];
+    self.button.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self.button translatesAutoresizingMaskIntoConstraints];
+    [self addSubview:self.button];
 }
 
 - (void) tapped:(id)sender
@@ -79,13 +77,11 @@
     }
 }
 
-- (void)loadMediaFromFile:(id)filename mediaType:(MediaTypes)mediaType isReal:(BOOL)isReal completion:(S3GetBlock)block
+- (void)loadMediaFromFile:(id)filename isReal:(BOOL)isReal completion:(S3GetBlock)block
 {
-    self.mediaType = mediaType;
-    self.mediaFile = filename;
     self.isReal = isReal;
     
-    switch (mediaType) {
+    switch (self.mediaType) {
         case kMediaTypeAudio:
         case kMediaTypeVideo:
         case kMediaTypePhoto: {
@@ -105,7 +101,7 @@
         case kMediaTypeURL:
         {
             if (block) {
-                UIImage *image = [self imageFromFile:filename mediaType:mediaType]; // create URL Image
+                UIImage *image = [self imageFromFile:filename mediaType:self.mediaType]; // create URL Image
                 NSData *data = UIImageJPEGRepresentation(image, kJPEGCompressionFull);
                 block(data, nil, YES);
             }
@@ -133,42 +129,66 @@
     }
 }
 
-- (void)loadMediaFromFile:(id)filename mediaType:(MediaTypes)mediaType isReal:(BOOL)isReal shouldRefresh:(ShouldRefreshBlock)block
+- (void)loadMediaFromFile:(id)filename isReal:(BOOL)isReal shouldRefresh:(ShouldRefreshBlock)block
 {
-    [self loadMediaFromFile:filename mediaType:mediaType isReal:isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
+    [self loadMediaFromFile:filename isReal:isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
         BOOL ret = NO;
         if (block) {
             ret = block(data, error, fromCache);
         }
         if (ret) {
-            [self setImage:[self postProcessImage:[UIImage imageWithData:data] mediaType:mediaType]];
+            [self setImage:[self postProcessImage:[UIImage imageWithData:data] mediaType:self.mediaType]];
         }
     }];
 }
 
 - (void)loadMediaFromMessage:(Bullet *)message completion:(S3GetBlock)block
 {
-    [self loadMediaFromFile:message.mediaFile mediaType:message.mediaType isReal:message.realMedia completion:block];
+    self.mediaType = message.mediaType;
+    self.mediaFile = message.mediaFile;
+    self.isReal = message.realMedia;
+
+    [self loadMediaFromFile:(self.mediaType == kMediaTypeVideo) ? message.mediaThumbnailFile : self.mediaFile isReal:self.isReal completion:block];
 }
 
 - (void)loadMediaFromMessage:(Bullet *)message shouldRefresh:(ShouldRefreshBlock)block
 {
-    BOOL hasThumbnail = NO;
-    if (message.mediaType == kMediaTypeVideo || message.mediaType == kMediaTypeAudio) {
-        hasThumbnail = YES;
-    }
+    self.mediaType = message.mediaType;
+    self.mediaFile = message.mediaFile;
+    self.isReal = message.realMedia;
+
+    [self loadMediaFromFile:(self.mediaType == kMediaTypeVideo) ? message.mediaThumbnailFile : self.mediaFile isReal:self.isReal shouldRefresh:block];
+}
+
+- (void)loadMediaFromUser:(User *)user
+{
+    self.mediaFile = user.profileMedia;
+    self.mediaType = (user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
+    self.isReal = NO;
     
-    [self loadMediaFromFile:hasThumbnail ? message.mediaThumbnailFile : message.mediaFile mediaType:message.mediaType isReal:message.realMedia shouldRefresh:block];
+    [self loadMediaFromFile:self.mediaFile isReal:self.isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.image = [UIImage imageWithData:data];
+        });
+    }];
 }
 
 - (void)loadMediaFromUser:(User *)user completion:(S3GetBlock)block
 {
-    [self loadMediaFromFile:user.profileMedia mediaType:(user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo isReal:NO completion:block];
+    self.mediaFile = user.profileMedia;
+    self.mediaType = (user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
+    self.isReal = NO;
+    
+    [self loadMediaFromFile:self.mediaFile isReal:self.isReal completion:block];
 }
 
 - (void)loadMediaFromUser:(User *)user shouldRefresh:(ShouldRefreshBlock)block
 {
-    [self loadMediaFromFile:user.profileMedia mediaType:(user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo isReal:NO shouldRefresh:block];
+    self.mediaFile = user.profileMedia;
+    self.mediaType = (user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
+    self.isReal = NO;
+
+    [self loadMediaFromFile:self.mediaFile isReal:self.isReal shouldRefresh:block];
 }
 
 @end
@@ -325,7 +345,6 @@
     self.playerItem = [AVPlayerItem playerItemWithURL:url];
     self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
     self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
-//    [self.playerLayer setVideoGravity:AVLayerVideoGravityResizeAspect];
     [self.playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playerItem];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemStalled:) name:AVPlayerItemPlaybackStalledNotification object:self.playerItem];
@@ -349,16 +368,9 @@
                 CGFloat w = size.width, h=size.height;
                 CGFloat W = self.bounds.size.width, H = self.bounds.size.height;
                 CGRect rect;
-                if (w >= h) { //landscape
-                    CGFloat fW = W, fH = h * W / w;
-                    rect = CGRectMake(0, (H-fH)/2, fW, fH);
-                }
-                else {
-                    CGFloat fH = H, fW = w * H / h;
-                    rect = CGRectMake((W-fW)/2, 0, fW, fH);
-                }
-                self.playerView.frame = rect;
-                self.playerLayer.frame = CGRectMake(0, 0, rect.size.width, rect.size.height);
+                CGFloat fW = W, fH = h * W / w;
+                self.playerView.frame = CGRectMake(0, (H-fH)/2, fW, fH);
+                self.playerLayer.frame = self.playerView.bounds;
                 if (self.isReal && !self.realLayer) {
                     self.realLayer = [CALayer layer];
                     UIImage *image = [UIImage imageNamed:@"real"];
@@ -367,7 +379,6 @@
                     
                     [self.playerLayer addSublayer:self.realLayer];
                 }
-
                 [self.player play];
             }
                 break;

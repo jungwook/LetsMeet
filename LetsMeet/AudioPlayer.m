@@ -29,6 +29,8 @@
     if (self) {
         [view addSubview:self];
         self.frame = view.bounds;
+        self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        [self translatesAutoresizingMaskIntoConstraints];
     }
     return self;
 }
@@ -40,8 +42,6 @@
 
 - (void)awakeFromNib
 {
-    self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    [self translatesAutoresizingMaskIntoConstraints];
     self.playBut.selected = NO;
     self.backgroundColor = [UIColor clearColor];
 }

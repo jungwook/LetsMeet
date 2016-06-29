@@ -40,8 +40,8 @@
 - (void) setUser:(User*)user tableView:(UITableView*)tableView
 {
     if (![self.userId isEqualToString:user.objectId]) {
-//        [self.photo setImage:[UIImage imageNamed:user.sexImageName]];
         self.userId = user.objectId;
+        
         NSInteger count = [self.system unreadMessagesFromUser:user.objectId];
         self.badge.hidden = !count;
         double distance = [self.system.location distanceInKilometersTo:user.location];

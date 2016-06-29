@@ -10,6 +10,7 @@
 #import "AppDelegate.h"
 #import "NSMutableDictionary+Bullet.h"
 #import "SimulatedUsers.h"
+#import "S3File.h"
 
 @interface AppDelegate ()
 @end
@@ -23,7 +24,6 @@
     [Parse enableLocalDatastore];
     
     [BulletObject registerSubclass];
-    [Originals registerSubclass];
     [User registerSubclass];
     
     self.system = [FileSystem new];
@@ -86,10 +86,12 @@
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     __LF
+    [S3File synchronize];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     __LF
+    [S3File synchronize];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -103,6 +105,7 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     __LF
+    [S3File synchronize];
 }
 
 

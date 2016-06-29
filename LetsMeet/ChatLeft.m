@@ -18,13 +18,14 @@
 @interface ChatLeft()
 @property (weak, nonatomic) IBOutlet Balloon *balloon;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *spacing;
-@property (weak, nonatomic) IBOutlet UIView *photoView;
+@property (weak, nonatomic) IBOutlet MediaView *photo;
+@property (weak, nonatomic) IBOutlet MediaView *thumbnail;
 @property (weak, nonatomic) IBOutlet IndentedLabel *nicknameLabel;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
 @property (weak, nonatomic) IBOutlet UILabel *messageLabel;
-@property (weak, nonatomic) IBOutlet UIView *thumbnailView;
 @property (weak, nonatomic) IBOutlet UIImageView *playView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *trailing;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *leading;
 @property (nonatomic) MediaTypes mediaType;
 @property (nonatomic) ProfileMediaTypes profileMediaType;
 @property (nonatomic) BOOL isReal;
@@ -42,32 +43,9 @@
     [super awakeFromNib];
     [self.balloon setIsMine:NO];
     
-    self.photoView.layer.cornerRadius = 14.f;
-    self.photoView.layer.masksToBounds = YES;
-    self.thumbnailView.layer.contentsGravity = kCAGravityResizeAspect;
-
-    if (![self.photoView.gestureRecognizers count]) {
-        [self.photoView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedPhotoView:)]];
-    }
-    
-    self.thumbnailView.userInteractionEnabled = YES;
-    if (![self.thumbnailView.gestureRecognizers count]) {
-        [self.thumbnailView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedThumbnailView:)]];
-    } else {
-        NSLog(@"GESTURES:%@", self.thumbnailView.gestureRecognizers);
-    }
-    
+    self.photo.layer.cornerRadius = 14.f;
+    self.photo.layer.masksToBounds = YES;
     self.audioPlayer = [AudioPlayer audioPlayerOnView:self.audioView];
-}
-
-- (void) tappedPhotoView:(UITapGestureRecognizer*)tap
-{
-    [MediaViewer showMediaFromView:tap.view filename:self.profileMediaFile mediaType:mediaTypeFromProfileMediaTypes(self.profileMediaType) isReal:self.isReal];
-}
-
-- (void) tappedThumbnailView:(UITapGestureRecognizer*)tap
-{
-    [MediaViewer showMediaFromView:tap.view filename:self.mediaFile mediaType:self.mediaType isReal:self.isReal];
 }
 
 - (void)setMessage:(Bullet *)message user:(User*)user tableView:(UITableView*)tableView isConsecutive:(BOOL)consecutive
@@ -81,18 +59,13 @@
     self.dateLabel.text = message.createdAt.timeAgo;
     self.nicknameLabel.text = user.nickname;
     self.nicknameLabel.hidden = consecutive;
-    self.photoView.hidden = consecutive;
-    self.audioView.alpha = 0.0;
+    self.photo.hidden = consecutive;
     self.isReal = message.realMedia;
-    self.messageLabel.hidden = NO;
+    self.messageLabel.hidden = YES;
+    self.thumbnail.hidden = YES;
+    self.audioView.hidden = YES;
     
-    [S3File getDataFromFile:user.thumbnail completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
-        if (!error) {
-            self.photoView.layer.contents = (id) [UIImage imageWithData:data].CGImage;
-        }
-    }];
-    
-    self.thumbnailView.alpha = 0.0;
+    [self.photo loadMediaFromUser:user];
     
     NSString *string = [message.message stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     self.messageLabel.text = string;
@@ -102,38 +75,34 @@
     switch (message.mediaType) {
         case kMediaTypeText: {
             CGRect rect = rectForString(string, self.messageLabel.font, kTextMessageWidth);
-            boxSize = rect.size.width;
+            boxSize = rect.size.width+self.leading.constant;
+            self.messageLabel.hidden = NO;
         }
             break;
         case kMediaTypeVideo:
         case kMediaTypePhoto: {
             self.playView.hidden = (message.mediaType == kMediaTypePhoto);
             boxSize = kThumbnailWidth;
-            [S3File getDataFromFile:message.mediaThumbnailFile completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
-                if (!error) {
-                    if (fromCache) {
-                        [self setupThumbnailImageWithData:data animated:NO];
-                    }
-                    else {
-                        [self lazyUpdateData:data onTableView:tableView];
-                    }
+            [self.thumbnail loadMediaFromMessage:message completion:^(NSData *data, NSError *error, BOOL fromCache) {
+                if (fromCache) {
+                    self.thumbnail.image = [UIImage imageWithData:data];
+                }
+                else {
+                    [self lazyUpdateData:data onTableView:tableView];
                 }
             }];
+            self.thumbnail.hidden = NO;
         }
             break;
         case kMediaTypeAudio: {
-            self.playView.hidden = YES;
-            self.messageLabel.hidden = YES;
             self.audioView.hidden = NO;
             boxSize = MIN(MAX(message.audioTicks*5 + 100, kAudioThumbnailWidth/2), kAudioThumbnailWidth);
             [S3File getDataFromFile:message.mediaThumbnailFile completedBlock:^(NSData *thumbnail, NSError *error, BOOL thumbnailFromCache) {
                 if (!error) {
                     [self.audioPlayer setupAudioThumbnailData:thumbnail audioFile:message.mediaFile];
-                    self.audioView.alpha = 1.0f;
                 }
                 else {
                     NSLog(@"ERROR:%@", error.localizedDescription);
-                    self.audioView.alpha = 0.0f;
                 }
             } progressBlock:nil];
         }
@@ -145,30 +114,21 @@
         default:
             break;
     }
-    self.spacing.constant = self.contentView.bounds.size.width-boxSize-(self.trailing.constant+CHATVIEWINSET*2);
+    self.spacing.constant = self.contentView.bounds.size.width-boxSize-(self.trailing.constant);
+}
+
+- (instancetype)zelf:(id)class
+{
+    return class;
 }
 
 - (void)lazyUpdateData:(NSData*)data onTableView:(UITableView*)tableView
 {
-    [[tableView visibleCells] enumerateObjectsUsingBlock:^(ChatLeft* _Nonnull cell, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([cell.messageId isEqualToString:self.messageId]) {
+    [[tableView visibleCells] enumerateObjectsUsingBlock:^(id _Nonnull cell, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([[self zelf:cell].messageId isEqualToString:self.messageId]) {
             *stop = YES;
-            [self setupThumbnailImageWithData:data animated:YES];
+            self.thumbnail.image = [UIImage imageWithData:data];
         }
     }];
-}
-
-- (void)setupThumbnailImageWithData:(NSData*)data animated:(BOOL) animated
-{
-    self.thumbnailView.alpha = animated ? 0.0f : 1.0f;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        UIImage *thumbnailImage = [UIImage imageWithData:data];
-        self.thumbnailView.layer.contents = (id) thumbnailImage.CGImage;
-        if (animated) {
-            [UIView animateWithDuration:0.25 animations:^{
-                self.thumbnailView.alpha = 1.0f;
-            }];
-        }
-    });
 }
 @end

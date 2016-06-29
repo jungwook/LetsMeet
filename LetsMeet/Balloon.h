@@ -11,6 +11,4 @@
 
 @interface Balloon : UIImageView
 @property (nonatomic) BOOL isMine;
-
-
 @end

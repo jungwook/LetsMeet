@@ -44,6 +44,7 @@
 		1296A7A91D03BB5500E44642 /* Notifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A81D03BB5500E44642 /* Notifications.m */; };
 		1296A7AC1D03E0CA00E44642 /* Profile.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7AB1D03E0CA00E44642 /* Profile.m */; };
 		129B07531D0AAAB5000C0276 /* NearByCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 129B07521D0AAAB5000C0276 /* NearByCell.m */; };
+		12A6071D1D23A99800D8476D /* MessageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A6071C1D23A99800D8476D /* MessageView.m */; };
 		12DB01B21D0E317700E33359 /* Chat.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB01B11D0E317700E33359 /* Chat.m */; };
 		12DE5FA91CFD43A7009B315F /* Balloon.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FA81CFD43A7009B315F /* Balloon.m */; };
 		12DE5FB31CFEF58A009B315F /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12DE5FB21CFEF58A009B315F /* Photos.framework */; };
@@ -166,6 +167,8 @@
 		1296A7AB1D03E0CA00E44642 /* Profile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Profile.m; sourceTree = "<group>"; };
 		129B07511D0AAAB5000C0276 /* NearByCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NearByCell.h; sourceTree = "<group>"; };
 		129B07521D0AAAB5000C0276 /* NearByCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NearByCell.m; sourceTree = "<group>"; };
+		12A6071B1D23A99800D8476D /* MessageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageView.h; sourceTree = "<group>"; };
+		12A6071C1D23A99800D8476D /* MessageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageView.m; sourceTree = "<group>"; };
 		12DB01B01D0E317700E33359 /* Chat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chat.h; sourceTree = "<group>"; };
 		12DB01B11D0E317700E33359 /* Chat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Chat.m; sourceTree = "<group>"; };
 		12DE5FA71CFD43A7009B315F /* Balloon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Balloon.h; sourceTree = "<group>"; };
@@ -324,6 +327,8 @@
 				120142F31D1F961500D66905 /* DisplayLinkView.m */,
 				120142EF1D1F952600D66905 /* AudioPlayer.h */,
 				120142F01D1F952600D66905 /* AudioPlayer.m */,
+				12A6071B1D23A99800D8476D /* MessageView.h */,
+				12A6071C1D23A99800D8476D /* MessageView.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -607,6 +612,7 @@
 				12805E8B1D1E3DD30082A95D /* AudioRecorder.m in Sources */,
 				12805E6E1D1AB5B40082A95D /* SignUp.m in Sources */,
 				12DE5FBB1D004443009B315F /* Progress.m in Sources */,
+				12A6071D1D23A99800D8476D /* MessageView.m in Sources */,
 				12F0D7191D0A7C6100A37C40 /* NearBy.m in Sources */,
 				12F741D21CE56B3400E8267A /* FloatingDrawerViewController.m in Sources */,
 				120142EE1D1042AD00D66905 /* EXPhotoViewer.m in Sources */,

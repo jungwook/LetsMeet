@@ -96,13 +96,6 @@ typedef NSMutableDictionary Bullet;
 - (Bullet*) bullet;
 @end
 
-@interface Originals : PFObject<PFSubclassing>
-+ (NSString*)parseClassName;
-
-@property (retain) NSString* messageId;
-@property (retain) PFFile* file;
-
-@end
 
 typedef NS_OPTIONS(BOOL, SexTypes)
 {

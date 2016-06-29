@@ -13,6 +13,7 @@ typedef void (^S3PutBlock)(NSString *file, BOOL succeeded, NSError * error);
 typedef void (^S3ProgressBlock)(int percentDone);
 
 @interface S3File : NSObject
++ (void) synchronize;
 + (void) getDataFromFile:(id)filename completedBlock:(S3GetBlock)block progressBlock:(S3ProgressBlock)progress;
 + (void) getDataFromFile:(id)filename completedBlock:(S3GetBlock)block;
 + (id) objectForKey:(id)key;

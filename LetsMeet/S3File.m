@@ -64,9 +64,6 @@
     }
     
     id cacheItem = [self.cache objectForKey:key];
-    if (cacheItem) {
-        printf(">");
-    }
     return cacheItem[@"data"];
 }
 
@@ -87,11 +84,20 @@
                               @"data" : data };
             
             [self.cache setObject:cacheItem forKey:key];
-            BOOL ret = [self.cache writeToURL:self.cachePath atomically:YES];
-            if (!ret) {
-                NSLog(@"ERROR WRITING TO FILE");
-            }
         }
+    }
+}
+
++ (void)synchronize
+{
+    [[S3File file] writeToCacheFile];
+}
+
+- (void) writeToCacheFile
+{
+    BOOL ret = [self.cache writeToURL:self.cachePath atomically:YES];
+    if (!ret) {
+        NSLog(@"ERROR: Error writing to S3FILE cache.");
     }
 }
 

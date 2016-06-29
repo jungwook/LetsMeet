@@ -376,16 +376,6 @@
 
 @end
 
-@implementation Originals
-@dynamic messageId, file;
-
-+ (NSString *)parseClassName {
-    return @"Originals";
-}
-
-@end
-
-
 @implementation User
 @dynamic nickname,location,locationUdateAt, sex, age, intro, isSimulated, profileMedia, thumbnail, profileMediaType;
 
