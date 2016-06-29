@@ -9,8 +9,8 @@
 #import "S3File.h"
 
 @interface S3File ()
-@property (nonatomic, strong) NSTimer *backgroundTimer;
-@property (nonatomic, strong) NSMutableArray *tasks;
+@property (nonatomic, strong) NSMutableDictionary *cache;
+@property (nonatomic, strong) NSURL* cachePath;
 @end
 
 
@@ -30,22 +30,15 @@
 {
     self = [super init];
     if (self) {
-        self.tasks = [NSMutableArray array];
-        self.backgroundTimer = [NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(backgroundTask) userInfo:nil repeats:YES];
+        NSURL* applicationPath = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+        NSURL* systemPath = [applicationPath URLByAppendingPathComponent:@"Engine"];
+        self.cachePath = [systemPath URLByAppendingPathComponent:@"MediaCache"];
+        self.cache = [NSMutableDictionary dictionaryWithContentsOfURL:self.cachePath];
+        if (!self.cache) {
+            self.cache = [NSMutableDictionary dictionary];
+        }
     }
     return self;
-}
-
-- (void) backgroundTask
-{
-    while (self.tasks.count) {
-        id task = nil;
-        @synchronized (self.tasks) {
-            task = [self.tasks lastObject];
-            [self.tasks removeLastObject];
-        }
-        [self getInternalDataFromFile:task[@"key"] completedBlock:task[@"completeBlock"] progressBlock:task[@"progressBlock"]];
-    }
 }
 
 + (id)objectForKey:(id)key
@@ -58,40 +51,51 @@
     [[S3File file] getDataFromFile:filename completedBlock:block progressBlock:progress];
 }
 
-- (void) getDataFromFile:(id)filename completedBlock:(S3GetBlock)block progressBlock:(S3ProgressBlock)progress
++ (void) getDataFromFile:(id)filename completedBlock:(S3GetBlock)block
 {
-    __LF
-    if (filename) {
-        NSData *data = [self objectForKey:filename];
-        if (data) {
-            if (block) {
-                if (progress) {
-                    progress(100);
-                }
-                block(data, nil, YES);
-            }
-            return;
-        }
-        else {
-            NSMutableDictionary *task = [NSMutableDictionary dictionary];
-            if (filename) {
-                [task setObject:filename forKey:@"key"];
-            }
-            if (block) {
-                [task setObject:block forKey:@"completeBlock"];
-            }
-            if (progress) {
-                [task setObject:progress forKey:@"progressBlock"];
-            }
+    [[S3File file] getDataFromFile:filename completedBlock:block progressBlock:nil];
+}
+
+- (id) objectForKey:(id)key
+{
+    if (!key) {
+        NSLog(@"ERROR: Cannot retrieve data from (null) key");
+        return nil;
+    }
+    
+    id cacheItem = [self.cache objectForKey:key];
+    if (cacheItem) {
+        printf(">");
+    }
+    return cacheItem[@"data"];
+}
+
+- (void) setObject:(id)data forKey:(id)key
+{
+    if (!key) {
+        NSLog(@"ERROR: Cannot store data to (null) key");
+        return;
+    }
+    
+    if (!data) {
+        [self.cache removeObjectForKey:key];
+        return;
+    }
+    else {
+        @synchronized (self.cache) {
+            id cacheItem = @{ @"updatedAt" : [NSDate date],
+                              @"data" : data };
             
-            @synchronized (self.tasks) {
-                [self.tasks addObject:task];
+            [self.cache setObject:cacheItem forKey:key];
+            BOOL ret = [self.cache writeToURL:self.cachePath atomically:YES];
+            if (!ret) {
+                NSLog(@"ERROR WRITING TO FILE");
             }
         }
     }
 }
 
-- (void) getInternalDataFromFile:(id)filename completedBlock:(S3GetBlock)block progressBlock:(S3ProgressBlock)progress
+- (void) getDataFromFile:(id)filename completedBlock:(S3GetBlock)block progressBlock:(S3ProgressBlock)progress
 {
     if (!filename) {
         if (block) {
@@ -232,72 +236,24 @@
     }
 }
 
-+ (NSString *)saveProfileMovieData:(NSData *)data completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
++ (NSString *)saveImageData:(NSData *)data completedBlock:(S3PutBlock)block
 {
-    return [S3File saveData:data named:@"profile" extension:@".mov" group:@"ProfileMedia/" completedBlock:block progressBlock:progress];
+    return [S3File saveImageData:data completedBlock:block progressBlock:nil];
 }
 
-+ (NSString *)saveProfileThumbnailData:(NSData *)data completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
++ (NSString *)saveMovieData:(NSData *)data completedBlock:(S3PutBlock)block
 {
-    return [S3File saveData:data named:@"thumbnail" extension:@".jpg" group:@"ProfileMedia/" completedBlock:block progressBlock:progress];
+    return [S3File saveMovieData:data completedBlock:block progressBlock:nil];
 }
 
-+ (NSString *)saveProfileImageData:(NSData *)data completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
++ (NSString *)saveAudioData:(NSData *)data completedBlock:(S3PutBlock)block
 {
-    return [S3File saveData:data named:@"profile" extension:@".jpg" group:@"ProfileMedia/" completedBlock:block progressBlock:progress];
+    return [S3File saveAudioData:data completedBlock:block progressBlock:nil];
 }
 
 + (NSString *)saveImageData:(NSData *)data completedBlock:(S3PutBlock)block progressBlock:(S3ProgressBlock)progress
 {
     return [S3File saveData:data named:nil extension:@".jpg" group:@"ProfileMedia/" completedBlock:block progressBlock:progress];
-}
-
-+ (NSString *)saveProfileMovieData:(NSData *)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress
-{
-    return [S3File saveData:data named:@"profile" extension:@".mov" group:@"ProfileMedia/" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            progress.progress = 0.0f;
-        });
-        if (block) {
-            block(file, succeeded, error);
-        }
-    } progressBlock:^(int percentDone) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            progress.progress = percentDone / 100.0f;
-        });
-    }];
-}
-
-+ (NSString *)saveProfileThumbnailData:(NSData *)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress
-{
-    return [S3File saveData:data named:@"thumbnail" extension:@".jpg" group:@"ProfileMedia/" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            progress.progress = 0.0f;
-        });
-        if (block) {
-            block(file, succeeded, error);
-        }
-    } progressBlock:^(int percentDone) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            progress.progress = percentDone / 100.0f;
-        });
-    }];
-}
-
-+ (NSString *)saveProfileImageData:(NSData *)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress
-{
-    return [S3File saveData:data named:@"profile" extension:@".jpg" group:@"ProfileMedia/" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            progress.progress = 0.0f;
-        });
-        if (block) {
-            block(file, succeeded, error);
-        }
-    } progressBlock:^(int percentDone) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            progress.progress = percentDone / 100.0f;
-        });
-    }];
 }
 
 + (NSString *)saveImageData:(NSData *)data completedBlock:(S3PutBlock)block progress:(UIProgressView*)progress

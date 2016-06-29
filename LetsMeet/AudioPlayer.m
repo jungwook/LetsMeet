@@ -23,28 +23,27 @@
 
 @implementation AudioPlayer
 
+- (instancetype)initOnceOnView:(UIView*)view
+{
+    self = [[[NSBundle mainBundle] loadNibNamed:@"AudioRecorder" owner:self options:nil] objectAtIndex:1];
+    if (self) {
+        [view addSubview:self];
+        self.frame = view.bounds;
+    }
+    return self;
+}
 
 + (instancetype)audioPlayerOnView:(UIView *)view
 {
-    AudioPlayer *ar = [[[NSBundle mainBundle] loadNibNamed:@"AudioRecorder" owner:self options:nil] objectAtIndex:1];
-    [view addSubview:ar];
-    ar.frame = view.bounds;
-    
-    return ar;
+    return [[AudioPlayer new] initOnceOnView:view];
 }
 
 - (void)awakeFromNib
 {
-    __LF
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self translatesAutoresizingMaskIntoConstraints];
     self.playBut.selected = NO;
-}
-
-- (void)layoutSubviews
-{
-    __LF
-    self.backgroundColor = self.superview.superview.backgroundColor;
+    self.backgroundColor = [UIColor clearColor];
 }
 
 - (void)setupAudioThumbnailData:(NSData*)thumbnail audioData:(NSData *)audioData
@@ -78,7 +77,7 @@
 {
     static int count = 0;
     
-    if (count++ % 5)
+    if (count++ % 10)
         return;
     
     NSTimeInterval now = self.player.currentTime;
@@ -119,7 +118,7 @@
                 [self.player play];
                 [self startPlaybackLink];
             }
-        } progressBlock:nil];
+        }];
     }
     else {
         [self updateTimerDisplayWithTime:self.player.duration];

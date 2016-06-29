@@ -45,7 +45,6 @@
 @property (weak, nonatomic) IBOutlet UITextField *sexTF;
 @property (weak, nonatomic) IBOutlet UILabel *pointsLB;
 @property (weak, nonatomic) IBOutlet UIButton *editPhotoBut;
-@property (weak, nonatomic) IBOutlet UIView *gradientView;
 @property (weak, nonatomic) IBOutlet ProfileView *profileView;
 @property (weak, nonatomic) IBOutlet UIProgressView *progress;
 @property CGFloat photoHeight;
@@ -124,7 +123,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.gradientView.hidden = YES;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -151,14 +149,13 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
     });
     
     NSData *thumb = compressedImageData(thumbnail, 100);
-    self.me.thumbnail = [S3File saveProfileThumbnailData:thumb completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-    } progress:self.progress];
+    self.me.thumbnail = [S3File saveImageData:thumb completedBlock:nil progress:self.progress];
     
     [self convertVideoToLowQuailtyWithInputURL:url outputURL:outputURL handler:^(AVAssetExportSession *exportSession)
      {
          if (exportSession.status == AVAssetExportSessionStatusCompleted) {
              NSData *videoData = [NSData dataWithContentsOfURL:outputURL];
-             self.me.profileMedia = [S3File saveProfileMovieData:videoData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+             self.me.profileMedia = [S3File saveMovieData:videoData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
                  if (succeeded) {
                      self.me.profileMediaType = kProfileMediaVideo;
                      [self.me saveInBackground];
@@ -202,14 +199,14 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
 - (void) save:(User*)user orig:(NSData*)orig thumb:(NSData*)thumb
 {
     user.profileMediaType = kProfileMediaPhoto;
-    user.profileMedia = [S3File saveProfileImageData:orig completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+    user.thumbnail = [S3File saveImageData:thumb completedBlock:nil progress:self.progress];
+    user.profileMedia = [S3File saveImageData:orig completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
         if (succeeded) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.profileView setMediaFromUser:user];
             });
         }
     } progress:self.progress];
-    user.thumbnail = [S3File saveProfileThumbnailData:thumb completedBlock:nil progress:self.progress];
     [user saveInBackground];
 }
 

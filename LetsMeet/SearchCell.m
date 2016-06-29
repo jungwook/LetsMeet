@@ -39,43 +39,38 @@
 
 - (void) setUser:(User*)user tableView:(UITableView*)tableView
 {
-    self.userId = user.objectId;
-    NSInteger count = [self.system unreadMessagesFromUser:user.objectId];
-    self.badge.hidden = !count;
-    double distance = [self.system.location distanceInKilometersTo:user.location];
-
-    self.badge.text = [NSString stringWithFormat:@"%ld", count];
-    self.distance.text = distanceString(distance);
-    self.nickname.text = user.nickname;
-    self.intro.text = user.intro;
-    
-    [self.photo setImage:[UIImage imageNamed:user.sexImageName]];
-    
-    [self.photo loadMediaFromUser:user completion:^(NSData *data, NSError *error, BOOL fromCache) {
-        UIImage *photo = [UIImage imageWithData:data];
-        if (fromCache && data) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                self.photo.image = photo;
-            });
-        }
-        else {
-            NSArray *visible = [tableView visibleCells];
-            [visible enumerateObjectsUsingBlock:^(SearchCell* _Nonnull cell, NSUInteger idx, BOOL * _Nonnull stop) {
-                if ([cell.userId isEqualToString:user.objectId]) {
-                    *stop = YES;
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        cell.photo.image = photo;
-                    });
-                }
-            }];
-        }
-    }];
-}
-
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
-
-    // Configure the view for the selected state
+    if (![self.userId isEqualToString:user.objectId]) {
+//        [self.photo setImage:[UIImage imageNamed:user.sexImageName]];
+        self.userId = user.objectId;
+        NSInteger count = [self.system unreadMessagesFromUser:user.objectId];
+        self.badge.hidden = !count;
+        double distance = [self.system.location distanceInKilometersTo:user.location];
+        
+        self.badge.text = [NSString stringWithFormat:@"%ld", count];
+        self.distance.text = distanceString(distance);
+        self.nickname.text = user.nickname;
+        self.intro.text = user.intro;
+        
+        [self.photo loadMediaFromUser:user completion:^(NSData *data, NSError *error, BOOL fromCache) {
+            UIImage *photo = [UIImage imageWithData:data];
+            if (fromCache && data) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    self.photo.image = photo;
+                });
+            }
+            else {
+                NSArray *visible = [tableView visibleCells];
+                [visible enumerateObjectsUsingBlock:^(SearchCell* _Nonnull cell, NSUInteger idx, BOOL * _Nonnull stop) {
+                    if ([cell.userId isEqualToString:user.objectId]) {
+                        *stop = YES;
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            cell.photo.image = photo;
+                        });
+                    }
+                }];
+            }
+        }];
+    }
 }
 
 @end

@@ -69,7 +69,7 @@
         else {
             NSLog(@"ERROR:%@", error.localizedDescription);
         }
-    } progress:nil];
+    }];
     
     NSString *mediaFile = [S3File saveImageData:imageData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
         if (succeeded) {
@@ -78,7 +78,7 @@
         else {
             NSLog(@"ERROR:%@", error.localizedDescription);
         }
-    } progress:nil];
+    }];
     
     NSLog(@"source type:%ld", sourceType);
     
@@ -101,7 +101,7 @@
         else {
             NSLog(@"ERROR:%@", error.localizedDescription);
         }
-    } progress:nil];
+    }];
     
     NSString *tempId = randomObjectId();
     NSURL *outputURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingString:tempId]];
@@ -128,7 +128,7 @@
                     NSLog(@"ERROR:%@", error.localizedDescription);
                 }
                 [[NSFileManager defaultManager] removeItemAtURL:outputURL error:nil];
-            } progress:nil];
+            }];
         }
     }];
 }

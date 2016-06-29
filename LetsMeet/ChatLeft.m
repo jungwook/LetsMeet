@@ -25,9 +25,9 @@
 @property (weak, nonatomic) IBOutlet UIView *thumbnailView;
 @property (weak, nonatomic) IBOutlet UIImageView *playView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *trailing;
-@property (weak, nonatomic) IBOutlet UIImageView *realIcon;
 @property (nonatomic) MediaTypes mediaType;
 @property (nonatomic) ProfileMediaTypes profileMediaType;
+@property (nonatomic) BOOL isReal;
 @property (nonatomic, strong) id mediaFile;
 @property (nonatomic, strong) id profileMediaFile;
 @property (nonatomic, strong) id messageId;
@@ -45,10 +45,6 @@
     self.photoView.layer.cornerRadius = 14.f;
     self.photoView.layer.masksToBounds = YES;
     self.thumbnailView.layer.contentsGravity = kCAGravityResizeAspect;
-    self.realIcon.layer.shadowColor = [UIColor blackColor].CGColor;
-    self.realIcon.layer.shadowOffset = CGSizeZero;
-    self.realIcon.layer.shadowRadius = 2.0f;
-    self.realIcon.layer.shadowOpacity = 0.3;
 
     if (![self.photoView.gestureRecognizers count]) {
         [self.photoView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedPhotoView:)]];
@@ -66,12 +62,12 @@
 
 - (void) tappedPhotoView:(UITapGestureRecognizer*)tap
 {
-    [MediaViewer showMediaFromView:tap.view filename:self.profileMediaFile mediaType:mediaTypeFromProfileMediaTypes(self.profileMediaType)];
+    [MediaViewer showMediaFromView:tap.view filename:self.profileMediaFile mediaType:mediaTypeFromProfileMediaTypes(self.profileMediaType) isReal:self.isReal];
 }
 
 - (void) tappedThumbnailView:(UITapGestureRecognizer*)tap
 {
-    [MediaViewer showMediaFromView:tap.view filename:self.mediaFile mediaType:self.mediaType];
+    [MediaViewer showMediaFromView:tap.view filename:self.mediaFile mediaType:self.mediaType isReal:self.isReal];
 }
 
 - (void)setMessage:(Bullet *)message user:(User*)user tableView:(UITableView*)tableView isConsecutive:(BOOL)consecutive
@@ -87,15 +83,16 @@
     self.nicknameLabel.hidden = consecutive;
     self.photoView.hidden = consecutive;
     self.audioView.alpha = 0.0;
+    self.isReal = message.realMedia;
+    self.messageLabel.hidden = NO;
     
     [S3File getDataFromFile:user.thumbnail completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
         if (!error) {
             self.photoView.layer.contents = (id) [UIImage imageWithData:data].CGImage;
         }
-    } progressBlock:nil];
+    }];
     
     self.thumbnailView.alpha = 0.0;
-    self.realIcon.hidden = YES;
     
     NSString *string = [message.message stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     self.messageLabel.text = string;
@@ -111,7 +108,6 @@
         case kMediaTypeVideo:
         case kMediaTypePhoto: {
             self.playView.hidden = (message.mediaType == kMediaTypePhoto);
-            self.realIcon.hidden = !(message.realMedia);
             boxSize = kThumbnailWidth;
             [S3File getDataFromFile:message.mediaThumbnailFile completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
                 if (!error) {
@@ -122,14 +118,14 @@
                         [self lazyUpdateData:data onTableView:tableView];
                     }
                 }
-            } progressBlock:nil];
+            }];
         }
             break;
         case kMediaTypeAudio: {
             self.playView.hidden = YES;
-            self.realIcon.hidden = YES;
+            self.messageLabel.hidden = YES;
             self.audioView.hidden = NO;
-            boxSize = kThumbnailWidth*1.5f;
+            boxSize = MIN(MAX(message.audioTicks*5 + 100, kAudioThumbnailWidth/2), kAudioThumbnailWidth);
             [S3File getDataFromFile:message.mediaThumbnailFile completedBlock:^(NSData *thumbnail, NSError *error, BOOL thumbnailFromCache) {
                 if (!error) {
                     [self.audioPlayer setupAudioThumbnailData:thumbnail audioFile:message.mediaFile];

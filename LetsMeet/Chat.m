@@ -19,8 +19,8 @@
 #define kInitialTextViewHeight 34
 #define kMaxTextViewHeight 200
 #define kNavigationBarHeight 64
-#define photoViewHeight 40
 #define balloonOffet 8
+#define kMinCellHeight 36
 
 @interface Chat ()
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -104,19 +104,18 @@
     } sendBlock:^(NSData *thumbnail, NSData *original) {
         [S3File saveAudioData:thumbnail completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
             if (succeeded) {
-                NSLog(@"SAVED THUMBNAIL AUDIO");
                 NSString *thumbnailFile = file;
                 [S3File saveAudioData:original completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
                     if (succeeded) {
                         NSLog(@"SAVED ORIGINAL AUDIO");
                         NSString *originalFile = file;
-                        Bullet* bullet = [Bullet bulletWithAudio:originalFile thumbnail:thumbnailFile];
+                        Bullet* bullet = [Bullet bulletWithAudio:originalFile thumbnail:thumbnailFile audioTicks:thumbnail.length audioSize:original.length];
                         [self.system add:bullet for:self.user.objectId];
                         [self clearTextView];
                     }
-                } progressBlock:nil];
+                }];
             }
-        } progressBlock:nil];
+        }];
         [self switchToAudio:NO];
     } onView:self.audioView];
 }
@@ -194,6 +193,8 @@
     
     BOOL consecutive = NO;
     
+    CGFloat height = kMinCellHeight;
+    
     if (indexPath.row > 0) {
         Bullet *prev = [[self.system messagesWith:self.user.objectId] objectAtIndex:indexPath.row-1];
         if ([bullet.fromUserId isEqualToString:prev.fromUserId]) {
@@ -205,23 +206,27 @@
         case kMediaTypePhoto:
         case kMediaTypeVideo: {
             if (bullet.mediaSize.width) {
-                CGFloat height = balloonOffet - 4 + kThumbnailWidth * bullet.mediaSize.height / bullet.mediaSize.width;
-                return height;
+                height = balloonOffet - 4 + kThumbnailWidth * bullet.mediaSize.height / bullet.mediaSize.width;
             }
             else {
-                return kThumbnailWidth;
+                height = kThumbnailWidth;
             }
         }
+            break;
         case kMediaTypeText: {
             CGRect rect = rectForString(bullet.message, self.messageView.font, kTextMessageWidth);
-            return rect.size.height;
+            height = rect.size.height+balloonOffet/2;
         }
+            break;
         case kMediaTypeAudio: {
-            return photoViewHeight+balloonOffet;
+            height = kMinCellHeight+1;
         }
+            break;
         default:
-            return photoViewHeight+balloonOffet;
+            height = kMinCellHeight;
+            break;
     }
+    return MAX(height, kMinCellHeight);
 }
 
 - (void) dealloc

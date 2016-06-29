@@ -110,7 +110,6 @@
 
 - (void)awakeFromNib
 {
-    __LF
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self translatesAutoresizingMaskIntoConstraints];
     [self initializeAVSessionAndRecorder];
@@ -124,11 +123,6 @@
     
     [self insertSubview:backdrop atIndex:0];
     self.equalizer.isRecording = YES;
-}
-
-- (void)layoutSubviews
-{
-    __LF
 }
 
 - (void)selectPlayBut
@@ -253,7 +247,7 @@
 {
     static int count = 0;
     
-    if (count++ % 5)
+    if (count++ % 10)
         return;
     
     

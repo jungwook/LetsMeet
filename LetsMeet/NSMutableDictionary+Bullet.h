@@ -40,7 +40,8 @@ typedef void (^NewUserBlock)(User* me);
 #define kJPEGCompressionDefault 0.6f
 #define kJPEGCompressionFull 1.0f
 
-#define kThumbnailWidth 140.0f
+#define kAudioThumbnailWidth 300.0f
+#define kThumbnailWidth 220.0f
 #define kTextMessageWidth 220.0f
 
 typedef NSMutableDictionary Bullet;
@@ -70,9 +71,11 @@ typedef NSMutableDictionary Bullet;
 + (instancetype) bulletWithText:(NSString*)text;
 + (instancetype) bulletWithPhoto:(NSString*)filename thumbnail:(NSString*)thumbnail mediaSize:(CGSize)size realMedia:(BOOL)realMedia;
 + (instancetype) bulletWithVideo:(NSString*)filename thumbnail:(NSString*)thumbnail mediaSize:(CGSize)size realMedia:(BOOL)realMedia;
-+ (instancetype) bulletWithAudio:(NSString*)filename thumbnail:(NSString*)thumbnail;
++ (instancetype) bulletWithAudio:(NSString*)filename thumbnail:(NSString*)thumbnail audioTicks:(CGFloat)length audioSize:(CGFloat)size;
 
 - (BulletObject*) object;
+- (CGFloat) audioTicks;
+- (CGFloat) audioSize;
 @end
 
 @interface BulletObject : PFObject<PFSubclassing>

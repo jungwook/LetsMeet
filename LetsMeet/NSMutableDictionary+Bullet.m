@@ -45,7 +45,7 @@
     return bullet;
 }
 
-+ (instancetype)bulletWithAudio:(NSString*)filename thumbnail:(NSString *)thumbnail
++ (instancetype)bulletWithAudio:(NSString*)filename thumbnail:(NSString *)thumbnail audioTicks:(CGFloat)length audioSize:(CGFloat)size
 {
     Bullet* bullet = [Bullet new];
     bullet.mediaType = kMediaTypeAudio;
@@ -53,7 +53,26 @@
     bullet.mediaThumbnailFile = thumbnail;
     bullet.message = [[self mediaTypeStringForType:bullet.mediaType] stringByAppendingString:@" 메시지"];
     bullet.realMedia = YES;
+    bullet.mediaSize = CGSizeMake(length, size);
     return bullet;
+}
+
+- (CGFloat)audioSize
+{
+    if (self.mediaType == kMediaTypeAudio) {
+        return self.mediaSize.height;
+    }
+    else
+        return 0;
+}
+
+- (CGFloat)audioTicks
+{
+    if (self.mediaType == kMediaTypeAudio) {
+        return self.mediaSize.width;
+    }
+    else
+        return 0;
 }
 
 - (instancetype)init

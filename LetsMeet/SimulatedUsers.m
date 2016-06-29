@@ -109,17 +109,17 @@
             NSString *oFN = [loggedIn.objectId stringByAppendingString:@".jpg"];
             NSString *tFN = [loggedIn.objectId stringByAppendingString:@"TN.jpg"];
             
-            loggedIn.profileMedia = [S3File saveData:largeData named:@"profile" extension:@".jpg" group:@"ProfileMedia" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+            loggedIn.profileMedia = [S3File saveImageData:largeData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
                 if (succeeded) {
                     NSLog(@"saved profile media [%@/%ld] for %@/%@ ", oFN, largeData.length, loggedIn.username, loggedIn.objectId);
                 }
-            } progressBlock:nil];
+            }];
             
-            loggedIn.thumbnail = [S3File saveData:tnData named:@"thumbnail" extension:@".jpg" group:@"ProfileMedia" completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+            loggedIn.thumbnail = [S3File saveImageData:tnData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
                 if (succeeded) {
                     NSLog(@"saved thumbnail [%@/%ld] for %@/%@ ", tFN, tnData.length, loggedIn.username, loggedIn.objectId);
                 }
-            } progressBlock:nil];
+            }];
             [loggedIn save];
         }
     }

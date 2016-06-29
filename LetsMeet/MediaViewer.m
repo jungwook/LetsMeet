@@ -14,6 +14,7 @@
 @property (nonatomic) MediaTypes mediaType;
 @property (nonatomic, strong) UIProgressView* progress;
 @property (nonatomic, strong) UIButton* button;
+@property (nonatomic) BOOL isReal;
 @end
 
 @implementation MediaView
@@ -53,7 +54,7 @@
 {
     __LF
     if (self.mediaType != kMediaTypeNone) {
-        [MediaViewer showMediaFromView:self filename:self.mediaFile mediaType:self.mediaType];
+        [MediaViewer showMediaFromView:self filename:self.mediaFile mediaType:self.mediaType isReal:self.isReal];
     }
 }
 
@@ -78,10 +79,11 @@
     }
 }
 
-- (void)loadMediaFromFile:(id)filename mediaType:(MediaTypes)mediaType completion:(S3GetBlock)block
+- (void)loadMediaFromFile:(id)filename mediaType:(MediaTypes)mediaType isReal:(BOOL)isReal completion:(S3GetBlock)block
 {
     self.mediaType = mediaType;
     self.mediaFile = filename;
+    self.isReal = isReal;
     
     switch (mediaType) {
         case kMediaTypeAudio:
@@ -131,9 +133,9 @@
     }
 }
 
-- (void)loadMediaFromFile:(id)filename mediaType:(MediaTypes)mediaType shouldRefresh:(ShouldRefreshBlock)block
+- (void)loadMediaFromFile:(id)filename mediaType:(MediaTypes)mediaType isReal:(BOOL)isReal shouldRefresh:(ShouldRefreshBlock)block
 {
-    [self loadMediaFromFile:filename mediaType:mediaType completion:^(NSData *data, NSError *error, BOOL fromCache) {
+    [self loadMediaFromFile:filename mediaType:mediaType isReal:isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
         BOOL ret = NO;
         if (block) {
             ret = block(data, error, fromCache);
@@ -146,7 +148,7 @@
 
 - (void)loadMediaFromMessage:(Bullet *)message completion:(S3GetBlock)block
 {
-    [self loadMediaFromFile:message.mediaFile mediaType:message.mediaType completion:block];
+    [self loadMediaFromFile:message.mediaFile mediaType:message.mediaType isReal:message.realMedia completion:block];
 }
 
 - (void)loadMediaFromMessage:(Bullet *)message shouldRefresh:(ShouldRefreshBlock)block
@@ -156,17 +158,17 @@
         hasThumbnail = YES;
     }
     
-    [self loadMediaFromFile:hasThumbnail ? message.mediaThumbnailFile : message.mediaFile mediaType:message.mediaType shouldRefresh:block];
+    [self loadMediaFromFile:hasThumbnail ? message.mediaThumbnailFile : message.mediaFile mediaType:message.mediaType isReal:message.realMedia shouldRefresh:block];
 }
 
 - (void)loadMediaFromUser:(User *)user completion:(S3GetBlock)block
 {
-    [self loadMediaFromFile:user.profileMedia mediaType:(user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo completion:block];
+    [self loadMediaFromFile:user.profileMedia mediaType:(user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo isReal:NO completion:block];
 }
 
 - (void)loadMediaFromUser:(User *)user shouldRefresh:(ShouldRefreshBlock)block
 {
-    [self loadMediaFromFile:user.profileMedia mediaType:(user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo  shouldRefresh:block];
+    [self loadMediaFromFile:user.profileMedia mediaType:(user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo isReal:NO shouldRefresh:block];
 }
 
 @end
@@ -210,13 +212,15 @@
 @property (nonatomic, strong) UIView* playerView;
 @property (nonatomic) CGFloat zoom;
 @property (nonatomic) BOOL alive;
+@property (nonatomic) BOOL isReal;
+@property (nonatomic, strong) CALayer *realLayer;
 @end
 
 @implementation MediaViewer
 
-+ (void)showMediaFromView:(UIView *)view filename:(id)filename mediaType:(MediaTypes)mediaType
++ (void)showMediaFromView:(UIView *)view filename:(id)filename mediaType:(MediaTypes)mediaType isReal:(BOOL)isReal
 {
-    [[MediaViewer new] showMediaFromView:view filename:filename mediaType:mediaType];
+    [[MediaViewer new] showMediaFromView:view filename:filename mediaType:mediaType isReal:isReal];
 }
 
 - (void) dealloc
@@ -234,10 +238,11 @@
 
 #define S3LOCATION @"http://parsekr.s3.ap-northeast-2.amazonaws.com/"
 
-- (void) showMediaFromView:(UIView*)view filename:(id)filename mediaType:(MediaTypes)mediaType
+- (void) showMediaFromView:(UIView*)view filename:(id)filename mediaType:(MediaTypes)mediaType isReal:(BOOL)isReal
 {
     self.alpha = 0.0f;
     self.mediaFile = filename;
+    self.isReal = isReal;
     
     CGRect bigFrame = [self setupSelfAndGetRootFrameFromView:view];
     self.frame = bigFrame;
@@ -317,11 +322,10 @@
 
 - (void) initializeVideoWithURL:(NSURL*)url
 {
-    NSLog(@"URL:%@", url);
     self.playerItem = [AVPlayerItem playerItemWithURL:url];
     self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
     self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
-    [self.playerLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
+//    [self.playerLayer setVideoGravity:AVLayerVideoGravityResizeAspect];
     [self.playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playerItem];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemStalled:) name:AVPlayerItemPlaybackStalledNotification object:self.playerItem];
@@ -332,6 +336,7 @@
     [self addSubview:self.playerView];
     
     [self.playerView.layer addSublayer:self.playerLayer];
+    
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context
@@ -354,6 +359,15 @@
                 }
                 self.playerView.frame = rect;
                 self.playerLayer.frame = CGRectMake(0, 0, rect.size.width, rect.size.height);
+                if (self.isReal && !self.realLayer) {
+                    self.realLayer = [CALayer layer];
+                    UIImage *image = [UIImage imageNamed:@"real"];
+                    self.realLayer.contents = (id) image.CGImage;
+                    self.realLayer.frame = CGRectMake(10 + fabs(rect.origin.x), 10, 40, 40);
+                    
+                    [self.playerLayer addSublayer:self.realLayer];
+                }
+
                 [self.player play];
             }
                 break;

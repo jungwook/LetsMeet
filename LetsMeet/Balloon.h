@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "IndentedLabel.h"
 
-@interface Balloon : UIView
+@interface Balloon : UIImageView
 @property (nonatomic) BOOL isMine;
 
 

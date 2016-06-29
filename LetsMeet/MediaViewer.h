@@ -14,8 +14,8 @@ typedef BOOL(^ShouldRefreshBlock)(NSData * data, NSError * error, BOOL fromCache
 @interface MediaView : UIView
 @property (nonatomic, strong) UIImage* image;
 
-- (void) loadMediaFromFile:(id)filename mediaType:(MediaTypes)mediaType completion:(S3GetBlock)block;
-- (void) loadMediaFromFile:(id)filename mediaType:(MediaTypes)mediaType shouldRefresh:(ShouldRefreshBlock)block;
+- (void) loadMediaFromFile:(id)filename mediaType:(MediaTypes)mediaType isReal:(BOOL)isReal completion:(S3GetBlock)block;
+- (void) loadMediaFromFile:(id)filename mediaType:(MediaTypes)mediaType isReal:(BOOL)isReal shouldRefresh:(ShouldRefreshBlock)block;
 - (void) loadMediaFromMessage:(Bullet*)message completion:(S3GetBlock)block;
 - (void) loadMediaFromMessage:(Bullet*)message shouldRefresh:(ShouldRefreshBlock)block;
 - (void) loadMediaFromUser:(User*)user completion:(S3GetBlock)block;
@@ -24,5 +24,5 @@ typedef BOOL(^ShouldRefreshBlock)(NSData * data, NSError * error, BOOL fromCache
 @end
 
 @interface MediaViewer : UIView
-+ (void)showMediaFromView:(UIView*)view filename:(id)filename mediaType:(MediaTypes)mediaType;
++ (void)showMediaFromView:(UIView*)view filename:(id)filename mediaType:(MediaTypes)mediaType isReal:(BOOL)isReal;
 @end
