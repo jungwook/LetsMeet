@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
+typedef void(^MessageViewLazyBlock)(NSData* data);
+
 @interface MessageView : UIView
+@property (nonatomic, copy) MessageViewLazyBlock lazyBlock;
 - (CGFloat) getSpacingWhileSettingMessage:(Bullet *)message;
+- (void) setThumbnailImage:(UIImage *)image;
 @end

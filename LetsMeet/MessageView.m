@@ -11,11 +11,11 @@
 #import "AudioPlayer.h"
 
 @interface MessageView()
-@property (weak, nonatomic) UITableView* tableView;
 @property (strong, nonatomic) MediaView *mediaView;
 @property (strong, nonatomic) AudioPlayer *audioView;
 @property (strong, nonatomic) UILabel* messageView;
 @property (nonatomic, strong) Bullet* message;
+@property (nonatomic, strong) UIImageView *playView;
 @end
 
 @implementation MessageView
@@ -23,6 +23,12 @@
 #define kColorMine [UIColor colorWithRed:100/255.f green:167/255.f blue:229/255.f alpha:1]
 #define kColorOther [UIColor colorWithRed:239/255.f green:239/255.f blue:244/255.f alpha:1]
 #define kColorGreen [UIColor colorWithRed:110/255.f green:200/255.f blue:41/255.f alpha:1]
+
+#define leadingMine 8
+#define trailingMine 10
+#define leadingOther 18
+#define trailingOther 0
+#define leadingAudio 10
 
 /*
  // Only override drawRect: if you perform custom drawing.
@@ -44,12 +50,6 @@
 - (void)awakeFromNib
 {
     __LF
-    self.mediaView = [MediaView new];
-    self.audioView = [AudioPlayer audioPlayerOnView:self];
-    self.messageView = [UILabel new];
-
-    [self addSubview:self.mediaView];
-    [self addSubview:self.messageView];
 }
 
 - (CGFloat) setupMessageView:(NSString*)message
@@ -60,32 +60,78 @@
     CGRect rect = rectForString(string, self.messageView.font, kTextMessageWidth);
     boxSize = rect.size.width;
     
-    return boxSize;
+    return boxSize + (self.message.isFromMe ? (leadingMine+trailingMine) : (leadingOther+trailingOther));
+}
+
+- (void) initializeViewsDependingOnMediaType
+{
+    [self.playView removeFromSuperview];
+    [self.mediaView removeFromSuperview];
+    [self.audioView removeFromSuperview];
+    [self.messageView removeFromSuperview];
+    
+    self.mediaView = nil;
+    self.audioView = nil;
+    self.messageView = nil;
+    self.playView = nil;
+    
+    switch (self.message.mediaType) {
+        case kMediaTypeText: {
+            self.messageView = [UILabel new];
+            self.messageView.font = [UIFont systemFontOfSize:13];
+            self.messageView.textColor = self.message.isFromMe ? [UIColor whiteColor] : [UIColor darkGrayColor];
+            self.messageView.numberOfLines = CGFLOAT_MAX;
+            [self addSubview:self.messageView];
+        }
+            break;
+        case kMediaTypeAudio: {
+            self.audioView = [AudioPlayer audioPlayerOnView:self];
+        }
+            break;
+        case kMediaTypePhoto:
+        case kMediaTypeVideo: {
+            self.mediaView = [MediaView new];
+            self.playView = [UIImageView new];
+            [self.playView setImage:[UIImage imageNamed:@"play white"]];
+            [self.mediaView addSubview:self.playView];
+            [self addSubview:self.mediaView];
+        }
+            break;
+        case kMediaTypeURL:
+            break;
+        case kMediaTypeNone:
+        default:
+            break;
+    }
+}
+
+- (void)setThumbnailImage:(UIImage *)image
+{
+    self.mediaView.image = image;
 }
 
 - (CGFloat) getSpacingWhileSettingMessage:(Bullet *)message
 {
     _message = message;
-
+    [self initializeViewsDependingOnMediaType];
     [self setBackgroundColor];
-    [self showHideViews];
     
     switch (message.mediaType) {
         case kMediaTypeText: {
-            return [self setupMessageView:message.message];
+            return MAX([self setupMessageView:message.message], 50);
         }
         case kMediaTypeVideo:
         case kMediaTypePhoto: {
-//            self.thumbnail.hidden = NO;
-//            self.playView.hidden = (message.mediaType == kMediaTypePhoto);
-            
+            self.playView.hidden = (message.mediaType == kMediaTypePhoto);
             [self.mediaView loadMediaFromMessage:message completion:^(NSData *data, NSError *error, BOOL fromCache) {
                 if (!error) {
                     if (fromCache) {
                         self.mediaView.image = [UIImage imageWithData:data];
                     }
                     else {
-//                        [self lazyUpdateData:data onTableView:tableView];
+                        if (self.lazyBlock) {
+                            self.lazyBlock(data);
+                        }
                     }
                 }
             }];
@@ -118,34 +164,14 @@
 
 - (void)layoutSubviews
 {
+    const CGFloat w = self.bounds.size.width, h = self.bounds.size.height;
+    const CGFloat pw = 25, ph = 25;
+    
     [self setMask];
-    self.audioView.frame = self.bounds;
+    self.playView.frame = CGRectMake((w-pw)/2.f, (h-ph)/2.f, pw, ph);
     self.mediaView.frame = self.bounds;
-}
-
-- (void) showHideViews
-{
-    switch (self.message.mediaType) {
-        case kMediaTypePhoto:
-        case kMediaTypeVideo:
-            self.mediaView.hidden = NO;
-            self.audioView.hidden = YES;
-            self.messageView.hidden = YES;
-            break;
-        case kMediaTypeAudio:
-            self.mediaView.hidden = YES;
-            self.audioView.hidden = NO;
-            self.messageView.hidden = YES;
-            break;
-        case kMediaTypeText:
-            self.mediaView.hidden = YES;
-            self.audioView.hidden = YES;
-            self.messageView.hidden = NO;
-            break;
-            
-        default:
-            break;
-    }
+    self.messageView.frame = CGRectMake(self.message.isFromMe ? leadingMine : leadingOther, 0, w-leadingMine-trailingMine, h);
+    self.audioView.frame = CGRectMake(self.message.isFromMe ? 0 : leadingAudio, 0, w-leadingAudio, h);
 }
 
 #define CPM(__X__,__Y__) CGPointMake(__X__, __Y__)
@@ -155,7 +181,9 @@
     CGRect rect = self.frame;
     CGFloat w = rect.size.width, h=rect.size.height;
     
-    CGFloat i = w < 43 ? MIN(w/2.3, 18) : 19, j = 10.0f, k = 13.0f;
+    const CGFloat min = self.message.mediaType == kMediaTypeText ? 13 : 18;
+    const CGFloat i = w < 3*leadingAudio ? MIN(w/4, min) : min;
+    const CGFloat j = leadingAudio, k = 13.0f;
     CAShapeLayer *mask = [CAShapeLayer layer];
     
     UIBezierPath *path = [UIBezierPath bezierPath];

@@ -20,7 +20,7 @@
 #define kMaxTextViewHeight 200
 #define kNavigationBarHeight 64
 #define balloonOffet 8
-#define kMinCellHeight 36
+#define kMinCellHeight 40
 
 @interface Chat ()
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -206,7 +206,7 @@
         case kMediaTypePhoto:
         case kMediaTypeVideo: {
             if (bullet.mediaSize.width) {
-                height = balloonOffet - 4 + kThumbnailWidth * bullet.mediaSize.height / bullet.mediaSize.width;
+                height = balloonOffet + kThumbnailWidth * bullet.mediaSize.height / bullet.mediaSize.width;
             }
             else {
                 height = kThumbnailWidth;
@@ -215,18 +215,18 @@
             break;
         case kMediaTypeText: {
             CGRect rect = rectForString(bullet.message, self.messageView.font, kTextMessageWidth);
-            height = rect.size.height+balloonOffet/2;
+            height = rect.size.height;
         }
             break;
         case kMediaTypeAudio: {
-            height = kMinCellHeight+1;
+            height = kMinCellHeight;
         }
             break;
         default:
             height = kMinCellHeight;
             break;
     }
-    return MAX(height, kMinCellHeight);
+    return height + (consecutive ? 4 : 20);
 }
 
 - (void) dealloc
