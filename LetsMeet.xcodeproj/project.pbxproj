@@ -45,6 +45,9 @@
 		1296A7AC1D03E0CA00E44642 /* Profile.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7AB1D03E0CA00E44642 /* Profile.m */; };
 		129B07531D0AAAB5000C0276 /* NearByCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 129B07521D0AAAB5000C0276 /* NearByCell.m */; };
 		12A6071D1D23A99800D8476D /* MessageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A6071C1D23A99800D8476D /* MessageView.m */; };
+		12A6071F1D23DF8900D8476D /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12A6071E1D23DF8900D8476D /* MapKit.framework */; };
+		12A607211D24CA2300D8476D /* ChatPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 12A607201D24CA2300D8476D /* ChatPanel.xib */; };
+		12A607241D24D1AE00D8476D /* ChatPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A607231D24D1AE00D8476D /* ChatPanel.m */; };
 		12DB01B21D0E317700E33359 /* Chat.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB01B11D0E317700E33359 /* Chat.m */; };
 		12DE5FA91CFD43A7009B315F /* Balloon.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FA81CFD43A7009B315F /* Balloon.m */; };
 		12DE5FB31CFEF58A009B315F /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12DE5FB21CFEF58A009B315F /* Photos.framework */; };
@@ -116,7 +119,6 @@
 		120A52361D17A75400EB8269 /* GradientView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GradientView.h; sourceTree = "<group>"; };
 		120A52371D17A75400EB8269 /* GradientView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GradientView.m; sourceTree = "<group>"; };
 		120A523A1D17C2A700EB8269 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
-		120A523E1D18C17600EB8269 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Main.strings; sourceTree = "<group>"; };
 		120A523F1D18C28E00EB8269 /* Search.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Search.h; sourceTree = "<group>"; };
 		120A52401D18C28E00EB8269 /* Search.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Search.m; sourceTree = "<group>"; };
 		120A52421D1907EF00EB8269 /* UsersTableBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UsersTableBase.h; sourceTree = "<group>"; };
@@ -169,6 +171,12 @@
 		129B07521D0AAAB5000C0276 /* NearByCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NearByCell.m; sourceTree = "<group>"; };
 		12A6071B1D23A99800D8476D /* MessageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageView.h; sourceTree = "<group>"; };
 		12A6071C1D23A99800D8476D /* MessageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageView.m; sourceTree = "<group>"; };
+		12A6071E1D23DF8900D8476D /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		12A607201D24CA2300D8476D /* ChatPanel.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ChatPanel.xib; sourceTree = "<group>"; };
+		12A607221D24D1AE00D8476D /* ChatPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatPanel.h; sourceTree = "<group>"; };
+		12A607231D24D1AE00D8476D /* ChatPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatPanel.m; sourceTree = "<group>"; };
+		12A607261D251D7400D8476D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
+		12A607281D251D8900D8476D /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Main.strings; sourceTree = "<group>"; };
 		12DB01B01D0E317700E33359 /* Chat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chat.h; sourceTree = "<group>"; };
 		12DB01B11D0E317700E33359 /* Chat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Chat.m; sourceTree = "<group>"; };
 		12DE5FA71CFD43A7009B315F /* Balloon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Balloon.h; sourceTree = "<group>"; };
@@ -239,6 +247,7 @@
 				120142E01D08802600D66905 /* AWSCore.framework in Frameworks */,
 				1201428D1D04703200D66905 /* AVKit.framework in Frameworks */,
 				12DE5FB31CFEF58A009B315F /* Photos.framework in Frameworks */,
+				12A6071F1D23DF8900D8476D /* MapKit.framework in Frameworks */,
 				12F741BE1CE4BF0100E8267A /* AudioToolbox.framework in Frameworks */,
 				12F741BF1CE4BF0100E8267A /* CFNetwork.framework in Frameworks */,
 				12F741C01CE4BF0100E8267A /* CoreGraphics.framework in Frameworks */,
@@ -413,6 +422,7 @@
 		12F741A71CE4BE8D00E8267A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				12A6071E1D23DF8900D8476D /* MapKit.framework */,
 				120142DE1D08802600D66905 /* AWSCore.framework */,
 				120142DF1D08802600D66905 /* AWSS3.framework */,
 				1201428A1D04703200D66905 /* AVFoundation.framework */,
@@ -457,6 +467,9 @@
 			children = (
 				12F741931CE4B97100E8267A /* Main.storyboard */,
 				12805E871D1CACAB0082A95D /* AudioRecorder.xib */,
+				12A607201D24CA2300D8476D /* ChatPanel.xib */,
+				12A607221D24D1AE00D8476D /* ChatPanel.h */,
+				12A607231D24D1AE00D8476D /* ChatPanel.m */,
 				129B07541D0AAABB000C0276 /* Cells */,
 				12F741D81CE56F4300E8267A /* MainController.h */,
 				12F741D91CE56F4300E8267A /* MainController.m */,
@@ -527,6 +540,9 @@
 							com.apple.BackgroundModes = {
 								enabled = 1;
 							};
+							com.apple.Maps.iOS = {
+								enabled = 1;
+							};
 							com.apple.Push = {
 								enabled = 1;
 							};
@@ -541,6 +557,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ko,
 			);
 			mainGroup = 12F7417E1CE4B97000E8267A;
 			productRefGroup = 12F741881CE4B97000E8267A /* Products */;
@@ -557,6 +574,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				12A607211D24CA2300D8476D /* ChatPanel.xib in Resources */,
 				12F7419A1CE4B97100E8267A /* LaunchScreen.storyboard in Resources */,
 				1235BC931D0FF97B00E4AA27 /* NSDateTimeAgo.bundle in Resources */,
 				12F741971CE4B97100E8267A /* Assets.xcassets in Resources */,
@@ -603,6 +621,7 @@
 				12DE5FE21D02BC79009B315F /* FileSystem.m in Sources */,
 				124928B21CF2E65A0038A2F3 /* ToggleButton.m in Sources */,
 				12F741D11CE56B3400E8267A /* FloatingDrawerView.m in Sources */,
+				12A607241D24D1AE00D8476D /* ChatPanel.m in Sources */,
 				1235BC8B1D0FD30100E4AA27 /* ChatRight.m in Sources */,
 				12DE5FE51D02D523009B315F /* NSMutableDictionary+Bullet.m in Sources */,
 				12F0D70D1D06D53D00A37C40 /* MediaPlayer.m in Sources */,
@@ -646,7 +665,8 @@
 			isa = PBXVariantGroup;
 			children = (
 				12F741941CE4B97100E8267A /* Base */,
-				120A523E1D18C17600EB8269 /* ko */,
+				12A607261D251D7400D8476D /* en */,
+				12A607281D251D8900D8476D /* ko */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";

@@ -94,13 +94,10 @@
 - (void)setURL:(NSURL *)url
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"REMOVING FROM SUPERLAYER");
         [self.layer removeFromSuperlayer];
         if (url) {
-            NSLog(@"ADDING SUBLAYER");
             [self.view.layer addSublayer:self.layer];
         }
-        NSLog(@"ASSIGNING PLAYER ITEM");
         [self setPlayerItemwithURL:url];
         [self.player replaceCurrentItemWithPlayerItem:self.item];
         [self.player seekToTime:kCMTimeZero];

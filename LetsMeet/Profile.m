@@ -15,6 +15,7 @@
 #import "ProfileView.h"
 #import "S3File.h"
 #import "TextFieldAlert.h"
+@import MapKit;
 
 @interface UIImageView(animated)
 - (void)setImage:(UIImage *)image animated:(BOOL)animated;
@@ -47,6 +48,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *editPhotoBut;
 @property (weak, nonatomic) IBOutlet ProfileView *profileView;
 @property (weak, nonatomic) IBOutlet UIProgressView *progress;
+@property (weak, nonatomic) IBOutlet MKMapView *map;
 @property CGFloat photoHeight;
 
 @property (strong, nonatomic) User *me;

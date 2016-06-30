@@ -9,12 +9,14 @@
 #import "Chat.h"
 #import "ChatRight.h"
 #import "ChatLeft.h"
-#import "NSMutableDictionary+Bullet.h"
-#import "FileSystem.h"
 #import "Notifications.h"
 #import "S3File.h"
 #import "MediaPicker.h"
 #import "AudioRecorder.h"
+#import "MediaViewer.h"
+#import "ChatPanel.h"
+
+@import MapKit;
 
 #define kInitialTextViewHeight 34
 #define kMaxTextViewHeight 200
@@ -37,6 +39,9 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageTop;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageBottom;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *barHeight;
+@property (weak, nonatomic) IBOutlet MediaView *userPhotoView;
+@property (weak, nonatomic) IBOutlet MediaView *gpsView;
+@property (strong, nonatomic) UIButton *gpsIndicator;
 @property (strong, nonatomic) AudioRecorder *audioRecorderView;
 @end
 
@@ -55,6 +60,7 @@
 - (void)awakeFromNib
 {
     __LF
+    
 }
 
 - (void)setUser:(User *)user
@@ -77,9 +83,23 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
     [self.notifications on];
     [self.tableView reloadData];
     [self scrollToBottomAnimated:NO];
+    [self.userPhotoView setIsCircle:YES];
+    [self.userPhotoView setAlpha:0.9];
+    [self.gpsView setAlpha:0.9];
+    [self.userPhotoView loadMediaFromUser:self.user];
+    [self.gpsView setMapLocationForUser:self.user];
+}
+
+- (void)setShadowOnView:(UIView*)view
+{
+    view.layer.shadowOffset = CGSizeZero;
+    view.layer.shadowColor = [UIColor colorWithWhite:0.2 alpha:1.0].CGColor;
+    view.layer.shadowRadius = 4.0f;
+    view.layer.shadowOpacity = 0.4f;
 }
 
 - (void)viewDidAppear:(BOOL)animated

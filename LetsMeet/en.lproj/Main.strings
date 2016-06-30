@@ -2,14 +2,17 @@
 /* Class = "UILabel"; text = "nickname"; ObjectID = "2CM-zV-QyA"; */
 "2CM-zV-QyA.text" = "nickname";
 
-/* Class = "UILabel"; text = "희라"; ObjectID = "6SJ-j5-cqa"; */
-"6SJ-j5-cqa.text" = "희라";
+/* Class = "UITextField"; placeholder = "male or female?"; ObjectID = "62F-at-T9t"; */
+"62F-at-T9t.placeholder" = "male or female?";
 
-/* Class = "UILabel"; text = "미디어 메시지"; ObjectID = "6qR-Er-Yf2"; */
-"6qR-Er-Yf2.text" = "미디어 메시지";
+/* Class = "UIButton"; normalTitle = "START"; ObjectID = "8Fb-E9-Scj"; */
+"8Fb-E9-Scj.normalTitle" = "START";
 
 /* Class = "UITextField"; placeholder = "e.g. 여자"; ObjectID = "9Kg-EN-tI9"; */
 "9Kg-EN-tI9.placeholder" = "e.g. 여자";
+
+/* Class = "UITextField"; placeholder = "nickname"; ObjectID = "9fT-1D-WxR"; */
+"9fT-1D-WxR.placeholder" = "nickname";
 
 /* Class = "UINavigationItem"; title = "Inbox"; ObjectID = "AZN-fc-GSm"; */
 "AZN-fc-GSm.title" = "Inbox";
@@ -17,14 +20,29 @@
 /* Class = "UITableViewSection"; headerTitle = "PROFILE"; ObjectID = "Aga-Ie-ce7"; */
 "Aga-Ie-ce7.headerTitle" = "PROFILE";
 
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "CiL-rD-2XY"; */
+"CiL-rD-2XY.text" = "Subtitle";
+
 /* Class = "UINavigationItem"; title = "Profile"; ObjectID = "ERH-QU-Yxz"; */
 "ERH-QU-Yxz.title" = "Profile";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "Ehc-FZ-RgX"; */
+"Ehc-FZ-RgX.text" = "Subtitle";
+
+/* Class = "UITextField"; placeholder = "why are you here?"; ObjectID = "HLN-nl-ZHy"; */
+"HLN-nl-ZHy.placeholder" = "why are you here?";
+
+/* Class = "UILabel"; text = "Enter some information about yourself and tap on START"; ObjectID = "HyP-WS-WSa"; */
+"HyP-WS-WSa.text" = "Enter some information about yourself and tap on START";
 
 /* Class = "UILabel"; text = "Label\nHello"; ObjectID = "IlY-6r-npv"; */
 "IlY-6r-npv.text" = "Label\nHello";
 
 /* Class = "UITableViewSection"; headerTitle = "POINTS"; ObjectID = "LJ4-fr-RcA"; */
 "LJ4-fr-RcA.headerTitle" = "POINTS";
+
+/* Class = "UITextField"; placeholder = "age"; ObjectID = "LNa-Kz-SCZ"; */
+"LNa-Kz-SCZ.placeholder" = "age";
 
 /* Class = "UITableViewController"; title = "Inbox"; ObjectID = "Mtf-PS-JYY"; */
 "Mtf-PS-JYY.title" = "Inbox";
@@ -35,11 +53,23 @@
 /* Class = "UIButton"; normalTitle = "EDIT"; ObjectID = "RWM-cd-uwh"; */
 "RWM-cd-uwh.normalTitle" = "EDIT";
 
+/* Class = "UILabel"; text = "Title"; ObjectID = "Rl9-5q-oEE"; */
+"Rl9-5q-oEE.text" = "Title";
+
+/* Class = "UILabel"; text = "11"; ObjectID = "Ry5-0G-1dn"; */
+"Ry5-0G-1dn.text" = "11";
+
 /* Class = "UILabel"; text = "<1km"; ObjectID = "SVa-UY-PES"; */
 "SVa-UY-PES.text" = "<1km";
 
-/* Class = "UIButton"; normalTitle = "전송"; ObjectID = "Tnm-1h-th9"; */
-"Tnm-1h-th9.normalTitle" = "전송";
+/* Class = "UISegmentedControl"; TaN-fa-yok.segmentTitles[0] = "Time"; ObjectID = "TaN-fa-yok"; */
+"TaN-fa-yok.segmentTitles[0]" = "Time";
+
+/* Class = "UISegmentedControl"; TaN-fa-yok.segmentTitles[1] = "Distance"; ObjectID = "TaN-fa-yok"; */
+"TaN-fa-yok.segmentTitles[1]" = "Distance";
+
+/* Class = "UIButton"; normalTitle = "Send"; ObjectID = "Tnm-1h-th9"; */
+"Tnm-1h-th9.normalTitle" = "Send";
 
 /* Class = "UILabel"; text = "1"; ObjectID = "Uql-kl-ufN"; */
 "Uql-kl-ufN.text" = "1";
@@ -53,17 +83,17 @@
 /* Class = "UITextField"; placeholder = "30대"; ObjectID = "Xw7-Qn-UXe"; */
 "Xw7-Qn-UXe.placeholder" = "30대";
 
-/* Class = "UILabel"; text = "희라"; ObjectID = "YMy-i1-b7S"; */
-"YMy-i1-b7S.text" = "희라";
-
 /* Class = "UISegmentedControl"; Ynb-dm-JWM.segmentTitles[0] = "Distance"; ObjectID = "Ynb-dm-JWM"; */
 "Ynb-dm-JWM.segmentTitles[0]" = "Distance";
 
 /* Class = "UISegmentedControl"; Ynb-dm-JWM.segmentTitles[1] = "Time"; ObjectID = "Ynb-dm-JWM"; */
 "Ynb-dm-JWM.segmentTitles[1]" = "Time";
 
-/* Class = "UILabel"; text = "미디어 메시지"; ObjectID = "baR-d3-B8i"; */
-"baR-d3-B8i.text" = "미디어 메시지";
+/* Class = "UILabel"; text = ">1km"; ObjectID = "aqg-ay-uzv"; */
+"aqg-ay-uzv.text" = ">1km";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "f3f-Na-JdM"; */
+"f3f-Na-JdM.text" = "Title";
 
 /* Class = "UILabel"; text = "100h"; ObjectID = "f3j-K4-tGi"; */
 "f3j-K4-tGi.text" = "100h";
@@ -86,14 +116,17 @@
 /* Class = "UILabel"; text = "10분전"; ObjectID = "oYX-uB-MPO"; */
 "oYX-uB-MPO.text" = "10분전";
 
-/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "qIg-fm-zoy"; */
-"qIg-fm-zoy.normalTitle" = "Button";
+/* Class = "UIButton"; normalTitle = "gps on"; ObjectID = "odr-j2-Wwo"; */
+"odr-j2-Wwo.normalTitle" = "gps on";
 
 /* Class = "UILabel"; text = "40대"; ObjectID = "rTr-n3-dBH"; */
 "rTr-n3-dBH.text" = "40대";
 
 /* Class = "UILabel"; text = "1"; ObjectID = "rtX-i6-Flb"; */
 "rtX-i6-Flb.text" = "1";
+
+/* Class = "UILabel"; text = "Welcome to Let's Meet"; ObjectID = "sfQ-Sw-goX"; */
+"sfQ-Sw-goX.text" = "Welcome to Let's Meet";
 
 /* Class = "UITableViewSection"; headerTitle = "POINTS"; ObjectID = "uOy-gL-Esq"; */
 "uOy-gL-Esq.headerTitle" = "POINTS";

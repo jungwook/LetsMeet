@@ -229,16 +229,8 @@
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="60"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TUP-5s-okm" customClass="MediaView">
-                                                    <rect key="frame" x="8" y="32" width="28" height="28"/>
-                                                    <color key="backgroundColor" red="0.98039215800000001" green="0.5411764979" blue="0.2274509817" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" constant="28" id="fVE-Lv-Dz9"/>
-                                                        <constraint firstAttribute="height" constant="28" id="h4J-Pp-AU6"/>
-                                                    </constraints>
-                                                </view>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RK3-bW-rFO" customClass="MessageView">
-                                                    <rect key="frame" x="36" y="24" width="210" height="32"/>
+                                                    <rect key="frame" x="8" y="24" width="238" height="32"/>
                                                     <color key="backgroundColor" red="0.71764707569999997" green="0.91372549530000002" blue="0.44705882670000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </view>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="10분전" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oYX-uB-MPO">
@@ -253,10 +245,8 @@
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="bottomMargin" secondItem="RK3-bW-rFO" secondAttribute="bottom" constant="-4" id="CfK-5X-3hd"/>
-                                                <constraint firstAttribute="leadingMargin" secondItem="TUP-5s-okm" secondAttribute="leading" id="GqY-nA-W4Z"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="TUP-5s-okm" secondAttribute="bottom" constant="-8" id="MwA-dr-7zf"/>
                                                 <constraint firstAttribute="leadingMargin" secondItem="oYX-uB-MPO" secondAttribute="leading" id="UX7-WB-bTv"/>
-                                                <constraint firstItem="RK3-bW-rFO" firstAttribute="leading" secondItem="ML5-lw-jvQ" secondAttribute="leadingMargin" constant="28" id="Z1i-rw-eHE"/>
+                                                <constraint firstItem="RK3-bW-rFO" firstAttribute="leading" secondItem="ML5-lw-jvQ" secondAttribute="leadingMargin" id="Z1i-rw-eHE"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="RK3-bW-rFO" secondAttribute="trailing" constant="160" id="cfh-Ok-kGE"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="oYX-uB-MPO" secondAttribute="trailing" id="dly-l5-Veh"/>
                                                 <constraint firstItem="RK3-bW-rFO" firstAttribute="top" secondItem="ML5-lw-jvQ" secondAttribute="topMargin" constant="16" id="fBq-t0-7Qg"/>
@@ -267,7 +257,6 @@
                                             <outlet property="dateLabel" destination="oYX-uB-MPO" id="s4S-7F-eST"/>
                                             <outlet property="leading" destination="Z1i-rw-eHE" id="UBy-1b-Lsc"/>
                                             <outlet property="messageView" destination="RK3-bW-rFO" id="X5s-Lx-Xq2"/>
-                                            <outlet property="photo" destination="TUP-5s-okm" id="bor-ta-4oU"/>
                                             <outlet property="spacing" destination="cfh-Ok-kGE" id="QLL-dM-caT"/>
                                             <outlet property="top" destination="fBq-t0-7Qg" id="fxa-MQ-HnL"/>
                                         </connections>
@@ -362,16 +351,37 @@
                                     <constraint firstItem="5Jx-7S-r05" firstAttribute="top" secondItem="Yp1-jH-8bQ" secondAttribute="top" constant="10" id="xHc-eS-Gz2"/>
                                 </constraints>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="odr-j2-Wwo" customClass="MediaView">
+                                <rect key="frame" x="70" y="72" width="50" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="50" id="rdb-KI-jc4"/>
+                                    <constraint firstAttribute="height" constant="50" id="zGW-Kj-pba"/>
+                                </constraints>
+                                <state key="normal" title="gps on" image="gps blue"/>
+                                <state key="disabled" image="no gps"/>
+                            </button>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Lqz-DW-onC" customClass="MediaView">
+                                <rect key="frame" x="12" y="72" width="50" height="50"/>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="50" id="gJS-to-tT7"/>
+                                    <constraint firstAttribute="height" constant="50" id="hlX-wq-qtg"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <gestureRecognizers/>
                         <constraints>
                             <constraint firstItem="Yp1-jH-8bQ" firstAttribute="top" secondItem="OMc-sT-9jv" secondAttribute="bottom" priority="750" constant="622" id="DHA-43-zXy"/>
+                            <constraint firstItem="odr-j2-Wwo" firstAttribute="leading" secondItem="Lqz-DW-onC" secondAttribute="trailing" constant="8" id="DNN-Ca-fcK"/>
+                            <constraint firstItem="Lqz-DW-onC" firstAttribute="leading" secondItem="h45-zX-A1Q" secondAttribute="leadingMargin" constant="-8" id="KtJ-RU-Qr4"/>
                             <constraint firstAttribute="trailingMargin" secondItem="Yp1-jH-8bQ" secondAttribute="trailing" constant="-20" id="Mfh-CT-lZd"/>
                             <constraint firstItem="Yp1-jH-8bQ" firstAttribute="leading" secondItem="h45-zX-A1Q" secondAttribute="leadingMargin" constant="-20" id="Tre-eK-BcQ"/>
                             <constraint firstItem="VD1-Li-YpC" firstAttribute="leading" secondItem="h45-zX-A1Q" secondAttribute="leadingMargin" constant="-20" id="X2E-tY-5n2"/>
                             <constraint firstItem="qc4-7W-5Ne" firstAttribute="top" secondItem="VD1-Li-YpC" secondAttribute="bottom" constant="50" id="YUQ-0v-JLM"/>
+                            <constraint firstItem="odr-j2-Wwo" firstAttribute="top" secondItem="OMc-sT-9jv" secondAttribute="bottom" constant="8" id="ZiE-PR-frT"/>
                             <constraint firstAttribute="trailingMargin" secondItem="VD1-Li-YpC" secondAttribute="trailing" constant="-20" id="asV-sm-Qgm"/>
+                            <constraint firstItem="Lqz-DW-onC" firstAttribute="top" secondItem="OMc-sT-9jv" secondAttribute="bottom" constant="8" id="gm2-vE-mLj"/>
                             <constraint firstItem="qc4-7W-5Ne" firstAttribute="top" secondItem="Yp1-jH-8bQ" secondAttribute="bottom" id="lYf-48-j1E"/>
                             <constraint firstItem="VD1-Li-YpC" firstAttribute="top" secondItem="OMc-sT-9jv" secondAttribute="bottom" constant="-64" id="rj7-jB-ax2"/>
                         </constraints>
@@ -386,12 +396,14 @@
                         <outlet property="barBottom" destination="lYf-48-j1E" id="fR4-9l-0RN"/>
                         <outlet property="barHeight" destination="Mvp-z3-wk2" id="xUu-lh-MZs"/>
                         <outlet property="barTop" destination="DHA-43-zXy" id="HaJ-Tx-77k"/>
+                        <outlet property="gpsView" destination="odr-j2-Wwo" id="u9l-Ic-Sge"/>
                         <outlet property="messageBottom" destination="0of-kB-5KO" id="pQ2-cL-Lbv"/>
                         <outlet property="messageTop" destination="dBA-8q-bSu" id="gQO-D8-3zc"/>
                         <outlet property="messageView" destination="KEb-aJ-h20" id="Qdc-wE-sXa"/>
                         <outlet property="microphone" destination="oU6-e8-1Xt" id="FPl-NB-NbY"/>
                         <outlet property="sendBut" destination="Tnm-1h-th9" id="hfI-pQ-EaE"/>
                         <outlet property="tableView" destination="VD1-Li-YpC" id="wqc-mB-JrS"/>
+                        <outlet property="userPhotoView" destination="Lqz-DW-onC" id="C9F-vk-6Bk"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yxs-Ye-IXe" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -643,7 +655,7 @@ Hello</string>
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="POINTS" footerTitle="" id="LJ4-fr-RcA">
+                            <tableViewSection headerTitle="INFORMATION" footerTitle="" id="LJ4-fr-RcA">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="PointsCell" rowHeight="45" id="arW-O6-gi6">
                                         <rect key="frame" x="0.0" y="342.5" width="320" height="45"/>
@@ -714,10 +726,33 @@ Hello</string>
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection headerTitle="LOCATION" footerTitle="" id="57b-cY-XuI">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="PointsCell" rowHeight="300" id="BoV-DL-NWU">
+                                        <rect key="frame" x="0.0" y="437.5" width="320" height="300"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="BoV-DL-NWU" id="yUN-uQ-xYu">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="299.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="V3Q-Hn-Zxk">
+                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="299.5"/>
+                                                </mapView>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="bottomMargin" secondItem="V3Q-Hn-Zxk" secondAttribute="bottom" constant="-8" id="8pa-4F-uex"/>
+                                                <constraint firstItem="V3Q-Hn-Zxk" firstAttribute="top" secondItem="yUN-uQ-xYu" secondAttribute="topMargin" constant="-8" id="DGB-tI-cCU"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="V3Q-Hn-Zxk" secondAttribute="trailing" constant="-8" id="QgI-UP-V9d"/>
+                                                <constraint firstItem="V3Q-Hn-Zxk" firstAttribute="leading" secondItem="yUN-uQ-xYu" secondAttribute="leadingMargin" constant="-8" id="qDC-2P-a5E"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                             <tableViewSection headerTitle="POINTS" footerTitle="" id="uOy-gL-Esq">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="PointsCell" rowHeight="45" id="I9P-oA-dfm">
-                                        <rect key="frame" x="0.0" y="437.5" width="320" height="45"/>
+                                        <rect key="frame" x="0.0" y="787.5" width="320" height="45"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="I9P-oA-dfm" id="bDx-l6-hix">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="44.5"/>
@@ -768,6 +803,7 @@ Hello</string>
                         <outlet property="ageTF" destination="Xw7-Qn-UXe" id="Cpx-DI-elU"/>
                         <outlet property="editPhotoBut" destination="RWM-cd-uwh" id="Z3c-qE-ZcL"/>
                         <outlet property="introTF" destination="h7j-VL-XeK" id="24m-j4-kGk"/>
+                        <outlet property="map" destination="V3Q-Hn-Zxk" id="kmY-RE-PHn"/>
                         <outlet property="pointsLB" destination="WMC-4b-iUC" id="5Uf-9L-Jie"/>
                         <outlet property="profileView" destination="68d-dJ-p8h" id="VIt-yd-QfO"/>
                         <outlet property="progress" destination="CAx-g1-ATM" id="af2-3i-5Pj"/>
@@ -974,13 +1010,13 @@ Hello</string>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <view key="tableHeaderView" contentMode="scaleToFill" id="YJK-jR-w62">
-                            <rect key="frame" x="0.0" y="64" width="414" height="44"/>
+                            <rect key="frame" x="0.0" y="64" width="414" height="36"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </view>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="SearchCellBasic" textLabel="Rl9-5q-oEE" detailTextLabel="Ehc-FZ-RgX" imageView="ysJ-Ew-ung" style="IBUITableViewCellStyleSubtitle" id="eip-vS-0ae">
-                                <rect key="frame" x="0.0" y="136" width="414" height="58"/>
+                                <rect key="frame" x="0.0" y="128" width="414" height="58"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="eip-vS-0ae" id="Jai-xO-OUu">
                                     <rect key="frame" x="0.0" y="0.0" width="381" height="58"/>
@@ -1008,7 +1044,7 @@ Hello</string>
                                 </tableViewCellContentView>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="SearchCell" id="VnA-Jp-tD6" customClass="SearchCell">
-                                <rect key="frame" x="0.0" y="194" width="414" height="58"/>
+                                <rect key="frame" x="0.0" y="186" width="414" height="58"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="VnA-Jp-tD6" id="sIb-lx-pDm">
                                     <rect key="frame" x="0.0" y="0.0" width="381" height="58"/>
@@ -1193,9 +1229,11 @@ Hello</string>
         <image name="camera" width="125" height="125"/>
         <image name="camera blue" width="125" height="125"/>
         <image name="girl" width="417" height="417"/>
+        <image name="gps blue" width="121" height="121"/>
         <image name="microphone blue" width="125" height="125"/>
+        <image name="no gps" width="121" height="121"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="3ut-gn-CJc"/>
+        <segue reference="SKW-cV-3ng"/>
     </inferredMetricsTieBreakers>
 </document>

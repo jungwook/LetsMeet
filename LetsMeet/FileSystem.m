@@ -213,6 +213,29 @@
     }
 }
 
++ (BOOL) gpsEnabled
+{
+    switch ([CLLocationManager authorizationStatus]) {
+        case kCLAuthorizationStatusAuthorizedAlways:
+        case kCLAuthorizationStatusAuthorizedWhenInUse:
+            return YES;
+        case kCLAuthorizationStatusDenied:
+        case kCLAuthorizationStatusRestricted:
+        case kCLAuthorizationStatusNotDetermined:
+        default:
+            return YES;
+    }
+}
+
+- (PFGeoPoint*) allowedLocation
+{
+    return [FileSystem gpsEnabled] ? [PFGeoPoint geoPointWithLocation:self.currentLocation] : nil;
+}
+
+/**
+    - (void)add:(Bullet *)bullet for:(id)userId is the entry point to the FileSystem.
+ 
+ **/
 - (void)add:(Bullet *)bullet for:(id)userId
 {
     bullet.isRead = NO;
@@ -220,7 +243,8 @@
     bullet.isSyncToUser = [bullet isFromMe];
     bullet.fromUserId = [User me].objectId;
     bullet.toUserId = userId;
-    BulletObject *object = [bullet object];
+    bullet.fromLocation = [self allowedLocation];
+    MessageObject *object = [bullet object];
     [object saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
         if (succeeded) {
             bullet.objectId = object.objectId;
@@ -255,12 +279,12 @@
     [self saveUser:userId];
 }
 
-- (void)addMessageFromObject:(BulletObject*) object
+- (void)addMessageFromObject:(MessageObject*) object
 {
     Bullet *bullet = [object bullet];
     
-    NSLog(@"BULLET RECEIVED:%@", bullet);
-    NSLog(@"object RECEVIED:%@", object);
+//    NSLog(@"BULLET RECEIVED:%@", bullet);
+//    NSLog(@"object RECEVIED:%@", object);
     
     // TODO DO SOMETHING ABOUT THE MEDIA SENT
     // ALSO DO SOMETHING ABOUT THE FILE ATTRIBUTE... SHOULD BE SOMETHING LIKE MEDIA
@@ -294,7 +318,7 @@
 
 - (void)addMessageFromObjectId:(id)objectId
 {
-    BulletObject *object = [BulletObject objectWithoutDataWithObjectId:objectId];
+    MessageObject *object = [MessageObject objectWithoutDataWithObjectId:objectId];
     [object fetchInBackgroundWithBlock:^(PFObject * _Nullable obj, NSError * _Nullable error) {
         [self addMessageFromObject:object];
     }];
@@ -361,10 +385,10 @@
                               [User me]];
     
     
-    PFQuery *query = [BulletObject queryWithPredicate:predicate];
+    PFQuery *query = [MessageObject queryWithPredicate:predicate];
     [query setLimit:1000];
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable bullets, NSError * _Nullable error) {
-        [bullets enumerateObjectsUsingBlock:^(BulletObject* _Nonnull bullet, NSUInteger idx, BOOL * _Nonnull stop) {
+        [bullets enumerateObjectsUsingBlock:^(MessageObject* _Nonnull bullet, NSUInteger idx, BOOL * _Nonnull stop) {
             [self addMessageFromObjectId:bullet.objectId];
         }];
     }];

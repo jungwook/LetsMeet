@@ -192,6 +192,20 @@
     return [[self objectForKey:@"realMedia"] boolValue];
 }
 
+- (PFGeoPoint *)fromLocation
+{
+    CGFloat latitude = [[self objectForKey:@"latitude"] floatValue];
+    CGFloat longitude = [[self objectForKey:@"longitude"] floatValue];
+    
+    return [PFGeoPoint geoPointWithLatitude:latitude longitude:longitude];
+}
+
+- (void)setFromLocation:(PFGeoPoint *)fromLocation
+{
+    [self setObject:@(fromLocation.latitude) forKey:@"latitude"];
+    [self setObject:@(fromLocation.longitude) forKey:@"longitude"];
+}
+
 -(void)setMediaType:(MediaTypes)mediaType
 {
     [self setObject:@(mediaType) forKey:@"mediaType"];
@@ -303,21 +317,21 @@
     }
 }
 
-- (BulletObject *)object
+- (MessageObject *)object
 {
-    BulletObject *object = [BulletObject object];
+    MessageObject *object = [MessageObject object];
     
     object.fromUser = [User objectWithoutDataWithObjectId:self.fromUserId];
     object.toUser = [User objectWithoutDataWithObjectId:self.toUserId];
     
-    if (self.message)
-        object.message = self.message;
+    if (self.message) object.message = self.message;
+    if (self.mediaFile) object.mediaFile = self.mediaFile;
+    if (self.mediaThumbnailFile) object.mediaThumbnailFile = self.mediaThumbnailFile;
+    if (self.fromLocation) object.fromLocation = self.fromLocation;
     
     object.mediaType = self.mediaType;
     object.isSyncFromUser = self.isSyncFromUser;
     object.isSyncToUser = self.isSyncToUser;
-    object.mediaFile = self.mediaFile;
-    object.mediaThumbnailFile = self.mediaThumbnailFile;
     object.mediaHeight = self.mediaSize.height;
     object.mediaWidth = self.mediaSize.width;
     object.realMedia = self.realMedia;
@@ -327,9 +341,10 @@
 @end
 
 
-@implementation BulletObject
+@implementation MessageObject
 @dynamic fromUser;
 @dynamic toUser;
+@dynamic fromLocation;
 @dynamic mediaType;
 @dynamic message;
 @dynamic isSyncToUser;
@@ -352,6 +367,7 @@
     IOTE(updatedAt);
     IOTU(fromUser, fromUserId);
     IOTU(toUser, toUserId);
+    IOTE(fromLocation);
     IOTE(mediaFile);
     IOTE(mediaThumbnailFile);
     IOTE(message);

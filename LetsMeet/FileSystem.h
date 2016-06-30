@@ -31,6 +31,7 @@ typedef void (^UsersArrayBlock)(NSArray<User*>*users);
  Creates a singleton instance of the FileSystem.
  */
 + (instancetype) new;
++ (BOOL) gpsEnabled;
 - (void) load;
 - (BOOL) save; 
 - (BOOL) saveUser:(id)userId;

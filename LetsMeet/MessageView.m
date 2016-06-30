@@ -50,6 +50,8 @@
 - (void)awakeFromNib
 {
     __LF
+    self.layer.cornerRadius = 3.0f;
+    self.layer.masksToBounds = YES;
 }
 
 - (CGFloat) setupMessageView:(NSString*)message

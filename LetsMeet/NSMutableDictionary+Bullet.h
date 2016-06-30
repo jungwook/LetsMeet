@@ -15,11 +15,12 @@ typedef NS_OPTIONS(NSUInteger, MediaTypes) {
     kMediaTypePhoto,
     kMediaTypeVideo,
     kMediaTypeAudio,
-    kMediaTypeURL
+    kMediaTypeURL,
+    kMediaTypeMap
 };
 
 @class Progress;
-@class BulletObject;
+@class MessageObject;
 @class User;
 
 typedef void (^FileBooleanResultBlock)(PFFile *file, BOOL succeeded, NSError * error);
@@ -51,16 +52,17 @@ typedef NSMutableDictionary Bullet;
 @property (nonatomic, assign) NSString* fromUserId;
 @property (nonatomic, assign) NSString* toUserId;
 @property (nonatomic, assign) NSString* message;
-@property (nonatomic, assign) NSDate* createdAt;
-@property (nonatomic, assign) NSDate* updatedAt;
-@property (nonatomic, assign) MediaTypes mediaType;
-@property (nonatomic, assign) CGSize mediaSize;
-@property (nonatomic) BOOL realMedia;
-@property (nonatomic) BOOL isSyncFromUser;
-@property (nonatomic) BOOL isSyncToUser;
-@property (nonatomic) BOOL isRead;
 @property (nonatomic, assign) NSString* mediaFile;
 @property (nonatomic, assign) NSString* mediaThumbnailFile;
+@property (nonatomic, assign) NSDate* createdAt;
+@property (nonatomic, assign) NSDate* updatedAt;
+@property (nonatomic, assign) PFGeoPoint* fromLocation;
+@property (nonatomic, assign) MediaTypes mediaType;
+@property (nonatomic, assign) CGSize mediaSize;
+@property (nonatomic, assign) BOOL realMedia;
+@property (nonatomic, assign) BOOL isSyncFromUser;
+@property (nonatomic, assign) BOOL isSyncToUser;
+@property (nonatomic, assign) BOOL isRead;
 
 - (BOOL) isFromMe;
 + (NSString*) mediaTypeStringForType:(MediaTypes)mediaType;
@@ -73,16 +75,17 @@ typedef NSMutableDictionary Bullet;
 + (instancetype) bulletWithVideo:(NSString*)filename thumbnail:(NSString*)thumbnail mediaSize:(CGSize)size realMedia:(BOOL)realMedia;
 + (instancetype) bulletWithAudio:(NSString*)filename thumbnail:(NSString*)thumbnail audioTicks:(CGFloat)length audioSize:(CGFloat)size;
 
-- (BulletObject*) object;
+- (MessageObject*) object;
 - (CGFloat) audioTicks;
 - (CGFloat) audioSize;
 @end
 
-@interface BulletObject : PFObject<PFSubclassing>
+@interface MessageObject : PFObject<PFSubclassing>
 + (NSString *)parseClassName;
 
 @property (retain) PFUser *fromUser;
 @property (retain) PFUser *toUser;
+@property (retain) PFGeoPoint *fromLocation;
 @property (retain) NSString *message;
 @property (retain) NSString *mediaFile;
 @property (retain) NSString *mediaThumbnailFile;

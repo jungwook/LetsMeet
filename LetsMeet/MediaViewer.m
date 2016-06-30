@@ -7,13 +7,12 @@
 //
 
 #import "MediaViewer.h"
-#import "NSMutableDictionary+Bullet.h"
 
 @interface MediaView()
 @property (nonatomic, strong) id mediaFile;
 @property (nonatomic) MediaTypes mediaType;
-@property (nonatomic, strong) UIProgressView* progress;
-@property (nonatomic, strong) UIButton* button;
+@property (nonatomic, strong) UIProgressView *progress;
+@property (nonatomic, strong) User *user;
 @property (nonatomic) BOOL isReal;
 @end
 
@@ -37,32 +36,47 @@
     return self;
 }
 
+- (void)setIsCircle:(BOOL)isCircle
+{
+    if (isCircle) {
+        self.layer.cornerRadius = MIN(self.bounds.size.width, self.bounds.size.height) / 2.0f;
+        self.layer.masksToBounds = YES;
+    }
+}
+
+- (void)setMapLocationForUser:(User *)user
+{
+    _user = user;
+    _mediaType = kMediaTypeMap;
+}
+
 - (void) initialize
 {
-    self.progress = [UIProgressView new];
-    self.button = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.button.frame = self.bounds;
-    [self.button addTarget:self action:@selector(tapped:) forControlEvents:UIControlEventTouchUpInside];
-    self.button.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    [self.button translatesAutoresizingMaskIntoConstraints];
-    [self addSubview:self.button];
+    [self addTarget:self action:@selector(tapped:) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void) tapped:(id)sender
 {
     __LF
-    if (self.mediaType != kMediaTypeNone) {
-        [MediaViewer showMediaFromView:self filename:self.mediaFile mediaType:self.mediaType isReal:self.isReal];
+    switch (self.mediaType) {
+        case kMediaTypePhoto:
+        case kMediaTypeVideo:
+            [MediaViewer showMediaFromView:self filename:self.mediaFile mediaType:self.mediaType isReal:self.isReal];
+            break;
+        case kMediaTypeMap: {
+            [S3File getDataFromFile:self.user.thumbnail completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
+                [MediaViewer showMapFromView:self user:self.user photo:[UIImage imageWithData:data]];
+            }];
+        }
+            break;
+        default:
+            break;
     }
 }
 
 - (void)setImage:(UIImage *)image
 {
-    _image = image;
-    
-    self.layer.contents = (id) image.CGImage;
-    self.layer.contentsGravity = kCAGravityResizeAspectFill;
-    self.layer.masksToBounds = YES;
+    [self setImage:image forState:UIControlStateNormal];
 }
 
 - (UIImage*) imageFromFile:(id)filename mediaType:(MediaTypes)mediaType
@@ -111,6 +125,8 @@
             if (block) {
                 block(nil, nil, YES);
             }
+            break;
+        case kMediaTypeMap:
             break;
     }
 }
@@ -220,6 +236,118 @@
 }
 @end
 
+@interface UserAnnotationView : MKAnnotationView
+@property (nonatomic, strong) UIImageView *photoView;
+@end
+
+@implementation UserAnnotationView
+
+- (CAAnimationGroup*) blowAnimations
+{
+    const CGFloat sf = 4;
+    CABasicAnimation *scale = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
+    scale.beginTime = 0.35;
+    scale.fromValue = [NSValue valueWithCGSize:CGSizeMake(1, 1)];
+    scale.toValue = [NSValue valueWithCGSize:CGSizeMake(sf, sf)];
+    scale.duration = 2.0f;
+    scale.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+    
+    CABasicAnimation *fade = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    fade.beginTime = 0.35;
+    fade.fromValue = @(1);
+    fade.toValue = @(0);
+    fade.duration = 2.0f;
+    fade.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+    
+    CAAnimationGroup *anim = [CAAnimationGroup new];
+    anim.animations = @[scale, fade];
+    anim.beginTime = 0;
+    anim.duration = 4;
+    anim.repeatCount = FLT_MAX;
+    
+    return anim;
+}
+
+- (CAAnimationGroup*) photoAnimations
+{
+    const CGFloat sf = 0.95;
+    CABasicAnimation *scale = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
+    scale.fromValue = [NSValue valueWithCGSize:CGSizeMake(1, 1)];
+    scale.toValue = [NSValue valueWithCGSize:CGSizeMake(sf, sf)];
+    scale.duration = 0.25f;
+    scale.autoreverses = YES;
+    scale.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    
+    CAAnimationGroup *anim = [CAAnimationGroup new];
+    anim.animations = @[scale];
+    anim.beginTime = 0;
+    anim.duration = 4;
+    anim.repeatCount = FLT_MAX;
+    
+    return anim;
+}
+
+- (void)setDragState:(MKAnnotationViewDragState)dragState animated:(BOOL)animated
+{
+    const CGFloat x = self.frame.origin.x, y = self.frame.origin.y, w = self.frame.size.width, h = self.frame.size.height, o = 5;
+
+    if (dragState == MKAnnotationViewDragStateStarting) {
+        [UIView animateWithDuration:0.25 delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.2 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            self.alpha = 0.8;
+            self.frame = CGRectMake(x, y-o, w, h);
+        } completion:^(BOOL finished) {
+            self.dragState = MKAnnotationViewDragStateDragging;
+        }];
+    } else if (dragState == MKAnnotationViewDragStateCanceling || dragState == MKAnnotationViewDragStateEnding) {
+        [UIView animateWithDuration:0.25 delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.2 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            self.alpha = 1.0;
+        } completion:^(BOOL finished) {
+            self.dragState = MKAnnotationViewDragStateNone;
+        }];
+    }
+}
+
+- (id)initWithAnnotation:(id <MKAnnotation>)annotation reuseIdentifier:(NSString *)reuseIdentifier
+{
+    self = [super initWithAnnotation:annotation reuseIdentifier:reuseIdentifier];
+    if (self)
+    {
+        const CGFloat offset = 5, size = 50, x = self.frame.origin.x, y = self.frame.origin.y;
+        self.frame = CGRectMake(x, y, size, size);
+
+        CALayer *blueLayer = [CALayer layer];
+        blueLayer.backgroundColor = [UIColor colorWithRed:100/255.f green:167/255.f blue:229/255.f alpha:1].CGColor;
+        blueLayer.frame = self.bounds;
+        blueLayer.cornerRadius = size / 2.0f;
+        blueLayer.masksToBounds = YES;
+        [self.layer addSublayer:blueLayer];
+        [blueLayer addAnimation:[self blowAnimations] forKey:nil];
+
+        CALayer *whiteLayer = [CALayer layer];
+        whiteLayer.backgroundColor = [UIColor whiteColor].CGColor;
+        whiteLayer.frame = self.bounds;
+        whiteLayer.cornerRadius = size / 2.0f;
+        whiteLayer.borderColor = [UIColor colorWithWhite:0.2 alpha:0.2].CGColor;
+        whiteLayer.borderWidth = 0.5f;
+        whiteLayer.shadowOffset = CGSizeZero;
+        whiteLayer.shadowColor = [UIColor colorWithWhite:0.2 alpha:1.0].CGColor;
+        whiteLayer.shadowRadius = 4.0f;
+        whiteLayer.shadowOpacity = 0.4f;
+        [self.layer addSublayer:whiteLayer];
+        
+        self.opaque = NO;
+        
+        self.photoView = [[UIImageView alloc] initWithFrame:CGRectMake(offset, offset, size-2*offset, size-2*offset)];
+        self.photoView.layer.cornerRadius = self.photoView.bounds.size.width / 2.0f;
+        self.photoView.layer.masksToBounds = YES;
+        [self.photoView.layer addAnimation:[self photoAnimations] forKey:nil];
+        [self addSubview:self.photoView];
+        
+        [self setDraggable:YES];
+    }
+    return self;
+}
+@end
 
 @interface MediaViewer() <UIScrollViewDelegate>
 @property (nonatomic, strong) id mediaFile;
@@ -230,13 +358,21 @@
 @property (nonatomic, strong) AVPlayer *player;
 @property (nonatomic, strong) AVPlayerLayer *playerLayer;
 @property (nonatomic, strong) UIView* playerView;
+@property (nonatomic, strong) MKMapView* map;
 @property (nonatomic) CGFloat zoom;
 @property (nonatomic) BOOL alive;
 @property (nonatomic) BOOL isReal;
 @property (nonatomic, strong) CALayer *realLayer;
+@property (nonatomic, strong) UIImage *photoForAnnotation;
+@property (nonatomic) CLLocationCoordinate2D mapCenter;
 @end
 
 @implementation MediaViewer
+
++ (void)showMapFromView:(UIView *)view user:(User *)user photo:(UIImage *)photo
+{
+    [[MediaViewer new] showMapFromView:view user:user photo:photo];
+}
 
 + (void)showMediaFromView:(UIView *)view filename:(id)filename mediaType:(MediaTypes)mediaType isReal:(BOOL)isReal
 {
@@ -253,10 +389,82 @@
     self.player = nil;
     self.playerLayer = nil;
     self.playerView = nil;
+    self.map = nil;
     self.alive = YES;
 }
 
 #define S3LOCATION @"http://parsekr.s3.ap-northeast-2.amazonaws.com/"
+
+- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation
+{
+    if ([annotation isKindOfClass:[MKPointAnnotation class]])
+    {
+        UserAnnotationView* pinView = (UserAnnotationView*)[mapView dequeueReusableAnnotationViewWithIdentifier:@"UserAnnotationView"];
+        
+        if (!pinView)
+        {
+            pinView = [[UserAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"UserAnnotationView"];
+            [pinView.photoView setImage:self.photoForAnnotation];
+        }
+        else {
+            pinView.annotation = annotation;
+        }
+        return pinView;
+    }
+    return nil;
+}
+
+- (void) showMapFromView:(UIView*)view user:(User*)user photo:(UIImage *)photo
+{
+    self.photoForAnnotation = photo;
+    CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(user.location.latitude, user.location.longitude);
+    self.mapCenter = coordinate;
+    const CGFloat span = 2500.0f;
+    
+    self.frame = [self setupSelfAndGetRootFrameFromView:view];
+    self.map = [[MKMapView alloc] initWithFrame:self.frame];
+    [self.map setRegion:MKCoordinateRegionMakeWithDistance(coordinate, span, span) animated:YES];
+    [self.map setZoomEnabled:YES];
+    [self.map setShowsScale:YES];
+    [self.map setShowsCompass:YES];
+    [self.map setShowsBuildings:YES];
+    [self.map setShowsUserLocation:YES];
+    [self.map setDelegate:self];
+    [self addSubview:self.map];
+    
+    MKPointAnnotation *annotation = [MKPointAnnotation new];
+    annotation.coordinate = self.mapCenter;
+    
+    [self.map addAnnotation:annotation];
+
+    self.alpha = 0.0f;
+    [UIView animateWithDuration:0.25 animations:^{
+        self.alpha = 1.0f;
+    } completion:^(BOOL finished) {
+        [self addGestureRecognizer:[self tapGestureRecognizer]];
+        [self addGestureRecognizer:[self longPressMapGestureRecognizer]];
+    }];
+}
+
+- (UILongPressGestureRecognizer*) longPressMapGestureRecognizer
+{
+    UILongPressGestureRecognizer *press = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(centerMap:)];
+    press.minimumPressDuration = 0.2f;
+    return press;
+}
+
+- (UITapGestureRecognizer*) tapMapGestureRecognizer
+{
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(centerMap:)];
+    tap.numberOfTapsRequired = 2;
+    return tap;
+}
+
+- (void)centerMap:(UITapGestureRecognizer*)gesture
+{
+    [self.map setCenterCoordinate:self.mapCenter];
+}
+
 
 - (void) showMediaFromView:(UIView*)view filename:(id)filename mediaType:(MediaTypes)mediaType isReal:(BOOL)isReal
 {
@@ -442,12 +650,12 @@
 
 - (UITapGestureRecognizer*) tapGestureRecognizer
 {
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(killTap:)];
     tap.numberOfTapsRequired = 1;
     return tap;
 }
 
-- (void)doubleTap:(UITapGestureRecognizer*)gesture
+- (void)killTap:(UITapGestureRecognizer*)gesture
 {
     __LF
     [self killThisView];

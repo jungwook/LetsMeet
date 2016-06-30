@@ -23,7 +23,7 @@
     [self setupAWSCredentials];
     [Parse enableLocalDatastore];
     
-    [BulletObject registerSubclass];
+    [MessageObject registerSubclass];
     [User registerSubclass];
     
     self.system = [FileSystem new];
