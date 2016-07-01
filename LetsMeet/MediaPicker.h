@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 typedef void(^MediaPickerBulletBlock)(Bullet* bullet);
-typedef void(^MediaPickerMediaBlock)(ProfileMediaTypes mediaType, NSData* thumbnailData, NSString* thumbnailFile, NSString* mediaFile, CGSize mediaSize);
+typedef void(^MediaPickerMediaBlock)(ProfileMediaTypes mediaType, NSData* thumbnailData, NSString* thumbnailFile, NSString* mediaFile, CGSize mediaSize, BOOL isRealMedia);
 //typedef void(^MediaPickerUserMediaBlock)(UserMedia *userMedia);
 
 @interface MediaPicker : UIImagePickerController <UIImagePickerControllerDelegate, UINavigationControllerDelegate>

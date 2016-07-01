@@ -547,9 +547,10 @@ The - (void) initLocationServices method initializes the location management sys
     __LF
 
     CLLocation* location = [locations lastObject];
-    self.currentLocation = location;
-    
-    [[User me] setLocation:self.location];
+    if (!self.isSimulator) {
+        self.currentLocation = location;
+        [[User me] setLocation:self.location];
+    }
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status

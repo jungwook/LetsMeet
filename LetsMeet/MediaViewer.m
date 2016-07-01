@@ -14,6 +14,8 @@
 @property (nonatomic, strong) UIProgressView *progress;
 @property (nonatomic, strong) User *user;
 @property (nonatomic) BOOL isReal;
+@property (nonatomic) BOOL animated;
+@property (nonatomic) CALayer* playLayer;
 @end
 
 @implementation MediaView
@@ -38,11 +40,43 @@
     return self;
 }
 
+- (void)awakeFromNib
+{
+    __LF
+    
+    const CGFloat w = self.bounds.size.width, h = self.bounds.size.height;
+    const CGFloat minSize = 12, maxSize = 25, size = MIN(MAX(MIN(w,h)/4.0f, minSize), maxSize);
+    
+    self.backgroundColor = [UIColor clearColor];
+    self.playLayer = [CALayer layer];
+    self.playLayer.frame = CGRectMake((w-size)/2.0f, (h-size)/2.0f, size, size);
+    self.playLayer.contents = (id) [UIImage imageNamed:@"play white"].CGImage;
+    self.playLayer.opacity = 0.4f;
+    self.playLayer.hidden = YES;
+    self.playLayer.shadowColor = [UIColor colorWithWhite:0.1 alpha:1].CGColor;
+    self.playLayer.shadowOffset = CGSizeZero;
+    self.playLayer.shadowRadius = 3.0f;
+    self.playLayer.shadowOpacity = 0.4f;
+    
+    
+    [self.layer addSublayer:self.playLayer];
+}
+
+- (void)setHasShadow:(BOOL)hasShadow
+{
+    if (hasShadow) {
+        self.layer.shadowColor = [UIColor colorWithWhite:0.1 alpha:1].CGColor;
+        self.layer.shadowOffset = CGSizeZero;
+        self.layer.shadowRadius = 3.0f;
+        self.layer.shadowOpacity = 0.4f;
+    }
+}
+
 - (void)setIsCircle:(BOOL)isCircle
 {
     if (isCircle) {
-        self.layer.cornerRadius = MIN(self.bounds.size.width, self.bounds.size.height) / 2.0f;
-        self.layer.masksToBounds = YES;
+        self.imageView.layer.cornerRadius = MIN(self.bounds.size.width, self.bounds.size.height) / 2.0f;
+        self.imageView.layer.masksToBounds = YES;
     }
 }
 
@@ -79,9 +113,17 @@
 
 - (void)setImage:(UIImage *)image
 {
-//    [self.imageView setImage:image];
+    self.playLayer.hidden = !(self.mediaType == kMediaTypeVideo);
+    if (self.animated) {
+        self.alpha = 0.0;
+    }
     [self setImage:image forState:UIControlStateNormal];
-    [[self imageView] setContentMode: UIViewContentModeScaleAspectFill];
+    [self.imageView setContentMode: UIViewContentModeScaleAspectFill];
+    if (self.animated) {
+        [UIView animateWithDuration:0.25f animations:^{
+            self.alpha = 1.0f;
+        }];
+    }
 }
 
 - (UIImage*) imageFromFile:(id)filename mediaType:(MediaTypes)mediaType
@@ -169,7 +211,7 @@
     self.mediaFile = message.mediaFile;
     self.isReal = message.realMedia;
 
-    [self loadMediaFromFile:(self.mediaType == kMediaTypeVideo) ? message.mediaThumbnailFile : self.mediaFile isReal:self.isReal completion:block];
+    [self loadMediaFromFile:message.mediaThumbnailFile isReal:self.isReal completion:block];
 }
 
 - (void)loadMediaFromMessage:(Bullet *)message shouldRefresh:(ShouldRefreshBlock)block
@@ -178,27 +220,34 @@
     self.mediaFile = message.mediaFile;
     self.isReal = message.realMedia;
 
-    [self loadMediaFromFile:(self.mediaType == kMediaTypeVideo) ? message.mediaThumbnailFile : self.mediaFile isReal:self.isReal shouldRefresh:block];
+    [self loadMediaFromFile:message.mediaThumbnailFile isReal:self.isReal shouldRefresh:block];
+}
+
+- (void)loadMediaFromUser:(User *)user animated:(BOOL)animated
+{
+    self.animated = animated;
+    [self loadMediaFromUser:user];
 }
 
 - (void)loadMediaFromUser:(User *)user
 {
     self.mediaFile = user.profileMedia;
     self.mediaType = (user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
-    self.isReal = NO;
+    self.isReal = user.isRealMedia;
     
-    [self loadMediaFromFile:self.mediaFile isReal:self.isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
+    [self loadMediaFromFile:user.thumbnail isReal:self.isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self setImage:[UIImage imageWithData:data]];
         });
     }];
 }
 
-- (void)loadMediaFromUserMedia:(UserMedia *)media
+- (void)loadMediaFromUserMedia:(UserMedia *)media animated:(BOOL)animated
 {
     self.mediaFile = media.mediaFile;
     self.mediaType = (media.mediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
     self.isReal = NO;
+    self.animated = YES;
     
     [self loadMediaFromFile:media.thumbailFile isReal:self.isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -211,18 +260,18 @@
 {
     self.mediaFile = user.profileMedia;
     self.mediaType = (user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
-    self.isReal = NO;
+    self.isReal = user.isRealMedia;
     
-    [self loadMediaFromFile:self.mediaFile isReal:self.isReal completion:block];
+    [self loadMediaFromFile:user.thumbnail isReal:self.isReal completion:block];
 }
 
 - (void)loadMediaFromUser:(User *)user shouldRefresh:(ShouldRefreshBlock)block
 {
     self.mediaFile = user.profileMedia;
     self.mediaType = (user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
-    self.isReal = NO;
+    self.isReal = user.isRealMedia;
 
-    [self loadMediaFromFile:self.mediaFile isReal:self.isReal shouldRefresh:block];
+    [self loadMediaFromFile:user.thumbnail isReal:self.isReal shouldRefresh:block];
 }
 
 @end

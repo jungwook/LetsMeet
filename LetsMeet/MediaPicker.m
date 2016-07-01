@@ -96,7 +96,7 @@
             self.bulletBlock(bullet);
         }
         if (self.mediaBlock) {
-            self.mediaBlock( kProfileMediaPhoto, thumbnailData, thumbnailFile, mediaFile, image.size);
+            self.mediaBlock( kProfileMediaPhoto, thumbnailData, thumbnailFile, mediaFile, image.size, (sourceType == UIImagePickerControllerSourceTypeCamera));
         }
     }];
 }
@@ -124,7 +124,7 @@
                             self.bulletBlock(bullet);
                         }
                         if (self.mediaBlock) {
-                            self.mediaBlock(kProfileMediaVideo, thumbnailData, thumbnailFile, mediaFile, thumbnailImage.size);
+                            self.mediaBlock(kProfileMediaVideo, thumbnailData, thumbnailFile, mediaFile, thumbnailImage.size, (sourceType == UIImagePickerControllerSourceTypeCamera));
                         }
                     }
                     else {

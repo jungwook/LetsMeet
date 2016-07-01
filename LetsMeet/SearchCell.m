@@ -26,9 +26,10 @@
     [super awakeFromNib];
     self.system = [FileSystem new];
     
-    [self setCornerRadiusOnView:self.photo radius:2.0f];
     [self setCornerRadiusOnView:self.distance radius:2.0f];
     [self setCornerRadiusOnView:self.badge radius:2.0f];
+    [self.photo setIsCircle:YES];
+    [self.photo setHasShadow:YES];
 }
 
 - (void) setCornerRadiusOnView:(UIView*) view radius:(CGFloat)radius;
@@ -51,23 +52,31 @@
         self.nickname.text = user.nickname;
         self.intro.text = user.intro;
         
+        [self.photo setImage:nil];
         [self.photo loadMediaFromUser:user completion:^(NSData *data, NSError *error, BOOL fromCache) {
-            UIImage *photo = [UIImage imageWithData:data];
-            if (fromCache && data) {
+            if (error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    self.photo.image = photo;
+                    self.photo.image = nil;
                 });
             }
             else {
-                NSArray *visible = [tableView visibleCells];
-                [visible enumerateObjectsUsingBlock:^(SearchCell* _Nonnull cell, NSUInteger idx, BOOL * _Nonnull stop) {
-                    if ([cell.userId isEqualToString:user.objectId]) {
-                        *stop = YES;
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            cell.photo.image = photo;
-                        });
-                    }
-                }];
+                UIImage *photo = [UIImage imageWithData:data];
+                if (fromCache && data) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.photo setImage:photo];
+                    });
+                }
+                else {
+                    NSArray *visible = [tableView visibleCells];
+                    [visible enumerateObjectsUsingBlock:^(SearchCell* _Nonnull cell, NSUInteger idx, BOOL * _Nonnull stop) {
+                        if ([cell.userId isEqualToString:user.objectId]) {
+                            *stop = YES;
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                [cell.photo setImage:photo];
+                            });
+                        }
+                    }];
+                }
             }
         }];
     }

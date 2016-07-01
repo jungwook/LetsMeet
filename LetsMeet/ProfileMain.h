@@ -9,5 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface ProfileMain : UICollectionViewController
-- (void)setMe:(User *)user;
+- (void) setMe:(User *)user;
+- (void) addMedia;
+- (void) removeMedia:(UserMedia*)media row:(NSInteger)row;
 @end

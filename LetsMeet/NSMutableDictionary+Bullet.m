@@ -393,7 +393,7 @@
 @end
 
 @implementation User
-@dynamic nickname,location,locationUdateAt, sex, age, intro, isSimulated, profileMedia, thumbnail, media, profileMediaType;
+@dynamic nickname,location,locationUdateAt, sex, age, intro, isSimulated, profileMedia, thumbnail, profileMediaType, isRealMedia;
 
 + (instancetype) me
 {
@@ -461,7 +461,7 @@
 @end
 
 @implementation UserMedia
-@dynamic userId, mediaType, thumbailFile, mediaFile, mediaSize;
+@dynamic userId, mediaType, thumbailFile, mediaFile, mediaSize, isRealMedia;
 
 + (NSString *)parseClassName {
     return @"UserMedia";

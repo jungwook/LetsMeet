@@ -118,6 +118,7 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
 @property (retain) NSString* thumbailFile;
 @property (retain) NSString* mediaFile;
 @property CGSize mediaSize;
+@property BOOL isRealMedia;
 @end
 
 @interface User : PFUser<PFSubclassing>
@@ -128,9 +129,8 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
 @property (retain) NSString* intro;
 @property (retain) NSString* profileMedia;
 @property (retain) NSString* thumbnail;
-@property (retain) NSMutableArray* media;
 @property ProfileMediaTypes profileMediaType;
-
+@property BOOL isRealMedia;
 @property BOOL isSimulated;
 @property SexTypes sex;
 

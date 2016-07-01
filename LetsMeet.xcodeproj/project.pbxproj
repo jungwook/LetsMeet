@@ -55,7 +55,6 @@
 		12DE5FBB1D004443009B315F /* Progress.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FBA1D004443009B315F /* Progress.m */; };
 		12DE5FE21D02BC79009B315F /* FileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FE11D02BC79009B315F /* FileSystem.m */; };
 		12DE5FE51D02D523009B315F /* NSMutableDictionary+Bullet.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FE41D02D523009B315F /* NSMutableDictionary+Bullet.m */; };
-		12E9E4441D25F8270098C439 /* ProfileMainView.m in Sources */ = {isa = PBXBuildFile; fileRef = 12E9E4431D25F8270098C439 /* ProfileMainView.m */; };
 		12E9E4471D25F8A30098C439 /* ProfileMain.m in Sources */ = {isa = PBXBuildFile; fileRef = 12E9E4461D25F8A30098C439 /* ProfileMain.m */; };
 		12F0D70D1D06D53D00A37C40 /* MediaPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F0D70C1D06D53D00A37C40 /* MediaPlayer.m */; };
 		12F0D7101D092F8600A37C40 /* ProfileView.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F0D70F1D092F8600A37C40 /* ProfileView.m */; };
@@ -192,8 +191,6 @@
 		12DE5FE11D02BC79009B315F /* FileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileSystem.m; sourceTree = "<group>"; };
 		12DE5FE31D02D523009B315F /* NSMutableDictionary+Bullet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableDictionary+Bullet.h"; sourceTree = "<group>"; };
 		12DE5FE41D02D523009B315F /* NSMutableDictionary+Bullet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableDictionary+Bullet.m"; sourceTree = "<group>"; };
-		12E9E4421D25F8270098C439 /* ProfileMainView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileMainView.h; sourceTree = "<group>"; };
-		12E9E4431D25F8270098C439 /* ProfileMainView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileMainView.m; sourceTree = "<group>"; };
 		12E9E4451D25F8A30098C439 /* ProfileMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileMain.h; sourceTree = "<group>"; };
 		12E9E4461D25F8A30098C439 /* ProfileMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileMain.m; sourceTree = "<group>"; };
 		12F0D70B1D06D53D00A37C40 /* MediaPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaPlayer.h; sourceTree = "<group>"; };
@@ -384,8 +381,6 @@
 		12E9E4411D25F8070098C439 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
-				12E9E4421D25F8270098C439 /* ProfileMainView.h */,
-				12E9E4431D25F8270098C439 /* ProfileMainView.m */,
 				12E9E4451D25F8A30098C439 /* ProfileMain.h */,
 				12E9E4461D25F8A30098C439 /* ProfileMain.m */,
 			);
@@ -631,7 +626,6 @@
 				1235BC991D11229600E4AA27 /* MediaViewer.m in Sources */,
 				1296A7AC1D03E0CA00E44642 /* Profile.m in Sources */,
 				12805E801D1BD3840082A95D /* SearchCell.m in Sources */,
-				12E9E4441D25F8270098C439 /* ProfileMainView.m in Sources */,
 				12DE5FB81CFFB1A2009B315F /* Preview.m in Sources */,
 				12F0D7101D092F8600A37C40 /* ProfileView.m in Sources */,
 				1235BC911D0FF82500E4AA27 /* NSDate+TimeAgo.m in Sources */,
