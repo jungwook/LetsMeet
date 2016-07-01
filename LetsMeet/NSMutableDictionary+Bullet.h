@@ -112,6 +112,14 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
     kProfileMediaVideo
 };
 
+@interface UserMedia : PFObject <PFSubclassing>
+@property (retain) NSString* userId;
+@property ProfileMediaTypes mediaType;
+@property (retain) NSString* thumbailFile;
+@property (retain) NSString* mediaFile;
+@property CGSize mediaSize;
+@end
+
 @interface User : PFUser<PFSubclassing>
 @property (retain) NSString* nickname;
 @property (retain) PFGeoPoint* location;
@@ -120,6 +128,7 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
 @property (retain) NSString* intro;
 @property (retain) NSString* profileMedia;
 @property (retain) NSString* thumbnail;
+@property (retain) NSMutableArray* media;
 @property ProfileMediaTypes profileMediaType;
 
 @property BOOL isSimulated;

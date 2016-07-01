@@ -12,6 +12,9 @@
 #import "ListPicker.h"
 #import "SignUp.h"
 
+
+#define MAIN_SCREEN_ID @"Profile"
+
 @interface MainController ()
 @end
 
@@ -32,7 +35,7 @@
         [user fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
             if (!error) {
                 [[FileSystem new] initializeSystem];
-                [self initializeMainViewController];
+                [self initializeMainViewControllerToScreenId:MAIN_SCREEN_ID];
             }
             else {
                 NSLog(@"ERROR:%@", error.localizedDescription);
@@ -58,7 +61,7 @@
                             [signup dismissViewControllerAnimated:YES completion:nil];
                             [self subscribeToChannelCurrentUser];
                             [[FileSystem new] initializeSystem];
-                            [self initializeMainViewController];
+                            [self initializeMainViewControllerToScreenId:MAIN_SCREEN_ID];
                         }
                         else {
                             [signup setInfo:[NSString stringWithFormat:@"Some error occured:%@", error.localizedDescription]];
@@ -81,6 +84,19 @@
     vc.completionBlock = sender;
 }
 
+- (void) initializeMainViewControllerToScreenId:(id)screenId
+{
+    if ([self initializeViewControllers]) {
+        NSLog(@"All systems go...");
+        
+        self.leftViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"LeftMenu"];
+        self.centerViewController = self.screens[screenId][@"screen"];
+        self.animator = [[FloatingDrawerSpringAnimator alloc] init];
+        
+        [AppDelegate globalDelegate].mainMenu = self;
+    }
+}
+
 - (BOOL)initializeViewControllers {
     
     
@@ -94,6 +110,12 @@
                       @"InBox" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"InBox"],
                                     @"title"   : @"쪽지함",
                                     @"menu"    : @"쪽지",
+                                    @"icon"    : @"488-github",
+                                    @"badge"   : @(YES)
+                                    },
+                      @"Profile" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"ProfileMain"],
+                                    @"title"   : @"사용자",
+                                    @"menu"    : @"사용자 2",
                                     @"icon"    : @"488-github",
                                     @"badge"   : @(YES)
                                     },
@@ -140,6 +162,7 @@
 
 - (void) selectScreenWithID:(NSString *)screen
 {
+    __LF
     UINavigationController *nav = self.screens[screen][@"screen"];
     NSString* title = self.screens[screen][@"title"];
     if (nav) {
@@ -149,17 +172,6 @@
     }
 }
 
-- (void) initializeMainViewController {
-    if ([self initializeViewControllers]) {
-        NSLog(@"All systems go...");
-        
-        self.leftViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"LeftMenu"];
-        self.centerViewController = self.screens[@"Search"][@"screen"];
-        self.animator = [[FloatingDrawerSpringAnimator alloc] init];
-
-        [AppDelegate globalDelegate].mainMenu = self;
-    }
-}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

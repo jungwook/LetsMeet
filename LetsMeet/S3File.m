@@ -242,6 +242,33 @@
     }
 }
 
++ (NSString *)saveImageData:(NSData *)data
+{
+    return [S3File saveImageData:data completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+        if (error) {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+        }
+    }];
+}
+
++ (NSString *)saveMovieData:(NSData *)data
+{
+    return [S3File saveMovieData:data completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+        if (error) {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+        }
+    }];
+}
+
++ (NSString *)saveAudioData:(NSData *)data
+{
+    return [S3File saveAudioData:data completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+        if (error) {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+        }
+    }];
+}
+
 + (NSString *)saveImageData:(NSData *)data completedBlock:(S3PutBlock)block
 {
     return [S3File saveImageData:data completedBlock:block progressBlock:nil];

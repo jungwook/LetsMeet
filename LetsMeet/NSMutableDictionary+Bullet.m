@@ -393,7 +393,7 @@
 @end
 
 @implementation User
-@dynamic nickname,location,locationUdateAt, sex, age, intro, isSimulated, profileMedia, thumbnail, profileMediaType;
+@dynamic nickname,location,locationUdateAt, sex, age, intro, isSimulated, profileMedia, thumbnail, media, profileMediaType;
 
 + (instancetype) me
 {
@@ -458,5 +458,24 @@
     return self.sex == kSexMale ? @"guy" : @"girl";
 }
 
+@end
+
+@implementation UserMedia
+@dynamic userId, mediaType, thumbailFile, mediaFile, mediaSize;
+
++ (NSString *)parseClassName {
+    return @"UserMedia";
+}
+
+- (void)setMediaSize:(CGSize)mediaSize
+{
+    [self setObject:@(mediaSize.width) forKey:@"mediaWidth"];
+    [self setObject:@(mediaSize.height) forKey:@"mediaHeight"];
+}
+
+- (CGSize)mediaSize
+{
+    return CGSizeMake([[self objectForKey:@"mediaWidth"] floatValue], [[self objectForKey:@"mediaHeight"] floatValue]);
+}
 @end
 

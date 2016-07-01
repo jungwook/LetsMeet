@@ -11,17 +11,24 @@
 @import MobileCoreServices;
 
 @interface MediaPicker ()
-@property (nonatomic, strong) MediaPickerBlock completionBlock;
+@property (nonatomic, strong) MediaPickerBulletBlock bulletBlock;
+@property (nonatomic, strong) MediaPickerMediaBlock mediaBlock;
+
 @end
 
 @implementation MediaPicker
 
-+(instancetype)mediaPickerWithSourceType:(UIImagePickerControllerSourceType)sourceType completion:(MediaPickerBlock)block
++(instancetype)mediaPickerWithSourceType:(UIImagePickerControllerSourceType)sourceType bulletBlock:(MediaPickerBulletBlock)block
 {
     return [[MediaPicker alloc] initWithSourceType:sourceType completionBlock:block];
 }
 
-- (instancetype) initWithSourceType:(UIImagePickerControllerSourceType)sourceType completionBlock:(MediaPickerBlock)block
++(instancetype)mediaPickerWithSourceType:(UIImagePickerControllerSourceType)sourceType mediaBlock:(MediaPickerMediaBlock)block
+{
+    return [[MediaPicker alloc] initWithSourceType:sourceType mediaBlock:block];
+}
+
+- (instancetype) initWithSourceType:(UIImagePickerControllerSourceType)sourceType completionBlock:(MediaPickerBulletBlock)block
 {
     self = [super init];
     if (self) {
@@ -31,7 +38,24 @@
         self.sourceType = sourceType;
         self.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:sourceType];
         self.modalPresentationStyle = UIModalPresentationOverFullScreen;
-        self.completionBlock = block;
+        self.bulletBlock = block;
+        self.mediaBlock = nil;
+    }
+    return self;
+}
+
+- (instancetype) initWithSourceType:(UIImagePickerControllerSourceType)sourceType mediaBlock:(MediaPickerMediaBlock)block
+{
+    self = [super init];
+    if (self) {
+        self.delegate = self;
+        self.allowsEditing = YES;
+        self.videoMaximumDuration = 10;
+        self.sourceType = sourceType;
+        self.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:sourceType];
+        self.modalPresentationStyle = UIModalPresentationOverFullScreen;
+        self.bulletBlock = nil;
+        self.mediaBlock = block;
     }
     return self;
 }
@@ -62,30 +86,19 @@
     NSData *imageData = UIImageJPEGRepresentation(image, 1.0);
     NSData *thumbnailData = compressedImageData(imageData, kThumbnailWidth);
     
-    NSString *thumbnailFile = [S3File saveImageData:thumbnailData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-        if (succeeded) {
-            
+    [S3File saveImageData:thumbnailData completedBlock:^(NSString *thumbnailFile, BOOL succeeded, NSError *error) {
+        NSString *mediaFile = [S3File saveImageData:imageData];
+        
+        NSLog(@"source type:%ld", sourceType);
+        
+        if (self.bulletBlock) {
+            Bullet* bullet = [Bullet bulletWithPhoto:mediaFile thumbnail:thumbnailFile mediaSize:image.size realMedia:(sourceType == UIImagePickerControllerSourceTypeCamera)];
+            self.bulletBlock(bullet);
         }
-        else {
-            NSLog(@"ERROR:%@", error.localizedDescription);
-        }
-    }];
-    
-    NSString *mediaFile = [S3File saveImageData:imageData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-        if (succeeded) {
-            
-        }
-        else {
-            NSLog(@"ERROR:%@", error.localizedDescription);
+        if (self.mediaBlock) {
+            self.mediaBlock( kProfileMediaPhoto, thumbnailData, thumbnailFile, mediaFile, image.size);
         }
     }];
-    
-    NSLog(@"source type:%ld", sourceType);
-    
-    Bullet* bullet = [Bullet bulletWithPhoto:mediaFile thumbnail:thumbnailFile mediaSize:image.size realMedia:(sourceType == UIImagePickerControllerSourceTypeCamera)];
-    if (self.completionBlock) {
-        self.completionBlock(bullet);
-    }
 }
 
 - (void) handleVideo:(NSDictionary<NSString*, id>*)info url:(NSURL*)url source:(UIImagePickerControllerSourceType)sourceType
@@ -94,42 +107,33 @@
     UIImage *thumbnailImage = [self thumbnailFromVideoAsset:asset source:sourceType];
     NSData *thumbnailData = compressedImageData(UIImageJPEGRepresentation(thumbnailImage, kJPEGCompressionFull), kThumbnailWidth);
     
-    NSString *thumbnailFile = [S3File saveImageData:thumbnailData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-        if (succeeded) {
-            NSLog(@"UPLOADED THUMBNAIL TO:%@", file);
-        }
-        else {
-            NSLog(@"ERROR:%@", error.localizedDescription);
-        }
-    }];
-    
-    NSString *tempId = randomObjectId();
-    NSURL *outputURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingString:tempId]];
-    
-    __block NSString *mediaFile = nil;
-    
-    [self convertVideoToLowQuailtyWithInputURL:url outputURL:outputURL handler:^(AVAssetExportSession *exportSession) {
-        if (exportSession.status == AVAssetExportSessionStatusCompleted) {
-            NSData *videoData = [NSData dataWithContentsOfURL:outputURL];
-            
-            mediaFile = [S3File saveMovieData:videoData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-                if (succeeded) {
-                    NSLog(@"source type:%ld", sourceType);
-                    
-                    Bullet* bullet = [Bullet bulletWithVideo:mediaFile thumbnail:thumbnailFile mediaSize:thumbnailImage.size realMedia:(sourceType == UIImagePickerControllerSourceTypeCamera)];
-                    NSLog(@"UPLOADED VIDEO TO:%@ %@", file, bullet);
-                    if (self.completionBlock) {
-                        self.completionBlock(bullet);
+    [S3File saveImageData:thumbnailData completedBlock:^(NSString *thumbnailFile, BOOL succeeded, NSError *error) {
+        NSString *tempId = randomObjectId();
+        NSURL *outputURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingString:tempId]];
+        
+        __block NSString *mediaFile = nil;
+        
+        [self convertVideoToLowQuailtyWithInputURL:url outputURL:outputURL handler:^(AVAssetExportSession *exportSession) {
+            if (exportSession.status == AVAssetExportSessionStatusCompleted) {
+                NSData *videoData = [NSData dataWithContentsOfURL:outputURL];
+                
+                mediaFile = [S3File saveMovieData:videoData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
+                    if (succeeded) {
+                        if (self.bulletBlock) {
+                            Bullet* bullet = [Bullet bulletWithVideo:mediaFile thumbnail:thumbnailFile mediaSize:thumbnailImage.size realMedia:(sourceType == UIImagePickerControllerSourceTypeCamera)];
+                            self.bulletBlock(bullet);
+                        }
+                        if (self.mediaBlock) {
+                            self.mediaBlock(kProfileMediaVideo, thumbnailData, thumbnailFile, mediaFile, thumbnailImage.size);
+                        }
                     }
-//                    [self.system add:bullet for:self.user.objectId];
-//                    [self clearTextView];
-                }
-                else {
-                    NSLog(@"ERROR:%@", error.localizedDescription);
-                }
-                [[NSFileManager defaultManager] removeItemAtURL:outputURL error:nil];
-            }];
-        }
+                    else {
+                        NSLog(@"ERROR:%@", error.localizedDescription);
+                    }
+                    [[NSFileManager defaultManager] removeItemAtURL:outputURL error:nil];
+                }];
+            }
+        }];
     }];
 }
 

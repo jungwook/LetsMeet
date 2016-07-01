@@ -54,6 +54,7 @@ typedef void (^BulletBlock)(id bullet);
 
 - (void) updateBadge
 {
+    __LF
     dispatch_async(dispatch_get_main_queue(), ^{
         NSUInteger count = (unsigned long)self.system.unreadMessages;
         
@@ -63,6 +64,7 @@ typedef void (^BulletBlock)(id bullet);
 
 - (void) toggleMenu:(id)sender
 {
+    __LF
     [AppDelegate toggleMenu];
 }
 

@@ -20,6 +20,7 @@
 
 - (instancetype) initWithCoder:(NSCoder *)aDecoder
 {
+    __LF
     self = [super initWithCoder:aDecoder];
     if (self) {
         [self initialize];
@@ -29,6 +30,7 @@
 
 - (instancetype) init
 {
+    __LF
     self = [super init];
     if (self) {
         [self initialize];
@@ -52,6 +54,7 @@
 
 - (void) initialize
 {
+    __LF
     [self addTarget:self action:@selector(tapped:) forControlEvents:UIControlEventTouchUpInside];
 }
 
@@ -76,7 +79,9 @@
 
 - (void)setImage:(UIImage *)image
 {
+//    [self.imageView setImage:image];
     [self setImage:image forState:UIControlStateNormal];
+    [[self imageView] setContentMode: UIViewContentModeScaleAspectFill];
 }
 
 - (UIImage*) imageFromFile:(id)filename mediaType:(MediaTypes)mediaType
@@ -184,7 +189,20 @@
     
     [self loadMediaFromFile:self.mediaFile isReal:self.isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.image = [UIImage imageWithData:data];
+            [self setImage:[UIImage imageWithData:data]];
+        });
+    }];
+}
+
+- (void)loadMediaFromUserMedia:(UserMedia *)media
+{
+    self.mediaFile = media.mediaFile;
+    self.mediaType = (media.mediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
+    self.isReal = NO;
+    
+    [self loadMediaFromFile:media.thumbailFile isReal:self.isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self setImage:[UIImage imageWithData:data]];
         });
     }];
 }

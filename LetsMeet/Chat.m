@@ -307,7 +307,7 @@
 
 - (void) selectMediaFromSource:(UIImagePickerControllerSourceType)sourceType
 {
-    MediaPicker *mediaPicker = [MediaPicker mediaPickerWithSourceType:sourceType completion:^(Bullet *bullet) {
+    MediaPicker *mediaPicker = [MediaPicker mediaPickerWithSourceType:sourceType bulletBlock:^(Bullet *bullet) {
         [self.system add:bullet for:self.user.objectId];
         [self clearTextView];
     }];
