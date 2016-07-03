@@ -15,7 +15,7 @@
 
 #define MAIN_SCREEN_ID @"Profile"
 #undef MAIN_SCREEN_ID
-#define MAIN_SCREEN_ID @"Map"
+#define MAIN_SCREEN_ID @"NearMe"
 
 @interface MainController ()
 @end
@@ -111,8 +111,8 @@
                                      @"badge"   : @(NO)
                                      },
                       @"NearMe" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"NearMe"],
-                                     @"title"   : @"주변2",
-                                     @"menu"    : @"주변2",
+                                     @"title"   : @"Near...",
+                                     @"menu"    : @"Near...",
                                      @"icon"    : @"488-github",
                                      @"badge"   : @(NO)
                                      },

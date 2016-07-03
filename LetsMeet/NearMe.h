@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface NearMe : UITableViewController
+@interface NearMe : UIViewController <UITableViewDelegate, UITableViewDataSource>
 
 @end

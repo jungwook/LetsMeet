@@ -29,7 +29,6 @@ typedef void (^DataBlock)(NSData *data);
 typedef void (^ArrayIntResultBlock)(NSArray *objects, int levels);
 typedef void (^UserResultBlock)(PFUser *user);
 typedef void (^voidBlock)(void);
-typedef void (^RefreshControlBlock)(UIRefreshControl* refreshControl);
 typedef void (^CountResultBlock)(NSUInteger count);
 typedef void (^DictionaryResultBlock)(NSDictionary *messages);
 typedef void (^DictionaryArrayResultBlock)(NSDictionary *messages, NSArray *users);

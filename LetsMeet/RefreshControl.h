@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "NSMutableDictionary+Bullet.h"
 
+typedef void (^RefreshControlBlock)(UIRefreshControl* refreshControl);
+
 @interface RefreshControl : UIRefreshControl
 
 + (instancetype)initWithCompletionBlock:(RefreshControlBlock) completionBlock;

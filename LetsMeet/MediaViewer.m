@@ -238,8 +238,12 @@
     self.isReal = user.isRealMedia;
     
     [self loadMediaFromFile:user.thumbnail isReal:self.isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
+        UIImage* photo = [UIImage imageWithData:data];
+        if (error || !data) {
+            photo = [UIImage imageNamed:user.sex == kSexMale ? @"guy" : @"girl"];
+        }
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self setImage:[UIImage imageWithData:data]];
+            [self setImage:photo];
         });
     }];
 }

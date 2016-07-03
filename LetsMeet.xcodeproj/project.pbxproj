@@ -292,6 +292,15 @@
 			name = SimulatedUser;
 			sourceTree = "<group>";
 		};
+		120142F51D28F6F400D66905 /* NearMe */ = {
+			isa = PBXGroup;
+			children = (
+				12EAD9DB1D28EAE000483EAE /* NearMe.h */,
+				12EAD9DC1D28EAE000483EAE /* NearMe.m */,
+			);
+			name = NearMe;
+			sourceTree = "<group>";
+		};
 		124928B31CF2ED790038A2F3 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -497,11 +506,10 @@
 		12F741D31CE56DD400E8267A /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				120142F51D28F6F400D66905 /* NearMe */,
 				12A7E38F1D2761EF00592CFA /* Map */,
 				12E9E4411D25F8070098C439 /* Profile */,
 				12F741931CE4B97100E8267A /* Main.storyboard */,
-				12EAD9DB1D28EAE000483EAE /* NearMe.h */,
-				12EAD9DC1D28EAE000483EAE /* NearMe.m */,
 				12805E871D1CACAB0082A95D /* AudioRecorder.xib */,
 				12A607201D24CA2300D8476D /* ChatPanel.xib */,
 				12A607221D24D1AE00D8476D /* ChatPanel.h */,
