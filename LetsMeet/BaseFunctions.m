@@ -61,6 +61,16 @@ float heading(PFGeoPoint* fromLoc, PFGeoPoint* toLoc)
     }
 }
 
+float headingRadians(PFGeoPoint* fromLoc, PFGeoPoint* toLoc)
+{
+    float fLat = degreesToRadians(fromLoc.latitude);
+    float fLng = degreesToRadians(fromLoc.longitude);
+    float tLat = degreesToRadians(toLoc.latitude);
+    float tLng = degreesToRadians(toLoc.longitude);
+    
+    return atan2(sin(tLng-fLng)*cos(tLat), cos(fLat)*sin(tLat)-sin(fLat)*cos(tLat)*cos(tLng-fLng));
+}
+
 float Heading(User* from, User* to)
 {
     PFGeoPoint *fromLoc = from.location;

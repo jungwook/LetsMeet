@@ -56,6 +56,31 @@
     return self;
 }
 
+- (void)drawRect:(CGRect)rect
+{
+    CGFloat xs = self.intro.frame.origin.x,
+            xe = self.sex.frame.origin.x + self.sex.frame.size.width,
+            ys = self.intro.frame.origin.y,
+            ye = self.intro.frame.origin.y + self.intro.frame.size.height,
+            x1 = self.age.frame.origin.x,
+            x2 = self.sex.frame.origin.x;
+    
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    [path moveToPoint:CGPointMake(xs, ys)];
+    [path addLineToPoint:CGPointMake(xe, ys)];
+    [path moveToPoint:CGPointMake(x1, ys)];
+    [path addLineToPoint:CGPointMake(x1, ye)];
+    [path moveToPoint:CGPointMake(x2, ys)];
+    [path addLineToPoint:CGPointMake(x2, ye)];
+
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetLineWidth(context, 0.5);
+    CGContextSetStrokeColorWithColor(context, [UIColor whiteColor].CGColor);
+    CGContextSetFillColorWithColor(context, [UIColor clearColor].CGColor);
+    CGContextAddPath(context, path.CGPath);
+    CGContextDrawPath(context, kCGPathStroke);
+}
+
 - (void)sayHiFromUser:(User*)user parent:(ProfileMain*)parent
 {
     __LF
@@ -119,7 +144,7 @@
         
         [self.me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
             if (!error) {
-                [self.mainPhoto setImage:[UIImage imageWithData:thumbnailData]];
+                [self.mainPhoto loadMediaFromUser:self.me];
             }
             else {
                 NSLog(@"ERROR:%@", error.localizedDescription);
@@ -267,6 +292,7 @@
 
 - (void)viewDidLoad
 {
+    
     [self.navigationController.navigationBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.navigationBar.shadowImage = [UIImage new];
     self.navigationController.navigationBar.translucent = YES;

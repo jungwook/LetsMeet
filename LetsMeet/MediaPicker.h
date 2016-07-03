@@ -10,10 +10,8 @@
 
 typedef void(^MediaPickerBulletBlock)(Bullet* bullet);
 typedef void(^MediaPickerMediaBlock)(ProfileMediaTypes mediaType, NSData* thumbnailData, NSString* thumbnailFile, NSString* mediaFile, CGSize mediaSize, BOOL isRealMedia);
-//typedef void(^MediaPickerUserMediaBlock)(UserMedia *userMedia);
 
 @interface MediaPicker : UIImagePickerController <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 + (instancetype) mediaPickerWithSourceType:(UIImagePickerControllerSourceType)sourceType bulletBlock:(MediaPickerBulletBlock)block;
 + (instancetype) mediaPickerWithSourceType:(UIImagePickerControllerSourceType)sourceType mediaBlock:(MediaPickerMediaBlock)block;
-//+ (instancetype) mediaPickerWithSourceType:(UIImagePickerControllerSourceType)sourceType userMediaBlock:(MediaPickerUserMediaBlock)block;
 @end

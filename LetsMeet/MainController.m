@@ -14,6 +14,8 @@
 
 
 #define MAIN_SCREEN_ID @"Profile"
+#undef MAIN_SCREEN_ID
+#define MAIN_SCREEN_ID @"Map"
 
 @interface MainController ()
 @end
@@ -24,6 +26,7 @@
     __LF
     [super viewDidLoad];
     self.backgroundImage = [UIImage imageNamed:@"bg"];
+
 }
 
 - (void)checkLoginStatusAndProceed
@@ -107,6 +110,12 @@
                                      @"icon"    : @"488-github",
                                      @"badge"   : @(NO)
                                      },
+                      @"NearMe" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"NearMe"],
+                                     @"title"   : @"주변2",
+                                     @"menu"    : @"주변2",
+                                     @"icon"    : @"488-github",
+                                     @"badge"   : @(NO)
+                                     },
                       @"InBox" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"InBox"],
                                     @"title"   : @"쪽지함",
                                     @"menu"    : @"쪽지",
@@ -119,6 +128,12 @@
                                     @"icon"    : @"488-github",
                                     @"badge"   : @(YES)
                                     },
+                      @"Map" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Map"],
+                                      @"title"   : @"WORLD",
+                                      @"menu"    : @"WORLD",
+                                      @"icon"    : @"488-github",
+                                      @"badge"   : @(YES)
+                                      },
                       @"Account" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Account"],
                                       @"title"   : @"사용자",
                                       @"menu"    : @"사용자 설정",

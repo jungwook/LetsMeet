@@ -111,14 +111,12 @@
         NSString *tempId = randomObjectId();
         NSURL *outputURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingString:tempId]];
         
-        __block NSString *mediaFile = nil;
-        
         [self convertVideoToLowQuailtyWithInputURL:url outputURL:outputURL handler:^(AVAssetExportSession *exportSession) {
             if (exportSession.status == AVAssetExportSessionStatusCompleted) {
                 NSData *videoData = [NSData dataWithContentsOfURL:outputURL];
                 
-                mediaFile = [S3File saveMovieData:videoData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-                    if (succeeded) {
+                [S3File saveMovieData:videoData completedBlock:^(NSString *mediaFile, BOOL succeeded, NSError *error) {
+                    if (succeeded && !error) {
                         if (self.bulletBlock) {
                             Bullet* bullet = [Bullet bulletWithVideo:mediaFile thumbnail:thumbnailFile mediaSize:thumbnailImage.size realMedia:(sourceType == UIImagePickerControllerSourceTypeCamera)];
                             self.bulletBlock(bullet);
