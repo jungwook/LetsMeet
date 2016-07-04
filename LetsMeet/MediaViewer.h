@@ -14,8 +14,9 @@ typedef BOOL(^ShouldRefreshBlock)(NSData * data, NSError * error, BOOL fromCache
 
 @interface MediaView : UIButton
 @property (nonatomic, assign) BOOL isCircle;
-@property (nonatomic, assign) BOOL hasShadow;
-- (void)setImage:(UIImage *)image;
+@property (nonatomic, assign) BOOL showsShadow;
+@property (nonatomic, assign) BOOL showsSex;
+- (void) setImage:(UIImage *)image;
 - (void) loadMediaFromMessage:(Bullet*)message completion:(S3GetBlock)block;
 - (void) loadMediaFromMessage:(Bullet*)message shouldRefresh:(ShouldRefreshBlock)block;
 - (void) loadMediaFromUserMedia:(UserMedia*)media animated:(BOOL)animated;

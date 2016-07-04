@@ -20,23 +20,35 @@ NSString const *UIButton_badgeOriginYKey = @"UIButton_badgeOriginYKey";
 NSString const *UIButton_shouldHideBadgeAtZeroKey = @"UIButton_shouldHideBadgeAtZeroKey";
 NSString const *UIButton_shouldAnimateBadgeKey = @"UIButton_shouldAnimateBadgeKey";
 NSString const *UIButton_badgeValueKey = @"UIButton_badgeValueKey";
+NSString const *UIButton_badgeIsCircleValueKey = @"UIButton_badgeIsCircleValueKey";
 
 @implementation UIButton (Badge)
 
 @dynamic badgeValue, badgeBGColor, badgeTextColor, badgeFont;
-@dynamic badgePadding, badgeMinSize, badgeOriginX, badgeOriginY;
+@dynamic badgePadding, badgeMinSize, badgeOriginX, badgeOriginY, buttonIsCircle;
 @dynamic shouldHideBadgeAtZero, shouldAnimateBadge;
+
 
 - (void)badgeInit
 {
     // Default design initialization
     self.badgeBGColor   = [UIColor redColor];
     self.badgeTextColor = [UIColor whiteColor];
-    self.badgeFont      = [UIFont systemFontOfSize:12.0];
+    self.badgeFont      = [UIFont boldSystemFontOfSize:10.0];
     self.badgePadding   = 6;
     self.badgeMinSize   = 8;
-    self.badgeOriginX   = self.frame.size.width - self.badge.frame.size.width/2;
-    self.badgeOriginY   = -4;
+    
+    if (self.buttonIsCircle) {
+        CGFloat diameter = self.frame.size.width / 2.f;
+        CGFloat size = self.badge.frame.size.width / 2.f;
+        self.badgeOriginX   = diameter + cos(M_PI/4.0f) * diameter - size;
+        self.badgeOriginY   = diameter - sin(M_PI/4.0f) * diameter - size - 8.0f;
+    }
+    else {
+        self.badgeOriginX   = self.frame.size.width - self.badge.frame.size.width/2;
+        self.badgeOriginY   = -4;
+    }
+
     self.shouldHideBadgeAtZero = YES;
     self.shouldAnimateBadge = YES;
     // Avoids badge to be clipped when animating its scale
@@ -247,6 +259,7 @@ NSString const *UIButton_badgeValueKey = @"UIButton_badgeValueKey";
     NSNumber *number = objc_getAssociatedObject(self, &UIButton_badgeOriginYKey);
     return number.floatValue;
 }
+
 -(void) setBadgeOriginY:(CGFloat)badgeOriginY
 {
     NSNumber *number = [NSNumber numberWithDouble:badgeOriginY];
@@ -254,6 +267,18 @@ NSString const *UIButton_badgeValueKey = @"UIButton_badgeValueKey";
     if (self.badge) {
         [self updateBadgeFrame];
     }
+}
+
+- (BOOL)buttonIsCircle
+{
+    NSNumber *number = objc_getAssociatedObject(self, &UIButton_badgeIsCircleValueKey);
+    return [number boolValue];
+}
+
+- (void)setButtonIsCircle:(BOOL)buttonIsCircle
+{
+    NSNumber *number = [NSNumber numberWithBool:buttonIsCircle];
+    objc_setAssociatedObject(self, &UIButton_badgeIsCircleValueKey, number, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 // In case of numbers, remove the badge when reaching zero

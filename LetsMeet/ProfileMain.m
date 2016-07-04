@@ -89,7 +89,7 @@
     
     self.parent = parent;
     [self.mainPhoto loadMediaFromUser:user animated:YES];
-    [self.mainPhoto setHasShadow:YES];
+    [self.mainPhoto setShowsShadow:YES];
     self.nickname.text = self.me.nickname;
     self.intro.text = self.me.intro;
     
@@ -244,7 +244,6 @@
 
 @interface AddMediaCell : UICollectionViewCell
 @property (nonatomic, weak) ProfileMain* parent;
-@property (nonatomic, weak) NSMutableArray *media;
 @property (nonatomic, weak) User *user;
 @end
 
@@ -261,7 +260,7 @@
 
 @interface ProfileMain ()
 @property (nonatomic, strong) User *me;
-@property (nonatomic, strong) NSMutableArray *media;
+//@property (nonatomic, strong) NSMutableArray *media;
 @end
 
 @implementation ProfileMain
@@ -369,7 +368,7 @@
     if (count == indexPath.row) {
         AddMediaCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"AddMedia" forIndexPath:indexPath];
         cell.parent = self;
-        cell.media = self.media;
+//        cell.media = self.media;
         cell.user = self.me;
         return cell;
     }

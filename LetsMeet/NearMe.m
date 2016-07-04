@@ -9,16 +9,36 @@
 #import "NearMe.h"
 #import "MediaViewer.h"
 #import "RefreshControl.h"
+#import "UIButton+Badge.h"
 
 #define blueColor [UIColor colorWithRed:95/255.f green:167/255.f blue:229/255.f alpha:1.0f]
 #define greyColor [UIColor colorWithWhite:0.3 alpha:1.0]
 
-@interface NearMeCell : UITableViewCell
+@interface MediaCell : UICollectionViewCell
+@property (weak, nonatomic) IBOutlet MediaView *photo;
+@property (strong, nonatomic) UserMedia *userMedia;
+@end
+
+@implementation MediaCell
+
+- (void)setUserMedia:(UserMedia *)userMedia
+{
+    __LF
+    _userMedia = userMedia;
+    [self.photo loadMediaFromUserMedia:userMedia animated:YES];
+}
+
+@end
+
+@interface NearMeCell : UITableViewCell <UICollectionViewDelegate, UICollectionViewDataSource>
 @property (weak, nonatomic) IBOutlet MediaView *photo;
 @property (weak, nonatomic) IBOutlet UILabel *distance;
 @property (weak, nonatomic) IBOutlet UILabel *desc;
 @property (weak, nonatomic) IBOutlet UILabel *nickname;
+@property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) User *user;
+@property (strong, nonatomic) NSArray *media;
+@property (nonatomic) BOOL isSelected;
 @end
 
 @implementation NearMeCell
@@ -42,6 +62,59 @@
     self.desc.text = [NSString stringWithFormat:@"%@ / %@", user.age ? user.age : @"", user.intro ? user.intro : @""];
 }
 
+- (void)setIsSelected:(BOOL)isSelected
+{
+    _isSelected = isSelected;
+    if (isSelected) {
+        __LF
+        self.collectionView.delegate = self;
+        self.collectionView.dataSource = self;
+        [self refreshMedia];
+    }
+    else {
+        self.collectionView.delegate = nil;
+        self.collectionView.dataSource = nil;
+    }
+}
+
+- (void) refreshMedia
+{
+    __LF
+    PFQuery *query = [UserMedia query];
+    [query whereKey:@"userId" equalTo:self.user.objectId];
+    [query orderByAscending:@"updatedAt"];
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        if (!error) {
+            self.media = [NSArray arrayWithArray:objects];
+            [self.collectionView reloadData];
+        }
+        else {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+        }
+    }];
+    
+}
+
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
+{
+    __LF
+    return 1;
+}
+
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+{
+    __LF
+    return self.media.count;
+}
+
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    MediaCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"NearMe" forIndexPath:indexPath];
+    cell.userMedia = [self.media objectAtIndex:indexPath.row];
+    
+    return cell;
+}
+
 @end
 
 @interface TopBar : UIView
@@ -59,6 +132,7 @@
 @property (strong, nonatomic) NSMutableDictionary *users;
 @property (strong, nonatomic) NSArray *usersData;
 @property (strong, nonatomic) RefreshControl *refresh;
+@property (strong, nonatomic) NSIndexPath *selectedIndexPath;
 @property (nonatomic) BOOL grouped;
 @end
 
@@ -201,6 +275,28 @@
     cell.user = user;
     
     return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([indexPath isEqual:self.selectedIndexPath]) {
+        return 400;
+    }
+    else {
+        return 80;
+    }
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    self.selectedIndexPath = [indexPath isEqual:self.selectedIndexPath] ? nil : indexPath;
+    [tableView deselectRowAtIndexPath:indexPath animated:TRUE];
+    
+    
+    NearMeCell* cell = [tableView cellForRowAtIndexPath:indexPath];
+    cell.isSelected = [indexPath isEqual:self.selectedIndexPath] ? YES : NO;
+
+    [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section

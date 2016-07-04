@@ -8,12 +8,15 @@
 
 #import "MediaViewer.h"
 #import "UserAnnotationView.h"
+#import "UIButton+Badge.h"
+#import "Notifications.h"
 
 @interface MediaView()
 @property (nonatomic, strong) id mediaFile;
 @property (nonatomic) MediaTypes mediaType;
 @property (nonatomic, strong) UIProgressView *progress;
 @property (nonatomic, strong) User *user;
+@property (nonatomic, strong) Notifications *notifications;
 @property (nonatomic) BOOL isReal;
 @property (nonatomic) BOOL animated;
 @property (nonatomic) CALayer* playLayer;
@@ -62,9 +65,29 @@
     self.imageView.backgroundColor = [UIColor blackColor];
     
     [self.layer addSublayer:self.playLayer];
+    
+    self.notifications = [Notifications notificationWithMessage:^(id bullet) {
+        [self updateBadge];
+    } broadcast:^(id senderId, NSString *message, NSTimeInterval duration) {
+        [self updateBadge];
+    } refresh:^{
+        [self updateBadge];
+    }];
+    [self.notifications on];
 }
 
-- (void)setHasShadow:(BOOL)hasShadow
+- (void) updateBadge
+{
+    __LF
+    NSInteger count = [[FileSystem new] unreadMessagesFromUser:self.user.objectId];
+    if (count>0) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.badgeValue = [NSString stringWithFormat:@"%ld", count];
+        });
+    }
+}
+
+- (void)setShowsShadow:(BOOL)hasShadow
 {
     if (hasShadow) {
         self.layer.shadowColor = [UIColor colorWithWhite:0.1 alpha:1].CGColor;
@@ -74,18 +97,31 @@
     }
 }
 
+- (void)setShowsSex:(BOOL)showsSex
+{
+    if (self.user) {
+        self.imageView.layer.borderWidth = showsSex ? 2.0f : 0.0f;
+        self.imageView.layer.borderColor = showsSex ? self.user.sexColor.CGColor : [UIColor clearColor].CGColor;
+    }
+}
+
 - (void)setIsCircle:(BOOL)isCircle
 {
-    if (isCircle) {
-        self.imageView.layer.cornerRadius = MIN(self.bounds.size.width, self.bounds.size.height) / 2.0f;
-        self.imageView.layer.masksToBounds = YES;
-    }
+    self.imageView.layer.cornerRadius = isCircle ? MIN(self.bounds.size.width, self.bounds.size.height) / 2.0f : 0;
+    self.imageView.layer.masksToBounds = isCircle;
+    [self setButtonIsCircle:isCircle];
 }
 
 - (void)setMapLocationForUser:(User *)user
 {
     _user = user;
     _mediaType = kMediaTypeMap;
+}
+
+- (void)setUser:(User *)user
+{
+    _user = user;
+    [self updateBadge];
 }
 
 - (void) initialize
@@ -225,28 +261,7 @@
     [self loadMediaFromFile:message.mediaThumbnailFile isReal:self.isReal shouldRefresh:block];
 }
 
-- (void)loadMediaFromUser:(User *)user animated:(BOOL)animated
-{
-    self.animated = animated;
-    [self loadMediaFromUser:user];
-}
-
-- (void)loadMediaFromUser:(User *)user
-{
-    self.mediaFile = user.profileMedia;
-    self.mediaType = (user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
-    self.isReal = user.isRealMedia;
-    
-    [self loadMediaFromFile:user.thumbnail isReal:self.isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
-        UIImage* photo = [UIImage imageWithData:data];
-        if (error || !data) {
-            photo = [UIImage imageNamed:user.sex == kSexMale ? @"guy" : @"girl"];
-        }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self setImage:photo];
-        });
-    }];
-}
+#pragma From User Media
 
 - (void)loadMediaFromUserMedia:(UserMedia *)media animated:(BOOL)animated
 {
@@ -262,8 +277,35 @@
     }];
 }
 
+#pragma From User
+
+- (void)loadMediaFromUser:(User *)user animated:(BOOL)animated
+{
+    self.animated = animated;
+    [self loadMediaFromUser:user];
+}
+
+- (void)loadMediaFromUser:(User *)user
+{
+    self.user = user;
+    self.mediaFile = user.profileMedia;
+    self.mediaType = (user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
+    self.isReal = user.isRealMedia;
+    
+    [self loadMediaFromFile:user.thumbnail isReal:self.isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
+        UIImage* photo = [UIImage imageWithData:data];
+        if (error || !data) {
+            photo = [UIImage imageNamed:user.sex == kSexMale ? @"guy" : @"girl"];
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self setImage:photo];
+        });
+    }];
+}
+
 - (void)loadMediaFromUser:(User *)user completion:(S3GetBlock)block
 {
+    self.user = user;
     self.mediaFile = user.profileMedia;
     self.mediaType = (user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
     self.isReal = user.isRealMedia;
@@ -273,6 +315,7 @@
 
 - (void)loadMediaFromUser:(User *)user shouldRefresh:(ShouldRefreshBlock)block
 {
+    self.user = user;
     self.mediaFile = user.profileMedia;
     self.mediaType = (user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
     self.isReal = user.isRealMedia;
@@ -595,7 +638,7 @@
     UIVisualEffectView* blurView;
     UIVisualEffectView* vibracyView;
 
-    UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+    UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
     UIVibrancyEffect *vibe = [UIVibrancyEffect effectForBlurEffect:blur];
     
     blurView = [[UIVisualEffectView alloc] initWithEffect:blur];
