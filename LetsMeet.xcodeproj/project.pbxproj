@@ -39,14 +39,14 @@
 		12805E831D1BE96E0082A95D /* MediaPicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 12805E821D1BE96E0082A95D /* MediaPicker.m */; };
 		12805E881D1CACAB0082A95D /* AudioRecorder.xib in Resources */ = {isa = PBXBuildFile; fileRef = 12805E871D1CACAB0082A95D /* AudioRecorder.xib */; };
 		12805E8B1D1E3DD30082A95D /* AudioRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 12805E8A1D1E3DD30082A95D /* AudioRecorder.m */; };
+		1285AACE1D2CCBBE00F508AC /* SelectionBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AACD1D2CCBBE00F508AC /* SelectionBar.m */; };
+		1285AAD11D2CDC9F00F508AC /* Profile.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAD01D2CDC9F00F508AC /* Profile.m */; };
 		1296A7A31D03B34000E44642 /* BaseCollections.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A21D03B34000E44642 /* BaseCollections.m */; };
 		1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A51D03B3CA00E44642 /* BaseFunctions.m */; };
 		1296A7A91D03BB5500E44642 /* Notifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A81D03BB5500E44642 /* Notifications.m */; };
-		1296A7AC1D03E0CA00E44642 /* Profile.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7AB1D03E0CA00E44642 /* Profile.m */; };
 		129B07531D0AAAB5000C0276 /* NearByCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 129B07521D0AAAB5000C0276 /* NearByCell.m */; };
 		12A6071D1D23A99800D8476D /* MessageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A6071C1D23A99800D8476D /* MessageView.m */; };
 		12A6071F1D23DF8900D8476D /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12A6071E1D23DF8900D8476D /* MapKit.framework */; };
-		12A607211D24CA2300D8476D /* ChatPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 12A607201D24CA2300D8476D /* ChatPanel.xib */; };
 		12A607241D24D1AE00D8476D /* ChatPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A607231D24D1AE00D8476D /* ChatPanel.m */; };
 		12A7E3921D27620700592CFA /* Map.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A7E3911D27620700592CFA /* Map.m */; };
 		12DB01B21D0E317700E33359 /* Chat.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB01B11D0E317700E33359 /* Chat.m */; };
@@ -60,7 +60,6 @@
 		12EAD9DA1D27897500483EAE /* UserAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 12EAD9D91D27897500483EAE /* UserAnnotationView.m */; };
 		12EAD9DD1D28EAE000483EAE /* NearMe.m in Sources */ = {isa = PBXBuildFile; fileRef = 12EAD9DC1D28EAE000483EAE /* NearMe.m */; };
 		12F0D70D1D06D53D00A37C40 /* MediaPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F0D70C1D06D53D00A37C40 /* MediaPlayer.m */; };
-		12F0D7101D092F8600A37C40 /* ProfileView.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F0D70F1D092F8600A37C40 /* ProfileView.m */; };
 		12F0D7161D0A773000A37C40 /* TextFieldAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F0D7151D0A773000A37C40 /* TextFieldAlert.m */; };
 		12F0D7191D0A7C6100A37C40 /* NearBy.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F0D7181D0A7C6100A37C40 /* NearBy.m */; };
 		12F7418C1CE4B97100E8267A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F7418B1CE4B97100E8267A /* main.m */; };
@@ -163,20 +162,21 @@
 		12805E871D1CACAB0082A95D /* AudioRecorder.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AudioRecorder.xib; sourceTree = "<group>"; };
 		12805E891D1E3DD30082A95D /* AudioRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioRecorder.h; sourceTree = "<group>"; };
 		12805E8A1D1E3DD30082A95D /* AudioRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioRecorder.m; sourceTree = "<group>"; };
+		1285AACC1D2CCBBE00F508AC /* SelectionBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectionBar.h; sourceTree = "<group>"; };
+		1285AACD1D2CCBBE00F508AC /* SelectionBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectionBar.m; sourceTree = "<group>"; };
+		1285AACF1D2CDC9F00F508AC /* Profile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Profile.h; sourceTree = "<group>"; };
+		1285AAD01D2CDC9F00F508AC /* Profile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Profile.m; sourceTree = "<group>"; };
 		1296A7A11D03B34000E44642 /* BaseCollections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseCollections.h; sourceTree = "<group>"; };
 		1296A7A21D03B34000E44642 /* BaseCollections.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseCollections.m; sourceTree = "<group>"; };
 		1296A7A41D03B3CA00E44642 /* BaseFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseFunctions.h; sourceTree = "<group>"; };
 		1296A7A51D03B3CA00E44642 /* BaseFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseFunctions.m; sourceTree = "<group>"; };
 		1296A7A71D03BB5500E44642 /* Notifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifications.h; sourceTree = "<group>"; };
 		1296A7A81D03BB5500E44642 /* Notifications.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifications.m; sourceTree = "<group>"; };
-		1296A7AA1D03E0CA00E44642 /* Profile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Profile.h; sourceTree = "<group>"; };
-		1296A7AB1D03E0CA00E44642 /* Profile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Profile.m; sourceTree = "<group>"; };
 		129B07511D0AAAB5000C0276 /* NearByCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NearByCell.h; sourceTree = "<group>"; };
 		129B07521D0AAAB5000C0276 /* NearByCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NearByCell.m; sourceTree = "<group>"; };
 		12A6071B1D23A99800D8476D /* MessageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageView.h; sourceTree = "<group>"; };
 		12A6071C1D23A99800D8476D /* MessageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageView.m; sourceTree = "<group>"; };
 		12A6071E1D23DF8900D8476D /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
-		12A607201D24CA2300D8476D /* ChatPanel.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ChatPanel.xib; sourceTree = "<group>"; };
 		12A607221D24D1AE00D8476D /* ChatPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatPanel.h; sourceTree = "<group>"; };
 		12A607231D24D1AE00D8476D /* ChatPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatPanel.m; sourceTree = "<group>"; };
 		12A607261D251D7400D8476D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
@@ -204,8 +204,6 @@
 		12EAD9DC1D28EAE000483EAE /* NearMe.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NearMe.m; sourceTree = "<group>"; };
 		12F0D70B1D06D53D00A37C40 /* MediaPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaPlayer.h; sourceTree = "<group>"; };
 		12F0D70C1D06D53D00A37C40 /* MediaPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaPlayer.m; sourceTree = "<group>"; };
-		12F0D70E1D092F8600A37C40 /* ProfileView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileView.h; sourceTree = "<group>"; };
-		12F0D70F1D092F8600A37C40 /* ProfileView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileView.m; sourceTree = "<group>"; };
 		12F0D7141D0A773000A37C40 /* TextFieldAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextFieldAlert.h; sourceTree = "<group>"; };
 		12F0D7151D0A773000A37C40 /* TextFieldAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextFieldAlert.m; sourceTree = "<group>"; };
 		12F0D7171D0A7C6100A37C40 /* NearBy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NearBy.h; sourceTree = "<group>"; };
@@ -339,8 +337,6 @@
 				12DE5FBA1D004443009B315F /* Progress.m */,
 				12F0D70B1D06D53D00A37C40 /* MediaPlayer.h */,
 				12F0D70C1D06D53D00A37C40 /* MediaPlayer.m */,
-				12F0D70E1D092F8600A37C40 /* ProfileView.h */,
-				12F0D70F1D092F8600A37C40 /* ProfileView.m */,
 				12F0D7141D0A773000A37C40 /* TextFieldAlert.h */,
 				12F0D7151D0A773000A37C40 /* TextFieldAlert.m */,
 				120142EC1D1042AD00D66905 /* EXPhotoViewer.h */,
@@ -361,8 +357,19 @@
 				12A6071C1D23A99800D8476D /* MessageView.m */,
 				12EAD9D81D27897500483EAE /* UserAnnotationView.h */,
 				12EAD9D91D27897500483EAE /* UserAnnotationView.m */,
+				1285AACC1D2CCBBE00F508AC /* SelectionBar.h */,
+				1285AACD1D2CCBBE00F508AC /* SelectionBar.m */,
 			);
 			name = "Views etc";
+			sourceTree = "<group>";
+		};
+		1285AACB1D2C8C3300F508AC /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				1285AACF1D2CDC9F00F508AC /* Profile.h */,
+				1285AAD01D2CDC9F00F508AC /* Profile.m */,
+			);
+			name = Profile;
 			sourceTree = "<group>";
 		};
 		129B07541D0AAABB000C0276 /* Cells */ = {
@@ -407,13 +414,13 @@
 			name = "File Manager";
 			sourceTree = "<group>";
 		};
-		12E9E4411D25F8070098C439 /* Profile */ = {
+		12E9E4411D25F8070098C439 /* Profile Main */ = {
 			isa = PBXGroup;
 			children = (
 				12E9E4451D25F8A30098C439 /* ProfileMain.h */,
 				12E9E4461D25F8A30098C439 /* ProfileMain.m */,
 			);
-			name = Profile;
+			name = "Profile Main";
 			sourceTree = "<group>";
 		};
 		12F7417E1CE4B97000E8267A = {
@@ -506,12 +513,12 @@
 		12F741D31CE56DD400E8267A /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				1285AACB1D2C8C3300F508AC /* Profile */,
 				120142F51D28F6F400D66905 /* NearMe */,
 				12A7E38F1D2761EF00592CFA /* Map */,
-				12E9E4411D25F8070098C439 /* Profile */,
+				12E9E4411D25F8070098C439 /* Profile Main */,
 				12F741931CE4B97100E8267A /* Main.storyboard */,
 				12805E871D1CACAB0082A95D /* AudioRecorder.xib */,
-				12A607201D24CA2300D8476D /* ChatPanel.xib */,
 				12A607221D24D1AE00D8476D /* ChatPanel.h */,
 				12A607231D24D1AE00D8476D /* ChatPanel.m */,
 				129B07541D0AAABB000C0276 /* Cells */,
@@ -521,8 +528,6 @@
 				12F741EE1CE593A500E8267A /* Menu.m */,
 				1296A7A11D03B34000E44642 /* BaseCollections.h */,
 				1296A7A21D03B34000E44642 /* BaseCollections.m */,
-				1296A7AA1D03E0CA00E44642 /* Profile.h */,
-				1296A7AB1D03E0CA00E44642 /* Profile.m */,
 				12F0D7171D0A7C6100A37C40 /* NearBy.h */,
 				12F0D7181D0A7C6100A37C40 /* NearBy.m */,
 				12DB01B01D0E317700E33359 /* Chat.h */,
@@ -618,7 +623,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				12A607211D24CA2300D8476D /* ChatPanel.xib in Resources */,
 				12F7419A1CE4B97100E8267A /* LaunchScreen.storyboard in Resources */,
 				1235BC931D0FF97B00E4AA27 /* NSDateTimeAgo.bundle in Resources */,
 				12F741971CE4B97100E8267A /* Assets.xcassets in Resources */,
@@ -656,10 +660,8 @@
 				12F741EF1CE593A500E8267A /* Menu.m in Sources */,
 				12EAD9DA1D27897500483EAE /* UserAnnotationView.m in Sources */,
 				1235BC991D11229600E4AA27 /* MediaViewer.m in Sources */,
-				1296A7AC1D03E0CA00E44642 /* Profile.m in Sources */,
 				12805E801D1BD3840082A95D /* SearchCell.m in Sources */,
 				12DE5FB81CFFB1A2009B315F /* Preview.m in Sources */,
-				12F0D7101D092F8600A37C40 /* ProfileView.m in Sources */,
 				1235BC911D0FF82500E4AA27 /* NSDate+TimeAgo.m in Sources */,
 				12805E831D1BE96E0082A95D /* MediaPicker.m in Sources */,
 				120142F41D1F961500D66905 /* DisplayLinkView.m in Sources */,
@@ -684,6 +686,7 @@
 				12F741D21CE56B3400E8267A /* FloatingDrawerViewController.m in Sources */,
 				120142EE1D1042AD00D66905 /* EXPhotoViewer.m in Sources */,
 				124928B91CF2ED810038A2F3 /* UIButton+Badge.m in Sources */,
+				1285AAD11D2CDC9F00F508AC /* Profile.m in Sources */,
 				1296A7A31D03B34000E44642 /* BaseCollections.m in Sources */,
 				12DE5FA91CFD43A7009B315F /* Balloon.m in Sources */,
 				124928B81CF2ED810038A2F3 /* UIBarButtonItem+Badge.m in Sources */,
@@ -692,6 +695,7 @@
 				1235BC8E1D0FD30E00E4AA27 /* ChatLeft.m in Sources */,
 				129B07531D0AAAB5000C0276 /* NearByCell.m in Sources */,
 				1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */,
+				1285AACE1D2CCBBE00F508AC /* SelectionBar.m in Sources */,
 				120142F11D1F952600D66905 /* AudioPlayer.m in Sources */,
 				12F741DA1CE56F4300E8267A /* MainController.m in Sources */,
 				12F0D7161D0A773000A37C40 /* TextFieldAlert.m in Sources */,

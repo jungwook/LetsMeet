@@ -10,41 +10,26 @@
 #import "MediaViewer.h"
 #import "RefreshControl.h"
 #import "UIButton+Badge.h"
+#import "ProfileMain.h"
 
 #define blueColor [UIColor colorWithRed:95/255.f green:167/255.f blue:229/255.f alpha:1.0f]
 #define greyColor [UIColor colorWithWhite:0.3 alpha:1.0]
 
-@interface MediaCell : UICollectionViewCell
-@property (weak, nonatomic) IBOutlet MediaView *photo;
-@property (strong, nonatomic) UserMedia *userMedia;
-@end
-
-@implementation MediaCell
-
-- (void)setUserMedia:(UserMedia *)userMedia
-{
-    __LF
-    _userMedia = userMedia;
-    [self.photo loadMediaFromUserMedia:userMedia animated:YES];
-}
-
-@end
-
-@interface NearMeCell : UITableViewCell <UICollectionViewDelegate, UICollectionViewDataSource>
+@interface NearMeCell : UITableViewCell
 @property (weak, nonatomic) IBOutlet MediaView *photo;
 @property (weak, nonatomic) IBOutlet UILabel *distance;
 @property (weak, nonatomic) IBOutlet UILabel *desc;
 @property (weak, nonatomic) IBOutlet UILabel *nickname;
-@property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
+@property (weak, nonatomic) IBOutlet UIButton *like;
 @property (weak, nonatomic) User *user;
-@property (strong, nonatomic) NSArray *media;
-@property (nonatomic) BOOL isSelected;
+@property (weak, nonatomic) NearMe *parent;
 @end
 
 @implementation NearMeCell
 
 - (void)awakeFromNib
 {
+    __LF
     [self.photo setIsCircle:YES];
     self.distance.textColor = blueColor;
     self.nickname.textColor = blueColor;
@@ -53,6 +38,7 @@
 
 - (void)setUser:(User *)user
 {
+    __LF
     _user = user;
     [self.photo loadMediaFromUser:user];
     
@@ -60,59 +46,26 @@
     self.distance.text = distanceString(distance);
     self.nickname.text = user.nickname;
     self.desc.text = [NSString stringWithFormat:@"%@ / %@", user.age ? user.age : @"", user.intro ? user.intro : @""];
+    self.like.selected = [[User me].likes containsObject:self.user.objectId];
 }
 
-- (void)setIsSelected:(BOOL)isSelected
-{
-    _isSelected = isSelected;
-    if (isSelected) {
-        __LF
-        self.collectionView.delegate = self;
-        self.collectionView.dataSource = self;
-        [self refreshMedia];
+- (IBAction)showProfile:(id)sender {
+    [self.parent showProfileForUser:self.user];
+}
+
+- (IBAction)likeUser:(UIButton *)sender {
+    User *me = [User me];
+    
+    NSArray *likes = me.likes;
+    if ([likes containsObject:self.user.objectId]) {
+        [me removeObject:self.user.objectId forKey:@"likes"];
+        sender.selected = NO;
     }
     else {
-        self.collectionView.delegate = nil;
-        self.collectionView.dataSource = nil;
+        [me addUniqueObject:self.user.objectId forKey:@"likes"];
+        sender.selected = YES;
     }
-}
-
-- (void) refreshMedia
-{
-    __LF
-    PFQuery *query = [UserMedia query];
-    [query whereKey:@"userId" equalTo:self.user.objectId];
-    [query orderByAscending:@"updatedAt"];
-    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
-        if (!error) {
-            self.media = [NSArray arrayWithArray:objects];
-            [self.collectionView reloadData];
-        }
-        else {
-            NSLog(@"ERROR:%@", error.localizedDescription);
-        }
-    }];
-    
-}
-
-- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
-{
-    __LF
-    return 1;
-}
-
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
-{
-    __LF
-    return self.media.count;
-}
-
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    MediaCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"NearMe" forIndexPath:indexPath];
-    cell.userMedia = [self.media objectAtIndex:indexPath.row];
-    
-    return cell;
+    [me saveInBackground];
 }
 
 @end
@@ -125,8 +78,6 @@
 @interface NearMe ()
 @property (weak, nonatomic) IBOutlet TopBar *bar;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-
-
 @property (strong, nonatomic) FileSystem *system;
 @property (strong, nonatomic) User *me;
 @property (strong, nonatomic) NSMutableDictionary *users;
@@ -151,15 +102,16 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    
     [self.tableView addSubview:self.refresh];
     [self reloadAllUsersOnCondition:self.bar.index]; //All users initially
+}
+
+- (void) showProfileForUser:(User*)user
+{
+    ProfileMain* main = [self.storyboard instantiateViewControllerWithIdentifier:@"ProfileMain"];
+    [main setMe:user];
+    main.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [self presentViewController:main animated:YES completion:nil];
 }
 
 - (IBAction)barItemSelected:(UIButton *)sender {
@@ -192,7 +144,7 @@
             [query whereKey:@"sex" equalTo:@(kSexMale)];
             break;
         case 3:
-            [query whereKey:@"objectId" containedIn:[[PFUser currentUser] objectForKey:@"friends"]];
+            [query whereKey:@"objectId" containedIn:[[PFUser currentUser] objectForKey:@"likes"]];
             break;
         default:
             break;
@@ -221,6 +173,7 @@
 
 - (void)reloadAllUsersOnCondition:(NSUInteger)condition
 {
+    self.selectedIndexPath = nil;
     if (![self.refresh isRefreshing]) {
         [self.refresh beginRefreshing];
     }
@@ -273,29 +226,31 @@
     User *user = [[self.users objectForKey:key] objectAtIndex:indexPath.row];
     
     cell.user = user;
-    
+    cell.parent = self;
+
     return cell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([indexPath isEqual:self.selectedIndexPath]) {
-        return 400;
+        return 200;
     }
     else {
         return 80;
     }
 }
 
+- (void)setSelectedIndexPath:(NSIndexPath *)selectedIndexPath
+{
+    _selectedIndexPath = selectedIndexPath;
+    
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     self.selectedIndexPath = [indexPath isEqual:self.selectedIndexPath] ? nil : indexPath;
     [tableView deselectRowAtIndexPath:indexPath animated:TRUE];
-    
-    
-    NearMeCell* cell = [tableView cellForRowAtIndexPath:indexPath];
-    cell.isSelected = [indexPath isEqual:self.selectedIndexPath] ? YES : NO;
-
     [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 

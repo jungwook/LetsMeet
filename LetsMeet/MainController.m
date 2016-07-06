@@ -104,6 +104,12 @@
     
     
     self.screens = @{
+                     @"Profile" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Profile"],
+                                    @"title"   : @"프로필",
+                                    @"menu"    : @"프로필",
+                                    @"icon"    : @"488-github",
+                                    @"badge"   : @(NO)
+                                    },
                       @"Search" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Search"],
                                      @"title"   : @"주변",
                                      @"menu"    : @"주변",
@@ -122,7 +128,7 @@
                                     @"icon"    : @"488-github",
                                     @"badge"   : @(YES)
                                     },
-                      @"Profile" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"ProfileMain"],
+                      @"Profile2" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"ProfileNav"],
                                     @"title"   : @"사용자",
                                     @"menu"    : @"사용자 2",
                                     @"icon"    : @"488-github",
@@ -134,12 +140,13 @@
                                       @"icon"    : @"488-github",
                                       @"badge"   : @(YES)
                                       },
-                      @"Account" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Account"],
-                                      @"title"   : @"사용자",
-                                      @"menu"    : @"사용자 설정",
-                                      @"icon"    : @"488-github",
-                                      @"badge"   : @(NO)
-                                      }};
+//                      @"Account" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Account"],
+//                                      @"title"   : @"사용자",
+//                                      @"menu"    : @"사용자 설정",
+//                                      @"icon"    : @"488-github",
+//                                      @"badge"   : @(NO)
+//                                      }
+                      };
     
     static BOOL init = true;
     [self.screens enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {

@@ -9,5 +9,5 @@
 #import <UIKit/UIKit.h>
 
 @interface NearMe : UIViewController <UITableViewDelegate, UITableViewDataSource>
-
+- (void) showProfileForUser:(User*)user;
 @end

@@ -393,7 +393,7 @@
 @end
 
 @implementation User
-@dynamic nickname,location,locationUdateAt, sex, age, intro, isSimulated, profileMedia, thumbnail, profileMediaType, isRealMedia, media;
+@dynamic nickname,location,locationUdateAt, sex, age, intro, isSimulated, profileMedia, thumbnail, profileMediaType, isRealMedia, media, likes;
 
 + (instancetype) me
 {
@@ -463,6 +463,11 @@
     return (self.sex == kSexMale) ?
     [UIColor colorWithRed:95/255.f green:167/255.f blue:229/255.f alpha:1.0f] :
     [UIColor colorWithRed:240/255.f green:82/255.f blue:10/255.f alpha:1.0f];
+}
+
+- (BOOL)isMe
+{
+    return ([self.objectId isEqualToString:[User me].objectId]);
 }
 
 @end

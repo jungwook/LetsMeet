@@ -2,217 +2,164 @@
 //  Profile.m
 //  LetsMeet
 //
-//  Created by 한정욱 on 2016. 6. 5..
+//  Created by 한정욱 on 2016. 7. 6..
 //  Copyright © 2016년 SMARTLY CO. All rights reserved.
 //
-#import "AVFoundation/AVFoundation.h"
-#import "AVKit/AVKit.h"
+
 #import "Profile.h"
-#import "NSMutableDictionary+Bullet.h"
-#import "ListPicker.h"
-#import "CachedFile.h"
-#import "ImagePicker.h"
-#import "ProfileView.h"
-#import "S3File.h"
-#import "TextFieldAlert.h"
-@import MapKit;
+#import "SelectionBar.h"
+#import "MediaViewer.h"
 
-@interface UIImageView(animated)
-- (void)setImage:(UIImage *)image animated:(BOOL)animated;
+@interface MediaCell : UICollectionViewCell
+@property (weak, nonatomic) UserMedia *media;
+@property (weak, nonatomic) IBOutlet MediaView *photo;
+@property (weak, nonatomic) id userId;
+@property (weak, nonatomic) UICollectionView* collectionView;
 @end
 
-@implementation UIImageView(animated)
-- (void)setImage:(UIImage *)image animated:(BOOL)animated
+@implementation MediaCell
+
+- (void)setMedia:(UserMedia *)media
 {
-    if (animated) {
-        [UIView animateWithDuration:0.2 animations:^{
-            self.alpha = 0.0f;
-        } completion:^(BOOL finished) {
-            [self setImage:image];
-            [UIView animateWithDuration:0.2 animations:^{
-                self.alpha = 1.0f;
-            }];
-        }];
-    }
-    else {
-        [self setImage:image];
-    }
+    _media = media;
+    [self.photo setImage:nil];
+    [self.photo loadMediaFromUserMedia:media animated:YES];
 }
+
+- (void)setUserId:(id)userId
+{
+    [self.photo setImage:nil];
+    User *user = [User objectWithoutDataWithObjectId:userId];
+    [user fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+        [self.photo loadMediaFromUser:user];
+    }];
+}
+
 @end
+
+
+@interface MapCell : UICollectionViewCell
+@property (weak, nonatomic) User *user;
+@end
+
+@implementation MapCell
+
+- (void)setUser:(User *)user
+{
+    
+}
+
+@end
+
+typedef enum {
+    kSectionMedia = 0,
+    kSectionLocation,
+    kSectionLikes,
+    kSectionLiked
+} Sections;
 
 @interface Profile ()
-@property (weak, nonatomic) IBOutlet UITextField *introTF;
-@property (weak, nonatomic) IBOutlet UITextField *ageTF;
-@property (weak, nonatomic) IBOutlet UITextField *sexTF;
-@property (weak, nonatomic) IBOutlet UILabel *pointsLB;
-@property (weak, nonatomic) IBOutlet UIButton *editPhotoBut;
-@property (weak, nonatomic) IBOutlet ProfileView *profileView;
-@property (weak, nonatomic) IBOutlet UIProgressView *progress;
-@property (weak, nonatomic) IBOutlet MKMapView *map;
-@property CGFloat photoHeight;
+@property (weak, nonatomic) IBOutlet SelectionBar *selectionBar;
+@property (weak, nonatomic) IBOutlet MediaView *photo;
+@property (weak, nonatomic) IBOutlet UILabel *location;
+@property (weak, nonatomic) IBOutlet UITextField *nickname;
+@property (weak, nonatomic) IBOutlet UITextField *intro;
+@property (weak, nonatomic) IBOutlet UITextField *age;
+@property (weak, nonatomic) IBOutlet UITextField *sex;
+@property (weak, nonatomic) IBOutlet UILabel *likesLB;
+@property (weak, nonatomic) IBOutlet UILabel *likedLB;
+@property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
+@property (weak, nonatomic) User *user;
+@property (nonatomic, readonly) BOOL editable;
+@property (nonatomic) Sections section;
 
-@property (strong, nonatomic) User *me;
+@property (strong, nonatomic) NSArray *liked;
 @end
 
 @implementation Profile
 
+- (BOOL)editable
+{
+    return self.user.isMe;
+}
+
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
 {
     self = [super initWithCoder:aDecoder];
-    if (self)
-    {
+    if (self) {
+        self.liked = nil;
     }
     return self;
 }
 
-- (void) setShadowOnView:(UIView*)view
+- (void)awakeFromNib
 {
-    view.layer.shadowColor = [UIColor redColor].CGColor;
-    view.layer.shadowOffset = CGSizeMake(2 , 2);
-    view.layer.shadowRadius = 2.0f;
-    view.layer.shadowOpacity = 0.9f;
-    view.layer.masksToBounds = NO;
-    
-    view.clipsToBounds = NO;
+    self.section = kSectionMedia;
 }
 
-- (void)viewWillAppear:(BOOL)animated
+- (void)setCellSpacingForSelection:(NSInteger)selection
 {
-    __LF
-    [super viewWillAppear:animated];
-    self.me = [User me];
-    self.photoHeight = 320;
-    self.progress.progress = 0.0f;
+    const CGFloat h = self.collectionView.bounds.size.height;
+    const CGFloat kCellsPerRow = (selection == kSectionLocation) ? 1 : 3;
+    UICollectionViewFlowLayout *flowLayout = (UICollectionViewFlowLayout*)self.collectionView.collectionViewLayout;
     
-    if (!self.me.nickname) {
-        [TextFieldAlert alertWithTitle:@"Set Nickname" message:@"Please input nickname\nYou cannot change your nickname" onViewController:self stringEnteredBlock:^(NSString *string) {
-            self.navigationItem.title = string;
-            self.me.nickname = string;
-            [self viewWillAppear:YES];
-            [self.me saveInBackground];
-        }];
-    }
-    self.navigationItem.title = self.me.nickname;
+    flowLayout.minimumLineSpacing = 2;
+    flowLayout.minimumInteritemSpacing = 2;
     
-    if (self.me) {
-        self.editPhotoBut.exclusiveTouch = YES;
-        
-        self.introTF.text = self.me.intro ? self.me.intro : @"";
-        [ListPicker pickerWithArray:@[@"우리 만나요!", @"애인 찾아요", @"함께 드라이브 해요", @"나쁜 친구 찾아요", @"착한 친구 찾아요", @"함께 먹으러 가요", @"술친구 찾아요"] onTextField:self.introTF selection:^(id data) {
-            self.me.intro = data;
-            [self.me saveInBackground];
-        }];
-        
-        self.ageTF.text = self.me.age;
-        [ListPicker pickerWithArray:@[@"고딩", @"20대", @"30대", @"40대", @"비밀"] onTextField:self.ageTF selection:^(id data) {
-            self.me.age = data;
-            [self.me saveInBackground];
-        }];
-        
-        self.sexTF.text = self.me.sexString;
-        [ListPicker pickerWithArray:@[@"여자", @"남자"] onTextField:self.sexTF selection:^(id data) {
-            self.me.sex = [data isEqualToString:@"여자"] ? kSexFemale : kSexMale ;
-            [self.me saveInBackground];
-        }];
-        
-        [self.profileView setMediaFromUser:self.me frameBlock:^(CGSize size) {
-            NSLog(@"REFRAMING:%@", NSStringFromCGSize(size));
-            self.photoHeight = size.width ? self.profileView.frame.size.width * size.height / size.width + 20 : 400;
-            [self.tableView reloadData];
-        }];
+    CGFloat availableWidthForCells = CGRectGetWidth(self.collectionView.frame) - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * (kCellsPerRow - 1);
+    
+    CGFloat cellWidth = availableWidthForCells / kCellsPerRow;
+    CGFloat cellHeight = h-64;
+    flowLayout.itemSize = CGSizeMake(cellWidth, (selection == kSectionLocation) ? cellHeight : cellWidth);
+}
+
+- (void) countLikesMeInBackground
+{
+    PFQuery *query = [User query];
+    [query whereKey:@"likes" containsString:self.user.objectId];
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        self.liked = [NSArray arrayWithArray:objects];
+    }];
+}
+
+- (void)setLiked:(NSArray *)liked
+{
+    _liked = liked;
+    self.likedLB.text = [NSString stringWithFormat:@"%ld", self.liked.count];
+    if (self.section == kSectionMedia) {
+        [self.collectionView reloadData];
     }
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    [self setUser:self.user];
+    [self setCellSpacingForSelection:kSectionMedia];
+    [self setupSelectionButtons];
+    [self countLikesMeInBackground];
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)setSection:(Sections)section
 {
-    if (indexPath.section == 0) {
-        return MIN(self.photoHeight, 500);
-    }
-    else {
-        return 45.0f;
-    }
+    _section = section;
+    [self setCellSpacingForSelection:section];
+    [self.collectionView reloadData];
 }
 
-UIImage *refit(UIImage *image, UIImageOrientation orientation)
+- (void)setupSelectionButtons
 {
-    return [UIImage imageWithCGImage:image.CGImage scale:1.0f orientation:orientation];
-}
-
-- (void) treatVideoOfType:(MediaTypes)type url:(NSURL*)url thumbnail:(NSData*)thumbnail
-{
-    NSURL *outputURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"profile_video.mov"];
+    const CGFloat width = 80.0f;
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.profileView setPlayerItemURL:url];
-    });
-    
-    NSData *thumb = compressedImageData(thumbnail, 100);
-    self.me.thumbnail = [S3File saveImageData:thumb completedBlock:nil progress:self.progress];
-    
-    [self convertVideoToLowQuailtyWithInputURL:url outputURL:outputURL handler:^(AVAssetExportSession *exportSession)
-     {
-         if (exportSession.status == AVAssetExportSessionStatusCompleted) {
-             NSData *videoData = [NSData dataWithContentsOfURL:outputURL];
-             self.me.profileMedia = [S3File saveMovieData:videoData completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-                 if (succeeded) {
-                     self.me.profileMediaType = kProfileMediaVideo;
-                     [self.me saveInBackground];
-                     
-                     [[NSFileManager defaultManager] removeItemAtURL:outputURL error:nil];
-                 }
-                 else {
-                     NSLog(@"ERROR:%@", error.localizedDescription);
-                 }
-             } progress:self.progress];
-         }
-     }];
-}
-
-- (void)convertVideoToLowQuailtyWithInputURL:(NSURL*)inputURL outputURL:(NSURL*)outputURL handler:(void (^)(AVAssetExportSession*))handler {
-    [[NSFileManager defaultManager] removeItemAtURL:outputURL error:nil];
-    AVURLAsset *asset = [AVURLAsset URLAssetWithURL:inputURL options:nil];
-    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:asset presetName:AVAssetExportPreset640x480];
-    exportSession.outputURL = outputURL;
-    exportSession.outputFileType = AVFileTypeQuickTimeMovie;
-    [exportSession exportAsynchronouslyWithCompletionHandler:^(void) {
-        handler(exportSession);
+    [self.selectionBar addButtonWithTitle:@"Media" width:width];
+    [self.selectionBar addButtonWithTitle:@"Location" width:width];
+    [self.selectionBar addButtonWithTitle:@"Likes" width:width];
+    [self.selectionBar addButtonWithTitle:@"Liked" width:width];
+    [self.selectionBar setIndex:self.section];
+    [self.selectionBar setHandler:^(NSInteger index) {
+        self.section = (Sections) index;
     }];
-}
- 
-- (IBAction)editPhoto:(id)sender {
-    [self.profileView pause];
     
-    [ImagePicker proceedWithParentViewController:self photoSelectedBlock:^(id data, MediaTypes type, NSString *sizeString, NSURL *url) {
-        if (type == kMediaTypePhoto) {
-            id orig = compressedImageData(data, 1024);
-            id thumb = compressedImageData(data, 100);
-            [self save:self.me orig:orig thumb:thumb];
-        }
-        else if (type == kMediaTypeVideo) {
-            [self treatVideoOfType:type url:url thumbnail:data];
-        }
-    } cancelBlock:nil];
-}
-
-- (void) save:(User*)user orig:(NSData*)orig thumb:(NSData*)thumb
-{
-    user.profileMediaType = kProfileMediaPhoto;
-    user.thumbnail = [S3File saveImageData:thumb completedBlock:nil progress:self.progress];
-    user.profileMedia = [S3File saveImageData:orig completedBlock:^(NSString *file, BOOL succeeded, NSError *error) {
-        if (succeeded) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.profileView setMediaFromUser:user];
-            });
-        }
-    } progress:self.progress];
-    [user saveInBackground];
-}
-
-- (IBAction)chargePoints:(id)sender {
 }
 
 - (void)didReceiveMemoryWarning {
@@ -220,6 +167,84 @@ UIImage *refit(UIImage *image, UIImageOrientation orientation)
     // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - Table view data source
+- (void) setUser:(User *)user
+{
+    _user = user ? user : [User me];
+    
+    self.nickname.text = self.user.nickname;
+    self.intro.text = self.user.intro;
+    self.age.text = self.user.age;
+    self.sex.text = self.user.sexString;
+    [self.photo loadMediaFromUser:self.user];
+    [self.photo setIsCircle:YES];
+    self.section = kSectionMedia;
+}
+
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
+{
+    return 1;
+}
+
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+{
+    switch (self.section) {
+        case kSectionMedia:
+            return self.user.media.count;
+            
+        case kSectionLocation:
+            return 1;
+            
+        case kSectionLikes:
+            return self.user.likes.count;
+            
+        case kSectionLiked:
+            return self.liked.count;
+    }
+}
+
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    switch (self.section) {
+        case kSectionLocation:
+        {
+            MapCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MapCell" forIndexPath:indexPath];
+            cell.user = self.user;
+            return cell;
+        }
+        case kSectionMedia:
+        {
+            MediaCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MediaCell" forIndexPath:indexPath];
+            cell.media = [self.user.media objectAtIndex:indexPath.row];
+            cell.collectionView = collectionView;
+            return cell;
+        }
+        case kSectionLikes:
+        {
+            MediaCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MediaCell" forIndexPath:indexPath];
+            cell.userId = [self.user.likes objectAtIndex:indexPath.row];
+            cell.collectionView = collectionView;
+            return cell;
+        }
+        case kSectionLiked:
+        {
+            MediaCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MediaCell" forIndexPath:indexPath];
+            cell.userId = ((User*)[self.liked objectAtIndex:indexPath.row]).objectId;
+            cell.collectionView = collectionView;
+            return cell;
+        }
+    }
+    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MediaCell" forIndexPath:indexPath];
+    return cell;
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
 
 @end

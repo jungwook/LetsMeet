@@ -128,7 +128,8 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
 @property (retain) NSString* intro;
 @property (retain) NSString* profileMedia;
 @property (retain) NSString* thumbnail;
-@property (retain) NSMutableArray *media;
+@property (retain) NSArray* media;
+@property (retain) NSArray* likes;
 @property ProfileMediaTypes profileMediaType;
 @property BOOL isRealMedia;
 @property BOOL isSimulated;
@@ -136,6 +137,7 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
 
 + (instancetype) me;
 - (void) removeMe;
+- (BOOL) isMe;
 - (NSString*) sexString;
 - (BOOL) profileIsVideo;
 - (BOOL) profileIsPhoto;

@@ -44,27 +44,19 @@
     return self;
 }
 
+/*
+- (void)layoutSubviews
+{
+}
+*/
+
 - (void)awakeFromNib
 {
     __LF
     
-    const CGFloat w = self.bounds.size.width, h = self.bounds.size.height;
-    const CGFloat minSize = 12, maxSize = 25, size = MIN(MAX(MIN(w,h)/4.0f, minSize), maxSize);
-    
     self.backgroundColor = [UIColor clearColor];
-    self.playLayer = [CALayer layer];
-    self.playLayer.frame = CGRectMake((w-size)/2.0f, (h-size)/2.0f, size, size);
-    self.playLayer.contents = (id) [UIImage imageNamed:@"play white"].CGImage;
-    self.playLayer.opacity = 0.4f;
-    self.playLayer.hidden = YES;
-    self.playLayer.shadowColor = [UIColor colorWithWhite:0.1 alpha:1].CGColor;
-    self.playLayer.shadowOffset = CGSizeZero;
-    self.playLayer.shadowRadius = 3.0f;
-    self.playLayer.shadowOpacity = 0.4f;
-    
+    [self setupPlayButton];
     self.imageView.backgroundColor = [UIColor blackColor];
-    
-    [self.layer addSublayer:self.playLayer];
     
     self.notifications = [Notifications notificationWithMessage:^(id bullet) {
         [self updateBadge];
@@ -74,6 +66,30 @@
         [self updateBadge];
     }];
     [self.notifications on];
+}
+
+- (void) layoutPlayButton
+{
+    const CGFloat w = self.bounds.size.width, h = self.bounds.size.height;
+    const CGFloat minSize = 12, maxSize = 25, size = MIN(MAX(MIN(w,h)/4.0f, minSize), maxSize);
+    self.playLayer.frame = CGRectMake((w-size)/2.0f, (h-size)/2.0f, size, size);
+}
+
+- (void) setupPlayButton
+{
+    const CGFloat w = self.bounds.size.width, h = self.bounds.size.height;
+    const CGFloat minSize = 12, maxSize = 25, size = MIN(MAX(MIN(w,h)/4.0f, minSize), maxSize);
+    self.playLayer = [CALayer layer];
+    self.playLayer.frame = CGRectMake((w-size)/2.0f, (h-size)/2.0f, size, size);
+    self.playLayer.contents = (id) [UIImage imageNamed:@"play white"].CGImage;
+    self.playLayer.opacity = 0.4f;
+    self.playLayer.hidden = YES;
+    self.playLayer.shadowColor = [UIColor colorWithWhite:0.1 alpha:1].CGColor;
+    self.playLayer.shadowOffset = CGSizeZero;
+    self.playLayer.shadowRadius = 3.0f;
+    self.playLayer.shadowOpacity = 0.4f;
+
+    [self.layer addSublayer:self.playLayer];
 }
 
 - (void) updateBadge
@@ -121,7 +137,7 @@
 - (void)setUser:(User *)user
 {
     _user = user;
-    [self updateBadge];
+//    [self updateBadge];
 }
 
 - (void) initialize
@@ -151,6 +167,7 @@
 
 - (void)setImage:(UIImage *)image
 {
+    [self layoutPlayButton];
     self.playLayer.hidden = !(self.mediaType == kMediaTypeVideo);
     if (self.animated) {
         self.alpha = 0.0;
@@ -265,15 +282,17 @@
 
 - (void)loadMediaFromUserMedia:(UserMedia *)media animated:(BOOL)animated
 {
-    self.mediaFile = media.mediaFile;
-    self.mediaType = (media.mediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
-    self.isReal = NO;
-    self.animated = YES;
-    
-    [self loadMediaFromFile:media.thumbailFile isReal:self.isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self setImage:[UIImage imageWithData:data]];
-        });
+    [media fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+        self.mediaFile = media.mediaFile;
+        self.mediaType = (media.mediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
+        self.isReal = NO;
+        self.animated = YES;
+        
+        [self loadMediaFromFile:media.thumbailFile isReal:self.isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self setImage:[UIImage imageWithData:data]];
+            });
+        }];
     }];
 }
 
