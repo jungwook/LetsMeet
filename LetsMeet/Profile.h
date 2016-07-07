@@ -9,5 +9,10 @@
 #import <UIKit/UIKit.h>
 
 @interface Profile : UIViewController <UICollectionViewDelegate, UICollectionViewDataSource>
+@property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
+
 - (void) setUser:(User*)user;
+- (void) addMedia;
+- (void) removeMedia:(UserMedia*)media row:(NSInteger)row;
+- (void) showProfileForUser:(User*)user;
 @end

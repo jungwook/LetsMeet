@@ -16,6 +16,7 @@ typedef BOOL(^ShouldRefreshBlock)(NSData * data, NSError * error, BOOL fromCache
 @property (nonatomic, assign) BOOL isCircle;
 @property (nonatomic, assign) BOOL showsShadow;
 @property (nonatomic, assign) BOOL showsSex;
+@property (nonatomic, assign) BOOL showsBorder;
 - (void) setImage:(UIImage *)image;
 - (void) loadMediaFromMessage:(Bullet*)message completion:(S3GetBlock)block;
 - (void) loadMediaFromMessage:(Bullet*)message shouldRefresh:(ShouldRefreshBlock)block;

@@ -10,6 +10,31 @@
 
 #define pointerHeight 5.0f
 
+@implementation UIColor (LightAndDark)
+
+- (UIColor *)lighterColor
+{
+    CGFloat h, s, b, a;
+    if ([self getHue:&h saturation:&s brightness:&b alpha:&a])
+        return [UIColor colorWithHue:h
+                          saturation:s
+                          brightness:MIN(b * 1.3f, 1.0f)
+                               alpha:a];
+    return nil;
+}
+
+- (UIColor *)darkerColor
+{
+    CGFloat h, s, b, a;
+    if ([self getHue:&h saturation:&s brightness:&b alpha:&a])
+        return [UIColor colorWithHue:h
+                          saturation:s
+                          brightness:b * 0.75f
+                               alpha:a * 0.45f];
+    return nil;
+}
+@end
+
 @interface SelectionBar()
 @property (nonatomic, strong) NSMutableArray* buttons;
 @property (nonatomic, strong) UIColor* highlightedColor;
@@ -34,7 +59,7 @@
     self.highlightedColor = [UIColor colorWithRed:183/255.0f green:233/255.0f blue:114/255.0f alpha:0.6f];
     self.barColor = self.backgroundColor;
     self.normalFont = [UIFont boldSystemFontOfSize:14];
-    self.highlightedFont = [UIFont systemFontOfSize:13 weight:UIFontWeightSemibold];
+    self.highlightedFont = [UIFont systemFontOfSize:12 weight:UIFontWeightSemibold];
     self.backgroundColor = [UIColor clearColor];
     self.index = 0;
 }
@@ -42,6 +67,12 @@
 - (void)setHandler:(SelectionBarBlock)handler
 {
     _handler = handler;
+}
+
+- (void)setTextColor:(UIColor *)textColor
+{
+    _textColor = [textColor lighterColor];
+    _highlightedColor = [textColor darkerColor];
 }
 
 - (CGFloat)nextStartPos

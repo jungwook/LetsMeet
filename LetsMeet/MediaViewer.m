@@ -121,6 +121,15 @@
     }
 }
 
+- (void)setShowsBorder:(BOOL)showsBorder
+{
+    if (self.user) {
+        self.imageView.layer.borderWidth = showsBorder ? 2.0f : 0.0f;
+        self.imageView.layer.borderColor = showsBorder ? [UIColor whiteColor].CGColor : [UIColor clearColor].CGColor;
+    }
+}
+
+
 - (void)setIsCircle:(BOOL)isCircle
 {
     self.imageView.layer.cornerRadius = isCircle ? MIN(self.bounds.size.width, self.bounds.size.height) / 2.0f : 0;
