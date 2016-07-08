@@ -41,6 +41,9 @@
 		12805E8B1D1E3DD30082A95D /* AudioRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 12805E8A1D1E3DD30082A95D /* AudioRecorder.m */; };
 		1285AACE1D2CCBBE00F508AC /* SelectionBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AACD1D2CCBBE00F508AC /* SelectionBar.m */; };
 		1285AAD11D2CDC9F00F508AC /* Profile.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAD01D2CDC9F00F508AC /* Profile.m */; };
+		1285AAD41D2F571C00F508AC /* PageSelectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAD31D2F571C00F508AC /* PageSelectionView.m */; };
+		1285AADB1D2F583600F508AC /* UIColor+LightAndDark.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AADA1D2F583600F508AC /* UIColor+LightAndDark.m */; };
+		1285AADD1D2F58AD00F508AC /* UIImage+AverageColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AADC1D2F58AD00F508AC /* UIImage+AverageColor.m */; };
 		1296A7A31D03B34000E44642 /* BaseCollections.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A21D03B34000E44642 /* BaseCollections.m */; };
 		1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A51D03B3CA00E44642 /* BaseFunctions.m */; };
 		1296A7A91D03BB5500E44642 /* Notifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A81D03BB5500E44642 /* Notifications.m */; };
@@ -166,6 +169,12 @@
 		1285AACD1D2CCBBE00F508AC /* SelectionBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectionBar.m; sourceTree = "<group>"; };
 		1285AACF1D2CDC9F00F508AC /* Profile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Profile.h; sourceTree = "<group>"; };
 		1285AAD01D2CDC9F00F508AC /* Profile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Profile.m; sourceTree = "<group>"; };
+		1285AAD21D2F571C00F508AC /* PageSelectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PageSelectionView.h; sourceTree = "<group>"; };
+		1285AAD31D2F571C00F508AC /* PageSelectionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PageSelectionView.m; sourceTree = "<group>"; };
+		1285AAD91D2F582100F508AC /* UIColor+LightAndDark.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIColor+LightAndDark.h"; sourceTree = "<group>"; };
+		1285AADA1D2F583600F508AC /* UIColor+LightAndDark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+LightAndDark.m"; sourceTree = "<group>"; };
+		1285AADC1D2F58AD00F508AC /* UIImage+AverageColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+AverageColor.m"; sourceTree = "<group>"; };
+		1285AADE1D2F58BB00F508AC /* UIImage+AverageColor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+AverageColor.h"; sourceTree = "<group>"; };
 		1296A7A11D03B34000E44642 /* BaseCollections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseCollections.h; sourceTree = "<group>"; };
 		1296A7A21D03B34000E44642 /* BaseCollections.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseCollections.m; sourceTree = "<group>"; };
 		1296A7A41D03B3CA00E44642 /* BaseFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseFunctions.h; sourceTree = "<group>"; };
@@ -359,6 +368,8 @@
 				12EAD9D91D27897500483EAE /* UserAnnotationView.m */,
 				1285AACC1D2CCBBE00F508AC /* SelectionBar.h */,
 				1285AACD1D2CCBBE00F508AC /* SelectionBar.m */,
+				1285AAD21D2F571C00F508AC /* PageSelectionView.h */,
+				1285AAD31D2F571C00F508AC /* PageSelectionView.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -410,6 +421,10 @@
 				1296A7A51D03B3CA00E44642 /* BaseFunctions.m */,
 				1296A7A71D03BB5500E44642 /* Notifications.h */,
 				1296A7A81D03BB5500E44642 /* Notifications.m */,
+				1285AAD91D2F582100F508AC /* UIColor+LightAndDark.h */,
+				1285AADA1D2F583600F508AC /* UIColor+LightAndDark.m */,
+				1285AADC1D2F58AD00F508AC /* UIImage+AverageColor.m */,
+				1285AADE1D2F58BB00F508AC /* UIImage+AverageColor.h */,
 			);
 			name = "File Manager";
 			sourceTree = "<group>";
@@ -672,8 +687,10 @@
 				12A607241D24D1AE00D8476D /* ChatPanel.m in Sources */,
 				1235BC8B1D0FD30100E4AA27 /* ChatRight.m in Sources */,
 				12DE5FE51D02D523009B315F /* NSMutableDictionary+Bullet.m in Sources */,
+				1285AADB1D2F583600F508AC /* UIColor+LightAndDark.m in Sources */,
 				12F0D70D1D06D53D00A37C40 /* MediaPlayer.m in Sources */,
 				1296A7A91D03BB5500E44642 /* Notifications.m in Sources */,
+				1285AAD41D2F571C00F508AC /* PageSelectionView.m in Sources */,
 				12F7418C1CE4B97100E8267A /* main.m in Sources */,
 				124928AF1CF2CD370038A2F3 /* RefreshControl.m in Sources */,
 				12EAD9DD1D28EAE000483EAE /* NearMe.m in Sources */,
@@ -707,6 +724,7 @@
 				120A52381D17A75400EB8269 /* GradientView.m in Sources */,
 				124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */,
 				12DB01B21D0E317700E33359 /* Chat.m in Sources */,
+				1285AADD1D2F58AD00F508AC /* UIImage+AverageColor.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

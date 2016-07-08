@@ -1,24 +1,23 @@
 //
-//  SelectionBar.m
+//  PageSelectionView.m
 //  LetsMeet
 //
-//  Created by 한정욱 on 2016. 7. 6..
+//  Created by 한정욱 on 2016. 7. 8..
 //  Copyright © 2016년 SMARTLY CO. All rights reserved.
 //
 
-#import "SelectionBar.h"
+#import "PageSelectionView.h"
 #import "UIColor+LightAndDark.h"
 
 #define pointerHeight 5.0f
 
-@interface SelectionBar()
+@interface PageSelectionView()
 @property (nonatomic, strong) NSMutableArray* buttons;
-@property (nonatomic, strong) UIColor* highlightedColor;
-@property (nonatomic, strong) UIFont * highlightedFont;
-@property (nonatomic, strong) UIFont * normalFont;
+@property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) UIPageControl *pageControl;
 @end
 
-@implementation SelectionBar
+@implementation PageSelectionView
 
 -(instancetype) initWithCoder:(NSCoder *)aDecoder
 {
@@ -32,15 +31,32 @@
 {
     self.buttons = [NSMutableArray array];
     self.textColor = [UIColor colorWithRed:183/255.0f green:233/255.0f blue:114/255.0f alpha:1.0f];
-    self.highlightedColor = [UIColor colorWithRed:183/255.0f green:233/255.0f blue:114/255.0f alpha:0.6f];
+    self.highlightedTextColor = [UIColor colorWithRed:183/255.0f green:233/255.0f blue:114/255.0f alpha:0.6f];
     self.barColor = self.backgroundColor;
     self.normalFont = [UIFont boldSystemFontOfSize:14];
     self.highlightedFont = [UIFont systemFontOfSize:12 weight:UIFontWeightSemibold];
     self.backgroundColor = [UIColor clearColor];
     self.index = 0;
+    
+    self.scrollView = [UIScrollView new];
+    self.scrollView.delegate = self;
+    self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self.scrollView translatesAutoresizingMaskIntoConstraints];
+    
+    [self addSubview:self.scrollView];
+    self.pageControl = [UIPageControl new];
+    self.pageControl.translatesAutoresizingMaskIntoConstraints = NO;
+
+    UILayoutGuide* margins = self.layoutMarginsGuide;
+    [self.pageControl.heightAnchor constraintEqualToConstant:25];
+    [self.pageControl.leadingAnchor constraintEqualToAnchor:margins.leadingAnchor];
+    [self.pageControl.trailingAnchor constraintEqualToAnchor:margins.trailingAnchor];
+    [self.pageControl.bottomAnchor constraintEqualToAnchor:margins.bottomAnchor];
+    
+    [self addSubview:self.pageControl];
 }
 
-- (void)setHandler:(SelectionBarBlock)handler
+- (void)setHandler:(PageSelectionBlock)handler
 {
     _handler = handler;
 }
@@ -48,18 +64,7 @@
 - (void)setTextColor:(UIColor *)textColor
 {
     _textColor = [textColor lighterColor];
-    _highlightedColor = [textColor darkerColor];
-}
-
-- (CGFloat)nextStartPos
-{
-    CGFloat __block sx = 20.0f;
-    
-    [self.buttons enumerateObjectsUsingBlock:^(UIButton* _Nonnull button, NSUInteger idx, BOOL * _Nonnull stop) {
-        sx += button.bounds.size.width;
-    }];
-    
-    return sx;
+    _highlightedTextColor = [textColor darkerColor];
 }
 
 - (void)setIndex:(NSInteger)index
@@ -72,26 +77,43 @@
             [obj.titleLabel setFont:self.normalFont];
         }
         else {
-            [obj setTitleColor:self.highlightedColor forState:UIControlStateNormal];
+            [obj setTitleColor:self.highlightedTextColor forState:UIControlStateNormal];
             [obj.titleLabel setFont:self.highlightedFont];
         }
     }];
 }
 
-- (void) addButtonWithTitle:(NSString*)title width:(CGFloat)width
+- (void) addButtonWithTitle:(NSString*)title view:(UIView *)view
 {
-    CGFloat h = self.bounds.size.height - pointerHeight;
+    const CGFloat offset = 16;
+    CGFloat h = self.bounds.size.height - pointerHeight, height = self.bounds.size.height, width = self.bounds.size.width;
     
     UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
     [button setTitle:title forState:UIControlStateNormal];
     [button setTitleColor:self.textColor forState:UIControlStateNormal];
     [button.titleLabel setFont:self.normalFont];
     [button setTag:self.buttons.count];
-    [button setFrame:CGRectMake([self nextStartPos], 0, width, h)];
     [button addTarget:self action:@selector(tappedItem:) forControlEvents:UIControlEventTouchUpInside];
     
+    [button setFrame:CGRectMake([self nextStartPos], 0, CGRectGetWidth(rectForString(title, self.normalFont, CGFLOAT_MAX))+offset, h)];
     [self addSubview:button];
+
     [self.buttons addObject:button];
+    self.scrollView.contentSize = CGSizeMake(width*self.buttons.count, height);
+    view.frame = CGRectMake(width*(self.buttons.count-1), 0, width, height);
+    self.pageControl.numberOfPages = self.buttons.count;
+    [self.scrollView addSubview:view];
+}
+
+- (CGFloat)nextStartPos
+{
+    CGFloat __block sx = 20.0f;
+    
+    [self.buttons enumerateObjectsUsingBlock:^(UIButton* _Nonnull button, NSUInteger idx, BOOL * _Nonnull stop) {
+        sx += button.bounds.size.width;
+    }];
+    
+    return sx;
 }
 
 - (void) tappedItem:(UIButton*)button
