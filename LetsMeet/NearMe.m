@@ -10,7 +10,7 @@
 #import "MediaViewer.h"
 #import "RefreshControl.h"
 #import "UIButton+Badge.h"
-#import "ProfileMain.h"
+#import "Profile.h"
 
 #define blueColor [UIColor colorWithRed:95/255.f green:167/255.f blue:229/255.f alpha:1.0f]
 #define greyColor [UIColor colorWithWhite:0.3 alpha:1.0]
@@ -20,7 +20,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *distance;
 @property (weak, nonatomic) IBOutlet UILabel *desc;
 @property (weak, nonatomic) IBOutlet UILabel *nickname;
-@property (weak, nonatomic) IBOutlet UIButton *like;
 @property (weak, nonatomic) User *user;
 @property (weak, nonatomic) NearMe *parent;
 @end
@@ -46,26 +45,6 @@
     self.distance.text = distanceString(distance);
     self.nickname.text = user.nickname;
     self.desc.text = [NSString stringWithFormat:@"%@ / %@", user.age ? user.age : @"", user.intro ? user.intro : @""];
-    self.like.selected = [[User me].likes containsObject:self.user.objectId];
-}
-
-- (IBAction)showProfile:(id)sender {
-    [self.parent showProfileForUser:self.user];
-}
-
-- (IBAction)likeUser:(UIButton *)sender {
-    User *me = [User me];
-    
-    NSArray *likes = me.likes;
-    if ([likes containsObject:self.user.objectId]) {
-        [me removeObject:self.user.objectId forKey:@"likes"];
-        sender.selected = NO;
-    }
-    else {
-        [me addUniqueObject:self.user.objectId forKey:@"likes"];
-        sender.selected = YES;
-    }
-    [me saveInBackground];
 }
 
 @end
@@ -83,7 +62,7 @@
 @property (strong, nonatomic) NSMutableDictionary *users;
 @property (strong, nonatomic) NSArray *usersData;
 @property (strong, nonatomic) RefreshControl *refresh;
-@property (strong, nonatomic) NSIndexPath *selectedIndexPath;
+//@property (strong, nonatomic) NSIndexPath *selectedIndexPath;
 @property (nonatomic) BOOL grouped;
 @end
 
@@ -106,12 +85,20 @@
     [self reloadAllUsersOnCondition:self.bar.index]; //All users initially
 }
 
-- (void) showProfileForUser:(User*)user
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    ProfileMain* main = [self.storyboard instantiateViewControllerWithIdentifier:@"ProfileMain"];
-    [main setMe:user];
-    main.modalPresentationStyle = UIModalPresentationOverFullScreen;
-    [self presentViewController:main animated:YES completion:nil];
+    if ([[segue identifier] isEqualToString:@"Profile"])
+    {
+        [self prepareProfile:segue.destinationViewController];
+    }
+}
+
+- (void) prepareProfile:(UINavigationController*) navigationController
+{
+    navigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    Profile *main = [navigationController.viewControllers firstObject];
+    main.user = [self userAtIndexPath:[self.tableView indexPathForSelectedRow]];
+    main.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:main action:@selector(dismissModalPresentation)];
 }
 
 - (IBAction)barItemSelected:(UIButton *)sender {
@@ -173,7 +160,7 @@
 
 - (void)reloadAllUsersOnCondition:(NSUInteger)condition
 {
-    self.selectedIndexPath = nil;
+//    self.selectedIndexPath = nil;
     if (![self.refresh isRefreshing]) {
         [self.refresh beginRefreshing];
     }
@@ -219,40 +206,43 @@
     cell.backgroundColor = indexPath.row % 2 ? [UIColor colorWithRed:252/255.f green:252./255.f blue:252/255.f alpha:1.0f] : [UIColor whiteColor];
 }
 
+- (User*)userAtIndexPath:(NSIndexPath*)indexPath
+{
+    id key = [[self.users allKeys] objectAtIndex:indexPath.section];
+    return [[self.users objectForKey:key] objectAtIndex:indexPath.row];
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     NearMeCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NearMe" forIndexPath:indexPath];
     
-    id key = [[self.users allKeys] objectAtIndex:indexPath.section];
-    User *user = [[self.users objectForKey:key] objectAtIndex:indexPath.row];
-    
-    cell.user = user;
+    cell.user = [self userAtIndexPath:indexPath];
     cell.parent = self;
 
     return cell;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if ([indexPath isEqual:self.selectedIndexPath]) {
-        return 200;
-    }
-    else {
-        return 80;
-    }
-}
+//- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    if ([indexPath isEqual:self.selectedIndexPath]) {
+//        return 200;
+//    }
+//    else {
+//        return 80;
+//    }
+//}
 
-- (void)setSelectedIndexPath:(NSIndexPath *)selectedIndexPath
-{
-    _selectedIndexPath = selectedIndexPath;
-    
-}
+//- (void)setSelectedIndexPath:(NSIndexPath *)selectedIndexPath
+//{
+//    _selectedIndexPath = selectedIndexPath;
+//    
+//}
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    self.selectedIndexPath = [indexPath isEqual:self.selectedIndexPath] ? nil : indexPath;
-    [tableView deselectRowAtIndexPath:indexPath animated:TRUE];
-    [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-}
+//- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    self.selectedIndexPath = [indexPath isEqual:self.selectedIndexPath] ? nil : indexPath;
+//    [tableView deselectRowAtIndexPath:indexPath animated:TRUE];
+//    [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+//}
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {

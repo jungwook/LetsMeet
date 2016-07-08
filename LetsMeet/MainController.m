@@ -16,6 +16,8 @@
 #define MAIN_SCREEN_ID @"Profile"
 #undef MAIN_SCREEN_ID
 #define MAIN_SCREEN_ID @"NearMe"
+#undef MAIN_SCREEN_ID
+#define MAIN_SCREEN_ID @"Profile"
 
 @interface MainController ()
 @end

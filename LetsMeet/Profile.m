@@ -94,7 +94,8 @@ typedef enum {
     _user = [User objectWithoutDataWithObjectId:userId];
     [self.user fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
         self.nickname.text = self.user.nickname;
-        [S3File getDataFromFile:self.user.thumbnail completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
+        id filename = self.user.profileMediaType == kProfileMediaPhoto ? self.user.profileMedia : self.user.thumbnail;
+        [S3File getDataFromFile:filename completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
             [[self.parent.collectionView visibleCells] enumerateObjectsUsingBlock:^(__kindof UICollectionViewCell * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
                 if (obj.tag == self.tag) {
                     *stop = YES;
@@ -183,7 +184,6 @@ typedef enum {
 @property (weak, nonatomic) IBOutlet UILabel *likedLB;
 @property (weak, nonatomic) IBOutlet UIView *backgroundView;
 @property (weak, nonatomic) IBOutlet UIButton *photoEdit;
-@property (weak, nonatomic) IBOutlet UIButton *like;
 @property (weak, nonatomic) User *user;
 @property (nonatomic, readonly) BOOL editable;
 @property (nonatomic) ProfileMediaSections section;
@@ -227,8 +227,8 @@ typedef enum {
     
     
     // setup for likes and liked and like heart
-    [self.like setSelected:[[User me].likes containsObject:self.user.objectId]];
-    [self setShadowOnView:self.like];
+    [self setupLikeBarButtonItem];
+    [self setupLikeBarButtonItemState:[[User me].likes containsObject:self.user.objectId]];
     [self setupLikes];
     
     [self.photo loadMediaFromUser:self.user];
@@ -242,7 +242,6 @@ typedef enum {
     [self.intro setUserInteractionEnabled:self.user.isMe];
     [self.age setUserInteractionEnabled:self.user.isMe];
     [self.sex setUserInteractionEnabled:self.user.isMe];
-    [self.like setUserInteractionEnabled:!self.user.isMe];
     
     self.intro.text = self.user.intro ? self.user.intro : @"";
     [ListPicker pickerWithArray:@[@"우리 만나요!", @"애인 찾아요", @"함께 드라이브 해요", @"나쁜 친구 찾아요", @"착한 친구 찾아요", @"함께 먹으러 가요", @"술친구 찾아요"] onTextField:self.intro selection:^(id data) {
@@ -261,6 +260,25 @@ typedef enum {
         self.user.sex = [data isEqualToString:@"여자"] ? kSexFemale : kSexMale ;
         [self.user saveInBackground];
     }];
+    
+}
+
+- (void) setupLikeBarButtonItemState:(BOOL)liked
+{
+    UIButton *but = self.navigationItem.rightBarButtonItem.customView;
+    but.selected = liked;
+}
+
+- (void) setupLikeBarButtonItem
+{
+    if (!self.user.isMe && !self.navigationItem.rightBarButtonItem) {
+        const CGFloat size = 30;
+        UIButton *but = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, size, size)];
+        [but setBackgroundImage:[UIImage imageNamed:@"like grey"] forState:UIControlStateNormal];
+        [but setBackgroundImage:[UIImage imageNamed:@"like red"] forState:UIControlStateSelected];
+        [but addTarget:self action:@selector(likeUser:) forControlEvents:UIControlEventTouchDown];
+        [self.navigationItem setRightBarButtonItem:[[UIBarButtonItem alloc] initWithCustomView:but]];
+    }
 }
 
 - (void) setupLikes
@@ -283,7 +301,6 @@ typedef enum {
     [super viewDidLoad];
     
     [self setUser:self.user];
-    [self setCellSpacingForSelection:kSectionMedia];
     [self setupSelectionButtons];
     [self setShadowOnViews];
     [self setupTapGestureRecognizerForExit];
@@ -295,7 +312,7 @@ typedef enum {
     [self.navigationController.navigationBar setTintColor:self.backgroundColor];
     [self.navigationController.navigationBar setTitleTextAttributes:@{
                                                                       NSForegroundColorAttributeName:self.backgroundColor,
-                                                                      NSFontAttributeName: [UIFont systemFontOfSize:18 weight:UIFontWeightBold]
+                                                                      NSFontAttributeName: [UIFont systemFontOfSize:16 weight:UIFontWeightBold]
                                                                       }];
 }
 
@@ -320,22 +337,6 @@ typedef enum {
     view.layer.shadowOffset = CGSizeZero;
     view.layer.shadowRadius = 2.5f;
     view.layer.shadowOpacity = 0.8f;
-}
-
-- (void)setCellSpacingForSelection:(NSInteger)selection
-{
-    const CGFloat h = self.collectionView.bounds.size.height;
-    const CGFloat kCellsPerRow = (selection == kSectionLocation) ? 1 : 3;
-    UICollectionViewFlowLayout *flowLayout = (UICollectionViewFlowLayout*)self.collectionView.collectionViewLayout;
-    
-    flowLayout.minimumLineSpacing = 2;
-    flowLayout.minimumInteritemSpacing = 2;
-    
-    CGFloat availableWidthForCells = CGRectGetWidth(self.collectionView.frame) - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * (kCellsPerRow - 1);
-    
-    CGFloat cellWidth = availableWidthForCells / kCellsPerRow;
-    CGFloat cellHeight = h-64;
-    flowLayout.itemSize = CGSizeMake(cellWidth, (selection == kSectionLocation) ? cellHeight : cellWidth);
 }
 
 - (void) countLikesMeInBackground
@@ -371,24 +372,20 @@ typedef enum {
 - (void)setSection:(ProfileMediaSections)section
 {
     _section = section;
-    [self setCellSpacingForSelection:section];
     [self.collectionView reloadData];
 }
 
 - (void)setupSelectionButtons
 {
-    const CGFloat width = 80.0f;
-    
     [self.selectionBar setTextColor:self.backgroundColor];
-    [self.selectionBar addButtonWithTitle:@"Media" width:width];
-    [self.selectionBar addButtonWithTitle:@"Location" width:width];
-    [self.selectionBar addButtonWithTitle:@"Likes" width:width];
-    [self.selectionBar addButtonWithTitle:@"Liked" width:width];
+    [self.selectionBar addButtonWithTitle:@"Media" width:60];
+    [self.selectionBar addButtonWithTitle:@"Location" width:80];
+    [self.selectionBar addButtonWithTitle:@"Likes" width:50];
+    [self.selectionBar addButtonWithTitle:@"Liked" width:50];
     [self.selectionBar setIndex:self.section];
     [self.selectionBar setHandler:^(NSInteger index) {
         self.section = (ProfileMediaSections) index;
     }];
-    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -474,6 +471,39 @@ typedef enum {
     }
 }
 
+CGFloat __cellWidth(UICollectionView* cv, CGFloat cpr)
+{
+    UICollectionViewFlowLayout *flowLayout = (UICollectionViewFlowLayout*)cv.collectionViewLayout;
+    return (CGRectGetWidth(cv.frame) - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * (cpr - 1))/cpr;
+}
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    __LF
+    const CGFloat h = self.collectionView.bounds.size.height;
+    CGFloat cellWidth = 0, cellHeight = 0;
+    switch (self.section) {
+        case kSectionMedia:
+            cellWidth = cellHeight = __cellWidth(self.collectionView, 3);
+            break;
+        case kSectionLocation:
+            cellWidth = __cellWidth(self.collectionView, 1);
+            cellHeight = h - 64;
+            break;
+        case kSectionLiked:
+        case kSectionLikes:
+            cellWidth = cellHeight = __cellWidth(self.collectionView, 2);
+            break;
+    }
+    
+    return CGSizeMake(cellWidth, cellHeight);
+}
+
+- (void) dismissModalPresentation
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 - (void) dismissKeyboard
 {
     [[self.backgroundView subviews] enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -515,7 +545,7 @@ typedef enum {
     }];
 }
 
-- (IBAction)likeUser:(UIButton *)sender {
+- (void) likeUser:(UIButton *)sender {
     User *me = [User me];
     
     NSArray *likes = me.likes;
@@ -532,9 +562,14 @@ typedef enum {
     }];
 }
 
+- (IBAction)editBackgroundMedia:(id)sender {
+    __LF
+    
+}
 
 - (IBAction)editProfileMedia:(id)sender
 {
+    __LF
     MediaPickerMediaBlock handler = ^(ProfileMediaTypes mediaType,
                                       NSData *thumbnailData,
                                       NSString *thumbnailFile,
