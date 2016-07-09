@@ -147,25 +147,21 @@
 }
 
 + (AppDelegate *)globalDelegate {
-    __LF
     return (AppDelegate *)[UIApplication sharedApplication].delegate;
 }
 
 + (void) toggleMenu
 {
-    __LF
     [[[self globalDelegate] mainMenu] toggleDrawerWithSide:FloatingDrawerSideLeft animated:YES completion:nil];
 }
 
 + (void) toggleMenuWithScreenID:(NSString *)screen
 {
-    __LF
     [[self globalDelegate].mainMenu selectScreenWithID:screen];
 }
 
 + (NSDictionary*) screens
 {
-    __LF
     return [self globalDelegate].mainMenu.screens;
 }
 

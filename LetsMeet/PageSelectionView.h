@@ -11,14 +11,8 @@
 typedef void(^PageSelectionBlock)(NSUInteger index);
 
 @interface PageSelectionView : UIView <UIScrollViewDelegate>
-@property (nonatomic) NSInteger index;
-@property (nonatomic, strong) UIColor *textColor;
-@property (nonatomic, strong) UIColor *barColor;
-@property (nonatomic, strong) UIColor* highlightedTextColor;
-@property (nonatomic, strong) UIFont * highlightedFont;
-@property (nonatomic, strong) UIFont * normalFont;
-@property (nonatomic, copy) PageSelectionBlock handler;
-
+@property (nonatomic, assign) UIColor *textColor;
+@property (nonatomic, assign) PageSelectionBlock handler;
 - (void) setHandler:(PageSelectionBlock)handler;
 - (void) addButtonWithTitle:(NSString*)title view:(UIView*)view;
 @end

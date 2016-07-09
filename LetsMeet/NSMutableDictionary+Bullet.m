@@ -7,7 +7,8 @@
 //
 
 #import "NSMutableDictionary+Bullet.h"
-#import "CachedFile.h"
+//#import "CachedFile.h"
+#import "S3File.h"
 
 #define ASSERTNOTNULL(__A__) NSAssert(__A__, @"__A__ cannot be nil")
 
@@ -470,6 +471,22 @@
     return ([self.objectId isEqualToString:[User me].objectId]);
 }
 
+- (void)allMediaLoaded:(UserMediaBlock)handler
+{
+    __block NSUInteger count = self.media.count;
+    [self.media enumerateObjectsUsingBlock:^(UserMedia* _Nonnull userMedia, NSUInteger idx, BOOL * _Nonnull stop) {
+        [userMedia load:^{
+            if (--count == 0) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (handler) {
+                        handler();
+                    }
+                });
+            }
+        }];
+    }];
+}
+
 @end
 
 @implementation UserMedia
@@ -488,6 +505,16 @@
 - (CGSize)mediaSize
 {
     return CGSizeMake([[self objectForKey:@"mediaWidth"] floatValue], [[self objectForKey:@"mediaHeight"] floatValue]);
+}
+
+- (void)load:(UserMediaBlock)block
+{
+    [self fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+        [S3File getDataFromFile:self.thumbailFile completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
+            if (block)
+                block();
+        }];
+    }];
 }
 @end
 

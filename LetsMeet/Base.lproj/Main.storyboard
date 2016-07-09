@@ -1758,6 +1758,57 @@ Hello</string>
             </objects>
             <point key="canvasLocation" x="4576" y="2807"/>
         </scene>
+        <!--Test-->
+        <scene sceneID="or5-O9-uuM">
+            <objects>
+                <viewController id="XXm-pO-PlU" customClass="Test" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="qmg-0e-qRM"/>
+                        <viewControllerLayoutGuide type="bottom" id="Xc8-xq-ylp"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="vgA-u1-sfu">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WM1-62-bEp" customClass="PageSelectionView">
+                                <rect key="frame" x="0.0" y="390" width="414" height="346"/>
+                                <color key="backgroundColor" red="0.99607843159999998" green="0.68235296010000002" blue="0.35686275360000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Xc8-xq-ylp" firstAttribute="top" secondItem="WM1-62-bEp" secondAttribute="bottom" id="7ba-f8-79B"/>
+                            <constraint firstItem="WM1-62-bEp" firstAttribute="top" secondItem="qmg-0e-qRM" secondAttribute="bottom" constant="326" id="jcD-aO-g6y"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="WM1-62-bEp" secondAttribute="trailing" constant="-20" id="oe6-GR-pdB"/>
+                            <constraint firstItem="WM1-62-bEp" firstAttribute="leading" secondItem="vgA-u1-sfu" secondAttribute="leadingMargin" constant="-20" id="quu-oi-6uH"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="z3G-jF-fEc"/>
+                    <connections>
+                        <outlet property="pageView" destination="WM1-62-bEp" id="OwX-OL-hBy"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="c7e-e5-Kzn" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5068" y="2807"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="fVF-lC-ik9">
+            <objects>
+                <navigationController storyboardIdentifier="Test" id="4gq-zc-Of7" sceneMemberID="viewController">
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina55"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="7rc-rR-16c">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="XXm-pO-PlU" kind="relationship" relationship="rootViewController" id="ZZe-f6-i4q"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="0pe-H4-SSv" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5068" y="1888"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="3Rl-Tw-vAI">
             <objects>

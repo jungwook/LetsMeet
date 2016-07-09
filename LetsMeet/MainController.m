@@ -18,6 +18,8 @@
 #define MAIN_SCREEN_ID @"NearMe"
 #undef MAIN_SCREEN_ID
 #define MAIN_SCREEN_ID @"Profile"
+#undef MAIN_SCREEN_ID
+#define MAIN_SCREEN_ID @"Test"
 
 @interface MainController ()
 @end
@@ -94,8 +96,9 @@
     if ([self initializeViewControllers]) {
         NSLog(@"All systems go...");
         
+        UIViewController *center = self.screens[screenId][@"screen"];
         self.leftViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"LeftMenu"];
-        self.centerViewController = self.screens[screenId][@"screen"];
+        self.centerViewController = center ? center : [self.storyboard instantiateViewControllerWithIdentifier:screenId];
         self.animator = [[FloatingDrawerSpringAnimator alloc] init];
         
         [AppDelegate globalDelegate].mainMenu = self;

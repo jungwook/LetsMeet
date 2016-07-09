@@ -11,54 +11,57 @@
 
 #define pointerHeight 5.0f
 
-@interface PageSelectionView()
+@interface PageSelectionBar : UIView
+@property (nonatomic) NSInteger index;
+@property (nonatomic, strong) UIColor *textColor;
+@property (nonatomic, strong) UIColor *barColor;
+@property (nonatomic, strong) UIColor* highlightedTextColor;
+@property (nonatomic, strong) UIFont * highlightedFont;
+@property (nonatomic, strong) UIFont * normalFont;
 @property (nonatomic, strong) NSMutableArray* buttons;
-@property (nonatomic, strong) UIScrollView *scrollView;
-@property (nonatomic, strong) UIPageControl *pageControl;
+@property (nonatomic, copy) PageSelectionBlock handler;
+@property (nonatomic, readonly) NSUInteger pages;
 @end
 
-@implementation PageSelectionView
+@implementation PageSelectionBar
 
--(instancetype) initWithCoder:(NSCoder *)aDecoder
+- (instancetype)init
 {
-    self = [super initWithCoder:aDecoder];
+    __LF
+    self = [super init];
     if (self) {
+        self.buttons = [NSMutableArray array];
+        self.textColor = [UIColor colorWithRed:183/255.0f green:233/255.0f blue:114/255.0f alpha:1.0f];
+        self.highlightedTextColor = [UIColor colorWithRed:183/255.0f green:233/255.0f blue:114/255.0f alpha:0.6f];
+        self.barColor = self.backgroundColor;
+        self.normalFont = [UIFont boldSystemFontOfSize:14];
+        self.highlightedFont = [UIFont systemFontOfSize:12 weight:UIFontWeightSemibold];
+        self.backgroundColor = [UIColor clearColor];
+        self.index = 0;
     }
     return self;
 }
 
-- (void)awakeFromNib
+- (NSUInteger)pages
 {
-    self.buttons = [NSMutableArray array];
-    self.textColor = [UIColor colorWithRed:183/255.0f green:233/255.0f blue:114/255.0f alpha:1.0f];
-    self.highlightedTextColor = [UIColor colorWithRed:183/255.0f green:233/255.0f blue:114/255.0f alpha:0.6f];
-    self.barColor = self.backgroundColor;
-    self.normalFont = [UIFont boldSystemFontOfSize:14];
-    self.highlightedFont = [UIFont systemFontOfSize:12 weight:UIFontWeightSemibold];
-    self.backgroundColor = [UIColor clearColor];
-    self.index = 0;
-    
-    self.scrollView = [UIScrollView new];
-    self.scrollView.delegate = self;
-    self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    [self.scrollView translatesAutoresizingMaskIntoConstraints];
-    
-    [self addSubview:self.scrollView];
-    self.pageControl = [UIPageControl new];
-    self.pageControl.translatesAutoresizingMaskIntoConstraints = NO;
-
-    UILayoutGuide* margins = self.layoutMarginsGuide;
-    [self.pageControl.heightAnchor constraintEqualToConstant:25];
-    [self.pageControl.leadingAnchor constraintEqualToAnchor:margins.leadingAnchor];
-    [self.pageControl.trailingAnchor constraintEqualToAnchor:margins.trailingAnchor];
-    [self.pageControl.bottomAnchor constraintEqualToAnchor:margins.bottomAnchor];
-    
-    [self addSubview:self.pageControl];
+    return self.buttons.count;
 }
 
-- (void)setHandler:(PageSelectionBlock)handler
+- (void)setIndex:(NSInteger)index
 {
-    _handler = handler;
+    __LF
+    _index = index;
+    [self setNeedsDisplay];
+    [self.buttons enumerateObjectsUsingBlock:^(UIButton* _Nonnull button, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (button.tag == self.index) {
+            [button setTitleColor:self.textColor forState:UIControlStateNormal];
+            [button.titleLabel setFont:self.normalFont];
+        }
+        else {
+            [button setTitleColor:self.highlightedTextColor forState:UIControlStateNormal];
+            [button.titleLabel setFont:self.highlightedFont];
+        }
+    }];
 }
 
 - (void)setTextColor:(UIColor *)textColor
@@ -67,26 +70,56 @@
     _highlightedTextColor = [textColor darkerColor];
 }
 
-- (void)setIndex:(NSInteger)index
+- (void)drawRect:(CGRect)rect
 {
-    _index = index;
-    [self setNeedsDisplay];
-    [self.subviews enumerateObjectsUsingBlock:^(__kindof UIButton * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (obj.tag == self.index) {
-            [obj setTitleColor:self.textColor forState:UIControlStateNormal];
-            [obj.titleLabel setFont:self.normalFont];
-        }
-        else {
-            [obj setTitleColor:self.highlightedTextColor forState:UIControlStateNormal];
-            [obj.titleLabel setFont:self.highlightedFont];
+    CGFloat __block ix = 0;
+    CGFloat l = self.bounds.origin.x, r = self.bounds.size.width, t = self.bounds.origin.y, b = self.bounds.size.height-pointerHeight;
+    
+    [self.buttons enumerateObjectsUsingBlock:^(UIButton* _Nonnull button, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (button.tag == self.index) {
+            *stop = YES;
+            ix = button.frame.origin.x + button.frame.size.width / 2.0f;
         }
     }];
+    
+    UIBezierPath *shadowPath = [UIBezierPath bezierPath];
+    [shadowPath moveToPoint:CGPointMake(l, t+10)];
+    [shadowPath addLineToPoint:CGPointMake(r, t+10)];
+    [shadowPath addLineToPoint:CGPointMake(r, b)];
+    [shadowPath addLineToPoint:CGPointMake(ix+pointerHeight, b)];
+    [shadowPath addLineToPoint:CGPointMake(ix, b+pointerHeight)];
+    [shadowPath addLineToPoint:CGPointMake(ix-pointerHeight, b)];
+    [shadowPath addLineToPoint:CGPointMake(l, b)];
+    [shadowPath addLineToPoint:CGPointMake(l, t+10)];
+    
+    
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    [path moveToPoint:CGPointMake(l, t)];
+    [path addLineToPoint:CGPointMake(r, t)];
+    [path addLineToPoint:CGPointMake(r, b)];
+    [path addLineToPoint:CGPointMake(ix+pointerHeight, b)];
+    [path addLineToPoint:CGPointMake(ix, b+pointerHeight)];
+    [path addLineToPoint:CGPointMake(ix-pointerHeight, b)];
+    [path addLineToPoint:CGPointMake(l, b)];
+    [path addLineToPoint:CGPointMake(l, t)];
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetLineWidth(context, 0.5);
+    CGContextSetFillColorWithColor(context, self.barColor.CGColor);
+    CGContextAddPath(context, path.CGPath);
+    CGContextFillPath(context);
+    
+    self.layer.shadowPath = shadowPath.CGPath;
+    self.layer.shadowColor = [UIColor colorWithWhite:0.0f alpha:0.7f].CGColor;
+    self.layer.shadowOffset = CGSizeMake(0, 1);
+    self.layer.shadowRadius = 2.0f;
+    self.layer.shadowOpacity = 0.3f;
 }
 
 - (void) addButtonWithTitle:(NSString*)title view:(UIView *)view
 {
-    const CGFloat offset = 16;
-    CGFloat h = self.bounds.size.height - pointerHeight, height = self.bounds.size.height, width = self.bounds.size.width;
+    const CGFloat offset = 4;
+    CGFloat height = self.bounds.size.height;
     
     UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
     [button setTitle:title forState:UIControlStateNormal];
@@ -95,14 +128,9 @@
     [button setTag:self.buttons.count];
     [button addTarget:self action:@selector(tappedItem:) forControlEvents:UIControlEventTouchUpInside];
     
-    [button setFrame:CGRectMake([self nextStartPos], 0, CGRectGetWidth(rectForString(title, self.normalFont, CGFLOAT_MAX))+offset, h)];
+    [button setFrame:CGRectMake([self nextStartPos], 0, CGRectGetWidth(rectForString(title, self.normalFont, CGFLOAT_MAX))+offset, height-pointerHeight)];
     [self addSubview:button];
-
     [self.buttons addObject:button];
-    self.scrollView.contentSize = CGSizeMake(width*self.buttons.count, height);
-    view.frame = CGRectMake(width*(self.buttons.count-1), 0, width, height);
-    self.pageControl.numberOfPages = self.buttons.count;
-    [self.scrollView addSubview:view];
 }
 
 - (CGFloat)nextStartPos
@@ -125,39 +153,111 @@
     }
 }
 
-- (void)drawRect:(CGRect)rect
+@end
+
+#define PAGESELECTIONVIEWSUBVIEW 1199
+
+@interface PageSelectionView()
+@property (nonatomic, strong) PageSelectionBar *selectionBar;
+@property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) UIPageControl *pageControl;
+@end
+
+@implementation PageSelectionView
+
+-(instancetype) initWithCoder:(NSCoder *)aDecoder
 {
-    CGFloat __block ix = 0;
-    CGFloat l = self.bounds.origin.x, r = self.bounds.size.width, t = self.bounds.origin.y, b = self.bounds.size.height-pointerHeight;
-    
-    [self.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (obj.tag == self.index) {
-            *stop = YES;
-            ix = obj.frame.origin.x + obj.frame.size.width / 2.0f;
+    __LF
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+    }
+    return self;
+}
+
+- (void)layoutSubviews
+{
+    __LF
+    self.selectionBar.frame = CGRectMake(0, 0, self.bounds.size.width, 49);
+    self.pageControl.frame = CGRectMake(0, self.bounds.size.height-25, self.bounds.size.width, 10);
+    self.scrollView.frame = CGRectMake(0, 44, self.bounds.size.width, self.bounds.size.height-44);
+
+    CGFloat height = self.scrollView.bounds.size.height, width = self.scrollView.frame.size.width;
+    [self.scrollView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull view, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (view.tag == PAGESELECTIONVIEWSUBVIEW) {
+            view.frame = CGRectMake(width*idx, self.scrollView.bounds.origin.y, width, height);
         }
     }];
+    self.scrollView.contentSize = CGSizeMake(width*self.selectionBar.pages, height+self.scrollView.bounds.origin.y);
+}
+
+- (void)awakeFromNib
+{
+    PageSelectionBlock handler = ^(NSUInteger index) {
+        [self showPage:index];
+    };
+    self.backgroundColor = [UIColor clearColor];
+    self.scrollView = [UIScrollView new];
+    self.scrollView.backgroundColor = [UIColor yellowColor];
+    [self.scrollView setContentInset:UIEdgeInsetsZero];
+    self.scrollView.pagingEnabled = YES;
+    self.scrollView.delegate = self;
+    [self addSubview:self.scrollView];
     
-    UIBezierPath *path = [UIBezierPath bezierPath];
-    [path moveToPoint:CGPointMake(l, t)];
-    [path addLineToPoint:CGPointMake(r, t)];
-    [path addLineToPoint:CGPointMake(r, b)];
-    [path addLineToPoint:CGPointMake(ix+pointerHeight, b)];
-    [path addLineToPoint:CGPointMake(ix, b+pointerHeight)];
-    [path addLineToPoint:CGPointMake(ix-pointerHeight, b)];
-    [path addLineToPoint:CGPointMake(l, b)];
-    [path addLineToPoint:CGPointMake(l, t)];
+    self.selectionBar = [PageSelectionBar new];
+    self.selectionBar.barColor = [UIColor colorWithWhite:1.0 alpha:1.0];
+    self.selectionBar.handler = handler;
+    [self addSubview:self.selectionBar];
     
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetLineWidth(context, 0.5);
-    CGContextSetFillColorWithColor(context, self.barColor.CGColor);
-    CGContextAddPath(context, path.CGPath);
-    CGContextFillPath(context);
-    
-    self.layer.shadowPath = path.CGPath;
-    self.layer.shadowColor = [UIColor colorWithWhite:0.0f alpha:0.7f].CGColor;
-    self.layer.shadowOffset = CGSizeZero;
-    self.layer.shadowRadius = 2.0f;
-    self.layer.shadowOpacity = 0.3f;
+    self.pageControl = [UIPageControl new];
+    [self.pageControl addTarget:self action:@selector(pageSelected:) forControlEvents:UIControlEventValueChanged];
+
+    [self addSubview:self.pageControl];
+    [self layoutIfNeeded];
+}
+
+- (void) addButtonWithTitle:(NSString*)title view:(UIView *)view
+{
+    __LF
+    [view setTag:PAGESELECTIONVIEWSUBVIEW];
+    [self.selectionBar addButtonWithTitle:title view:view];
+    self.pageControl.numberOfPages = self.selectionBar.pages;
+    [self.scrollView addSubview:view];
+    [self layoutIfNeeded];
+}
+
+- (void) pageSelected:(UIPageControl*)sender
+{
+    [self showPage:sender.currentPage];
+    [self.selectionBar setIndex:sender.currentPage];
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    CGFloat x = scrollView.contentOffset.x, sw = scrollView.bounds.size.width;
+    NSInteger index = (x / sw);
+    if (index != self.pageControl.currentPage) {
+        [self.pageControl setCurrentPage:index];
+        [self.selectionBar setIndex:index];
+    }
+}
+
+- (void) showPage:(NSInteger)page
+{
+    [self.scrollView scrollRectToVisible:CGRectMake(page*self.scrollView.bounds.size.width,
+                                                    self.scrollView.bounds.origin.y,
+                                                    self.scrollView.bounds.size.width,
+                                                    self.scrollView.bounds.size.height) animated:YES];
+}
+
+
+- (void)setHandler:(PageSelectionBlock)handler
+{
+    self.selectionBar.handler = handler;
+}
+
+- (void)setTextColor:(UIColor *)textColor
+{
+    self.selectionBar.textColor = textColor;
 }
 
 @end

@@ -19,7 +19,7 @@
 @property (nonatomic, strong) Notifications *notifications;
 @property (nonatomic) BOOL isReal;
 @property (nonatomic) BOOL animated;
-@property (nonatomic) CALayer* playLayer;
+@property (nonatomic, strong) UIButton* playBut;
 @end
 
 @implementation MediaView
@@ -40,15 +40,10 @@
     self = [super init];
     if (self) {
         [self initialize];
+        [self awakeFromNib];
     }
     return self;
 }
-
-/*
-- (void)layoutSubviews
-{
-}
-*/
 
 - (void)awakeFromNib
 {
@@ -68,28 +63,22 @@
     [self.notifications on];
 }
 
-- (void) layoutPlayButton
-{
-    const CGFloat w = self.bounds.size.width, h = self.bounds.size.height;
-    const CGFloat minSize = 12, maxSize = 25, size = MIN(MAX(MIN(w,h)/4.0f, minSize), maxSize);
-    self.playLayer.frame = CGRectMake((w-size)/2.0f, (h-size)/2.0f, size, size);
-}
-
 - (void) setupPlayButton
 {
-    const CGFloat w = self.bounds.size.width, h = self.bounds.size.height;
-    const CGFloat minSize = 12, maxSize = 25, size = MIN(MAX(MIN(w,h)/4.0f, minSize), maxSize);
-    self.playLayer = [CALayer layer];
-    self.playLayer.frame = CGRectMake((w-size)/2.0f, (h-size)/2.0f, size, size);
-    self.playLayer.contents = (id) [UIImage imageNamed:@"play white"].CGImage;
-    self.playLayer.opacity = 0.4f;
-    self.playLayer.hidden = YES;
-    self.playLayer.shadowColor = [UIColor colorWithWhite:0.1 alpha:1].CGColor;
-    self.playLayer.shadowOffset = CGSizeZero;
-    self.playLayer.shadowRadius = 3.0f;
-    self.playLayer.shadowOpacity = 0.4f;
+    self.playBut = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.playBut setImage:[UIImage imageNamed:@"play white"] forState:UIControlStateNormal];
+    [self.playBut addTarget:self action:@selector(tapped:) forControlEvents:UIControlEventTouchDown];
+    [self.playBut setHidden:YES];
+    [self setShadowOnView:self.playBut];
+    [self addSubview:self.playBut];
+}
 
-    [self.layer addSublayer:self.playLayer];
+- (void) setShadowOnView:(UIView*)view
+{
+    view.layer.shadowColor = [UIColor colorWithWhite:0.1 alpha:1].CGColor;
+    view.layer.shadowOffset = CGSizeZero;
+    view.layer.shadowRadius = 3.0f;
+    view.layer.shadowOpacity = 0.4f;
 }
 
 - (void) updateBadge
@@ -106,10 +95,7 @@
 - (void)setShowsShadow:(BOOL)hasShadow
 {
     if (hasShadow) {
-        self.layer.shadowColor = [UIColor colorWithWhite:0.1 alpha:1].CGColor;
-        self.layer.shadowOffset = CGSizeZero;
-        self.layer.shadowRadius = 3.0f;
-        self.layer.shadowOpacity = 0.4f;
+        [self setShadowOnView:self];
     }
 }
 
@@ -128,7 +114,6 @@
         self.imageView.layer.borderColor = showsBorder ? [UIColor whiteColor].CGColor : [UIColor clearColor].CGColor;
     }
 }
-
 
 - (void)setIsCircle:(BOOL)isCircle
 {
@@ -174,17 +159,29 @@
     }
 }
 
+- (void) layoutPlayButton
+{
+    const CGFloat w = self.bounds.size.width, h = self.bounds.size.height, offset = 8;
+    const CGFloat minSize = 12, maxSize = 16, size = MIN(MAX(MIN(w,h)/4.0f, minSize), maxSize);
+    self.playBut.frame = CGRectMake(w-size-offset, h-size-offset, size, size);
+}
+
 - (void)setImage:(UIImage *)image
 {
     [self layoutPlayButton];
-    self.playLayer.hidden = !(self.mediaType == kMediaTypeVideo);
+    self.playBut.hidden = !(self.mediaType == kMediaTypeVideo);
     if (self.animated) {
         self.alpha = 0.0;
+        self.playBut.alpha = 0.0f;
+    }
+    else {
+        self.playBut.alpha = 0.8f;
     }
     [self setImage:image forState:UIControlStateNormal];
     [self.imageView setContentMode: UIViewContentModeScaleAspectFill];
     if (self.animated) {
         [UIView animateWithDuration:0.25f animations:^{
+            self.playBut.alpha = 0.8f;
             self.alpha = 1.0f;
         }];
     }
@@ -289,9 +286,27 @@
 
 #pragma From User Media
 
+- (void)loadMediaFromUserMedia:(UserMedia *)media completion:(S3GetBlock)block
+{
+    [media fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+        self.mediaFile = media.mediaFile;
+        self.mediaType = (media.mediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
+        self.isReal = NO;
+        self.animated = YES;
+        
+        [self loadMediaFromFile:media.thumbailFile isReal:self.isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (block) {
+                    block(data, error, fromCache);
+                }
+            });
+        }];
+    }];
+}
+
 - (void)loadMediaFromUserMedia:(UserMedia *)media animated:(BOOL)animated
 {
-    [media fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+    [media fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
         self.mediaFile = media.mediaFile;
         self.mediaType = (media.mediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
         self.isReal = NO;
@@ -393,7 +408,7 @@
 @property (nonatomic) CGFloat zoom;
 @property (nonatomic) BOOL alive;
 @property (nonatomic) BOOL isReal;
-@property (nonatomic, strong) CALayer *realLayer;
+@property (nonatomic, strong) UIImageView *realView;
 @property (nonatomic, strong) UIImage *photoForAnnotation;
 @property (nonatomic) CLLocationCoordinate2D mapCenter;
 @end
@@ -496,12 +511,25 @@
     [self.map setCenterCoordinate:self.mapCenter];
 }
 
+- (void) setShadowOnView:(UIView*)view
+{
+    view.layer.shadowColor = [UIColor colorWithWhite:0.1 alpha:1].CGColor;
+    view.layer.shadowOffset = CGSizeZero;
+    view.layer.shadowRadius = 3.0f;
+    view.layer.shadowOpacity = 0.4f;
+}
 
 - (void) showMediaFromView:(UIView*)view filename:(id)filename mediaType:(MediaTypes)mediaType isReal:(BOOL)isReal
 {
     self.alpha = 0.0f;
     self.mediaFile = filename;
     self.isReal = isReal;
+
+    self.realView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"real"]];
+    self.realView.contentMode = UIViewContentModeScaleAspectFill;
+    self.realView.frame = CGRectMake(8, 16+8, 25, 25);
+    self.realView.hidden = !self.isReal;
+    [self setShadowOnView:self.realView];
     
     CGRect bigFrame = [self setupSelfAndGetRootFrameFromView:view];
     self.frame = bigFrame;
@@ -526,6 +554,7 @@
                         self.imageView.alpha = 1.0f;
                     } completion:^(BOOL finished) {
                         [self.progress removeFromSuperview];
+                        [self addSubview:self.realView];
                     }];
                 } progressBlock:^(int percentDone) {
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -584,20 +613,34 @@
     self.playerItem = [AVPlayerItem playerItemWithURL:url];
     self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
     self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
-    [self.playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playerItem];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemStalled:) name:AVPlayerItemPlaybackStalledNotification object:self.playerItem];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemFailedToPlayToEndTimeNotification object:self.playerItem];
-
+    
+    [self.playerItem addObserver:self
+                      forKeyPath:@"status"
+                         options:NSKeyValueObservingOptionNew
+                         context:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(playerItemDidReachEnd:)
+                                                 name:AVPlayerItemDidPlayToEndTimeNotification
+                                               object:self.playerItem];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(playerItemStalled:)
+                                                 name:AVPlayerItemPlaybackStalledNotification
+                                               object:self.playerItem];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(playerItemDidReachEnd:)
+                                                 name:AVPlayerItemFailedToPlayToEndTimeNotification
+                                               object:self.playerItem];
 
     self.playerView = [[UIView alloc] init];
     [self addSubview:self.playerView];
-    
     [self.playerView.layer addSublayer:self.playerLayer];
-    
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary<NSString *,id> *)change
+                       context:(void *)context
 {
     __LF
     if (object == self.playerItem && [keyPath isEqualToString:@"status"]) {
@@ -608,15 +651,14 @@
                 CGFloat W = self.bounds.size.width, H = self.bounds.size.height;
                 CGRect rect;
                 CGFloat fW = W, fH = h * W / w;
+                
                 self.playerView.frame = CGRectMake(0, (H-fH)/2, fW, fH);
                 self.playerLayer.frame = self.playerView.bounds;
-                if (self.isReal && !self.realLayer) {
-                    self.realLayer = [CALayer layer];
-                    UIImage *image = [UIImage imageNamed:@"real"];
-                    self.realLayer.contents = (id) image.CGImage;
-                    self.realLayer.frame = CGRectMake(10 + fabs(rect.origin.x), 10, 40, 40);
-                    
-                    [self.playerLayer addSublayer:self.realLayer];
+                [self.playerLayer removeAllAnimations];
+                if (YES) {
+//                    if (self.isReal) {
+                    self.realView.frame = CGRectMake(8 + fabs(rect.origin.x), 8, 25, 25);
+                    [self.playerView addSubview:self.realView];
                 }
                 [self.player play];
             }

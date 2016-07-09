@@ -44,6 +44,8 @@
 		1285AAD41D2F571C00F508AC /* PageSelectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAD31D2F571C00F508AC /* PageSelectionView.m */; };
 		1285AADB1D2F583600F508AC /* UIColor+LightAndDark.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AADA1D2F583600F508AC /* UIColor+LightAndDark.m */; };
 		1285AADD1D2F58AD00F508AC /* UIImage+AverageColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AADC1D2F58AD00F508AC /* UIImage+AverageColor.m */; };
+		1285AAE11D2F6A5900F508AC /* Test.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAE01D2F6A5900F508AC /* Test.m */; };
+		1285AAE41D2F99F000F508AC /* UserMediaCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAE31D2F99F000F508AC /* UserMediaCollection.m */; };
 		1296A7A31D03B34000E44642 /* BaseCollections.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A21D03B34000E44642 /* BaseCollections.m */; };
 		1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A51D03B3CA00E44642 /* BaseFunctions.m */; };
 		1296A7A91D03BB5500E44642 /* Notifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A81D03BB5500E44642 /* Notifications.m */; };
@@ -175,6 +177,10 @@
 		1285AADA1D2F583600F508AC /* UIColor+LightAndDark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+LightAndDark.m"; sourceTree = "<group>"; };
 		1285AADC1D2F58AD00F508AC /* UIImage+AverageColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+AverageColor.m"; sourceTree = "<group>"; };
 		1285AADE1D2F58BB00F508AC /* UIImage+AverageColor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+AverageColor.h"; sourceTree = "<group>"; };
+		1285AADF1D2F6A5900F508AC /* Test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Test.h; sourceTree = "<group>"; };
+		1285AAE01D2F6A5900F508AC /* Test.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Test.m; sourceTree = "<group>"; };
+		1285AAE21D2F99F000F508AC /* UserMediaCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserMediaCollection.h; sourceTree = "<group>"; };
+		1285AAE31D2F99F000F508AC /* UserMediaCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserMediaCollection.m; sourceTree = "<group>"; };
 		1296A7A11D03B34000E44642 /* BaseCollections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseCollections.h; sourceTree = "<group>"; };
 		1296A7A21D03B34000E44642 /* BaseCollections.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseCollections.m; sourceTree = "<group>"; };
 		1296A7A41D03B3CA00E44642 /* BaseFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseFunctions.h; sourceTree = "<group>"; };
@@ -370,6 +376,8 @@
 				1285AACD1D2CCBBE00F508AC /* SelectionBar.m */,
 				1285AAD21D2F571C00F508AC /* PageSelectionView.h */,
 				1285AAD31D2F571C00F508AC /* PageSelectionView.m */,
+				1285AAE21D2F99F000F508AC /* UserMediaCollection.h */,
+				1285AAE31D2F99F000F508AC /* UserMediaCollection.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -379,6 +387,8 @@
 			children = (
 				1285AACF1D2CDC9F00F508AC /* Profile.h */,
 				1285AAD01D2CDC9F00F508AC /* Profile.m */,
+				1285AADF1D2F6A5900F508AC /* Test.h */,
+				1285AAE01D2F6A5900F508AC /* Test.m */,
 			);
 			name = Profile;
 			sourceTree = "<group>";
@@ -690,6 +700,7 @@
 				1285AADB1D2F583600F508AC /* UIColor+LightAndDark.m in Sources */,
 				12F0D70D1D06D53D00A37C40 /* MediaPlayer.m in Sources */,
 				1296A7A91D03BB5500E44642 /* Notifications.m in Sources */,
+				1285AAE11D2F6A5900F508AC /* Test.m in Sources */,
 				1285AAD41D2F571C00F508AC /* PageSelectionView.m in Sources */,
 				12F7418C1CE4B97100E8267A /* main.m in Sources */,
 				124928AF1CF2CD370038A2F3 /* RefreshControl.m in Sources */,
@@ -719,6 +730,7 @@
 				120A52441D1907EF00EB8269 /* UsersTableBase.m in Sources */,
 				12F741D01CE56B3400E8267A /* FloatingDrawerSpringAnimator.m in Sources */,
 				120142E81D08930B00D66905 /* S3File.m in Sources */,
+				1285AAE41D2F99F000F508AC /* UserMediaCollection.m in Sources */,
 				120A52411D18C28E00EB8269 /* Search.m in Sources */,
 				1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */,
 				120A52381D17A75400EB8269 /* GradientView.m in Sources */,
