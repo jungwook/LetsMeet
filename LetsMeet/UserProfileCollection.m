@@ -165,7 +165,7 @@
         {
             UserLikesCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kUserLikesCell forIndexPath:indexPath];
             User *user = [self.likes objectAtIndex:row];
-            cell.user = user;
+            [cell setUser:user parent:nil];
             cell.backgroundColor = [UIColor darkGrayColor];
             return cell;
         }
@@ -173,7 +173,7 @@
         {
             UserLikesCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kUserLikesCell forIndexPath:indexPath];
             User *user = [self.liked objectAtIndex:row];
-            cell.user = user;
+            [cell setUser:user parent:nil];
             cell.backgroundColor = [UIColor darkGrayColor];
             return cell;
         }

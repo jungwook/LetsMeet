@@ -67,6 +67,37 @@
     [self initialize];
 }
 
+- (void)setLiked:(NSArray *)liked
+{
+    [self performBatchUpdates:^{
+        [self deleteItemsAtIndexPaths:[self indexPathsForRows:self.liked.count section:kSectionUserLiked]];
+        _liked = liked;
+        [self insertItemsAtIndexPaths:[self indexPathsForRows:liked.count section:kSectionUserLiked]];
+    } completion:^(BOOL finished) {
+        [self reloadData];
+    }];
+}
+
+- (void)setLikes:(NSArray *)likes
+{
+    [self performBatchUpdates:^{
+        [self deleteItemsAtIndexPaths:[self indexPathsForRows:self.likes.count section:kSectionUserLikes]];
+        _likes = likes;
+        [self insertItemsAtIndexPaths:[self indexPathsForRows:likes.count section:kSectionUserLikes]];
+    } completion:^(BOOL finished) {
+        [self reloadData];
+    }];
+}
+
+- (NSArray*) indexPathsForRows:(NSInteger)count section:(NSInteger)section
+{
+    NSMutableArray* ip = [NSMutableArray array];
+    for (int i=0; i<count; i++) {
+        [ip addObject:[NSIndexPath indexPathForRow:i inSection:section]];
+    }
+    return ip;
+}
+
 - (void) initialize
 {
     [self registerNib:[UINib nibWithNibName:kUserMediaCell bundle:[NSBundle mainBundle]] forCellWithReuseIdentifier:kUserMediaCell];
@@ -97,14 +128,13 @@
 - (void) setUser:(User *)user
 {
     __LF
-    _user = user;
-    [self loadAllLikesUsers];
-    [self loadAllLikedUsers];
-    
-    [self.user mediaReady:^{
-        self.delegate = self;
-        self.dataSource = self;
-        [self reloadData];
+    [user fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+        _user = user;
+        [self.user mediaReady:^{
+            self.delegate = self;
+            self.dataSource = self;
+            [self reloadData];
+        }];
     }];
 }
 
@@ -114,28 +144,6 @@
         [self reloadData];
     });
 }
-
-- (void)loadAllLikesUsers
-{
-    PFQuery *query = [User query];
-    [query whereKey:@"objectId" containedIn:self.user.likes];
-    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
-        self.likes = objects;
-        [self refreshProfile];
-    }];
-}
-
-- (void) loadAllLikedUsers
-{
-    PFQuery *query = [User query];
-    [query whereKey:@"likes" containsString:self.user.objectId];
-    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
-        self.liked = objects;
-        [self refreshProfile];
-    }];
-}
-
-
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
@@ -207,14 +215,14 @@
         {
             UserLikesCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kUserLikesCell forIndexPath:indexPath];
             User *user = [self.likes objectAtIndex:row];
-            cell.user = user;
+            [cell setUser:user parent:self];
             return cell;
         }
         case kSectionUserLiked:
         {
             UserLikesCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kUserLikesCell forIndexPath:indexPath];
             User *user = [self.liked objectAtIndex:row];
-            cell.user = user;
+            [cell setUser:user parent:self];
             return cell;
         }
     }
@@ -243,13 +251,13 @@
         header.title.textColor = [UIColor darkGrayColor];
         switch (section) {
             case kSectionUserMedia:
-                header.title.text = @"USER PHOTOS";
+                header.title.text = [NSString stringWithFormat:@"USER PHOTOS (%ld)", self.user.media.count];
                 break;
             case kSectionUserLikes:
-                header.title.text = @"FOLLOWING";
+                header.title.text = [NSString stringWithFormat:@"FOLLOWING (%ld)", self.likes.count];
                 break;
             case kSectionUserLiked:
-                header.title.text = @"FOLLOWED BY";
+                header.title.text = [NSString stringWithFormat:@"FOLLOWED BY (%ld)", self.liked.count];
                 break;
         }
         return header;
@@ -359,6 +367,13 @@
 {
     MediaPicker *mediaPicker = [MediaPicker mediaPickerWithSourceType:sourceType mediaBlock:handler];
     [self.viewController presentViewController:mediaPicker animated:YES completion:nil];
+}
+
+- (void) tappedOnLikeUser:(User*)user
+{
+    if (self.userLikeHandler) {
+        self.userLikeHandler(user);
+    }
 }
 
 - (void) removeMedia:(UserMedia*)media row:(NSInteger)row

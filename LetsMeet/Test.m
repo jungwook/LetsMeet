@@ -43,7 +43,7 @@
     
     
     [self.pageView addButtonWithTitle:@"Media" view:col];
-    [self.pageView addButtonWithTitle:@"Likes" view:likes];
+//    [self.pageView addButtonWithTitle:@"Likes" view:likes];
     [self.pageView addButtonWithTitle:@"Location" view:map];
     [self.pageView addButtonWithTitle:@"Hello2" view:v2];
     

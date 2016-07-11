@@ -118,8 +118,8 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, UICollectionViewFlowLayout
 {
     UserLikesCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier forIndexPath:indexPath];
     NSUInteger row = indexPath.row;
-    cell.user = (indexPath.section == 0) ? self.likes[row] : self.liked[row];
-    cell.titleColor = self.titleColor;
+    User *user = (indexPath.section == 0) ? self.likes[row] : self.liked[row];
+    [cell setUser:user parent:nil];
 
     return cell;
 }

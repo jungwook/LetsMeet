@@ -7,9 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "UserLikesCollection.h"
+#import "UserMediaCollection.h"
 
 @interface UserLikesCell : UICollectionViewCell
-@property (nonatomic, assign) UIColor *titleColor;
-- (void) setUser:(User*)user;
+- (void) setUser:(User*)user parent:(UserMediaCollection*)parent;
 @end

@@ -3,57 +3,38 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
-        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="UserLikesCell" id="PU3-NT-d25" customClass="UserLikesCell">
-            <rect key="frame" x="0.0" y="0.0" width="124" height="156"/>
+            <rect key="frame" x="0.0" y="0.0" width="124" height="124"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                <rect key="frame" x="0.0" y="0.0" width="124" height="156"/>
+                <rect key="frame" x="0.0" y="0.0" width="124" height="124"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wWL-3E-TUt">
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NUw-qf-lN0">
                         <rect key="frame" x="0.0" y="0.0" width="124" height="124"/>
-                        <color key="backgroundColor" red="0.99607843159999998" green="0.68235296010000002" blue="0.35686275360000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <constraints>
-                            <constraint firstAttribute="width" secondItem="wWL-3E-TUt" secondAttribute="height" multiplier="1:1" id="4SD-5Q-OA8"/>
-                        </constraints>
-                    </imageView>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="nickname" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aGC-Rt-gon">
-                        <rect key="frame" x="0.0" y="124" width="124" height="24"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="24" id="O22-Di-CeH"/>
-                        </constraints>
-                        <fontDescription key="fontDescription" name="AvenirNextCondensed-DemiBold" family="Avenir Next Condensed" pointSize="10"/>
-                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                        <nil key="highlightedColor"/>
-                    </label>
+                        <state key="normal" title="Button"/>
+                        <connections>
+                            <action selector="tappedUser:" destination="PU3-NT-d25" eventType="touchUpInside" id="cl0-7z-M9T"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             </view>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="wWL-3E-TUt" secondAttribute="trailing" id="3Tc-mU-JMP"/>
-                <constraint firstItem="wWL-3E-TUt" firstAttribute="top" secondItem="PU3-NT-d25" secondAttribute="top" id="La6-hE-Zge"/>
-                <constraint firstItem="wWL-3E-TUt" firstAttribute="leading" secondItem="PU3-NT-d25" secondAttribute="leading" id="SSQ-60-BlJ"/>
-                <constraint firstAttribute="bottom" secondItem="aGC-Rt-gon" secondAttribute="bottom" id="Tyv-bh-zLA"/>
-                <constraint firstItem="aGC-Rt-gon" firstAttribute="top" secondItem="wWL-3E-TUt" secondAttribute="bottom" id="mtb-8E-9DP"/>
-                <constraint firstItem="aGC-Rt-gon" firstAttribute="leading" secondItem="PU3-NT-d25" secondAttribute="leading" id="qEQ-UF-1uC"/>
-                <constraint firstAttribute="trailing" secondItem="aGC-Rt-gon" secondAttribute="trailing" id="vVK-CW-5Kj"/>
+                <constraint firstAttribute="bottom" secondItem="NUw-qf-lN0" secondAttribute="bottom" id="4AR-Nx-Fl4"/>
+                <constraint firstItem="NUw-qf-lN0" firstAttribute="leading" secondItem="PU3-NT-d25" secondAttribute="leading" id="QAh-vu-xx8"/>
+                <constraint firstItem="NUw-qf-lN0" firstAttribute="top" secondItem="PU3-NT-d25" secondAttribute="top" id="irs-WP-xRY"/>
+                <constraint firstAttribute="trailing" secondItem="NUw-qf-lN0" secondAttribute="trailing" id="rWq-R5-3n0"/>
             </constraints>
-            <size key="customSize" width="124" height="156"/>
-            <variation key="default">
-                <mask key="constraints">
-                    <exclude reference="Tyv-bh-zLA"/>
-                </mask>
-            </variation>
+            <size key="customSize" width="124" height="124"/>
             <connections>
-                <outlet property="nickname" destination="aGC-Rt-gon" id="dqy-Mn-3Io"/>
-                <outlet property="photo" destination="wWL-3E-TUt" id="Aui-Zp-P8q"/>
+                <outlet property="photo" destination="NUw-qf-lN0" id="nMc-Nh-Jpg"/>
             </connections>
-            <point key="canvasLocation" x="244" y="409"/>
+            <point key="canvasLocation" x="244" y="393"/>
         </collectionViewCell>
     </objects>
 </document>

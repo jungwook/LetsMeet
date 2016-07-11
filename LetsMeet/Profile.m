@@ -12,140 +12,12 @@
 #import "MediaPicker.h"
 #import "ListPicker.h"
 #import "UIImage+AverageColor.h"
-
-typedef enum {
-    kSectionMedia = 0,
-    kSectionLocation,
-    kSectionLikes,
-    kSectionLiked
-} ProfileMediaSections;
-
-@interface AddMoreCell : UICollectionViewCell
-@property (weak, nonatomic) Profile* parent;
-@end
-
-@implementation AddMoreCell
-
-- (IBAction)addMedia:(id)sender {
-    [self.parent addMedia];
-}
-
-@end
-
-@interface LikesCell : UICollectionViewCell
-@property (weak, nonatomic) IBOutlet UIButton *photo;
-@property (weak, nonatomic) IBOutlet UILabel *nickname;
-@property (nonatomic) ProfileMediaSections section;
-@property (nonatomic) BOOL editable;
-@property (weak, nonatomic) Profile* parent;
-@property (weak, nonatomic) id userId;
-@property (strong, nonatomic, readonly) User* user;
-@property (nonatomic) BOOL likes;
-@end
-
-@implementation LikesCell
-
-- (void)awakeFromNib
-{
-    self.nickname.layer.shadowColor = [UIColor colorWithWhite:0.0f alpha:1.0f].CGColor;
-    self.nickname.layer.shadowOffset = CGSizeZero;
-    self.nickname.layer.shadowRadius = 2.5f;
-    self.nickname.layer.shadowOpacity = 0.8f;
-}
-
-- (IBAction)gotoProfile:(id)sender {
-    __LF
-    
-    [self.parent showProfileForUser:self.user];
-}
-
-- (void)setUserId:(id)userId
-{
-    [self.photo setImage:nil forState:UIControlStateNormal];
-    _userId = userId;
-    _user = [User objectWithoutDataWithObjectId:userId];
-    [self.user fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
-        self.nickname.text = self.user.nickname;
-        id filename = self.user.profileMediaType == kProfileMediaPhoto ? self.user.profileMedia : self.user.thumbnail;
-        [S3File getDataFromFile:filename completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
-            [[self.parent.collectionView visibleCells] enumerateObjectsUsingBlock:^(__kindof UICollectionViewCell * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                if (obj.tag == self.tag) {
-                    *stop = YES;
-                    [self.photo setImage:[UIImage imageWithData:data] forState:UIControlStateNormal];
-                }
-            }];
-        }];
-    }];
-}
-
-@end
-
-
-@interface MediaCell : UICollectionViewCell
-@property (weak, nonatomic) IBOutlet UIButton *delete;
-@property (weak, nonatomic) UserMedia *media;
-@property (weak, nonatomic) IBOutlet MediaView *photo;
-@property (weak, nonatomic) id userId;
-@property (weak, nonatomic) Profile *parent;
-@property (nonatomic) ProfileMediaSections section;
-@property (nonatomic) BOOL editable;
-@end
-
-@implementation MediaCell
-
-- (void)setEditable:(BOOL)editable
-{
-    _editable = editable;
-    self.delete.hidden = !editable;
-}
-
-- (void)setMedia:(UserMedia *)media
-{
-    
-    _media = media;
-    [self.photo setImage:nil];
-    [self.photo loadMediaFromUserMedia:media animated:YES];
-}
-
-- (void)setUserId:(id)userId
-{
-    [self.photo setImage:nil];
-    User *user = [User objectWithoutDataWithObjectId:userId];
-    [user fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
-        [self.photo loadMediaFromUser:user completion:^(NSData *data, NSError *error, BOOL fromCache) {
-            [[self.parent.collectionView visibleCells] enumerateObjectsUsingBlock:^(__kindof UICollectionViewCell * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                if (obj.tag == self.tag) {
-                    *stop = YES;
-                    [((MediaCell*)obj).photo setImage:[UIImage imageWithData:data]];
-                }
-            }];
-        }];
-    }];
-}
-
-- (IBAction)removeMedia:(UIButton *)sender {
-    [self.parent removeMedia:self.media row:self.tag];
-}
-
-@end
-
-
-@interface MapCell : UICollectionViewCell
-@property (weak, nonatomic) User *user;
-@property (nonatomic) ProfileMediaSections section;
-@end
-
-@implementation MapCell
-
-- (void)setUser:(User *)user
-{
-    
-}
-
-@end
+#import "PageSelectionView.h"
+#import "UserMap.h"
+#import "UserMediaCollection.h"
 
 @interface Profile ()
-@property (weak, nonatomic) IBOutlet SelectionBar *selectionBar;
+@property (weak, nonatomic) IBOutlet PageSelectionView *page;
 @property (weak, nonatomic) IBOutlet MediaView *photo;
 @property (weak, nonatomic) IBOutlet UILabel *location;
 @property (weak, nonatomic) IBOutlet UITextField *nickname;
@@ -158,11 +30,12 @@ typedef enum {
 @property (weak, nonatomic) IBOutlet UIButton *photoEdit;
 @property (weak, nonatomic) User *user;
 @property (nonatomic, readonly) BOOL editable;
-@property (nonatomic) ProfileMediaSections section;
 @property (strong, nonatomic, readonly) UIImage* backgroundImage;
 @property (strong, nonatomic, readonly) UIColor* backgroundColor;
-
+@property (strong, nonatomic) UserMap *map;
+@property (strong, nonatomic) UserMediaCollection* mediaCollection;
 @property (strong, nonatomic) NSArray *liked;
+@property (strong, nonatomic) NSArray *likes;
 @end
 
 @implementation Profile
@@ -183,7 +56,29 @@ typedef enum {
 
 - (void)awakeFromNib
 {
-    self.section = kSectionMedia;
+    __LF
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    UserLikeHandler handler = ^(User* user) {
+        [self showProfileForUser:user];
+    };
+
+    self.mediaCollection = [UserMediaCollection userMediaCollectionOnViewController:self];
+    self.mediaCollection.userLikeHandler = handler;
+    
+    self.map = [UserMap new];
+    self.map.userInteractionEnabled = NO;
+    
+    [self.page addButtonWithTitle:@"User photos" view:self.mediaCollection];
+    [self.page setBarHeight:44];
+    [self.page addButtonWithTitle:@"Location" view:self.map];
+
+    [self setUser:self.user];
+    [self setShadowOnViews];
+    [self setupTapGestureRecognizerForExit];
 }
 
 - (void) setUser:(User *)user
@@ -191,12 +86,10 @@ typedef enum {
     _user = user ? user : [User me];
 
     // basic information
-    self.section = kSectionMedia;
     self.nickname.text = self.user.nickname;
     self.intro.text = self.user.intro;
     self.age.text = self.user.age;
     self.sex.text = self.user.sexString;
-    
     
     // setup for likes and liked and like heart
     [self setupLikeBarButtonItem];
@@ -215,8 +108,6 @@ typedef enum {
     [self.age setUserInteractionEnabled:self.user.isMe];
     [self.sex setUserInteractionEnabled:self.user.isMe];
     
-    NSLog(@"FONT:%@", self.nickname.font);
-    
     self.intro.text = self.user.intro ? self.user.intro : @"";
     [ListPicker pickerWithArray:@[@"우리 만나요!", @"애인 찾아요", @"함께 드라이브 해요", @"나쁜 친구 찾아요", @"착한 친구 찾아요", @"함께 먹으러 가요", @"술친구 찾아요"] onTextField:self.intro selection:^(id data) {
         self.user.intro = data;
@@ -234,7 +125,10 @@ typedef enum {
         self.user.sex = [data isEqualToString:@"여자"] ? kSexFemale : kSexMale ;
         [self.user saveInBackground];
     }];
-    
+
+    [self.mediaCollection setUser:self.user];
+    [self.mediaCollection setCommentColor:[UIColor redColor]];
+    [self.map setUser:self.user];
 }
 
 - (void) setupLikeBarButtonItemState:(BOOL)liked
@@ -255,29 +149,14 @@ typedef enum {
     }
 }
 
-- (void) setupLikes
-{
-    [self countMyLikes];
-    [self countLikesMeInBackground];
-}
-
-- (UIImage *)backgroundImage
+- (UIImage *) backgroundImage
 {
     return self.user.sex == kSexMale ? [UIImage imageNamed:@"background"] : [UIImage imageNamed:@"background2"];
 }
 
-- (UIColor *)backgroundColor
+- (UIColor *) backgroundColor
 {
     return self.backgroundImage.averageColor;
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    [self setUser:self.user];
-    [self setupSelectionButtons];
-    [self setShadowOnViews];
-    [self setupTapGestureRecognizerForExit];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -296,44 +175,41 @@ typedef enum {
     [self.view addGestureRecognizer:tap];
 }
 
-- (void)setShadowOnViews
+- (void) setShadowOnViews
 {
     [[self.backgroundView subviews] enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull view, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([view isKindOfClass:[UILabel class]] || [view isKindOfClass:[UITextField class]]) {
-            [self setShadowOnView:view];
+            setShadowOnView(view, 2.5f, 0.8f);
         }
     }];
 }
 
-- (void)setShadowOnView:(UIView*)view
+- (void) setupLikes
 {
-    view.layer.shadowColor = [UIColor colorWithWhite:0.0f alpha:1.0f].CGColor;
-    view.layer.shadowOffset = CGSizeZero;
-    view.layer.shadowRadius = 2.5f;
-    view.layer.shadowOpacity = 0.8f;
+    [self loadAllLiked];
+    [self loadAllLikes];
 }
 
-- (void) countLikesMeInBackground
+- (void)loadAllLikes
+{
+    PFQuery *query = [User query];
+    [query whereKey:@"objectId" containedIn:self.user.likes];
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        self.likes = objects;
+        [self.mediaCollection setLikes:objects];
+        self.likesLB.text = [NSString stringWithFormat:@"%ld", self.likes.count];
+    }];
+}
+
+- (void) loadAllLiked
 {
     PFQuery *query = [User query];
     [query whereKey:@"likes" containsString:self.user.objectId];
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
-        self.liked = [NSArray arrayWithArray:objects];
+        self.liked = objects;
+        [self.mediaCollection setLiked:objects];
+        self.likedLB.text = [NSString stringWithFormat:@"%ld", self.liked.count];
     }];
-}
-
-- (void) countMyLikes
-{
-    self.likesLB.text = [NSString stringWithFormat:@"%ld", self.user.likes.count];
-}
-
-- (void)setLiked:(NSArray *)liked
-{
-    _liked = liked;
-    self.likedLB.text = [NSString stringWithFormat:@"%ld", self.liked.count];
-    if (self.section == kSectionLiked || self.section == kSectionLikes) {
-        [self.collectionView reloadData];
-    }
 }
 
 - (void) setBackgroundViewImage:(UIImage*)image
@@ -343,134 +219,8 @@ typedef enum {
     self.backgroundView.layer.masksToBounds = YES;
 }
 
-- (void)setSection:(ProfileMediaSections)section
-{
-    _section = section;
-    [self.collectionView reloadData];
-}
-
-- (void)setupSelectionButtons
-{
-    [self.selectionBar setTextColor:self.backgroundColor];
-    [self.selectionBar addButtonWithTitle:@"Media" width:60];
-    [self.selectionBar addButtonWithTitle:@"Location" width:80];
-    [self.selectionBar addButtonWithTitle:@"Likes" width:50];
-    [self.selectionBar addButtonWithTitle:@"Liked" width:50];
-    [self.selectionBar setIndex:self.section];
-    [self.selectionBar setHandler:^(NSInteger index) {
-        self.section = (ProfileMediaSections) index;
-    }];
-}
-
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
-{
-    return 1;
-}
-
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
-{
-    switch (self.section) {
-        case kSectionMedia:
-            return self.user.media.count + self.editable;
-            
-        case kSectionLocation:
-            return 1;
-            
-        case kSectionLikes:
-            return self.user.likes.count;
-            
-        case kSectionLiked:
-            return self.liked.count;
-    }
-}
-
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    switch (self.section) {
-        case kSectionLocation:
-        {
-            MapCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MapCell" forIndexPath:indexPath];
-            cell.backgroundColor = self.backgroundColor;
-            cell.tag = indexPath.row;
-            cell.section = self.section;
-            cell.user = self.user;
-            return cell;
-        }
-        case kSectionMedia:
-        {
-            if (self.editable && indexPath.row == self.user.media.count) {
-                AddMoreCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"AddMoreCell" forIndexPath:indexPath];
-                cell.backgroundColor = self.backgroundColor;
-                cell.parent = self;
-                return cell;
-            }
-            else {
-                MediaCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MediaCell" forIndexPath:indexPath];
-                cell.backgroundColor = self.backgroundColor;
-                cell.media = [self.user.media objectAtIndex:indexPath.row];
-                cell.tag = indexPath.row;
-                cell.section = self.section;
-                cell.parent = self;
-                cell.editable = self.editable;
-                return cell;
-            }
-        }
-        case kSectionLikes:
-        {
-            LikesCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"LikesCell" forIndexPath:indexPath];
-            cell.backgroundColor = self.backgroundColor;
-            cell.userId = [self.user.likes objectAtIndex:indexPath.row];
-            cell.tag = indexPath.row;
-            cell.section = self.section;
-            cell.parent = self;
-            cell.editable = self.editable;
-            return cell;
-        }
-        case kSectionLiked:
-        {
-            LikesCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"LikesCell" forIndexPath:indexPath];
-            cell.backgroundColor = self.backgroundColor;
-            cell.userId = ((User*)[self.liked objectAtIndex:indexPath.row]).objectId;
-            cell.tag = indexPath.row;
-            cell.section = self.section;
-            cell.parent = self;
-            cell.editable = self.editable;
-            return cell;
-        }
-    }
-}
-
-CGFloat __cellWidth(UICollectionView* cv, CGFloat cpr)
-{
-    UICollectionViewFlowLayout *flowLayout = (UICollectionViewFlowLayout*)cv.collectionViewLayout;
-    return (CGRectGetWidth(cv.frame) - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * (cpr - 1))/cpr;
-}
-
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    __LF
-    const CGFloat h = self.collectionView.bounds.size.height;
-    CGFloat cellWidth = 0, cellHeight = 0;
-    switch (self.section) {
-        case kSectionMedia:
-            cellWidth = cellHeight = __cellWidth(self.collectionView, 3);
-            break;
-        case kSectionLocation:
-            cellWidth = __cellWidth(self.collectionView, 1);
-            cellHeight = h - 64;
-            break;
-        case kSectionLiked:
-        case kSectionLikes:
-            cellWidth = cellHeight = __cellWidth(self.collectionView, 2);
-            break;
-    }
-    
-    return CGSizeMake(cellWidth, cellHeight);
 }
 
 - (void) dismissModalPresentation
@@ -495,28 +245,6 @@ CGFloat __cellWidth(UICollectionView* cv, CGFloat cpr)
     main.navigationItem.leftBarButtonItem = nil;
     main.navigationItem.title = user.nickname;
     [self.navigationController pushViewController:main animated:YES];
-}
-
-- (void) removeMedia:(UserMedia*)media row:(NSInteger)row
-{
-    if (!self.editable) {
-        NSLog(@"ERROR: Cannot remove other's media");
-        return;
-    }
-    
-    [media deleteInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-        if (!error && succeeded) {
-            [self.collectionView performBatchUpdates:^{
-                [self.user removeObjectsInArray:@[media] forKey:@"media"];
-                [self.user saveInBackground];
-                [self.collectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:row inSection:0]]];
-            } completion:^(BOOL finished) {
-            }];
-        }
-        else {
-            NSLog(@"ERROR:%@", error.localizedDescription);
-        }
-    }];
 }
 
 - (void) likeUser:(UIButton *)sender {
@@ -574,43 +302,6 @@ CGFloat __cellWidth(UICollectionView* cv, CGFloat cpr)
     [self addMediaWithHandler:handler];
 }
 
-- (void) addMedia
-{
-    MediaPickerMediaBlock handler = ^(ProfileMediaTypes mediaType,
-                                      NSData *thumbnailData,
-                                      NSString *thumbnailFile,
-                                      NSString *mediaFile,
-                                      CGSize mediaSize,
-                                      BOOL isRealMedia)
-    {
-        if (self.user.isMe) {
-            UserMedia *media = [UserMedia object];
-            media.mediaSize = mediaSize;
-            media.mediaFile = mediaFile;
-            media.thumbailFile = thumbnailFile;
-            media.mediaType = mediaType;
-            media.userId = self.user.objectId;
-            media.isRealMedia = isRealMedia;
-            
-            [self.user addUniqueObject:media forKey:@"media"];
-            [self.user saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-                if (!error) {
-                    [self.collectionView performBatchUpdates:^{
-                        [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.user.media.count-self.editable inSection:0]]];
-                    } completion:nil];
-                }
-                else {
-                    NSLog(@"ERROR:%@", error.localizedDescription);
-                }
-            }];
-        }
-        else {
-            NSLog(@"ERROR: Cannot add on other user media.");
-        }
-    };
-    [self addMediaWithHandler:handler];
-}
-
 - (void) addMediaWithHandler:(MediaPickerMediaBlock)handler
 {
     __LF
@@ -639,16 +330,5 @@ CGFloat __cellWidth(UICollectionView* cv, CGFloat cpr)
     MediaPicker *mediaPicker = [MediaPicker mediaPickerWithSourceType:sourceType mediaBlock:handler];
     [self presentViewController:mediaPicker animated:YES completion:nil];
 }
-
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

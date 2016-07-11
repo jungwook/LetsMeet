@@ -479,17 +479,24 @@
 - (void)mediaReady:(ReadyBlock)handler
 {
     __block NSUInteger count = self.media.count;
-    [self.media enumerateObjectsUsingBlock:^(UserMedia* _Nonnull userMedia, NSUInteger idx, BOOL * _Nonnull stop) {
-        [userMedia ready:^{
-            if (--count == 0) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (handler) {
-                        handler();
-                    }
-                });
-            }
+    if (count == 0) {
+        if (handler) {
+            handler();
+        }
+    }
+    else {
+        [self.media enumerateObjectsUsingBlock:^(UserMedia* _Nonnull userMedia, NSUInteger idx, BOOL * _Nonnull stop) {
+            [userMedia ready:^{
+                if (--count == 0) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (handler) {
+                            handler();
+                        }
+                    });
+                }
+            }];
         }];
-    }];
+    }
 }
 
 

@@ -22,8 +22,11 @@ typedef void(^UserLikeHandler)(User* user);
 @property (nonatomic, strong) UIColor *commentColor;
 @property (nonatomic, strong) UIFont *commentFont;
 @property (nonatomic, copy) UserLikeHandler userLikeHandler;
+- (void) tappedOnLikeUser:(User*)user;
 - (void) addMedia;
 - (void) removeMedia:(UserMedia*)media row:(NSInteger)row;
 - (void) editMediaComment:(UserMedia*)media row:(NSInteger)row;
 + (instancetype) userMediaCollectionOnViewController:(UIViewController*)viewController;
+- (void) setLikes:(NSArray*)likes;
+- (void) setLiked:(NSArray*)liked;
 @end

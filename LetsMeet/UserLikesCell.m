@@ -11,8 +11,8 @@
 
 @interface UserLikesCell()
 @property (nonatomic, strong) User* user;
-@property (weak, nonatomic) IBOutlet UIImageView *photo;
-@property (weak, nonatomic) IBOutlet UILabel *nickname;
+@property (weak, nonatomic) IBOutlet UIButton *photo;
+@property (weak, nonatomic) UserMediaCollection *parent;
 @end
 
 @implementation UserLikesCell
@@ -31,25 +31,24 @@
     return self;
 }
 
-- (void)setTitleColor:(UIColor *)titleColor
-{
-    self.nickname.textColor = titleColor;
-}
-
-- (void)setUser:(User *)user
+- (void)setUser:(User *)user parent:(UserMediaCollection *)parent
 {
     _user = user;
+    _parent = parent;
 
     [S3File getDataFromFile:self.user.thumbnail completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
         if (data && !error) {
-            [self.photo setImage:[UIImage imageWithData:data]];
+            [self.photo setImage:[UIImage imageWithData:data] forState:UIControlStateNormal];
         }
         else {
-            [self.photo setImage:user.sexImage];
+            [self.photo setImage:user.sexImage forState:UIControlStateNormal];
         }
     }];
-    
-    self.nickname.text = self.user.nickname;
+}
+
+- (IBAction)tappedUser:(id)sender
+{
+    [self.parent tappedOnLikeUser:self.user];
 }
 
 @end

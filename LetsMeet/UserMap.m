@@ -58,7 +58,6 @@ UIImage* snapshot(UIView* view)
     return self;
 }
 
-
 - (void)setUser:(User *)user
 {
     _user = user;
@@ -103,6 +102,11 @@ UIImage* snapshot(UIView* view)
 - (void) addUserAnnotation
 {
     __LF
+    
+    if (self.annotations.count>0) {
+        [self removeAnnotations:self.annotations];
+    }
+    
     UserAnnotation *annotation = [[UserAnnotation alloc] initWithLocation:CLLocationCoordinate2DMake(self.user.location.latitude, self.user.location.longitude)];
     [S3File getDataFromFile:self.user.thumbnail completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
         annotation.animate = YES;
