@@ -7,159 +7,27 @@
 //
 
 #import "UserMediaCollection.h"
-#import "MediaViewer.h"
 #import "MediaPicker.h"
 
-#define sUSERMEDIACELL @"UserMediaCell"
-#define sADDUSERMEDIACELL @"AddUserMediaCell"
+#import "AddMoreUserMediaCell.h"
+#import "UserMediaCell.h"
+#import "UserLikesCell.h"
+#import "UserProfileHeader.h"
+
+#define kAddMoreUserMediaCell @"AddMoreUserMediaCell"
+#define kUserMediaCell @"UserMediaCell"
+#define kUserLikesCell @"UserLikesCell"
+#define kUserProfileHeader @"UserProfileHeader"
+
 #define kNumCellsPerRow 3
+#define kPadding 0
 
-@class UserMediaCollection;
-
-@interface AddUserMediaCell : UICollectionViewCell
-@property (weak, nonatomic) UserMediaCollection* parent;
-@property (strong, nonatomic) UIButton* add;
-@property (strong, nonatomic) UILabel* addMedia;
-@end
-
-@implementation AddUserMediaCell
-
-
-- (instancetype)initWithFrame:(CGRect)frame
-{
-    __LF
-    self = [super initWithFrame:frame];
-    if (self) {
-        self.add = [UIButton buttonWithType:UIButtonTypeCustom];
-        [self.add setImage:[UIImage imageNamed:@"camera"] forState:UIControlStateNormal];
-        [self.add addTarget:self action:@selector(addMedia:) forControlEvents:UIControlEventTouchUpInside];
-        [self addSubview:self.add];
-        
-        self.addMedia = [UILabel new];
-        self.addMedia.text = @"add media";
-        self.addMedia.textAlignment = NSTextAlignmentCenter;
-        self.addMedia.font = [UIFont boldSystemFontOfSize:12];
-        self.addMedia.textColor = [UIColor whiteColor];
-        [self addSubview:self.addMedia];
-        
-        self.clipsToBounds = YES;
-        self.layer.cornerRadius = 1.0f;
-    }
-    return self;
-}
-
-- (void)layoutSubviews
-{
-    const CGFloat size = 25, height = 21, w = self.bounds.size.width, h = self.bounds.size.height;
-    
-    self.add.frame = CGRectMake((w-size)/2, (h-(size+height))/2, size, size);
-    self.addMedia.frame = CGRectMake(0, (h-(size+height))/2+size, w, height);
-}
-
-- (void)addMedia:(id)sender {
-    [self.parent addMedia];
-}
-
-@end
-
-
-@interface UserMediaCell : UICollectionViewCell
-@property (strong, nonatomic) UIButton *delete;
-@property (strong, nonatomic) MediaView *photo;
-
-@property (strong, nonatomic) UserMedia *media;
-@property (strong, nonatomic) id userId;
-@property (weak, nonatomic) UserMediaCollection *parent;
-@property (nonatomic) BOOL editable;
-@end
-
-@implementation UserMediaCell
-
--(void)awakeFromNib
-{
-    __LF
-}
-
-- (instancetype)initWithFrame:(CGRect)frame
-{
-    __LF
-    self = [super initWithFrame:frame];
-    if (self) {
-        self.delete = [UIButton buttonWithType:UIButtonTypeCustom];
-        [self.delete setImage:[UIImage imageNamed:@"trash"] forState:UIControlStateNormal];
-        [self.delete addTarget:self action:@selector(removeMedia:) forControlEvents:UIControlEventTouchUpInside];
-        
-        self.delete.layer.shadowOffset = CGSizeZero;
-        self.delete.layer.shadowColor = [UIColor blackColor].CGColor;
-        self.delete.layer.shadowRadius = 2.0f;
-        self.delete.layer.shadowOpacity = 0.7f;
-
-        self.photo = [MediaView new];
-        [self addSubview:self.photo];
-        [self addSubview:self.delete];
-        self.clipsToBounds = YES;
-        self.layer.cornerRadius = 1.0f;
-        self.delete.hidden = YES;
-        self.delete.alpha = 0;
-    }
-    return self;
-}
-
-- (void)layoutSubviews
-{
-    const CGFloat offset = 4;
-    self.photo.frame = CGRectMake(-offset, -offset, self.bounds.size.width+2*offset, self.bounds.size.height+2*offset);
-    self.delete.frame = CGRectMake(4, 4, 20, 20);
-}
-
-- (void)setEditable:(BOOL)editable
-{
-    _editable = editable;
-}
-
-- (void)setMedia:(UserMedia *)media
-{
-    _media = media;
-    [self.photo setImage:nil];
-    [self.photo loadMediaFromUserMedia:media completion:^(NSData *data, NSError *error, BOOL fromCache) {
-        [[self.parent visibleCells] enumerateObjectsUsingBlock:^(__kindof UICollectionViewCell * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if ([obj isKindOfClass:[UserMediaCell class]]) {
-                UserMediaCell *cell = (UserMediaCell*) obj;
-                if ([cell.media.objectId isEqualToString:media.objectId]) {
-                    *stop = YES;
-                    [cell.photo setImage:[UIImage imageWithData:data]];
-                    [self showDeleteButton:self.editable];
-                }
-            }
-        }];
-    }];
-}
-
-- (void) showDeleteButton:(BOOL)show
-{
-    if (show) {
-        self.delete.alpha = 0.0;
-        self.delete.hidden = !show;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [UIView animateWithDuration:0.5 animations:^{
-                self.delete.alpha = 0.8;
-            }];
-        });
-    }
-    else {
-        self.delete.hidden = show;
-    }
-}
-
-- (void)removeMedia:(UIButton *)sender {
-    [self.parent removeMedia:self.media row:self.tag];
-}
-
-@end
 
 @interface UserMediaCollection()
 @property (nonatomic, strong) UICollectionViewFlowLayout *flow;
 @property (weak, nonatomic) UIViewController *viewController;
+@property (strong, nonatomic) NSArray *likes;
+@property (strong, nonatomic) NSArray *liked;
 @end
 
 @implementation UserMediaCollection
@@ -172,11 +40,11 @@
 - (instancetype) initWithViewController:(UIViewController *)viewController
 {
     self.flow = [UICollectionViewFlowLayout new];
-    self.flow.minimumLineSpacing = 2;
-    self.flow.minimumInteritemSpacing = 2;
-    self.flow.sectionInset = UIEdgeInsetsMake(2, 2, 2, 2);
+    self.flow.minimumLineSpacing = 4;
+    self.flow.minimumInteritemSpacing = 4;
+    self.flow.sectionInset = UIEdgeInsetsMake(3, 4, 3, 4);
     
-    self = [super initWithFrame:CGRectMake(0, 0, 1, 1) collectionViewLayout:self.flow];
+    self = [super initWithFrame:viewController.view.bounds collectionViewLayout:self.flow];
     if (self) {
         self.viewController = viewController;
         [self initialize];
@@ -201,79 +69,217 @@
 
 - (void) initialize
 {
-    [self registerClass:[UserMediaCell class] forCellWithReuseIdentifier:sUSERMEDIACELL];
-    [self registerClass:[AddUserMediaCell class] forCellWithReuseIdentifier:sADDUSERMEDIACELL];
+    [self registerNib:[UINib nibWithNibName:kUserMediaCell bundle:[NSBundle mainBundle]] forCellWithReuseIdentifier:kUserMediaCell];
+    [self registerNib:[UINib nibWithNibName:kUserLikesCell bundle:[NSBundle mainBundle]] forCellWithReuseIdentifier:kUserLikesCell];
+    [self registerNib:[UINib nibWithNibName:kAddMoreUserMediaCell bundle:[NSBundle mainBundle]] forCellWithReuseIdentifier:kAddMoreUserMediaCell];
+    [self registerNib:[UINib nibWithNibName:kUserProfileHeader bundle:[NSBundle mainBundle]] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kUserProfileHeader];
+
+    
+    self.commentColor = [UIColor darkGrayColor];
+    self.commentFont = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:11];
     self.backgroundColor = [UIColor groupTableViewBackgroundColor];
     self.alwaysBounceVertical = YES;
     _user = [User me];
+}
+
+- (void)setCommentColor:(UIColor *)commentColor
+{
+    _commentColor = commentColor;
+    [self reloadData];
+}
+
+- (void)setCommentFont:(UIFont *)commentFont
+{
+    _commentFont = commentFont;
+    [self reloadData];
 }
 
 - (void) setUser:(User *)user
 {
     __LF
     _user = user;
-    [self.user allMediaLoaded:^{
+    [self loadAllLikesUsers];
+    [self loadAllLikedUsers];
+    
+    [self.user mediaReady:^{
         self.delegate = self;
         self.dataSource = self;
         [self reloadData];
     }];
 }
 
+- (void)refreshProfile
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self reloadData];
+    });
+}
+
+- (void)loadAllLikesUsers
+{
+    PFQuery *query = [User query];
+    [query whereKey:@"objectId" containedIn:self.user.likes];
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        self.likes = objects;
+        [self refreshProfile];
+    }];
+}
+
+- (void) loadAllLikedUsers
+{
+    PFQuery *query = [User query];
+    [query whereKey:@"likes" containsString:self.user.objectId];
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        self.liked = objects;
+        [self refreshProfile];
+    }];
+}
+
+
+
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-    return 1;
+    return 3;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    __LF
-    return self.user.media.count + self.user.isMe;
-}
-
-CGFloat ___cellWidth(UICollectionView* cv, UICollectionViewFlowLayout *flowLayout, CGFloat cpr)
-{
-    return (CGRectGetWidth(cv.bounds) - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * (cpr - 1))/cpr;
+    switch ((UserMediaCollectionSections)section) {
+        case kSectionUserMedia:
+            return self.user.media.count + self.user.isMe;
+        case kSectionUserLikes:
+            return self.likes.count;
+        case kSectionUserLiked:
+            return self.liked.count;
+    }
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    __LF
-    CGFloat cellWidth = 0, cellHeight = 0;
-    cellWidth = cellHeight = ___cellWidth(collectionView, (UICollectionViewFlowLayout*) collectionViewLayout, kNumCellsPerRow);
-    
-    return CGSizeMake( MAX(cellWidth, 10), MAX(cellHeight, 10));
+    UICollectionViewFlowLayout* layout = (UICollectionViewFlowLayout*)collectionViewLayout;
+    UserMediaCollectionSections section = indexPath.section;
+    switch (section) {
+        case kSectionUserMedia: {
+            layout.minimumLineSpacing = 2;
+            layout.minimumInteritemSpacing = 2;
+            layout.sectionInset = UIEdgeInsetsMake(0, 40, 30, 10);
+            CGFloat w = widthForNumberOfCells(collectionView, layout, 3);
+            return CGSizeMake(w, w+25);
+        }
+        case kSectionUserLikes:{
+            layout.minimumLineSpacing = 4;
+            layout.minimumInteritemSpacing = 4;
+            layout.sectionInset = UIEdgeInsetsMake(0, 40, 30, 10);
+            CGFloat w = widthForNumberOfCells(collectionView, layout, 6);
+            return CGSizeMake(w, w);
+        }
+        case kSectionUserLiked:{
+            layout.minimumLineSpacing = 4;
+            layout.minimumInteritemSpacing = 4;
+            layout.sectionInset = UIEdgeInsetsMake(0, 40, 30, 10);
+            CGFloat w = widthForNumberOfCells(collectionView, layout, 6);
+            return CGSizeMake(w, w);
+        }
+    }
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    __LF
-    
-    NSUInteger row = indexPath.row;
-    
-    if (row == self.user.media.count) {
-        // This can only be the Add More Cell;
-        AddUserMediaCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:sADDUSERMEDIACELL forIndexPath:indexPath];
-        cell.backgroundColor = [UIColor darkGrayColor];
-        cell.tag = row;
-        cell.parent = self;
-        return cell;
+    NSInteger row = indexPath.row;
+    UserMediaCollectionSections section = indexPath.section;
+    switch (section) {
+        case kSectionUserMedia:
+        {
+            if (row == self.user.media.count) {
+                AddMoreUserMediaCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kAddMoreUserMediaCell forIndexPath:indexPath];
+                cell.backgroundColor = [UIColor darkGrayColor];
+                cell.tag = row;
+                cell.parent = self;
+                return cell;
+            }
+            else {
+                UserMediaCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kUserMediaCell forIndexPath:indexPath];
+                [cell setUserMedia:[self.user.media objectAtIndex:row] parent:self row:indexPath.row];
+                return cell;
+            }
+        }
+        case kSectionUserLikes:
+        {
+            UserLikesCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kUserLikesCell forIndexPath:indexPath];
+            User *user = [self.likes objectAtIndex:row];
+            cell.user = user;
+            return cell;
+        }
+        case kSectionUserLiked:
+        {
+            UserLikesCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kUserLikesCell forIndexPath:indexPath];
+            User *user = [self.liked objectAtIndex:row];
+            cell.user = user;
+            return cell;
+        }
+    }
+}
+
+- (CGSize) collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section
+{
+    switch ((UserMediaCollectionSections) section) {
+        case kSectionUserMedia:
+            return CGSizeMake(1, 50);
+            break;
+        case kSectionUserLikes:
+            return CGSizeMake(1, 30);
+            break;
+        case kSectionUserLiked:
+            return CGSizeMake(1, 30);
+            break;
+    }
+}
+
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+{
+    UserMediaCollectionSections section = indexPath.section;
+    if (kind == UICollectionElementKindSectionHeader) {
+        UserProfileHeader *header = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kUserProfileHeader forIndexPath:indexPath];
+        header.title.textColor = [UIColor darkGrayColor];
+        switch (section) {
+            case kSectionUserMedia:
+                header.title.text = @"USER PHOTOS";
+                break;
+            case kSectionUserLikes:
+                header.title.text = @"FOLLOWING";
+                break;
+            case kSectionUserLiked:
+                header.title.text = @"FOLLOWED BY";
+                break;
+        }
+        return header;
     }
     else {
-        UserMediaCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:sUSERMEDIACELL forIndexPath:indexPath];
-        cell.parent = self;
-        cell.editable = self.user.isMe;
-        cell.media = [self.user.media objectAtIndex:row];
-        cell.tag = row;
-        
-        return cell;
+        return nil;
     }
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.row == self.user.media.count) {
-        // This can only happen to addMoreMedia
-        [self addMedia];
+    UserMediaCollectionSections section = indexPath.section;
+    switch (section) {
+        case kSectionUserMedia:
+            if (indexPath.row == self.user.media.count) {
+                [self addMedia];
+            }
+            break;
+        case kSectionUserLikes: {
+            if (self.userLikeHandler) {
+                self.userLikeHandler([self.likes objectAtIndex:indexPath.row]);
+            }
+        }
+            break;
+        case kSectionUserLiked: {
+            if (self.userLikeHandler) {
+                self.userLikeHandler([self.liked objectAtIndex:indexPath.row]);
+            }
+        }
+            break;
     }
 }
 
@@ -288,25 +294,36 @@ CGFloat ___cellWidth(UICollectionView* cv, UICollectionViewFlowLayout *flowLayou
                                       BOOL isRealMedia)
     {
         if (self.user.isMe) {
-            UserMedia *media = [UserMedia object];
-            media.mediaSize = mediaSize;
-            media.mediaFile = mediaFile;
-            media.thumbailFile = thumbnailFile;
-            media.mediaType = mediaType;
-            media.userId = self.user.objectId;
-            media.isRealMedia = isRealMedia;
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"JUST 1 SEC" message:@"enter comment for your media" preferredStyle:UIAlertControllerStyleAlert];
             
-            [self.user addUniqueObject:media forKey:@"media"];
-            [self.user saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-                if (!error) {
-                    [self performBatchUpdates:^{
-                        [self insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.user.media.count-self.user.isMe inSection:0]]];
-                    } completion:nil];
-                }
-                else {
-                    NSLog(@"ERROR:%@", error.localizedDescription);
-                }
-            }];
+            [alert addTextFieldWithConfigurationHandler:nil];
+            [alert addAction:[UIAlertAction actionWithTitle:@"SAVE" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                UserMedia *media = [UserMedia object];
+                media.mediaSize = mediaSize;
+                media.mediaFile = mediaFile;
+                media.thumbailFile = thumbnailFile;
+                media.mediaType = mediaType;
+                media.userId = self.user.objectId;
+                media.isRealMedia = isRealMedia;
+                media.comment = [alert.textFields firstObject].text;
+                
+                [self.user addUniqueObject:media forKey:@"media"];
+                [self.user saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+                    if (!error) {
+                        [self performBatchUpdates:^{
+                            [self insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.user.media.count-self.user.isMe inSection:0]]];
+                        } completion:nil];
+                    }
+                    else {
+                        NSLog(@"ERROR:%@", error.localizedDescription);
+                    }
+                }];
+            }]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"CANCEL" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+                NSLog(@"Add media cancelled");
+            }]];
+            alert.modalPresentationStyle = UIModalPresentationOverFullScreen;
+            [self.viewController presentViewController:alert animated:YES completion:nil];
         }
         else {
             NSLog(@"ERROR: Cannot add on other user media.");
@@ -365,13 +382,27 @@ CGFloat ___cellWidth(UICollectionView* cv, UICollectionViewFlowLayout *flowLayou
     }];
 }
 
-
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
+- (void)editMediaComment:(UserMedia *)media row:(NSInteger)row
+{
+    __LF
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"JUST 1 SEC" message:@"enter comment for your media" preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.text = media.comment;
+        textField.placeholder = @"enter a comment";
+    }];
+    [alert addAction:[UIAlertAction actionWithTitle:@"SAVE" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        NSString *newcomment = [alert.textFields firstObject].text;
+        media.comment = newcomment;
+        [media saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+            [self reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:row inSection:0]]];
+        }];
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"CANCEL" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        NSLog(@"edit comment cancelled");
+    }]];
+    [self.viewController presentViewController:alert animated:YES completion:nil];
 }
-*/
+
 
 @end

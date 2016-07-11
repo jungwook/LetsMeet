@@ -415,6 +415,7 @@
     
     if (kind == UICollectionElementKindSectionHeader) {
         [view sayHiFromUser:self.me parent:self];
+        
         return view;
     }
     else {

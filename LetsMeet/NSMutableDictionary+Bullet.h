@@ -111,17 +111,20 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
     kProfileMediaVideo
 };
 
-typedef void(^UserMediaBlock)(void);
+typedef void(^ReadyBlock)(void);
+typedef void(^UsersReadyBlock)(NSArray* users);
 
 @interface UserMedia : PFObject <PFSubclassing>
 @property (retain) NSString* userId;
-@property ProfileMediaTypes mediaType;
+@property (retain) NSString* comment;
 @property (retain) NSString* thumbailFile;
 @property (retain) NSString* mediaFile;
+@property ProfileMediaTypes mediaType;
 @property CGSize mediaSize;
 @property BOOL isRealMedia;
 
-- (void) load:(UserMediaBlock)block;
+- (void) ready:(ReadyBlock)block;
+
 @end
 
 @interface User : PFUser<PFSubclassing>
@@ -148,6 +151,7 @@ typedef void(^UserMediaBlock)(void);
 - (void) setSexFromString:(NSString*)sex;
 - (NSString*) sexImageName;
 - (UIColor*) sexColor;
-- (void) allMediaLoaded:(UserMediaBlock)handler;
+- (UIImage*) sexImage;
+- (void) mediaReady:(ReadyBlock)handler;
 @end
 

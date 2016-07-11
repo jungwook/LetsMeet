@@ -169,7 +169,6 @@
 - (void)setImage:(UIImage *)image
 {
     [self layoutPlayButton];
-    self.playBut.hidden = !(self.mediaType == kMediaTypeVideo);
     if (self.animated) {
         self.alpha = 0.0;
         self.playBut.alpha = 0.0f;
@@ -179,6 +178,7 @@
     }
     [self setImage:image forState:UIControlStateNormal];
     [self.imageView setContentMode: UIViewContentModeScaleAspectFill];
+    self.playBut.hidden = !(self.mediaType == kMediaTypeVideo);
     if (self.animated) {
         [UIView animateWithDuration:0.25f animations:^{
             self.playBut.alpha = 0.8f;
@@ -253,21 +253,10 @@
     }
 }
 
-- (void)loadMediaFromFile:(id)filename isReal:(BOOL)isReal shouldRefresh:(ShouldRefreshBlock)block
-{
-    [self loadMediaFromFile:filename isReal:isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
-        BOOL ret = NO;
-        if (block) {
-            ret = block(data, error, fromCache);
-        }
-        if (ret) {
-            [self setImage:[self postProcessImage:[UIImage imageWithData:data] mediaType:self.mediaType]];
-        }
-    }];
-}
-
 - (void)loadMediaFromMessage:(Bullet *)message completion:(S3GetBlock)block
 {
+    self.playBut.hidden = YES;
+
     self.mediaType = message.mediaType;
     self.mediaFile = message.mediaFile;
     self.isReal = message.realMedia;
@@ -275,19 +264,13 @@
     [self loadMediaFromFile:message.mediaThumbnailFile isReal:self.isReal completion:block];
 }
 
-- (void)loadMediaFromMessage:(Bullet *)message shouldRefresh:(ShouldRefreshBlock)block
-{
-    self.mediaType = message.mediaType;
-    self.mediaFile = message.mediaFile;
-    self.isReal = message.realMedia;
-
-    [self loadMediaFromFile:message.mediaThumbnailFile isReal:self.isReal shouldRefresh:block];
-}
 
 #pragma From User Media
 
 - (void)loadMediaFromUserMedia:(UserMedia *)media completion:(S3GetBlock)block
 {
+    self.playBut.hidden = YES;
+
     [media fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
         self.mediaFile = media.mediaFile;
         self.mediaType = (media.mediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
@@ -306,6 +289,8 @@
 
 - (void)loadMediaFromUserMedia:(UserMedia *)media animated:(BOOL)animated
 {
+    self.playBut.hidden = YES;
+
     [media fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
         self.mediaFile = media.mediaFile;
         self.mediaType = (media.mediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
@@ -330,6 +315,8 @@
 
 - (void)loadMediaFromUser:(User *)user
 {
+    self.playBut.hidden = YES;
+
     self.user = user;
     self.mediaFile = user.profileMedia;
     self.mediaType = (user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
@@ -348,22 +335,14 @@
 
 - (void)loadMediaFromUser:(User *)user completion:(S3GetBlock)block
 {
+    self.playBut.hidden = YES;
+
     self.user = user;
     self.mediaFile = user.profileMedia;
     self.mediaType = (user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
     self.isReal = user.isRealMedia;
     
     [self loadMediaFromFile:user.thumbnail isReal:self.isReal completion:block];
-}
-
-- (void)loadMediaFromUser:(User *)user shouldRefresh:(ShouldRefreshBlock)block
-{
-    self.user = user;
-    self.mediaFile = user.profileMedia;
-    self.mediaType = (user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
-    self.isReal = user.isRealMedia;
-
-    [self loadMediaFromFile:user.thumbnail isReal:self.isReal shouldRefresh:block];
 }
 
 @end

@@ -9,6 +9,8 @@
 #import "Test.h"
 #import "PageSelectionView.h"
 #import "UserMediaCollection.h"
+#import "UserMap.h"
+#import "UserLikesCollection.h"
 
 @import MapKit;
 
@@ -22,20 +24,31 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    
     UIView *v1 = [UIView new];
     v1.backgroundColor = [UIColor redColor];
-    UIView *v2 = [UIView new];
+    UIView<PageSelectionViewProtocol> *v2 = (UIView<PageSelectionViewProtocol>*)[UIView new];
     v2.backgroundColor = [UIColor blueColor];
     
-    MKMapView *map = [MKMapView new];
+    UserMap *map = [UserMap new];
     map.userInteractionEnabled = NO;
+    
+    UserLikesCollection *likes = [UserLikesCollection userLikesCollectionWithHandler:^(User *user) {
+        NSLog(@"SELECTED USER:%@", user);
+    }];
     
     UserMediaCollection *col = [UserMediaCollection userMediaCollectionOnViewController:self];
     [col setUser:[User me]];
+    [col setCommentColor:[UIColor redColor]];
+    
+    
     [self.pageView addButtonWithTitle:@"Media" view:col];
-    [self.pageView addButtonWithTitle:@"Hello" view:v1];
+    [self.pageView addButtonWithTitle:@"Likes" view:likes];
     [self.pageView addButtonWithTitle:@"Location" view:map];
     [self.pageView addButtonWithTitle:@"Hello2" view:v2];
+    
+    self.pageView.barColor = [UIColor lightGrayColor];
+    self.pageView.barHeight = 44;
 }
 
 - (void)didReceiveMemoryWarning {

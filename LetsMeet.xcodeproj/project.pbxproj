@@ -46,6 +46,21 @@
 		1285AADD1D2F58AD00F508AC /* UIImage+AverageColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AADC1D2F58AD00F508AC /* UIImage+AverageColor.m */; };
 		1285AAE11D2F6A5900F508AC /* Test.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAE01D2F6A5900F508AC /* Test.m */; };
 		1285AAE41D2F99F000F508AC /* UserMediaCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAE31D2F99F000F508AC /* UserMediaCollection.m */; };
+		1285AAE71D320D5F00F508AC /* UserMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAE61D320D5F00F508AC /* UserMap.m */; };
+		1285AAEA1D3319FA00F508AC /* UserLikesCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAE91D3319FA00F508AC /* UserLikesCollection.m */; };
+		1285AAEF1D331AD600F508AC /* UserLikesCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1285AAEE1D331AD600F508AC /* UserLikesCell.xib */; };
+		1285AAF11D331AFA00F508AC /* UserLikesHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1285AAF01D331AFA00F508AC /* UserLikesHeader.xib */; };
+		1285AAF41D331B3B00F508AC /* UserLikesCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAF31D331B3B00F508AC /* UserLikesCell.m */; };
+		1285AAF71D331B7200F508AC /* UserLikesHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAF61D331B7200F508AC /* UserLikesHeader.m */; };
+		1285AAFB1D33649800F508AC /* UserProfileCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAFA1D33649800F508AC /* UserProfileCollection.m */; };
+		1285AAFD1D3364BD00F508AC /* UserMediaCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1285AAFC1D3364BD00F508AC /* UserMediaCell.xib */; };
+		1285AB001D3365BD00F508AC /* UserMediaCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAFF1D3365BD00F508AC /* UserMediaCell.m */; };
+		1285AB021D33662F00F508AC /* UserMapCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1285AB011D33662F00F508AC /* UserMapCell.xib */; };
+		1285AB051D33664600F508AC /* UserMapCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AB041D33664600F508AC /* UserMapCell.m */; };
+		1285AB071D33681C00F508AC /* UserProfileHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1285AB061D33681C00F508AC /* UserProfileHeader.xib */; };
+		1285AB0A1D33683600F508AC /* UserProfileHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AB091D33683600F508AC /* UserProfileHeader.m */; };
+		1285AB111D337CDB00F508AC /* AddMoreUserMediaCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1285AB101D337CDB00F508AC /* AddMoreUserMediaCell.xib */; };
+		1285AB141D337CE900F508AC /* AddMoreUserMediaCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AB131D337CE900F508AC /* AddMoreUserMediaCell.m */; };
 		1296A7A31D03B34000E44642 /* BaseCollections.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A21D03B34000E44642 /* BaseCollections.m */; };
 		1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A51D03B3CA00E44642 /* BaseFunctions.m */; };
 		1296A7A91D03BB5500E44642 /* Notifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 1296A7A81D03BB5500E44642 /* Notifications.m */; };
@@ -181,6 +196,30 @@
 		1285AAE01D2F6A5900F508AC /* Test.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Test.m; sourceTree = "<group>"; };
 		1285AAE21D2F99F000F508AC /* UserMediaCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserMediaCollection.h; sourceTree = "<group>"; };
 		1285AAE31D2F99F000F508AC /* UserMediaCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserMediaCollection.m; sourceTree = "<group>"; };
+		1285AAE51D320D5F00F508AC /* UserMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserMap.h; sourceTree = "<group>"; };
+		1285AAE61D320D5F00F508AC /* UserMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserMap.m; sourceTree = "<group>"; };
+		1285AAE81D3319FA00F508AC /* UserLikesCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserLikesCollection.h; sourceTree = "<group>"; };
+		1285AAE91D3319FA00F508AC /* UserLikesCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserLikesCollection.m; sourceTree = "<group>"; };
+		1285AAEE1D331AD600F508AC /* UserLikesCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserLikesCell.xib; sourceTree = "<group>"; };
+		1285AAF01D331AFA00F508AC /* UserLikesHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserLikesHeader.xib; sourceTree = "<group>"; };
+		1285AAF21D331B3B00F508AC /* UserLikesCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserLikesCell.h; sourceTree = "<group>"; };
+		1285AAF31D331B3B00F508AC /* UserLikesCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserLikesCell.m; sourceTree = "<group>"; };
+		1285AAF51D331B7200F508AC /* UserLikesHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserLikesHeader.h; sourceTree = "<group>"; };
+		1285AAF61D331B7200F508AC /* UserLikesHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserLikesHeader.m; sourceTree = "<group>"; };
+		1285AAF91D33649800F508AC /* UserProfileCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserProfileCollection.h; sourceTree = "<group>"; };
+		1285AAFA1D33649800F508AC /* UserProfileCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserProfileCollection.m; sourceTree = "<group>"; };
+		1285AAFC1D3364BD00F508AC /* UserMediaCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserMediaCell.xib; sourceTree = "<group>"; };
+		1285AAFE1D3365BD00F508AC /* UserMediaCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserMediaCell.h; sourceTree = "<group>"; };
+		1285AAFF1D3365BD00F508AC /* UserMediaCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserMediaCell.m; sourceTree = "<group>"; };
+		1285AB011D33662F00F508AC /* UserMapCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserMapCell.xib; sourceTree = "<group>"; };
+		1285AB031D33664600F508AC /* UserMapCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserMapCell.h; sourceTree = "<group>"; };
+		1285AB041D33664600F508AC /* UserMapCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserMapCell.m; sourceTree = "<group>"; };
+		1285AB061D33681C00F508AC /* UserProfileHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserProfileHeader.xib; sourceTree = "<group>"; };
+		1285AB081D33683600F508AC /* UserProfileHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserProfileHeader.h; sourceTree = "<group>"; };
+		1285AB091D33683600F508AC /* UserProfileHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserProfileHeader.m; sourceTree = "<group>"; };
+		1285AB101D337CDB00F508AC /* AddMoreUserMediaCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddMoreUserMediaCell.xib; sourceTree = "<group>"; };
+		1285AB121D337CE900F508AC /* AddMoreUserMediaCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddMoreUserMediaCell.h; sourceTree = "<group>"; };
+		1285AB131D337CE900F508AC /* AddMoreUserMediaCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddMoreUserMediaCell.m; sourceTree = "<group>"; };
 		1296A7A11D03B34000E44642 /* BaseCollections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseCollections.h; sourceTree = "<group>"; };
 		1296A7A21D03B34000E44642 /* BaseCollections.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseCollections.m; sourceTree = "<group>"; };
 		1296A7A41D03B3CA00E44642 /* BaseFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseFunctions.h; sourceTree = "<group>"; };
@@ -374,10 +413,6 @@
 				12EAD9D91D27897500483EAE /* UserAnnotationView.m */,
 				1285AACC1D2CCBBE00F508AC /* SelectionBar.h */,
 				1285AACD1D2CCBBE00F508AC /* SelectionBar.m */,
-				1285AAD21D2F571C00F508AC /* PageSelectionView.h */,
-				1285AAD31D2F571C00F508AC /* PageSelectionView.m */,
-				1285AAE21D2F99F000F508AC /* UserMediaCollection.h */,
-				1285AAE31D2F99F000F508AC /* UserMediaCollection.m */,
 			);
 			name = "Views etc";
 			sourceTree = "<group>";
@@ -391,6 +426,48 @@
 				1285AAE01D2F6A5900F508AC /* Test.m */,
 			);
 			name = Profile;
+			sourceTree = "<group>";
+		};
+		1285AAEB1D331A2E00F508AC /* PageSelectionViews */ = {
+			isa = PBXGroup;
+			children = (
+				1285AAD21D2F571C00F508AC /* PageSelectionView.h */,
+				1285AAD31D2F571C00F508AC /* PageSelectionView.m */,
+				1285AAE21D2F99F000F508AC /* UserMediaCollection.h */,
+				1285AAE31D2F99F000F508AC /* UserMediaCollection.m */,
+				1285AAE51D320D5F00F508AC /* UserMap.h */,
+				1285AAE61D320D5F00F508AC /* UserMap.m */,
+				1285AAE81D3319FA00F508AC /* UserLikesCollection.h */,
+				1285AAE91D3319FA00F508AC /* UserLikesCollection.m */,
+				1285AAF01D331AFA00F508AC /* UserLikesHeader.xib */,
+				1285AAF51D331B7200F508AC /* UserLikesHeader.h */,
+				1285AAF61D331B7200F508AC /* UserLikesHeader.m */,
+			);
+			name = PageSelectionViews;
+			sourceTree = "<group>";
+		};
+		1285AAF81D33648400F508AC /* UserProfileCollection */ = {
+			isa = PBXGroup;
+			children = (
+				1285AAF91D33649800F508AC /* UserProfileCollection.h */,
+				1285AAFA1D33649800F508AC /* UserProfileCollection.m */,
+				1285AB011D33662F00F508AC /* UserMapCell.xib */,
+				1285AB031D33664600F508AC /* UserMapCell.h */,
+				1285AB041D33664600F508AC /* UserMapCell.m */,
+				1285AAFC1D3364BD00F508AC /* UserMediaCell.xib */,
+				1285AAFE1D3365BD00F508AC /* UserMediaCell.h */,
+				1285AAFF1D3365BD00F508AC /* UserMediaCell.m */,
+				1285AAEE1D331AD600F508AC /* UserLikesCell.xib */,
+				1285AAF21D331B3B00F508AC /* UserLikesCell.h */,
+				1285AAF31D331B3B00F508AC /* UserLikesCell.m */,
+				1285AB061D33681C00F508AC /* UserProfileHeader.xib */,
+				1285AB081D33683600F508AC /* UserProfileHeader.h */,
+				1285AB091D33683600F508AC /* UserProfileHeader.m */,
+				1285AB101D337CDB00F508AC /* AddMoreUserMediaCell.xib */,
+				1285AB121D337CE900F508AC /* AddMoreUserMediaCell.h */,
+				1285AB131D337CE900F508AC /* AddMoreUserMediaCell.m */,
+			);
+			name = UserProfileCollection;
 			sourceTree = "<group>";
 		};
 		129B07541D0AAABB000C0276 /* Cells */ = {
@@ -537,6 +614,8 @@
 		12F741D31CE56DD400E8267A /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				1285AAF81D33648400F508AC /* UserProfileCollection */,
+				1285AAEB1D331A2E00F508AC /* PageSelectionViews */,
 				1285AACB1D2C8C3300F508AC /* Profile */,
 				120142F51D28F6F400D66905 /* NearMe */,
 				12A7E38F1D2761EF00592CFA /* Map */,
@@ -649,8 +728,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				12F7419A1CE4B97100E8267A /* LaunchScreen.storyboard in Resources */,
+				1285AAFD1D3364BD00F508AC /* UserMediaCell.xib in Resources */,
+				1285AAEF1D331AD600F508AC /* UserLikesCell.xib in Resources */,
+				1285AB071D33681C00F508AC /* UserProfileHeader.xib in Resources */,
 				1235BC931D0FF97B00E4AA27 /* NSDateTimeAgo.bundle in Resources */,
 				12F741971CE4B97100E8267A /* Assets.xcassets in Resources */,
+				1285AAF11D331AFA00F508AC /* UserLikesHeader.xib in Resources */,
+				1285AB021D33662F00F508AC /* UserMapCell.xib in Resources */,
+				1285AB111D337CDB00F508AC /* AddMoreUserMediaCell.xib in Resources */,
 				12805E881D1CACAB0082A95D /* AudioRecorder.xib in Resources */,
 				12F741951CE4B97100E8267A /* Main.storyboard in Resources */,
 			);
@@ -688,6 +773,7 @@
 				12805E801D1BD3840082A95D /* SearchCell.m in Sources */,
 				12DE5FB81CFFB1A2009B315F /* Preview.m in Sources */,
 				1235BC911D0FF82500E4AA27 /* NSDate+TimeAgo.m in Sources */,
+				1285AAE71D320D5F00F508AC /* UserMap.m in Sources */,
 				12805E831D1BE96E0082A95D /* MediaPicker.m in Sources */,
 				120142F41D1F961500D66905 /* DisplayLinkView.m in Sources */,
 				12DE5FE21D02BC79009B315F /* FileSystem.m in Sources */,
@@ -704,20 +790,26 @@
 				1285AAD41D2F571C00F508AC /* PageSelectionView.m in Sources */,
 				12F7418C1CE4B97100E8267A /* main.m in Sources */,
 				124928AF1CF2CD370038A2F3 /* RefreshControl.m in Sources */,
+				1285AAFB1D33649800F508AC /* UserProfileCollection.m in Sources */,
 				12EAD9DD1D28EAE000483EAE /* NearMe.m in Sources */,
 				12805E8B1D1E3DD30082A95D /* AudioRecorder.m in Sources */,
 				12805E6E1D1AB5B40082A95D /* SignUp.m in Sources */,
 				12DE5FBB1D004443009B315F /* Progress.m in Sources */,
 				12A6071D1D23A99800D8476D /* MessageView.m in Sources */,
+				1285AAEA1D3319FA00F508AC /* UserLikesCollection.m in Sources */,
 				12F0D7191D0A7C6100A37C40 /* NearBy.m in Sources */,
 				12E9E4471D25F8A30098C439 /* ProfileMain.m in Sources */,
+				1285AAF71D331B7200F508AC /* UserLikesHeader.m in Sources */,
 				12F741D21CE56B3400E8267A /* FloatingDrawerViewController.m in Sources */,
+				1285AB0A1D33683600F508AC /* UserProfileHeader.m in Sources */,
 				120142EE1D1042AD00D66905 /* EXPhotoViewer.m in Sources */,
 				124928B91CF2ED810038A2F3 /* UIButton+Badge.m in Sources */,
 				1285AAD11D2CDC9F00F508AC /* Profile.m in Sources */,
 				1296A7A31D03B34000E44642 /* BaseCollections.m in Sources */,
+				1285AB001D3365BD00F508AC /* UserMediaCell.m in Sources */,
 				12DE5FA91CFD43A7009B315F /* Balloon.m in Sources */,
 				124928B81CF2ED810038A2F3 /* UIBarButtonItem+Badge.m in Sources */,
+				1285AAF41D331B3B00F508AC /* UserLikesCell.m in Sources */,
 				126AF40B1CEDAE0E00E3ED67 /* IndentedLabel.m in Sources */,
 				125AEF3C1CF9F08300553475 /* SimulatedUsers.m in Sources */,
 				1235BC8E1D0FD30E00E4AA27 /* ChatLeft.m in Sources */,
@@ -725,6 +817,8 @@
 				1296A7A61D03B3CA00E44642 /* BaseFunctions.m in Sources */,
 				1285AACE1D2CCBBE00F508AC /* SelectionBar.m in Sources */,
 				120142F11D1F952600D66905 /* AudioPlayer.m in Sources */,
+				1285AB141D337CE900F508AC /* AddMoreUserMediaCell.m in Sources */,
+				1285AB051D33664600F508AC /* UserMapCell.m in Sources */,
 				12F741DA1CE56F4300E8267A /* MainController.m in Sources */,
 				12F0D7161D0A773000A37C40 /* TextFieldAlert.m in Sources */,
 				120A52441D1907EF00EB8269 /* UsersTableBase.m in Sources */,

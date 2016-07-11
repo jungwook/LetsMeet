@@ -8,11 +8,19 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol PageSelectionViewProtocol <NSObject>
+@optional
+- (void)viewDidLoad;
+
+@end
+
 typedef void(^PageSelectionBlock)(NSUInteger index);
 
 @interface PageSelectionView : UIView <UIScrollViewDelegate>
 @property (nonatomic, assign) UIColor *textColor;
 @property (nonatomic, assign) PageSelectionBlock handler;
+@property (nonatomic, strong) UIColor *barColor;
+@property (nonatomic) CGFloat barHeight;
 - (void) setHandler:(PageSelectionBlock)handler;
-- (void) addButtonWithTitle:(NSString*)title view:(UIView*)view;
+- (void) addButtonWithTitle:(NSString*)title view:(UIView<PageSelectionViewProtocol>*)view;
 @end

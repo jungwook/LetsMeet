@@ -1536,12 +1536,12 @@ Hello</string>
                                         </constraints>
                                     </button>
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="nickname" placeholder="nickname" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="4qH-QE-3kw">
-                                        <rect key="frame" x="163" y="204" width="88" height="30"/>
+                                        <rect key="frame" x="171.5" y="204" width="71" height="30"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="zg7-yA-xP4"/>
                                         </constraints>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
+                                        <fontDescription key="fontDescription" name="AvenirNextCondensed-DemiBold" family="Avenir Next Condensed" pointSize="18"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="서울시 강남구 대치동" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qpg-3P-5BR">
@@ -1771,19 +1771,23 @@ Hello</string>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WM1-62-bEp" customClass="PageSelectionView">
-                                <rect key="frame" x="0.0" y="390" width="414" height="346"/>
+                                <rect key="frame" x="0.0" y="207" width="414" height="529"/>
                                 <color key="backgroundColor" red="0.99607843159999998" green="0.68235296010000002" blue="0.35686275360000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="Xc8-xq-ylp" firstAttribute="top" secondItem="WM1-62-bEp" secondAttribute="bottom" id="7ba-f8-79B"/>
-                            <constraint firstItem="WM1-62-bEp" firstAttribute="top" secondItem="qmg-0e-qRM" secondAttribute="bottom" constant="326" id="jcD-aO-g6y"/>
+                            <constraint firstItem="WM1-62-bEp" firstAttribute="top" secondItem="qmg-0e-qRM" secondAttribute="bottom" constant="143" id="jcD-aO-g6y"/>
                             <constraint firstAttribute="trailingMargin" secondItem="WM1-62-bEp" secondAttribute="trailing" constant="-20" id="oe6-GR-pdB"/>
                             <constraint firstItem="WM1-62-bEp" firstAttribute="leading" secondItem="vgA-u1-sfu" secondAttribute="leadingMargin" constant="-20" id="quu-oi-6uH"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="z3G-jF-fEc"/>
+                    <navigationItem key="navigationItem" title="Test" id="n20-Dp-orC">
+                        <barButtonItem key="leftBarButtonItem" image="399-list1" id="MYj-7x-rRg" customClass="ToggleButton">
+                            <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="0.80104518579999995" colorSpace="calibratedRGB"/>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="pageView" destination="WM1-62-bEp" id="OwX-OL-hBy"/>
                     </connections>

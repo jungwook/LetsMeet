@@ -466,16 +466,21 @@
     [UIColor colorWithRed:240/255.f green:82/255.f blue:10/255.f alpha:1.0f];
 }
 
+- (UIImage*) sexImage
+{
+    return (self.sex == kSexMale) ? [UIImage imageNamed:@"guy"] : [UIImage imageNamed:@"girl"] ;
+}
+
 - (BOOL)isMe
 {
     return ([self.objectId isEqualToString:[User me].objectId]);
 }
 
-- (void)allMediaLoaded:(UserMediaBlock)handler
+- (void)mediaReady:(ReadyBlock)handler
 {
     __block NSUInteger count = self.media.count;
     [self.media enumerateObjectsUsingBlock:^(UserMedia* _Nonnull userMedia, NSUInteger idx, BOOL * _Nonnull stop) {
-        [userMedia load:^{
+        [userMedia ready:^{
             if (--count == 0) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (handler) {
@@ -487,10 +492,11 @@
     }];
 }
 
+
 @end
 
 @implementation UserMedia
-@dynamic userId, mediaType, thumbailFile, mediaFile, mediaSize, isRealMedia;
+@dynamic userId, comment, mediaType, thumbailFile, mediaFile, mediaSize, isRealMedia;
 
 + (NSString *)parseClassName {
     return @"UserMedia";
@@ -507,7 +513,7 @@
     return CGSizeMake([[self objectForKey:@"mediaWidth"] floatValue], [[self objectForKey:@"mediaHeight"] floatValue]);
 }
 
-- (void)load:(UserMediaBlock)block
+- (void)ready:(ReadyBlock)block
 {
     [self fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
         [S3File getDataFromFile:self.thumbailFile completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {

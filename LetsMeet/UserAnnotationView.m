@@ -93,7 +93,7 @@
     if (self) {
         UserAnnotation *anno = annotation;
         
-        const CGFloat offset = 5, size = 50, x = self.frame.origin.x, y = self.frame.origin.y;
+        const CGFloat offset = 3, size = 25, photoSize = 50, x = self.frame.origin.x, y = self.frame.origin.y;
         self.frame = CGRectMake(x, y, size, size);
         
         CALayer *blueLayer = [CALayer layer];
@@ -101,9 +101,11 @@
         blueLayer.frame = self.bounds;
         blueLayer.cornerRadius = size / 2.0f;
         blueLayer.masksToBounds = YES;
+        
         [self.layer addSublayer:blueLayer];
         
         if (anno.animate) {
+            [blueLayer removeAllAnimations];
             [blueLayer addAnimation:[self blowAnimations] forKey:nil];
         }
         
@@ -117,19 +119,28 @@
         whiteLayer.shadowColor = [UIColor colorWithWhite:0.2 alpha:1.0].CGColor;
         whiteLayer.shadowRadius = 4.0f;
         whiteLayer.shadowOpacity = 0.4f;
+        
         [self.layer addSublayer:whiteLayer];
         
         self.opaque = NO;
         
-        self.photoView = [[UIImageView alloc] initWithFrame:CGRectMake(offset, offset, size-2*offset, size-2*offset)];
+        self.ball = [UIView new];
+        self.ball.backgroundColor = [UIColor colorWithRed:100/255.f green:167/255.f blue:229/255.f alpha:1];
+        self.ball.frame = CGRectMake(offset, offset, size-2*offset, size-2*offset);
+        self.ball.layer.cornerRadius = self.ball.bounds.size.width / 2.0f;
+        self.ball.layer.masksToBounds = YES;
+        
+        
+        self.photoView = [[UIImageView alloc] initWithFrame:CGRectMake(offset, offset, photoSize-2*offset, photoSize-2*offset)];
         self.photoView.layer.cornerRadius = self.photoView.bounds.size.width / 2.0f;
         self.photoView.layer.masksToBounds = YES;
         
         if (anno.animate) {
-            [self.photoView.layer addAnimation:[self photoAnimations] forKey:nil];
+            [self.ball.layer removeAllAnimations];
+            [self.ball.layer addAnimation:[self photoAnimations] forKey:nil];
         }
 
-        [self addSubview:self.photoView];
+        [self addSubview:self.ball];
         [self setDraggable:anno.draggable];
     }
     return self;

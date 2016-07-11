@@ -215,6 +215,8 @@ typedef enum {
     [self.age setUserInteractionEnabled:self.user.isMe];
     [self.sex setUserInteractionEnabled:self.user.isMe];
     
+    NSLog(@"FONT:%@", self.nickname.font);
+    
     self.intro.text = self.user.intro ? self.user.intro : @"";
     [ListPicker pickerWithArray:@[@"우리 만나요!", @"애인 찾아요", @"함께 드라이브 해요", @"나쁜 친구 찾아요", @"착한 친구 찾아요", @"함께 먹으러 가요", @"술친구 찾아요"] onTextField:self.intro selection:^(id data) {
         self.user.intro = data;
