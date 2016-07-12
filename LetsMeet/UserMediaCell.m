@@ -17,7 +17,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *delete;
 
 @property (strong, nonatomic) UserMedia* media;
-@property (weak, nonatomic) UserMediaCollection* parent;
+@property (weak, nonatomic) UserMediaLikesCollection* parent;
 @property (nonatomic) BOOL editable;
 @end
 
@@ -40,19 +40,21 @@
     [self.parent editMediaComment:self.media row:self.tag];
 }
 
-- (void)setUserMedia:(UserMedia *)media parent:(UserMediaCollection *)parent row:(NSInteger)row
+- (void)setUserMedia:(UserMedia *)media parent:(UserMediaLikesCollection *)parent row:(NSInteger)row
 {
     self.tag = row;
     
     _media = media;
+    
     _parent = parent;
-    _editable = [media.userId isEqualToString:[User me].objectId];
+    _editable = NO;
     
     self.delete.hidden = !self.editable;
     self.edit.hidden = !self.editable;
     
     [self.photo setImage:nil];
     [self.photo loadMediaFromUserMedia:media completion:^(NSData *data, NSError *error, BOOL fromCache) {
+        _editable = [media.userId isEqualToString:[User me].objectId];
         [[self.parent visibleCells] enumerateObjectsUsingBlock:^(__kindof UICollectionViewCell * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             if ([obj isKindOfClass:[UserMediaCell class]]) {
                 UserMediaCell *cell = (UserMediaCell*) obj;

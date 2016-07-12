@@ -8,7 +8,7 @@
 
 #import "Test.h"
 #import "PageSelectionView.h"
-#import "UserMediaCollection.h"
+#import "UserMediaLikesCollection.h"
 #import "UserMap.h"
 #import "UserLikesCollection.h"
 
@@ -33,17 +33,12 @@
     UserMap *map = [UserMap new];
     map.userInteractionEnabled = NO;
     
-    UserLikesCollection *likes = [UserLikesCollection userLikesCollectionWithHandler:^(User *user) {
-        NSLog(@"SELECTED USER:%@", user);
-    }];
-    
-    UserMediaCollection *col = [UserMediaCollection userMediaCollectionOnViewController:self];
+    UserMediaLikesCollection *col = [UserMediaLikesCollection UserMediaLikesCollectionOnViewController:self];
     [col setUser:[User me]];
     [col setCommentColor:[UIColor redColor]];
     
     
     [self.pageView addButtonWithTitle:@"Media" view:col];
-//    [self.pageView addButtonWithTitle:@"Likes" view:likes];
     [self.pageView addButtonWithTitle:@"Location" view:map];
     [self.pageView addButtonWithTitle:@"Hello2" view:v2];
     

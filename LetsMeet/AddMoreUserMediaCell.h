@@ -7,8 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "UserMediaCollection.h"
+#import "UserMediaLikesCollection.h"
 
 @interface AddMoreUserMediaCell : UICollectionViewCell
-@property (nonatomic, weak) UserMediaCollection *parent;
+@property (nonatomic, weak) UserMediaLikesCollection *parent;
 @end

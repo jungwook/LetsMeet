@@ -7,8 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "UserMediaCollection.h"
+#import "UserMediaLikesCollection.h"
 
 @interface UserLikesCell : UICollectionViewCell
-- (void) setUser:(User*)user parent:(UserMediaCollection*)parent;
+- (void) setUser:(User*)user parent:(UserMediaLikesCollection*)parent;
 @end

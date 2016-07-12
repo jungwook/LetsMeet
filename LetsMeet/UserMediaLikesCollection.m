@@ -1,12 +1,12 @@
 //
-//  UserMediaCollection.m
+//  UserMediaLikesCollection.m
 //  LetsMeet
 //
 //  Created by 한정욱 on 2016. 7. 8..
 //  Copyright © 2016년 SMARTLY CO. All rights reserved.
 //
 
-#import "UserMediaCollection.h"
+#import "UserMediaLikesCollection.h"
 #import "MediaPicker.h"
 
 #import "AddMoreUserMediaCell.h"
@@ -23,18 +23,18 @@
 #define kPadding 0
 
 
-@interface UserMediaCollection()
+@interface UserMediaLikesCollection()
 @property (nonatomic, strong) UICollectionViewFlowLayout *flow;
 @property (weak, nonatomic) UIViewController *viewController;
 @property (strong, nonatomic) NSArray *likes;
 @property (strong, nonatomic) NSArray *liked;
 @end
 
-@implementation UserMediaCollection
+@implementation UserMediaLikesCollection
 
-+ (instancetype)userMediaCollectionOnViewController:(UIViewController *)viewController
++ (instancetype)UserMediaLikesCollectionOnViewController:(UIViewController *)viewController
 {
-    return [[UserMediaCollection alloc] initWithViewController:viewController];
+    return [[UserMediaLikesCollection alloc] initWithViewController:viewController];
 }
 
 - (instancetype) initWithViewController:(UIViewController *)viewController
@@ -50,21 +50,6 @@
         [self initialize];
     }
     return self;
-}
-
-- (instancetype)initWithCoder:(NSCoder *)aDecoder
-{
-    self = [super initWithCoder:aDecoder];
-    if (self) {
-        
-    }
-    return self;
-}
-
-- (void)awakeFromNib
-{
-    [super awakeFromNib];
-    [self initialize];
 }
 
 - (void)setLiked:(NSArray *)liked
@@ -113,18 +98,6 @@
     _user = [User me];
 }
 
-- (void)setCommentColor:(UIColor *)commentColor
-{
-    _commentColor = commentColor;
-    [self reloadData];
-}
-
-- (void)setCommentFont:(UIFont *)commentFont
-{
-    _commentFont = commentFont;
-    [self reloadData];
-}
-
 - (void) setUser:(User *)user
 {
     __LF
@@ -136,6 +109,18 @@
             [self reloadData];
         }];
     }];
+}
+
+- (void)setCommentColor:(UIColor *)commentColor
+{
+    _commentColor = commentColor;
+    [self reloadData];
+}
+
+- (void)setCommentFont:(UIFont *)commentFont
+{
+    _commentFont = commentFont;
+    [self reloadData];
 }
 
 - (void)refreshProfile
@@ -152,7 +137,7 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    switch ((UserMediaCollectionSections)section) {
+    switch ((UserMediaLikesCollectionSections)section) {
         case kSectionUserMedia:
             return self.user.media.count + self.user.isMe;
         case kSectionUserLikes:
@@ -165,7 +150,7 @@
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     UICollectionViewFlowLayout* layout = (UICollectionViewFlowLayout*)collectionViewLayout;
-    UserMediaCollectionSections section = indexPath.section;
+    UserMediaLikesCollectionSections section = indexPath.section;
     switch (section) {
         case kSectionUserMedia: {
             layout.minimumLineSpacing = 2;
@@ -194,7 +179,7 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     NSInteger row = indexPath.row;
-    UserMediaCollectionSections section = indexPath.section;
+    UserMediaLikesCollectionSections section = indexPath.section;
     switch (section) {
         case kSectionUserMedia:
         {
@@ -230,7 +215,7 @@
 
 - (CGSize) collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section
 {
-    switch ((UserMediaCollectionSections) section) {
+    switch ((UserMediaLikesCollectionSections) section) {
         case kSectionUserMedia:
             return CGSizeMake(1, 50);
             break;
@@ -245,7 +230,7 @@
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
-    UserMediaCollectionSections section = indexPath.section;
+    UserMediaLikesCollectionSections section = indexPath.section;
     if (kind == UICollectionElementKindSectionHeader) {
         UserProfileHeader *header = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kUserProfileHeader forIndexPath:indexPath];
         header.title.textColor = [UIColor darkGrayColor];
@@ -269,7 +254,7 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    UserMediaCollectionSections section = indexPath.section;
+    UserMediaLikesCollectionSections section = indexPath.section;
     switch (section) {
         case kSectionUserMedia:
             if (indexPath.row == self.user.media.count) {
@@ -337,39 +322,10 @@
             NSLog(@"ERROR: Cannot add on other user media.");
         }
     };
-    [self addMediaWithHandler:handler];
+    [MediaPicker addMediaOnViewController:self.viewController withMediaHandler:handler];
 }
 
-- (void) addMediaWithHandler:(MediaPickerMediaBlock)handler
-{
-    __LF
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    
-    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
-        [alert addAction:[UIAlertAction actionWithTitle:@"Library"
-                                                  style:UIAlertActionStyleDefault
-                                                handler:^(UIAlertAction * _Nonnull action) {
-                                                    [self addUserMediaFromSource:UIImagePickerControllerSourceTypePhotoLibrary mediaBlock:handler];
-                                                }]];
-    }
-    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        [alert addAction:[UIAlertAction actionWithTitle:@"Camera"
-                                                  style:UIAlertActionStyleDefault
-                                                handler:^(UIAlertAction * _Nonnull action) {
-                                                    [self addUserMediaFromSource:UIImagePickerControllerSourceTypeCamera mediaBlock:handler];
-                                                }]];
-    }
-    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-    [self.viewController presentViewController:alert animated:YES completion:nil];
-}
-
-- (void) addUserMediaFromSource:(UIImagePickerControllerSourceType)sourceType mediaBlock:(MediaPickerMediaBlock)handler
-{
-    MediaPicker *mediaPicker = [MediaPicker mediaPickerWithSourceType:sourceType mediaBlock:handler];
-    [self.viewController presentViewController:mediaPicker animated:YES completion:nil];
-}
-
-- (void) tappedOnLikeUser:(User*)user
+- (void) userSelected:(User *)user
 {
     if (self.userLikeHandler) {
         self.userLikeHandler(user);

@@ -45,7 +45,7 @@
 		1285AADB1D2F583600F508AC /* UIColor+LightAndDark.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AADA1D2F583600F508AC /* UIColor+LightAndDark.m */; };
 		1285AADD1D2F58AD00F508AC /* UIImage+AverageColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AADC1D2F58AD00F508AC /* UIImage+AverageColor.m */; };
 		1285AAE11D2F6A5900F508AC /* Test.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAE01D2F6A5900F508AC /* Test.m */; };
-		1285AAE41D2F99F000F508AC /* UserMediaCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAE31D2F99F000F508AC /* UserMediaCollection.m */; };
+		1285AAE41D2F99F000F508AC /* UserMediaLikesCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAE31D2F99F000F508AC /* UserMediaLikesCollection.m */; };
 		1285AAE71D320D5F00F508AC /* UserMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAE61D320D5F00F508AC /* UserMap.m */; };
 		1285AAEA1D3319FA00F508AC /* UserLikesCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 1285AAE91D3319FA00F508AC /* UserLikesCollection.m */; };
 		1285AAEF1D331AD600F508AC /* UserLikesCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1285AAEE1D331AD600F508AC /* UserLikesCell.xib */; };
@@ -194,8 +194,8 @@
 		1285AADE1D2F58BB00F508AC /* UIImage+AverageColor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+AverageColor.h"; sourceTree = "<group>"; };
 		1285AADF1D2F6A5900F508AC /* Test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Test.h; sourceTree = "<group>"; };
 		1285AAE01D2F6A5900F508AC /* Test.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Test.m; sourceTree = "<group>"; };
-		1285AAE21D2F99F000F508AC /* UserMediaCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserMediaCollection.h; sourceTree = "<group>"; };
-		1285AAE31D2F99F000F508AC /* UserMediaCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserMediaCollection.m; sourceTree = "<group>"; };
+		1285AAE21D2F99F000F508AC /* UserMediaLikesCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserMediaLikesCollection.h; sourceTree = "<group>"; };
+		1285AAE31D2F99F000F508AC /* UserMediaLikesCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserMediaLikesCollection.m; sourceTree = "<group>"; };
 		1285AAE51D320D5F00F508AC /* UserMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserMap.h; sourceTree = "<group>"; };
 		1285AAE61D320D5F00F508AC /* UserMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserMap.m; sourceTree = "<group>"; };
 		1285AAE81D3319FA00F508AC /* UserLikesCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserLikesCollection.h; sourceTree = "<group>"; };
@@ -433,8 +433,8 @@
 			children = (
 				1285AAD21D2F571C00F508AC /* PageSelectionView.h */,
 				1285AAD31D2F571C00F508AC /* PageSelectionView.m */,
-				1285AAE21D2F99F000F508AC /* UserMediaCollection.h */,
-				1285AAE31D2F99F000F508AC /* UserMediaCollection.m */,
+				1285AAE21D2F99F000F508AC /* UserMediaLikesCollection.h */,
+				1285AAE31D2F99F000F508AC /* UserMediaLikesCollection.m */,
 				1285AAE51D320D5F00F508AC /* UserMap.h */,
 				1285AAE61D320D5F00F508AC /* UserMap.m */,
 				1285AAE81D3319FA00F508AC /* UserLikesCollection.h */,
@@ -824,7 +824,7 @@
 				120A52441D1907EF00EB8269 /* UsersTableBase.m in Sources */,
 				12F741D01CE56B3400E8267A /* FloatingDrawerSpringAnimator.m in Sources */,
 				120142E81D08930B00D66905 /* S3File.m in Sources */,
-				1285AAE41D2F99F000F508AC /* UserMediaCollection.m in Sources */,
+				1285AAE41D2F99F000F508AC /* UserMediaLikesCollection.m in Sources */,
 				120A52411D18C28E00EB8269 /* Search.m in Sources */,
 				1249288A1CF0176C0038A2F3 /* ListPicker.m in Sources */,
 				120A52381D17A75400EB8269 /* GradientView.m in Sources */,

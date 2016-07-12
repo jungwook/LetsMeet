@@ -18,6 +18,29 @@
 
 @implementation MediaPicker
 
++(void) addMediaOnViewController:(UIViewController*)viewController withMediaHandler:(MediaPickerMediaBlock)handler
+{
+    __LF
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
+        [alert addAction:[UIAlertAction actionWithTitle:@"Library"
+                                                  style:UIAlertActionStyleDefault
+                                                handler:^(UIAlertAction * _Nonnull action) {
+                                                    [viewController presentViewController:[MediaPicker mediaPickerWithSourceType:UIImagePickerControllerSourceTypePhotoLibrary mediaBlock:handler] animated:YES completion:nil];
+                                                }]];
+    }
+    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        [alert addAction:[UIAlertAction actionWithTitle:@"Camera"
+                                                  style:UIAlertActionStyleDefault
+                                                handler:^(UIAlertAction * _Nonnull action) {
+                                                    [viewController presentViewController:[MediaPicker mediaPickerWithSourceType:UIImagePickerControllerSourceTypeCamera mediaBlock:handler] animated:YES completion:nil];
+                                                }]];
+    }
+    [alert addAction:[UIAlertAction actionWithTitle:@"CANCEL" style:UIAlertActionStyleCancel handler:nil]];
+    [viewController presentViewController:alert animated:YES completion:nil];
+}
+
 +(instancetype)mediaPickerWithSourceType:(UIImagePickerControllerSourceType)sourceType bulletBlock:(MediaPickerBulletBlock)block
 {
     return [[MediaPicker alloc] initWithSourceType:sourceType completionBlock:block];

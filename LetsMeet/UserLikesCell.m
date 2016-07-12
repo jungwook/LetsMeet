@@ -12,7 +12,7 @@
 @interface UserLikesCell()
 @property (nonatomic, strong) User* user;
 @property (weak, nonatomic) IBOutlet UIButton *photo;
-@property (weak, nonatomic) UserMediaCollection *parent;
+@property (weak, nonatomic) UserMediaLikesCollection *parent;
 @end
 
 @implementation UserLikesCell
@@ -31,7 +31,7 @@
     return self;
 }
 
-- (void)setUser:(User *)user parent:(UserMediaCollection *)parent
+- (void)setUser:(User *)user parent:(UserMediaLikesCollection *)parent
 {
     _user = user;
     _parent = parent;
@@ -48,7 +48,7 @@
 
 - (IBAction)tappedUser:(id)sender
 {
-    [self.parent tappedOnLikeUser:self.user];
+    [self.parent userSelected:self.user];
 }
 
 @end

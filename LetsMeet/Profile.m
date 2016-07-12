@@ -14,7 +14,7 @@
 #import "UIImage+AverageColor.h"
 #import "PageSelectionView.h"
 #import "UserMap.h"
-#import "UserMediaCollection.h"
+#import "UserMediaLikesCollection.h"
 
 @interface Profile ()
 @property (weak, nonatomic) IBOutlet PageSelectionView *page;
@@ -33,7 +33,7 @@
 @property (strong, nonatomic, readonly) UIImage* backgroundImage;
 @property (strong, nonatomic, readonly) UIColor* backgroundColor;
 @property (strong, nonatomic) UserMap *map;
-@property (strong, nonatomic) UserMediaCollection* mediaCollection;
+@property (strong, nonatomic) UserMediaLikesCollection* mediaCollection;
 @property (strong, nonatomic) NSArray *liked;
 @property (strong, nonatomic) NSArray *likes;
 @end
@@ -66,7 +66,7 @@
         [self showProfileForUser:user];
     };
 
-    self.mediaCollection = [UserMediaCollection userMediaCollectionOnViewController:self];
+    self.mediaCollection = [UserMediaLikesCollection UserMediaLikesCollectionOnViewController:self];
     self.mediaCollection.userLikeHandler = handler;
     
     self.map = [UserMap new];
@@ -84,51 +84,54 @@
 - (void) setUser:(User *)user
 {
     _user = user ? user : [User me];
-
-    // basic information
-    self.nickname.text = self.user.nickname;
-    self.intro.text = self.user.intro;
-    self.age.text = self.user.age;
-    self.sex.text = self.user.sexString;
     
-    // setup for likes and liked and like heart
-    [self setupLikeBarButtonItem];
-    [self setupLikeBarButtonItemState:[[User me].likes containsObject:self.user.objectId]];
-    [self setupLikes];
-    
-    [self.photo loadMediaFromUser:self.user];
-    [self.photo setIsCircle:YES];
-    [self.photo setShowsBorder:YES];
-    
-    [self setBackgroundViewImage:self.backgroundImage];
-
-    [self.photoEdit setHidden:!self.user.isMe];
-    [self.nickname setUserInteractionEnabled:self.user.isMe];
-    [self.intro setUserInteractionEnabled:self.user.isMe];
-    [self.age setUserInteractionEnabled:self.user.isMe];
-    [self.sex setUserInteractionEnabled:self.user.isMe];
-    
-    self.intro.text = self.user.intro ? self.user.intro : @"";
-    [ListPicker pickerWithArray:@[@"우리 만나요!", @"애인 찾아요", @"함께 드라이브 해요", @"나쁜 친구 찾아요", @"착한 친구 찾아요", @"함께 먹으러 가요", @"술친구 찾아요"] onTextField:self.intro selection:^(id data) {
-        self.user.intro = data;
-        [self.user saveInBackground];
+    [self.user fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+        // Media collection user
+        [self.mediaCollection setUser:self.user];
+        [self.mediaCollection setCommentColor:[UIColor redColor]];
+        [self.map setUser:self.user];
+        
+        // basic information
+        self.nickname.text = self.user.nickname;
+        self.intro.text = self.user.intro;
+        self.age.text = self.user.age;
+        self.sex.text = self.user.sexString;
+        
+        // setup for likes and liked and like heart
+        [self setupLikeBarButtonItem];
+        [self setupLikeBarButtonItemState:[[User me].likes containsObject:self.user.objectId]];
+        [self setupLikes];
+        
+        [self.photo loadMediaFromUser:self.user];
+        [self.photo setIsCircle:YES];
+        [self.photo setShowsBorder:YES];
+        
+        [self setBackgroundViewImage:self.backgroundImage];
+        
+        [self.photoEdit setHidden:!self.user.isMe];
+        [self.nickname setUserInteractionEnabled:self.user.isMe];
+        [self.intro setUserInteractionEnabled:self.user.isMe];
+        [self.age setUserInteractionEnabled:self.user.isMe];
+        [self.sex setUserInteractionEnabled:self.user.isMe];
+        
+        self.intro.text = self.user.intro ? self.user.intro : @"";
+        [ListPicker pickerWithArray:@[@"우리 만나요!", @"애인 찾아요", @"함께 드라이브 해요", @"나쁜 친구 찾아요", @"착한 친구 찾아요", @"함께 먹으러 가요", @"술친구 찾아요"] onTextField:self.intro selection:^(id data) {
+            self.user.intro = data;
+            [self.user saveInBackground];
+        }];
+        
+        self.age.text = self.user.age ? self.user.age : @"";
+        [ListPicker pickerWithArray:@[@"고딩", @"20대", @"30대", @"40대", @"비밀"] onTextField:self.age selection:^(id data) {
+            self.user.age = data;
+            [self.user saveInBackground];
+        }];
+        
+        self.sex.text = self.user.sexString;
+        [ListPicker pickerWithArray:@[@"여자", @"남자"] onTextField:self.sex selection:^(id data) {
+            self.user.sex = [data isEqualToString:@"여자"] ? kSexFemale : kSexMale ;
+            [self.user saveInBackground];
+        }];
     }];
-    
-    self.age.text = self.user.age ? self.user.age : @"";
-    [ListPicker pickerWithArray:@[@"고딩", @"20대", @"30대", @"40대", @"비밀"] onTextField:self.age selection:^(id data) {
-        self.user.age = data;
-        [self.user saveInBackground];
-    }];
-    
-    self.sex.text = self.user.sexString;
-    [ListPicker pickerWithArray:@[@"여자", @"남자"] onTextField:self.sex selection:^(id data) {
-        self.user.sex = [data isEqualToString:@"여자"] ? kSexFemale : kSexMale ;
-        [self.user saveInBackground];
-    }];
-
-    [self.mediaCollection setUser:self.user];
-    [self.mediaCollection setCommentColor:[UIColor redColor]];
-    [self.map setUser:self.user];
 }
 
 - (void) setupLikeBarButtonItemState:(BOOL)liked
@@ -260,7 +263,7 @@
         sender.selected = YES;
     }
     [me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-        [self setupLikes];
+        [self loadAllLiked]; // When I like/dislike THIS user. I only need to refresh this USER's likes list.
     }];
 }
 
@@ -299,36 +302,7 @@
         }
     };
     
-    [self addMediaWithHandler:handler];
-}
-
-- (void) addMediaWithHandler:(MediaPickerMediaBlock)handler
-{
-    __LF
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    
-    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
-        [alert addAction:[UIAlertAction actionWithTitle:@"Library"
-                                                  style:UIAlertActionStyleDefault
-                                                handler:^(UIAlertAction * _Nonnull action) {
-                                                    [self addUserMediaFromSource:UIImagePickerControllerSourceTypePhotoLibrary mediaBlock:handler];
-                                                }]];
-    }
-    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        [alert addAction:[UIAlertAction actionWithTitle:@"Camera"
-                                                  style:UIAlertActionStyleDefault
-                                                handler:^(UIAlertAction * _Nonnull action) {
-                                                    [self addUserMediaFromSource:UIImagePickerControllerSourceTypeCamera mediaBlock:handler];
-                                                }]];
-    }
-    [alert addAction:[UIAlertAction actionWithTitle:@"CANCEL" style:UIAlertActionStyleCancel handler:nil]];
-    [self presentViewController:alert animated:YES completion:nil];
-}
-
-- (void) addUserMediaFromSource:(UIImagePickerControllerSourceType)sourceType mediaBlock:(MediaPickerMediaBlock)handler
-{
-    MediaPicker *mediaPicker = [MediaPicker mediaPickerWithSourceType:sourceType mediaBlock:handler];
-    [self presentViewController:mediaPicker animated:YES completion:nil];
+    [MediaPicker addMediaOnViewController:self withMediaHandler:handler];
 }
 
 @end
