@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import "PageSelectionView.h"
+#import "AddMoreUserMediaCell.h"
+#import "UserMediaCell.h"
+#import "UserLikesCell.h"
+#import "UserProfileHeader.h"
 
 typedef enum : NSInteger {
     kSectionUserMedia = 0,
@@ -17,23 +21,44 @@ typedef enum : NSInteger {
 
 typedef void(^UserLikeHandler)(User* user);
 
-@interface UserMediaLikesCollection : UICollectionView <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, PageSelectionViewProtocol>
-@property (nonatomic, strong) User* user;
+
+@class UserMediaLikesCollection;
+
+@protocol UserMediaLikesCollectionDelegate <NSObject>
+@required
+- (void) collectionAddMedia;
+- (void) collectionRemoveMedia:(UserMedia*)media;
+- (void) collectionEditCommentOnMedia:(UserMedia*)media;
+- (NSArray*) collectionMedia;
+- (NSArray*) collectionLikes;
+- (NSArray*) collectionLiked;
+@end
+
+@interface UserMediaLikesCollection : UICollectionView <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, PageSelectionViewProtocol, UserMediaCellDelegate, UserLikesCellDelegate, AddMoreUserMediaCellDelegate>
+
+//@property (nonatomic, strong) User* user;
+@property (nonatomic, weak) id <UserMediaLikesCollectionDelegate> collectionDelegate;
 @property (nonatomic, strong) UIColor *commentColor;
 @property (nonatomic, strong) UIFont *commentFont;
 @property (nonatomic, copy) UserLikeHandler userLikeHandler;
+@property (nonatomic) BOOL editable;
 
 /**
  The only initialization method for UserMediaLikesCollection
  **/
+
 + (instancetype) UserMediaLikesCollectionOnViewController:(UIViewController*)viewController;
+- (void) initializeCollectionWithDelegate:(id <UserMediaLikesCollectionDelegate>)delegate;
+- (void) collectionMediaAddedAtIndex:(NSInteger)index;
+- (void) collectionMediaRemovedAtIndex:(NSInteger)index;
+- (void) collectionCommentEditedAtIndex:(NSInteger)index;
+- (void) collectionRefreshLikes;
+- (void) collectionRefreshLiked;
 
-
-- (void) userSelected:(User*)user;
-- (void) addMedia;
-- (void) removeMedia:(UserMedia*)media row:(NSInteger)row;
-- (void) editMediaComment:(UserMedia*)media row:(NSInteger)row;
-- (void) setLikes:(NSArray*)likes;
-- (void) setLiked:(NSArray*)liked;
-
+//- (void) collectionAddMedia:(UserMedia*)media;
+//- (void) collectionRemoveMedia:(UserMedia*)media;
+//- (void) collectionEditCommentOnMedia:(UserMedia*)media;
+//- (void) collectionAddLikes:(User*)user;
+//- (void) collectionAddLiked:(User*)user;
+//- (void) collectionRemoveLiked:(User*)user;
 @end

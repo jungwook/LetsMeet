@@ -196,7 +196,7 @@
         
         [self.me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
             if (!error) {
-                [self.mainPhoto loadMediaFromUser:self.me];
+                [self.mainPhoto loadMediaFromUser:self.me animated:NO];
             }
             else {
                 NSLog(@"ERROR:%@", error.localizedDescription);

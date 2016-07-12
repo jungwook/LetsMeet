@@ -7,8 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "UserMediaLikesCollection.h"
+
+@class UserLikesCell;
+
+@protocol UserLikesCellDelegate <NSObject>
+@required
+- (void) userLikesCell:(UserLikesCell*)cell selectUser:(User*)user;
+- (NSArray*) collectionVisibleCells;
+@end
 
 @interface UserLikesCell : UICollectionViewCell
-- (void) setUser:(User*)user parent:(UserMediaLikesCollection*)parent;
+@property (nonatomic, strong) User* user;
+@property (nonatomic, weak) id<UserLikesCellDelegate> delegate;
 @end

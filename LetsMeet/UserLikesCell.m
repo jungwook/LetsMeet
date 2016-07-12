@@ -10,9 +10,8 @@
 #import "S3File.h"
 
 @interface UserLikesCell()
-@property (nonatomic, strong) User* user;
 @property (weak, nonatomic) IBOutlet UIButton *photo;
-@property (weak, nonatomic) UserMediaLikesCollection *parent;
+//@property (weak, nonatomic) UserMediaLikesCollection *parent;
 @end
 
 @implementation UserLikesCell
@@ -31,24 +30,32 @@
     return self;
 }
 
-- (void)setUser:(User *)user parent:(UserMediaLikesCollection *)parent
+- (void)setUser:(User *)user
 {
     _user = user;
-    _parent = parent;
-
-    [S3File getDataFromFile:self.user.thumbnail completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
-        if (data && !error) {
+    [self.user fetched:^{
+        NSData* data = [S3File objectForKey:self.user.thumbnail];
+        if (data) {
             [self.photo setImage:[UIImage imageWithData:data] forState:UIControlStateNormal];
         }
         else {
-            [self.photo setImage:user.sexImage forState:UIControlStateNormal];
+            [S3File getDataFromFile:self.user.thumbnail completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
+                if (data && !error) {
+                    [self.photo setImage:[UIImage imageWithData:data] forState:UIControlStateNormal];
+                }
+                else {
+                    [self.photo setImage:user.sexImage forState:UIControlStateNormal];
+                }
+            }];
         }
     }];
 }
 
 - (IBAction)tappedUser:(id)sender
 {
-    [self.parent userSelected:self.user];
+    if ([self.delegate respondsToSelector:@selector(userLikesCell:selectUser:)]) {
+        [self.delegate userLikesCell:self selectUser:self.user];
+    }
 }
 
 @end

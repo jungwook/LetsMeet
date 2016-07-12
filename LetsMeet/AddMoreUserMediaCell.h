@@ -7,8 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "UserMediaLikesCollection.h"
+
+
+@class AddMoreUserMediaCell;
+@protocol AddMoreUserMediaCellDelegate <NSObject>
+@required
+- (void) addMoreUserMedia;
+@end
 
 @interface AddMoreUserMediaCell : UICollectionViewCell
-@property (nonatomic, weak) UserMediaLikesCollection *parent;
+@property (nonatomic, weak) id<AddMoreUserMediaCellDelegate> delegate;
 @end

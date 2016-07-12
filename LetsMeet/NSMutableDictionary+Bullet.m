@@ -499,6 +499,38 @@
     }
 }
 
+- (void)fetched:(FetchedNoErrorBlock)handler
+{
+    [self fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+        }
+        else {
+            if (handler) {
+                handler();
+            }
+        }
+    }];
+}
+
+- (void)saved:(SavedNoErrorBlock)handler
+{
+    [self saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+        }
+        else {
+            if (handler) {
+                handler();
+            }
+        }
+    }];
+}
+
+- (BOOL)isEqual:(User*)object
+{
+    return [self.objectId isEqualToString:object.objectId];
+}
 
 @end
 
@@ -507,6 +539,11 @@
 
 + (NSString *)parseClassName {
     return @"UserMedia";
+}
+
+- (BOOL)isEqual:(UserMedia*)object
+{
+    return [self.objectId isEqual:object.objectId];
 }
 
 - (void)setMediaSize:(CGSize)mediaSize
@@ -529,5 +566,34 @@
         }];
     }];
 }
+
+- (void)fetched:(FetchedNoErrorBlock)handler
+{
+    [self fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+        }
+        else {
+            if (handler) {
+                handler();
+            }
+        }
+    }];
+}
+
+- (void)saved:(SavedNoErrorBlock)handler
+{
+    [self saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+        }
+        else {
+            if (handler) {
+                handler();
+            }
+        }
+    }];
+}
+
 @end
 

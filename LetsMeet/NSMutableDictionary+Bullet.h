@@ -112,6 +112,8 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
 };
 
 typedef void(^ReadyBlock)(void);
+typedef void(^FetchedNoErrorBlock)(void);
+typedef void(^SavedNoErrorBlock)(void);
 typedef void(^UsersReadyBlock)(NSArray* users);
 
 @interface UserMedia : PFObject <PFSubclassing>
@@ -124,7 +126,8 @@ typedef void(^UsersReadyBlock)(NSArray* users);
 @property BOOL isRealMedia;
 
 - (void) ready:(ReadyBlock)block;
-
+- (void) fetched:(FetchedNoErrorBlock)handler;
+- (void) saved:(SavedNoErrorBlock)handler;
 @end
 
 @interface User : PFUser<PFSubclassing>
@@ -153,5 +156,7 @@ typedef void(^UsersReadyBlock)(NSArray* users);
 - (UIColor*) sexColor;
 - (UIImage*) sexImage;
 - (void) mediaReady:(ReadyBlock)handler;
+- (void) fetched:(FetchedNoErrorBlock)handler;
+- (void) saved:(SavedNoErrorBlock)handler;
 @end
 

@@ -19,7 +19,7 @@
 #undef MAIN_SCREEN_ID
 #define MAIN_SCREEN_ID @"Profile"
 #undef MAIN_SCREEN_ID
-#define MAIN_SCREEN_ID @"Test"
+#define MAIN_SCREEN_ID @"Near"
 
 @interface MainController ()
 @end
@@ -121,6 +121,12 @@
                                      @"icon"    : @"488-github",
                                      @"badge"   : @(NO)
                                      },
+                     @"Near" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Near"],
+                                    @"title"   : @"Near",
+                                    @"menu"    : @"Near",
+                                    @"icon"    : @"488-github",
+                                    @"badge"   : @(NO)
+                                    },
                       @"NearMe" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"NearMe"],
                                      @"title"   : @"Near...",
                                      @"menu"    : @"Near...",

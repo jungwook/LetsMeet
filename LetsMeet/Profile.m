@@ -14,7 +14,6 @@
 #import "UIImage+AverageColor.h"
 #import "PageSelectionView.h"
 #import "UserMap.h"
-#import "UserMediaLikesCollection.h"
 
 @interface Profile ()
 @property (weak, nonatomic) IBOutlet PageSelectionView *page;
@@ -28,14 +27,12 @@
 @property (weak, nonatomic) IBOutlet UILabel *likedLB;
 @property (weak, nonatomic) IBOutlet UIView *backgroundView;
 @property (weak, nonatomic) IBOutlet UIButton *photoEdit;
-@property (weak, nonatomic) User *user;
 @property (nonatomic, readonly) BOOL editable;
 @property (strong, nonatomic, readonly) UIImage* backgroundImage;
 @property (strong, nonatomic, readonly) UIColor* backgroundColor;
 @property (strong, nonatomic) UserMap *map;
 @property (strong, nonatomic) UserMediaLikesCollection* mediaCollection;
 @property (strong, nonatomic) NSArray *liked;
-@property (strong, nonatomic) NSArray *likes;
 @end
 
 @implementation Profile
@@ -76,19 +73,39 @@
     [self.page setBarHeight:44];
     [self.page addButtonWithTitle:@"Location" view:self.map];
 
-    [self setUser:self.user];
+    [self setAndInitializeWithUser:self.user];
     [self setShadowOnViews];
     [self setupTapGestureRecognizerForExit];
 }
 
-- (void) setUser:(User *)user
+- (NSArray *)collectionMedia
+{
+    return self.user.media;
+}
+
+- (NSArray *)collectionLiked
+{
+    return self.liked;
+}
+
+- (NSArray *)collectionLikes
+{
+    return self.user.likes;
+}
+
+- (void) setAndInitializeWithUser:(User *)user
 {
     _user = user ? user : [User me];
     
-    [self.user fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+    [self.user fetched:^{
         // Media collection user
-        [self.mediaCollection setUser:self.user];
+        [self.mediaCollection initializeCollectionWithDelegate:self];
+        [self processUserLikedForUser:self.user];           
+        
+        [self.mediaCollection setEditable:self.editable];
         [self.mediaCollection setCommentColor:[UIColor redColor]];
+        
+        // Map information
         [self.map setUser:self.user];
         
         // basic information
@@ -99,10 +116,9 @@
         
         // setup for likes and liked and like heart
         [self setupLikeBarButtonItem];
-        [self setupLikeBarButtonItemState:[[User me].likes containsObject:self.user.objectId]];
-        [self setupLikes];
+        [self setupLikeBarButtonItemState:[[User me].likes containsObject:self.user]];
         
-        [self.photo loadMediaFromUser:self.user];
+        [self.photo loadMediaFromUser:self.user animated:NO];
         [self.photo setIsCircle:YES];
         [self.photo setShowsBorder:YES];
         
@@ -134,6 +150,50 @@
     }];
 }
 
+- (void) processUserLikedForUser:(User*)user
+{
+    [self findAllLikedByUser:user inBackground:^(NSArray<User *> *users) {
+        self.liked = users;
+        [self.mediaCollection collectionRefreshLiked];
+//        [self.mediaCollection collectionRefreshLikes];
+    }];
+}
+
+- (void)setLiked:(NSArray *)liked
+{
+    _liked = liked;
+    self.likedLB.text = [NSString stringWithFormat:@"%ld", liked.count];
+    self.likesLB.text = [NSString stringWithFormat:@"%ld", self.user.likes.count];
+}
+
+typedef void(^UsersBlock)(NSArray<User*>* users);
+- (void) findAllLikedByUser:(User*)user inBackground:(UsersBlock)block
+{
+    PFQuery *query = [User query];
+    [query whereKey:@"likes" containsAllObjectsInArray:@[user]];
+    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        if (block) {
+            block(objects);
+        }
+    }];
+}
+
+- (void) likeUser:(UIButton *)sender {
+    User *me = [User me];
+    
+    if ([me.likes containsObject:self.user]) {
+        [me removeObject:self.user forKey:@"likes"];
+        sender.selected = NO;
+    }
+    else {
+        [me addUniqueObject:self.user forKey:@"likes"];
+        sender.selected = YES;
+    }
+    [me saved:^{
+        [self processUserLikedForUser:self.user];
+    }];
+}
+
 - (void) setupLikeBarButtonItemState:(BOOL)liked
 {
     UIButton *likeButtonWithinBarButtonItem = self.navigationItem.rightBarButtonItem.customView;
@@ -148,7 +208,10 @@
         [but setBackgroundImage:[UIImage imageNamed:@"like grey"] forState:UIControlStateNormal];
         [but setBackgroundImage:[UIImage imageNamed:@"like red"] forState:UIControlStateSelected];
         [but addTarget:self action:@selector(likeUser:) forControlEvents:UIControlEventTouchDown];
-        [self.navigationItem setRightBarButtonItem:[[UIBarButtonItem alloc] initWithCustomView:but]];
+        
+        UIBarButtonItem *likebbi = [[UIBarButtonItem alloc] initWithCustomView:but];
+        [likebbi setTintColor:[UIColor blueColor]];
+        [self.navigationItem setRightBarButtonItem:likebbi];
     }
 }
 
@@ -170,6 +233,8 @@
                                                                       NSForegroundColorAttributeName:self.backgroundColor,
                                                                       NSFontAttributeName: [UIFont systemFontOfSize:16 weight:UIFontWeightBold]
                                                                       }];
+    
+    [self.mediaCollection reloadData];
 }
 
 - (void) setupTapGestureRecognizerForExit
@@ -184,34 +249,6 @@
         if ([view isKindOfClass:[UILabel class]] || [view isKindOfClass:[UITextField class]]) {
             setShadowOnView(view, 2.5f, 0.8f);
         }
-    }];
-}
-
-- (void) setupLikes
-{
-    [self loadAllLiked];
-    [self loadAllLikes];
-}
-
-- (void)loadAllLikes
-{
-    PFQuery *query = [User query];
-    [query whereKey:@"objectId" containedIn:self.user.likes];
-    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
-        self.likes = objects;
-        [self.mediaCollection setLikes:objects];
-        self.likesLB.text = [NSString stringWithFormat:@"%ld", self.likes.count];
-    }];
-}
-
-- (void) loadAllLiked
-{
-    PFQuery *query = [User query];
-    [query whereKey:@"likes" containsString:self.user.objectId];
-    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
-        self.liked = objects;
-        [self.mediaCollection setLiked:objects];
-        self.likedLB.text = [NSString stringWithFormat:@"%ld", self.liked.count];
     }];
 }
 
@@ -244,27 +281,11 @@
 - (void) showProfileForUser:(User*)user
 {
     Profile* main = [self.storyboard instantiateViewControllerWithIdentifier:@"ProfileViewController"];
+    
     [main setUser:user];
     main.navigationItem.leftBarButtonItem = nil;
     main.navigationItem.title = user.nickname;
     [self.navigationController pushViewController:main animated:YES];
-}
-
-- (void) likeUser:(UIButton *)sender {
-    User *me = [User me];
-    
-    NSArray *likes = me.likes;
-    if ([likes containsObject:self.user.objectId]) {
-        [me removeObject:self.user.objectId forKey:@"likes"];
-        sender.selected = NO;
-    }
-    else {
-        [me addUniqueObject:self.user.objectId forKey:@"likes"];
-        sender.selected = YES;
-    }
-    [me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-        [self loadAllLiked]; // When I like/dislike THIS user. I only need to refresh this USER's likes list.
-    }];
 }
 
 - (IBAction)editBackgroundMedia:(id)sender {
@@ -287,14 +308,8 @@
             self.user.thumbnail = thumbnailFile;
             self.user.profileMediaType = mediaType;
             self.user.isRealMedia = isRealMedia;
-            
-            [self.user saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-                if (!error) {
-                    [self.photo loadMediaFromUser:self.user];
-                }
-                else {
-                    NSLog(@"ERROR:%@", error.localizedDescription);
-                }
+            [self.user saved:^{
+                [self.photo loadMediaFromUser:self.user animated:NO];
             }];
         }
         else {
@@ -303,6 +318,95 @@
     };
     
     [MediaPicker addMediaOnViewController:self withMediaHandler:handler];
+}
+
+- (void)collectionAddMedia
+{
+    __LF
+    MediaPickerMediaBlock handler = ^(ProfileMediaTypes mediaType,
+                                      NSData *thumbnailData,
+                                      NSString *thumbnailFile,
+                                      NSString *mediaFile,
+                                      CGSize mediaSize,
+                                      BOOL isRealMedia)
+    {
+        if (self.editable) {
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"JUST 1 SEC" message:@"enter comment for your media" preferredStyle:UIAlertControllerStyleAlert];
+            
+            [alert addTextFieldWithConfigurationHandler:nil];
+            [alert addAction:[UIAlertAction actionWithTitle:@"SAVE" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                UserMedia *media = [UserMedia object];
+                media.mediaSize = mediaSize;
+                media.mediaFile = mediaFile;
+                media.thumbailFile = thumbnailFile;
+                media.mediaType = mediaType;
+                media.userId = self.user.objectId;
+                media.isRealMedia = isRealMedia;
+                media.comment = [alert.textFields firstObject].text;
+                
+                NSUInteger index = self.user.media.count;
+                [self.user addUniqueObject:media forKey:@"media"];
+                [self.user saved:^{
+                    [self.mediaCollection collectionMediaAddedAtIndex:index];
+                }];
+            }]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"CANCEL" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+                NSLog(@"Add media cancelled");
+            }]];
+            alert.modalPresentationStyle = UIModalPresentationOverFullScreen;
+            [self presentViewController:alert animated:YES completion:nil];
+        }
+        else {
+            NSLog(@"ERROR: Cannot add on other user media.");
+        }
+    };
+    [MediaPicker addMediaOnViewController:self withMediaHandler:handler];
+}
+
+- (void)collectionRemoveMedia:(UserMedia *)media
+{
+    __LF
+    
+    if (!self.editable) {
+        NSLog(@"ERROR: Cannot remove other's media");
+    }
+    else {
+        
+        [media deleteInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+            if (!error && succeeded) {
+                NSUInteger index = [self.user.media indexOfObject:media];
+                [self.user removeObjectsInArray:@[media] forKey:@"media"];
+                [self.user saveInBackground];
+                [self.mediaCollection collectionMediaRemovedAtIndex:index];
+            }
+            else {
+                NSLog(@"ERROR:%@", error.localizedDescription);
+            }
+        }];
+    }
+}
+
+- (void)collectionEditCommentOnMedia:(UserMedia *)media
+{
+    __LF
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"JUST 1 SEC" message:@"enter comment for your media" preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.text = media.comment;
+        textField.placeholder = @"enter a comment";
+    }];
+    [alert addAction:[UIAlertAction actionWithTitle:@"SAVE" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        NSString *newcomment = [alert.textFields firstObject].text;
+        media.comment = newcomment;
+        NSUInteger index = [self.user.media indexOfObject:media];
+        [media saved:^{
+            [self.mediaCollection collectionCommentEditedAtIndex:index];
+        }];
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"CANCEL" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        NSLog(@"edit comment cancelled");
+    }]];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 @end

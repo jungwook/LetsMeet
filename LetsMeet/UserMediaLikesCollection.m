@@ -9,11 +9,6 @@
 #import "UserMediaLikesCollection.h"
 #import "MediaPicker.h"
 
-#import "AddMoreUserMediaCell.h"
-#import "UserMediaCell.h"
-#import "UserLikesCell.h"
-#import "UserProfileHeader.h"
-
 #define kAddMoreUserMediaCell @"AddMoreUserMediaCell"
 #define kUserMediaCell @"UserMediaCell"
 #define kUserLikesCell @"UserLikesCell"
@@ -26,8 +21,9 @@
 @interface UserMediaLikesCollection()
 @property (nonatomic, strong) UICollectionViewFlowLayout *flow;
 @property (weak, nonatomic) UIViewController *viewController;
-@property (strong, nonatomic) NSArray *likes;
-@property (strong, nonatomic) NSArray *liked;
+@property (strong, readonly) NSArray *likes;
+@property (strong, readonly) NSArray *liked;
+@property (strong, readonly) NSArray *media;
 @end
 
 @implementation UserMediaLikesCollection
@@ -52,36 +48,79 @@
     return self;
 }
 
-- (void)setLiked:(NSArray *)liked
+#pragma UserMediaCell delegate methods
+
+- (NSArray*) collectionVisibleCells
 {
-    [self performBatchUpdates:^{
-        [self deleteItemsAtIndexPaths:[self indexPathsForRows:self.liked.count section:kSectionUserLiked]];
-        _liked = liked;
-        [self insertItemsAtIndexPaths:[self indexPathsForRows:liked.count section:kSectionUserLiked]];
-    } completion:^(BOOL finished) {
-        [self reloadData];
-    }];
+    return self.visibleCells;
 }
 
-- (void)setLikes:(NSArray *)likes
+- (void)userMediaCell:(UserMediaCell *)cell editCommentOnMedia:(UserMedia *)media
 {
-    [self performBatchUpdates:^{
-        [self deleteItemsAtIndexPaths:[self indexPathsForRows:self.likes.count section:kSectionUserLikes]];
-        _likes = likes;
-        [self insertItemsAtIndexPaths:[self indexPathsForRows:likes.count section:kSectionUserLikes]];
-    } completion:^(BOOL finished) {
-        [self reloadData];
-    }];
-}
-
-- (NSArray*) indexPathsForRows:(NSInteger)count section:(NSInteger)section
-{
-    NSMutableArray* ip = [NSMutableArray array];
-    for (int i=0; i<count; i++) {
-        [ip addObject:[NSIndexPath indexPathForRow:i inSection:section]];
+    __LF
+    if ([self.collectionDelegate respondsToSelector:@selector(collectionEditCommentOnMedia:)]) {
+        [self.collectionDelegate collectionEditCommentOnMedia:media];
     }
-    return ip;
 }
+
+-(void)userMediaCell:(UserMediaCell *)cell removeMedia:(UserMedia *)media
+{
+    __LF
+    if ([self.collectionDelegate respondsToSelector:@selector(collectionRemoveMedia:)]) {
+        [self.collectionDelegate collectionRemoveMedia:media];
+    }
+}
+
+#pragma UserLikesCell delegate methods
+
+- (void)userLikesCell:(UserLikesCell *)cell selectUser:(User *)user
+{
+    __LF
+    if (self.userLikeHandler) {
+        self.userLikeHandler(user);
+    }
+}
+
+#pragma AddMoreMedia delegate methods
+
+- (void)addMoreUserMedia
+{
+    __LF
+    if ([self.collectionDelegate respondsToSelector:@selector(collectionAddMedia)]) {
+        [self.collectionDelegate collectionAddMedia];
+    }
+}
+
+#pragma UserMediaLikesCollection delegate methods
+
+- (NSArray *)media
+{
+    NSArray *returnArray = nil;
+    if ([self.collectionDelegate respondsToSelector:@selector(collectionMedia)]) {
+        returnArray = [self.collectionDelegate collectionMedia];
+    }
+    return returnArray;
+}
+
+- (NSArray *)likes
+{
+    NSArray *returnArray = nil;
+    if ([self.collectionDelegate respondsToSelector:@selector(collectionLikes)]) {
+        returnArray = [self.collectionDelegate collectionLikes];
+    }
+    return returnArray;
+}
+
+- (NSArray *)liked
+{
+    NSArray *returnArray = nil;
+    if ([self.collectionDelegate respondsToSelector:@selector(collectionLiked)]) {
+        returnArray = [self.collectionDelegate collectionLiked];
+    }
+    return returnArray;
+}
+
+#pragma UserMediaLikesCollection Methods
 
 - (void) initialize
 {
@@ -95,21 +134,137 @@
     self.commentFont = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:11];
     self.backgroundColor = [UIColor groupTableViewBackgroundColor];
     self.alwaysBounceVertical = YES;
-    _user = [User me];
+    self.allowsSelection = YES;
 }
 
-- (void) setUser:(User *)user
+- (void) initializeCollectionWithDelegate:(id<UserMediaLikesCollectionDelegate>)delegate
 {
     __LF
-    [user fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
-        _user = user;
-        [self.user mediaReady:^{
-            self.delegate = self;
-            self.dataSource = self;
-            [self reloadData];
-        }];
+    self.collectionDelegate = delegate;
+    self.delegate = self;
+    self.dataSource = self;
+    [self reloadData];
+}
+
+- (void)collectionMediaAddedAtIndex:(NSInteger)index
+{
+    [self performBatchUpdates:^{
+        [self insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:kSectionUserMedia]]];
+    } completion:^(BOOL finished) {
+        [self reloadSections:[NSIndexSet indexSetWithIndex:kSectionUserMedia]];
     }];
 }
+
+- (void)collectionMediaRemovedAtIndex:(NSInteger)index
+{
+    [self performBatchUpdates:^{
+        [self deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:kSectionUserMedia]]];
+    } completion:^(BOOL finished) {
+        [self reloadSections:[NSIndexSet indexSetWithIndex:kSectionUserMedia]];
+    }];
+}
+
+
+- (void)collectionCommentEditedAtIndex:(NSInteger)index
+{
+    [self performBatchUpdates:^{
+        [self reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:kSectionUserMedia]]];
+    } completion:nil];
+}
+
+- (void)collectionRefreshLikes
+{
+    [self performBatchUpdates:^{
+        [self reloadSections:[NSIndexSet indexSetWithIndex:kSectionUserLikes]];
+    } completion:nil];
+}
+
+- (void)collectionRefreshLiked
+{
+    [self performBatchUpdates:^{
+        [self reloadSections:[NSIndexSet indexSetWithIndex:kSectionUserLiked]];
+    } completion:nil];
+}
+
+//- (void)collectionAddMedia:(UserMedia *)media
+//{
+//    __LF
+//    [media fetched:^{
+//        [self performBatchUpdates:^{
+//            NSUInteger count = self.media.count;
+//            [self.media addObject:media];
+//            [self insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:count inSection:kSectionUserMedia]]];
+//        } completion:^(BOOL finished) {
+//            [self reloadSections:[NSIndexSet indexSetWithIndex:kSectionUserMedia]];
+//        }];
+//    }];
+//}
+
+//- (void)collectionRemoveMedia:(UserMedia*)media
+//{
+//    __LF
+//    [media fetched:^{
+//        [self performBatchUpdates:^{
+//            NSUInteger index = [self.media indexOfObject:media];
+//            [self.media removeObject:media];
+//            [self deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:kSectionUserMedia]]];
+//        } completion:^(BOOL finished) {
+//            [self reloadSections:[NSIndexSet indexSetWithIndex:kSectionUserMedia]];
+//        }];
+//    }];
+//}
+
+//- (void)collectionEditCommentOnMedia:(UserMedia *)media
+//{
+//    __LF
+//    [media fetched:^{
+//        [self performBatchUpdates:^{
+//            NSUInteger index = [self.media indexOfObject:media];
+//            [self reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:kSectionUserMedia]]];
+//        } completion:^(BOOL finished) {
+//        }];
+//    }];
+//}
+//
+//- (void)collectionAddLikes:(User *)user
+//{
+//    [user fetched:^{
+//        [self performBatchUpdates:^{
+//            NSUInteger count = self.likes.count;
+//            [self.likes addObject:user];
+//            [self insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:count inSection:kSectionUserLikes]]];
+//        } completion:^(BOOL finished) {
+//            [self reloadSections:[NSIndexSet indexSetWithIndex:kSectionUserLikes]];
+//        }];
+//    }];
+//}
+//
+//- (void)collectionAddLiked:(User *)user
+//{
+//    [user fetched:^{
+//        [self performBatchUpdates:^{
+//            NSUInteger count = self.liked.count;
+//            [self.liked addObject:user];
+//            [self insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:count inSection:kSectionUserLiked]]];
+//        } completion:^(BOOL finished) {
+//            [self reloadSections:[NSIndexSet indexSetWithIndex:kSectionUserLiked]];
+//        }];
+//    }];
+//}
+//
+//- (void)collectionRemoveLiked:(User *)user
+//{
+//    NSLog(@"DELETEING FROM LIKED:%@", self.liked);
+//    [user fetched:^{
+//        [self performBatchUpdates:^{
+//            NSUInteger index = [self.liked indexOfObject:user];
+//            [self.liked removeObject:user];
+//            [self deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:kSectionUserLiked]]];
+//        } completion:^(BOOL finished) {
+//            [self reloadSections:[NSIndexSet indexSetWithIndex:kSectionUserLiked]];
+//        }];
+//    }];
+//}
 
 - (void)setCommentColor:(UIColor *)commentColor
 {
@@ -139,7 +294,7 @@
 {
     switch ((UserMediaLikesCollectionSections)section) {
         case kSectionUserMedia:
-            return self.user.media.count + self.user.isMe;
+            return self.media.count + self.editable;
         case kSectionUserLikes:
             return self.likes.count;
         case kSectionUserLiked:
@@ -183,16 +338,17 @@
     switch (section) {
         case kSectionUserMedia:
         {
-            if (row == self.user.media.count) {
+            if (row == self.media.count) {
                 AddMoreUserMediaCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kAddMoreUserMediaCell forIndexPath:indexPath];
                 cell.backgroundColor = [UIColor darkGrayColor];
                 cell.tag = row;
-                cell.parent = self;
+                cell.delegate = self;
                 return cell;
             }
             else {
                 UserMediaCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kUserMediaCell forIndexPath:indexPath];
-                [cell setUserMedia:[self.user.media objectAtIndex:row] parent:self row:indexPath.row];
+                [cell setMedia:[self.media objectAtIndex:row]];
+                [cell setDelegate:self];
                 return cell;
             }
         }
@@ -200,14 +356,16 @@
         {
             UserLikesCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kUserLikesCell forIndexPath:indexPath];
             User *user = [self.likes objectAtIndex:row];
-            [cell setUser:user parent:self];
+            [cell setUser:user];
+            [cell setDelegate:self];
             return cell;
         }
         case kSectionUserLiked:
         {
             UserLikesCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kUserLikesCell forIndexPath:indexPath];
             User *user = [self.liked objectAtIndex:row];
-            [cell setUser:user parent:self];
+            [cell setUser:user];
+            [cell setDelegate:self];
             return cell;
         }
     }
@@ -236,13 +394,13 @@
         header.title.textColor = [UIColor darkGrayColor];
         switch (section) {
             case kSectionUserMedia:
-                header.title.text = [NSString stringWithFormat:@"USER PHOTOS (%ld)", self.user.media.count];
+                header.title.text = [NSString stringWithFormat:@"USER PHOTOS (%ld)", self.media.count];
                 break;
             case kSectionUserLikes:
-                header.title.text = [NSString stringWithFormat:@"FOLLOWING (%ld)", self.likes.count];
+                header.title.text = [NSString stringWithFormat:@"LIKES (%ld)", self.likes.count];
                 break;
             case kSectionUserLiked:
-                header.title.text = [NSString stringWithFormat:@"FOLLOWED BY (%ld)", self.liked.count];
+                header.title.text = [NSString stringWithFormat:@"LIKED BY (%ld)", self.liked.count];
                 break;
         }
         return header;
@@ -254,11 +412,12 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
+    __LF
     UserMediaLikesCollectionSections section = indexPath.section;
     switch (section) {
         case kSectionUserMedia:
-            if (indexPath.row == self.user.media.count) {
-                [self addMedia];
+            if (indexPath.row == self.media.count) {
+                [self addMoreUserMedia];
             }
             break;
         case kSectionUserLikes: {
@@ -275,105 +434,5 @@
             break;
     }
 }
-
-- (void)addMedia
-{
- __LF
-    MediaPickerMediaBlock handler = ^(ProfileMediaTypes mediaType,
-                                      NSData *thumbnailData,
-                                      NSString *thumbnailFile,
-                                      NSString *mediaFile,
-                                      CGSize mediaSize,
-                                      BOOL isRealMedia)
-    {
-        if (self.user.isMe) {
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"JUST 1 SEC" message:@"enter comment for your media" preferredStyle:UIAlertControllerStyleAlert];
-            
-            [alert addTextFieldWithConfigurationHandler:nil];
-            [alert addAction:[UIAlertAction actionWithTitle:@"SAVE" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                UserMedia *media = [UserMedia object];
-                media.mediaSize = mediaSize;
-                media.mediaFile = mediaFile;
-                media.thumbailFile = thumbnailFile;
-                media.mediaType = mediaType;
-                media.userId = self.user.objectId;
-                media.isRealMedia = isRealMedia;
-                media.comment = [alert.textFields firstObject].text;
-                
-                [self.user addUniqueObject:media forKey:@"media"];
-                [self.user saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-                    if (!error) {
-                        [self performBatchUpdates:^{
-                            [self insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.user.media.count-self.user.isMe inSection:0]]];
-                        } completion:nil];
-                    }
-                    else {
-                        NSLog(@"ERROR:%@", error.localizedDescription);
-                    }
-                }];
-            }]];
-            [alert addAction:[UIAlertAction actionWithTitle:@"CANCEL" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-                NSLog(@"Add media cancelled");
-            }]];
-            alert.modalPresentationStyle = UIModalPresentationOverFullScreen;
-            [self.viewController presentViewController:alert animated:YES completion:nil];
-        }
-        else {
-            NSLog(@"ERROR: Cannot add on other user media.");
-        }
-    };
-    [MediaPicker addMediaOnViewController:self.viewController withMediaHandler:handler];
-}
-
-- (void) userSelected:(User *)user
-{
-    if (self.userLikeHandler) {
-        self.userLikeHandler(user);
-    }
-}
-
-- (void) removeMedia:(UserMedia*)media row:(NSInteger)row
-{
-    if (!self.user.isMe) {
-        NSLog(@"ERROR: Cannot remove other's media");
-        return;
-    }
-    
-    [media deleteInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-        if (!error && succeeded) {
-            [self performBatchUpdates:^{
-                [self.user removeObjectsInArray:@[media] forKey:@"media"];
-                [self.user saveInBackground];
-                [self deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:row inSection:0]]];
-            } completion:nil];
-        }
-        else {
-            NSLog(@"ERROR:%@", error.localizedDescription);
-        }
-    }];
-}
-
-- (void)editMediaComment:(UserMedia *)media row:(NSInteger)row
-{
-    __LF
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"JUST 1 SEC" message:@"enter comment for your media" preferredStyle:UIAlertControllerStyleAlert];
-    
-    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-        textField.text = media.comment;
-        textField.placeholder = @"enter a comment";
-    }];
-    [alert addAction:[UIAlertAction actionWithTitle:@"SAVE" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        NSString *newcomment = [alert.textFields firstObject].text;
-        media.comment = newcomment;
-        [media saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-            [self reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:row inSection:0]]];
-        }];
-    }]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"CANCEL" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        NSLog(@"edit comment cancelled");
-    }]];
-    [self.viewController presentViewController:alert animated:YES completion:nil];
-}
-
 
 @end

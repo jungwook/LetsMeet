@@ -27,7 +27,9 @@
 }
 
 - (IBAction)addMore:(id)sender {
-    [self.parent addMedia];
+    if ([self.delegate respondsToSelector:@selector(addMoreUserMedia)]) {
+        [self.delegate addMoreUserMedia];
+    }
 }
 
 @end

@@ -10,7 +10,7 @@
 #import "PageSelectionView.h"
 #import "UserMediaLikesCollection.h"
 #import "UserMap.h"
-#import "UserLikesCollection.h"
+//#import "UserLikesCollection.h"
 
 @import MapKit;
 
@@ -34,7 +34,7 @@
     map.userInteractionEnabled = NO;
     
     UserMediaLikesCollection *col = [UserMediaLikesCollection UserMediaLikesCollectionOnViewController:self];
-    [col setUser:[User me]];
+//    [col setUser:[User me]];
     [col setCommentColor:[UIColor redColor]];
     
     

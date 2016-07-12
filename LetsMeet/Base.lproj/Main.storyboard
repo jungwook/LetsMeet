@@ -1370,12 +1370,12 @@ Hello</string>
                                         </constraints>
                                     </button>
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="nickname" placeholder="nickname" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="4qH-QE-3kw">
-                                        <rect key="frame" x="171.5" y="204" width="71" height="30"/>
+                                        <rect key="frame" x="167.5" y="204" width="79" height="30"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="zg7-yA-xP4"/>
                                         </constraints>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                        <fontDescription key="fontDescription" name="AvenirNextCondensed-DemiBold" family="Avenir Next Condensed" pointSize="18"/>
+                                        <fontDescription key="fontDescription" name="AvenirNextCondensed-DemiBold" family="Avenir Next Condensed" pointSize="20"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="서울시 강남구 대치동" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qpg-3P-5BR">
@@ -1427,7 +1427,7 @@ Hello</string>
                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="12" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1yk-Kx-knb">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1yk-Kx-knb">
                                         <rect key="frame" x="274" y="259" width="60" height="30"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="Ef6-Yw-0xJ"/>
@@ -1437,7 +1437,7 @@ Hello</string>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="12" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aTu-LV-pCV">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aTu-LV-pCV">
                                         <rect key="frame" x="334" y="259" width="60" height="30"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="Fle-oO-SqV"/>
@@ -1483,7 +1483,7 @@ Hello</string>
                                         <color key="textColor" red="1" green="1" blue="1" alpha="0.80442356418918914" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="liked" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4bT-p9-BzM">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="liked by" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4bT-p9-BzM">
                                         <rect key="frame" x="334" y="280" width="60" height="21"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="21" id="wgx-xn-Hev"/>
@@ -1623,6 +1623,61 @@ Hello</string>
             </objects>
             <point key="canvasLocation" x="5068" y="2807"/>
         </scene>
+        <!--Near-->
+        <scene sceneID="hAD-tH-DFd">
+            <objects>
+                <viewController id="xd6-yM-Mdn" customClass="Near" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="gA6-m3-K1Z"/>
+                        <viewControllerLayoutGuide type="bottom" id="g1Q-Y7-ODT"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="xOR-PY-aMD">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="yf4-ex-AFA">
+                                <rect key="frame" x="0.0" y="108" width="414" height="628"/>
+                                <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="FT1-qX-uk7">
+                                    <size key="itemSize" width="50" height="50"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells/>
+                                <connections>
+                                    <outlet property="dataSource" destination="xd6-yM-Mdn" id="vDh-Ji-vrF"/>
+                                    <outlet property="delegate" destination="xd6-yM-Mdn" id="DLd-53-bQi"/>
+                                </connections>
+                            </collectionView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vgR-fn-w05" customClass="PageSelectionBar">
+                                <rect key="frame" x="0.0" y="64" width="414" height="49"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="49" id="ZOQ-t3-P82"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="yf4-ex-AFA" firstAttribute="leading" secondItem="xOR-PY-aMD" secondAttribute="leadingMargin" constant="-20" id="KPu-EO-PaW"/>
+                            <constraint firstItem="yf4-ex-AFA" firstAttribute="top" secondItem="vgR-fn-w05" secondAttribute="bottom" constant="-5" id="Lhu-7T-THl"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="yf4-ex-AFA" secondAttribute="trailing" constant="-20" id="QYh-gT-eXd"/>
+                            <constraint firstItem="vgR-fn-w05" firstAttribute="top" secondItem="gA6-m3-K1Z" secondAttribute="bottom" id="bw5-hu-9Tu"/>
+                            <constraint firstItem="g1Q-Y7-ODT" firstAttribute="top" secondItem="yf4-ex-AFA" secondAttribute="bottom" id="cHD-oB-4gd"/>
+                            <constraint firstItem="vgR-fn-w05" firstAttribute="leading" secondItem="xOR-PY-aMD" secondAttribute="leadingMargin" constant="-20" id="qEo-AO-q8z"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="vgR-fn-w05" secondAttribute="trailing" constant="-20" id="qhQ-Fw-4RK"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="Aoo-C9-ENA"/>
+                    <connections>
+                        <outlet property="bar" destination="vgR-fn-w05" id="ZCh-6p-2KA"/>
+                        <outlet property="collectionView" destination="yf4-ex-AFA" id="gx7-3V-A9p"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ogf-4y-7MF" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5570" y="2807"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="fVF-lC-ik9">
             <objects>
@@ -1639,6 +1694,23 @@ Hello</string>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0pe-H4-SSv" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="5068" y="1888"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="yso-hs-ux1">
+            <objects>
+                <navigationController storyboardIdentifier="Near" id="wsM-9H-3Xg" sceneMemberID="viewController">
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina55"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="UIy-BU-6kc">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="xd6-yM-Mdn" kind="relationship" relationship="rootViewController" id="g0D-ak-T7k"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="wJY-8D-wMP" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5570" y="1888"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="3Rl-Tw-vAI">
@@ -1912,7 +1984,7 @@ Hello</string>
                     </view>
                     <navigationItem key="navigationItem" title="Near Me" id="Ryb-YT-jrh">
                         <barButtonItem key="leftBarButtonItem" image="399-list1" id="1gX-rQ-2np" customClass="ToggleButton">
-                            <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="0.80104518579999995" colorSpace="calibratedRGB"/>
+                            <color key="tintColor" red="0.1215686275" green="0.12941176469999999" blue="0.14117647059999999" alpha="1" colorSpace="calibratedRGB"/>
                         </barButtonItem>
                     </navigationItem>
                     <connections>

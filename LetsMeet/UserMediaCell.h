@@ -7,8 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "UserMediaLikesCollection.h"
+
+@class UserMediaCell;
+
+@protocol UserMediaCellDelegate <NSObject>
+@required
+- (void) userMediaCell:(UserMediaCell*)cell removeMedia:(UserMedia*)media;
+- (void) userMediaCell:(UserMediaCell*)cell editCommentOnMedia:(UserMedia*)media;
+- (NSArray*) collectionVisibleCells;
+@end
 
 @interface UserMediaCell : UICollectionViewCell
-- (void) setUserMedia:(UserMedia*)media parent:(UserMediaLikesCollection*)parent row:(NSInteger)row;
+@property (strong, nonatomic) UserMedia* media;
+@property (nonatomic, weak) id <UserMediaCellDelegate> delegate;
 @end

@@ -7,14 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "PageSelectionBar.h"
 
 @protocol PageSelectionViewProtocol <NSObject>
 @optional
 - (void)viewDidLoad;
-
 @end
-
-typedef void(^PageSelectionBlock)(NSUInteger index);
 
 @interface PageSelectionView : UIView <UIScrollViewDelegate>
 @property (nonatomic, assign) UIColor *textColor;

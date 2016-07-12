@@ -57,13 +57,23 @@
                             <constraint firstItem="0v8-OB-py1" firstAttribute="centerY" secondItem="Gg2-7Z-Ifq" secondAttribute="centerY" id="mzc-Gm-h8p"/>
                         </constraints>
                     </view>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eBx-Xh-5j3">
+                        <rect key="frame" x="0.0" y="0.0" width="139" height="204"/>
+                        <connections>
+                            <action selector="addMore:" destination="BXr-pa-gPx" eventType="touchUpInside" id="Aeo-Zv-eLH"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             </view>
             <constraints>
+                <constraint firstItem="eBx-Xh-5j3" firstAttribute="top" secondItem="BXr-pa-gPx" secondAttribute="top" id="1ky-Bz-WCy"/>
                 <constraint firstAttribute="trailing" secondItem="Gg2-7Z-Ifq" secondAttribute="trailing" id="NDd-oh-q9I"/>
                 <constraint firstItem="Gg2-7Z-Ifq" firstAttribute="leading" secondItem="BXr-pa-gPx" secondAttribute="leading" id="NR8-UN-1gz"/>
+                <constraint firstAttribute="trailing" secondItem="eBx-Xh-5j3" secondAttribute="trailing" id="V8d-Yc-7Ym"/>
+                <constraint firstItem="eBx-Xh-5j3" firstAttribute="leading" secondItem="BXr-pa-gPx" secondAttribute="leading" id="d9I-06-J6v"/>
                 <constraint firstItem="Gg2-7Z-Ifq" firstAttribute="top" secondItem="BXr-pa-gPx" secondAttribute="top" id="rD4-3x-y2W"/>
+                <constraint firstAttribute="bottom" secondItem="eBx-Xh-5j3" secondAttribute="bottom" id="zzW-Oj-Ub2"/>
             </constraints>
             <size key="customSize" width="139" height="204"/>
             <connections>

@@ -39,7 +39,7 @@
 {
     __LF
     _user = user;
-    [self.photo loadMediaFromUser:user];
+    [self.photo loadMediaFromUser:user animated:NO];
     
     double distance = [[User me].location distanceInKilometersTo:self.user.location];
     self.distance.text = distanceString(distance);
@@ -53,7 +53,6 @@
 @property (nonatomic) NSUInteger index;
 @end
 
-
 @interface NearMe ()
 @property (weak, nonatomic) IBOutlet TopBar *bar;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -62,7 +61,6 @@
 @property (strong, nonatomic) NSMutableDictionary *users;
 @property (strong, nonatomic) NSArray *usersData;
 @property (strong, nonatomic) RefreshControl *refresh;
-//@property (strong, nonatomic) NSIndexPath *selectedIndexPath;
 @property (nonatomic) BOOL grouped;
 @end
 
@@ -97,7 +95,7 @@
 {
     navigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     Profile *main = [navigationController.viewControllers firstObject];
-    main.user = [self userAtIndexPath:[self.tableView indexPathForSelectedRow]];
+    [main setAndInitializeWithUser:[self userAtIndexPath:[self.tableView indexPathForSelectedRow]]];
     main.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:main action:@selector(dismissModalPresentation)];
 }
 
@@ -120,6 +118,15 @@
 
 #pragma mark - Table view data source
 
+- (NSArray*) arrayOfUserIds:(NSArray*)users
+{
+    NSMutableArray *userIds = [NSMutableArray array];
+    [users enumerateObjectsUsingBlock:^(User* _Nonnull user, NSUInteger idx, BOOL * _Nonnull stop) {
+        [userIds addObject:user.objectId];
+    }];
+    return userIds;
+}
+
 - (void)usersNear:(User*)user completionHandler:(UsersArrayBlock)block condition:(NSUInteger)condition
 {
     PFQuery *query = [User query];
@@ -131,7 +138,7 @@
             [query whereKey:@"sex" equalTo:@(kSexMale)];
             break;
         case 3:
-            [query whereKey:@"objectId" containedIn:[[PFUser currentUser] objectForKey:@"likes"]];
+            [query whereKey:@"objectId" containedIn:[self arrayOfUserIds:[User me].likes]];
             break;
         default:
             break;

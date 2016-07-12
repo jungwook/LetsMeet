@@ -26,7 +26,7 @@
 
 - (instancetype) initWithCoder:(NSCoder *)aDecoder
 {
-    __LF
+//    __LF
     self = [super initWithCoder:aDecoder];
     if (self) {
         [self initialize];
@@ -36,7 +36,7 @@
 
 - (instancetype) init
 {
-    __LF
+//    __LF
     self = [super init];
     if (self) {
         [self initialize];
@@ -47,8 +47,7 @@
 
 - (void)awakeFromNib
 {
-    __LF
-    
+//    __LF
     self.backgroundColor = [UIColor clearColor];
     [self setupPlayButton];
     self.imageView.backgroundColor = [UIColor blackColor];
@@ -83,7 +82,7 @@
 
 - (void) updateBadge
 {
-    __LF
+//    __LF
     NSInteger count = [[FileSystem new] unreadMessagesFromUser:self.user.objectId];
     if (count>0) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -136,7 +135,7 @@
 
 - (void) initialize
 {
-    __LF
+//    __LF
     [self addTarget:self action:@selector(tapped:) forControlEvents:UIControlEventTouchUpInside];
 }
 
@@ -168,6 +167,7 @@
 
 - (void)setImage:(UIImage *)image
 {
+//    __LF
     [self layoutPlayButton];
     if (self.animated) {
         self.alpha = 0.0;
@@ -275,7 +275,7 @@
         self.mediaFile = media.mediaFile;
         self.mediaType = (media.mediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
         self.isReal = NO;
-        self.animated = YES;
+        self.animated = NO;
         
         [self loadMediaFromFile:media.thumbailFile isReal:self.isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -295,7 +295,7 @@
         self.mediaFile = media.mediaFile;
         self.mediaType = (media.mediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
         self.isReal = NO;
-        self.animated = YES;
+        self.animated = animated;
         
         [self loadMediaFromFile:media.thumbailFile isReal:self.isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -309,18 +309,13 @@
 
 - (void)loadMediaFromUser:(User *)user animated:(BOOL)animated
 {
-    self.animated = animated;
-    [self loadMediaFromUser:user];
-}
-
-- (void)loadMediaFromUser:(User *)user
-{
     self.playBut.hidden = YES;
-
+    
     self.user = user;
     self.mediaFile = user.profileMedia;
     self.mediaType = (user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
     self.isReal = user.isRealMedia;
+    self.animated = animated;
     
     [self loadMediaFromFile:user.thumbnail isReal:self.isReal completion:^(NSData *data, NSError *error, BOOL fromCache) {
         UIImage* photo = [UIImage imageWithData:data];
@@ -333,7 +328,7 @@
     }];
 }
 
-- (void)loadMediaFromUser:(User *)user completion:(S3GetBlock)block
+- (void)loadMediaFromUser:(User *)user completion:(S3GetBlock)block animated:(BOOL)animated
 {
     self.playBut.hidden = YES;
 
@@ -341,6 +336,7 @@
     self.mediaFile = user.profileMedia;
     self.mediaType = (user.profileMediaType == kProfileMediaPhoto) ? kMediaTypePhoto : kMediaTypeVideo;
     self.isReal = user.isRealMedia;
+    self.animated = animated;
     
     [self loadMediaFromFile:user.thumbnail isReal:self.isReal completion:block];
 }

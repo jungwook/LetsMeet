@@ -7,9 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "UserMediaLikesCollection.h"
 
-@interface Profile : UIViewController
-- (void) setUser:(User*)user;
+@interface Profile : UIViewController <UserMediaLikesCollectionDelegate>
+@property (weak, nonatomic) User *user;
+
+- (void) setAndInitializeWithUser:(User*)user;
 - (void) showProfileForUser:(User*)user;
 - (void) dismissModalPresentation;
 @end

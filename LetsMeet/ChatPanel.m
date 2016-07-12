@@ -60,8 +60,8 @@
     _me = [User me];
     _user = user;
     
-    [_userPhoto loadMediaFromUser:user];
-    [_myPhoto loadMediaFromUser:self.me];
+    [_userPhoto loadMediaFromUser:user animated:NO];
+    [_myPhoto loadMediaFromUser:self.me animated:NO];
     
 }
 
