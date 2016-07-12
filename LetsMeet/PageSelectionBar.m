@@ -35,11 +35,27 @@
     self.highlightedTextColor = [self.textColor lighterColor];
     self.barColor = self.backgroundColor;
     self.normalFont = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:18]; // [UIFont boldSystemFontOfSize:14];
-    self.highlightedFont = [UIFont fontWithName:@"AvenirNextCondensed-Medium" size:16]; //[UIFont systemFontOfSize:12 weight:UIFontWeightSemibold];
+    self.highlightedFont = [UIFont fontWithName:@"AvenirNextCondensed-Medium" size:12]; //[UIFont systemFontOfSize:12 weight:UIFontWeightSemibold];
     self.backgroundColor = [UIColor clearColor];
     self.index = 0;
 }
 
+- (NSAttributedString*) attributedTitle:(NSString*)title font:(UIFont*)normalFont color:(UIColor*)normalColor
+{
+    NSShadow *shadow = [[NSShadow alloc] init];
+    [shadow setShadowColor : [UIColor colorWithWhite:0.8 alpha:0.8]];
+    [shadow setShadowOffset : CGSizeMake (1.0, 1.0)];
+    [shadow setShadowBlurRadius : 1];
+    
+    NSMutableAttributedString *labelText = [[NSMutableAttributedString alloc] initWithString : [title uppercaseString]
+                                                                                  attributes : @{
+                                                                                                 NSKernAttributeName : @2.0,
+                                                                                                 NSFontAttributeName : normalFont,
+                                                                                                 NSForegroundColorAttributeName : normalColor,
+                                                                                                 NSShadowAttributeName : shadow }];
+    
+    return labelText;
+}
 
 - (NSUInteger)pages
 {
@@ -53,12 +69,14 @@
     [self setNeedsDisplay];
     [self.buttons enumerateObjectsUsingBlock:^(UIButton* _Nonnull button, NSUInteger idx, BOOL * _Nonnull stop) {
         if (button.tag == self.index) {
-            [button setTitleColor:self.textColor forState:UIControlStateNormal];
-            [button.titleLabel setFont:self.normalFont];
+            [button setAttributedTitle:[self attributedTitle:button.titleLabel.text font:self.normalFont color:self.textColor] forState:UIControlStateNormal];
+//            [button setTitleColor:self.textColor forState:UIControlStateNormal];
+//            [button.titleLabel setFont:self.normalFont];
         }
         else {
-            [button setTitleColor:self.highlightedTextColor forState:UIControlStateNormal];
-            [button.titleLabel setFont:self.highlightedFont];
+            [button setAttributedTitle:[self attributedTitle:button.titleLabel.text font:self.highlightedFont color:self.highlightedTextColor] forState:UIControlStateNormal];
+//            [button setTitleColor:self.highlightedTextColor forState:UIControlStateNormal];
+//            [button.titleLabel setFont:self.highlightedFont];
         }
     }];
 }
@@ -118,7 +136,8 @@
 - (void) addButtonWithTitle:(NSString*)title
 {
     UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
-    [button setTitle:title forState:UIControlStateNormal];
+    button.titleLabel.allowsDefaultTighteningForTruncation = YES;
+    [button setTitle:[title uppercaseString] forState:UIControlStateNormal];
     [button setTitleColor:self.textColor forState:UIControlStateNormal];
     [button.titleLabel setFont:self.normalFont];
     [button setTag:self.buttons.count];

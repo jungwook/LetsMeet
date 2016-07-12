@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface Near : UIViewController
+@interface Near : UIViewController <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
 
 @end

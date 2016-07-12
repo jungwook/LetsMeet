@@ -11,6 +11,7 @@
 #import "NearHeader.h"
 #import "PageSelectionBar.h"
 #import "RefreshControl.h"
+#import "UIColor+LightAndDark.h"
 
 @interface SectionObject : NSObject
 @property (nonatomic) NSUInteger index;
@@ -37,8 +38,13 @@
 @interface Near ()
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet PageSelectionBar *bar;
-@property (nonatomic, strong) NSArray* sections;
+@property (nonatomic, strong) NSArray* timeSections;
+@property (nonatomic, strong) NSArray* distanceSections;
+@property (nonatomic, strong) NSArray* users;
 @property (nonatomic, strong) RefreshControl* refresh;
+@property (weak, nonatomic) IBOutlet UISwitch *searchSwitch;
+@property (nonatomic, readonly) NSArray *sections;
+@property (nonatomic, readonly) NSArray *otherSections;
 @end
 
 @implementation Near
@@ -49,11 +55,13 @@
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
+    
     self.refresh = [RefreshControl initWithCompletionBlock:^(UIRefreshControl *refreshControl) {
         [self reloadAllUsersOnCondition:self.bar.index];
     }];
     int index = 0;
-    self.sections = @[
+    self.distanceSections = @[
                       [SectionObject sectionWith:index++ title:@"next door" from:0 to:1],
                       [SectionObject sectionWith:index++ title:@"hood" from:1 to:2.5],
                       [SectionObject sectionWith:index++ title:@"near" from:2.5 to:5],
@@ -63,6 +71,15 @@
                       [SectionObject sectionWith:index++ title:@"country" from:100 to:500],
                       [SectionObject sectionWith:index++ title:@"world" from:500 to:FLT_MAX],
                       ];
+    index = 0;
+    self.timeSections = @[
+                          [SectionObject sectionWith:index++ title:@"just now" from:0 to:1],
+                          [SectionObject sectionWith:index++ title:@"recent" from:1 to:10],
+                          [SectionObject sectionWith:index++ title:@"1 hour ago" from:10 to:60],
+                          [SectionObject sectionWith:index++ title:@"within 24 hours" from:60 to:(60*24)],
+                          [SectionObject sectionWith:index++ title:@"long time ago" from:(60*24) to:FLT_MAX],
+                          ];
+    [self setPageTitle];
 }
 
 - (void)viewDidLoad {
@@ -84,8 +101,23 @@
     [self.collectionView registerNib:[UINib nibWithNibName:kNearCell bundle:[NSBundle mainBundle]] forCellWithReuseIdentifier:kNearCell];
     [self.collectionView registerNib:[UINib nibWithNibName:kNearHeader bundle:[NSBundle mainBundle]] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kNearHeader];
     
-    [self.collectionView reloadData];
     [self reloadAllUsersOnCondition:self.bar.index];
+}
+
+- (void)setPageTitle
+{
+    self.navigationItem.title = [(self.searchSwitch.on ? @"Near by time" : @"Near by distance") uppercaseString];
+}
+
+- (IBAction)toggleSection:(UISwitch *)sender
+{
+    [self setPageTitle];
+    if (self.users.count) {
+        [self sortSectionUsers:self.users andMe:[User me] toggle:YES];
+    }
+    else {
+        [self reloadAllUsersOnCondition:self.bar.index];
+    }
 }
 
 - (NSArray*) arrayOfUserIds:(NSArray*)users
@@ -117,22 +149,18 @@
     [query whereKey:@"location" nearGeoPoint:user.location];
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable users, NSError * _Nullable error) {
         if (block)
-            block([users sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-                PFGeoPoint *p1 = ((User*)obj1).location;
-                PFGeoPoint *p2 = ((User*)obj2).location;
-                
-                CGFloat distanceA = [user.location distanceInKilometersTo:p1];
-                CGFloat distanceB = [user.location distanceInKilometersTo:p2];
-                
-                if (distanceA < distanceB) {
-                    return NSOrderedAscending;
-                } else if (distanceA > distanceB) {
-                    return NSOrderedDescending;
-                } else {
-                    return NSOrderedSame;
-                }
-            }]);
+            block(users);
     }];
+}
+
+- (NSArray*) sections
+{
+    return self.searchSwitch.on ? self.timeSections : self.distanceSections;
+}
+
+- (NSArray*) otherSections
+{
+    return self.searchSwitch.on ? self.distanceSections : self.timeSections;
 }
 
 - (void)reloadAllUsersOnCondition:(NSUInteger)condition
@@ -142,26 +170,59 @@
         [self.refresh beginRefreshing];
     }
     [self usersNear:me completionHandler:^(NSArray<User *> *users) {
-        [self.sections enumerateObjectsUsingBlock:^(SectionObject* _Nonnull section, NSUInteger idx, BOOL * _Nonnull stop) {
-            section.users = [users filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(User* _Nonnull user, NSDictionary<NSString *,id> * _Nullable bindings) {
-                CGFloat distance = [me.location distanceInKilometersTo:user.location];
-                return (distance<section.to && distance>=section.from);
-            }]];
+        self.users = users;
+        [self sortSectionUsers:users andMe:me toggle:NO];
+    } condition:condition];
+}
+
+- (void) sortSectionUsers:(NSArray*)users andMe:(User*)me toggle:(BOOL)toggle
+{
+    [self.sections enumerateObjectsUsingBlock:^(SectionObject* _Nonnull section, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSPredicate *distancePredicate = [NSPredicate predicateWithBlock:^BOOL(User* _Nonnull user, NSDictionary<NSString *,id> * _Nullable bindings) {
+            CGFloat distance = [me.location distanceInKilometersTo:user.location];
+            return (distance<section.to && distance>=section.from);
+        }];
+        NSPredicate *timePredicate = [NSPredicate predicateWithBlock:^BOOL(User* _Nonnull user, NSDictionary<NSString *,id> * _Nullable bindings) {
+            CGFloat timeInMinutes = fabs([user.updatedAt timeIntervalSinceNow])/60.0f;
+            return (timeInMinutes<section.to && timeInMinutes>=section.from);
         }];
         
-        [self.refresh endRefreshing];
+        section.users = [[users filteredArrayUsingPredicate:self.searchSwitch.on ? timePredicate : distancePredicate] sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+            PFGeoPoint *p1 = ((User*)obj1).location;
+            PFGeoPoint *p2 = ((User*)obj2).location;
+            
+            CGFloat distanceA = [me.location distanceInKilometersTo:p1];
+            CGFloat distanceB = [me.location distanceInKilometersTo:p2];
+            
+            if (distanceA < distanceB) {
+                return NSOrderedAscending;
+            } else if (distanceA > distanceB) {
+                return NSOrderedDescending;
+            } else {
+                return NSOrderedSame;
+            }
+        }];
+    }];
+    
+    if (users.count>0) {
+        [self.collectionView performBatchUpdates:^{
+            [(toggle ? self.otherSections : self.sections) enumerateObjectsUsingBlock:^(SectionObject* _Nonnull section, NSUInteger idx, BOOL * _Nonnull stop) {
+                [self.collectionView deleteSections:[NSIndexSet indexSetWithIndex:idx]];
+            }];
+            [self.sections enumerateObjectsUsingBlock:^(SectionObject* _Nonnull section, NSUInteger idx, BOOL * _Nonnull stop) {
+                [self.collectionView insertSections:[NSIndexSet indexSetWithIndex:idx]];
+            }];
+        } completion:nil];
+    }
+    else {
         [self.collectionView reloadData];
-    } condition:condition];
+    }
+    [self.refresh endRefreshing];
 }
 
 - (UIEdgeInsets) contentInset
 {
     return UIEdgeInsetsMake(-(self.navigationController.navigationBar.frame.origin.y+self.navigationController.navigationBar.frame.size.height), 0, 0, 0);
-}
-
-- (void)setupSections
-{
-    self.sections = @[ @(1), @(2.5), @(5), @(10), @(20), @(50), @(100), @(500), @(20000)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -193,7 +254,9 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     NearCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kNearCell forIndexPath:indexPath];
-    cell.backgroundColor = [UIColor redColor];
+    SectionObject *section = [self.sections objectAtIndex:indexPath.section];
+    cell.user = [section.users objectAtIndex:indexPath.row];
+    
     return cell;
 }
 
@@ -202,7 +265,7 @@
     UICollectionViewFlowLayout* layout = (UICollectionViewFlowLayout*)collectionViewLayout;
     layout.minimumLineSpacing = 4;
     layout.minimumInteritemSpacing = 4;
-    layout.sectionInset = UIEdgeInsetsMake(0, 40, 30, 10);
+    layout.sectionInset = UIEdgeInsetsMake(0, 40, 0, 10);
     CGFloat w = widthForNumberOfCells(collectionView, layout, 4);
     return CGSizeMake(w, w);
 }
@@ -216,7 +279,37 @@
 {
     if (kind == UICollectionElementKindSectionHeader) {
         NearHeader *header = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kNearHeader forIndexPath:indexPath];
-        header.backgroundColor = [UIColor redColor];
+        
+        
+        
+        SectionObject *section = [self.sections objectAtIndex:indexPath.section];
+//        header.title.text = [[section.title uppercaseString] stringByAppendingString:[NSString stringWithFormat:@" (%ld)", section.users.count]];
+
+        UIFont *normalFont = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:14];
+        UIFont *countFont = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:12];
+        
+        UIColor *normalColor = [UIColor darkGrayColor];
+        UIColor *countColor = normalColor.lighterColor;
+        NSShadow *shadow = [[NSShadow alloc] init];
+        [shadow setShadowColor : [UIColor colorWithWhite:1.0 alpha:0.8]];
+        [shadow setShadowOffset : CGSizeMake (1.0, 1.0)];
+        [shadow setShadowBlurRadius : 1];
+        
+        NSMutableAttributedString *labelText = [[NSMutableAttributedString alloc] initWithString : [section.title uppercaseString]
+                                                                        attributes : @{
+                                                                                       NSKernAttributeName : @2.0,
+                                                                                       NSFontAttributeName : normalFont,
+                                                                                       NSForegroundColorAttributeName : normalColor,
+                                                                                       NSShadowAttributeName : shadow }];
+        NSAttributedString *countText = [[NSAttributedString alloc] initWithString : [NSString stringWithFormat:@" (%ld)", section.users.count]
+                                                                        attributes : @{
+                                                                                       NSKernAttributeName : @2.0,
+                                                                                       NSFontAttributeName : countFont,
+                                                                                       NSForegroundColorAttributeName : countColor,
+                                                                                       NSShadowAttributeName : shadow }];
+        [labelText appendAttributedString:countText];
+        header.title.attributedText = labelText;
+        
         return header;
     }
     else {
@@ -224,6 +317,10 @@
     }
 }
 
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSLog(@"SELECTED");
+}
 
 #pragma mark <UICollectionViewDelegate>
 

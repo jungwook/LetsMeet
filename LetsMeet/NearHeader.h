@@ -9,5 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface NearHeader : UICollectionReusableView
+@property (weak, nonatomic) IBOutlet UILabel *title;
 
 @end

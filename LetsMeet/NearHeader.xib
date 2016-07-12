@@ -10,6 +10,21 @@
         <collectionReusableView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NearHeader" id="Lfu-cp-7Jl" customClass="NearHeader">
             <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UPW-8Y-gjr">
+                    <rect key="frame" x="25" y="15" width="29" height="20"/>
+                    <fontDescription key="fontDescription" name="AvenirNextCondensed-DemiBold" family="Avenir Next Condensed" pointSize="14"/>
+                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <constraints>
+                <constraint firstItem="UPW-8Y-gjr" firstAttribute="centerY" secondItem="Lfu-cp-7Jl" secondAttribute="centerY" id="6kW-WO-L0a"/>
+                <constraint firstItem="UPW-8Y-gjr" firstAttribute="leading" secondItem="Lfu-cp-7Jl" secondAttribute="leading" constant="25" id="nI5-Hw-oUb"/>
+            </constraints>
+            <connections>
+                <outlet property="title" destination="UPW-8Y-gjr" id="1LN-aG-1Pj"/>
+            </connections>
             <point key="canvasLocation" x="319" y="547"/>
         </collectionReusableView>
     </objects>

@@ -9,5 +9,5 @@
 #import <UIKit/UIKit.h>
 
 @interface NearCell : UICollectionViewCell
-
+@property (nonatomic, weak) User* user;
 @end
