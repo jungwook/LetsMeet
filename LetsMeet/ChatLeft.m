@@ -54,7 +54,7 @@
     self.dateLabel.text = message.createdAt.timeAgo;
     self.top.constant = consecutive ? -4 : 16;
     
-    [self.photo loadMediaFromUser:user];
+    [self.photo loadMediaFromUser:user animated:NO];
     self.spacing.constant = self.contentView.bounds.size.width-boxSize-(self.leading.constant);
 }
 

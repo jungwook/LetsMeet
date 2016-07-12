@@ -30,7 +30,7 @@
 
 - (instancetype)init
 {
-    __LF
+//    __LF
     self = [super init];
     if (self) {
         self.actions = [NSMutableDictionary dictionary];
@@ -40,7 +40,7 @@
 
 - (instancetype)initWithMessage:(BulletBlock)block broadcast:(BroadcastBlock)broadcast refresh:(RefreshBadgeBlock)refresh
 {
-    __LF
+//    __LF
     self = [self init];
     if (self) {
         self.bulletAction = block;
@@ -53,7 +53,7 @@
 
 - (void) dealloc
 {
-    __LF
+//    __LF
     [self off];
 }
 
@@ -131,7 +131,7 @@
 
 - (void)on
 {
-    __LF
+//    __LF
     @synchronized (self.turnedOn) {
         if (![self.turnedOn boolValue]) {
             self.turnedOn = @(YES);
@@ -153,7 +153,7 @@
 
 - (void)off
 {
-    __LF
+//    __LF
     @synchronized (self.turnedOn) {
         if ([self.turnedOn boolValue]) {
             self.turnedOn = @(NO);

@@ -90,7 +90,7 @@
     [self.userPhotoView setIsCircle:YES];
     [self.userPhotoView setAlpha:0.9];
     [self.gpsView setAlpha:0.9];
-    [self.userPhotoView loadMediaFromUser:self.user];
+    [self.userPhotoView loadMediaFromUser:self.user animated:NO];
     [self.gpsView setMapLocationForUser:self.user];
 }
 

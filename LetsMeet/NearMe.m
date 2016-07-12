@@ -9,6 +9,8 @@
 #import "NearMe.h"
 #import "MediaViewer.h"
 #import "RefreshControl.h"
+#import "UIButton+Badge.h"
+#import "Profile.h"
 
 #define blueColor [UIColor colorWithRed:95/255.f green:167/255.f blue:229/255.f alpha:1.0f]
 #define greyColor [UIColor colorWithWhite:0.3 alpha:1.0]
@@ -19,12 +21,14 @@
 @property (weak, nonatomic) IBOutlet UILabel *desc;
 @property (weak, nonatomic) IBOutlet UILabel *nickname;
 @property (weak, nonatomic) User *user;
+@property (weak, nonatomic) NearMe *parent;
 @end
 
 @implementation NearMeCell
 
 - (void)awakeFromNib
 {
+    __LF
     [self.photo setIsCircle:YES];
     self.distance.textColor = blueColor;
     self.nickname.textColor = blueColor;
@@ -33,8 +37,9 @@
 
 - (void)setUser:(User *)user
 {
+    __LF
     _user = user;
-    [self.photo loadMediaFromUser:user];
+    [self.photo loadMediaFromUser:user animated:NO];
     
     double distance = [[User me].location distanceInKilometersTo:self.user.location];
     self.distance.text = distanceString(distance);
@@ -48,12 +53,9 @@
 @property (nonatomic) NSUInteger index;
 @end
 
-
 @interface NearMe ()
 @property (weak, nonatomic) IBOutlet TopBar *bar;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-
-
 @property (strong, nonatomic) FileSystem *system;
 @property (strong, nonatomic) User *me;
 @property (strong, nonatomic) NSMutableDictionary *users;
@@ -77,15 +79,24 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    
     [self.tableView addSubview:self.refresh];
     [self reloadAllUsersOnCondition:self.bar.index]; //All users initially
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([[segue identifier] isEqualToString:@"Profile"])
+    {
+        [self prepareProfile:segue.destinationViewController];
+    }
+}
+
+- (void) prepareProfile:(UINavigationController*) navigationController
+{
+    navigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    Profile *main = [navigationController.viewControllers firstObject];
+    [main setAndInitializeWithUser:[self userAtIndexPath:[self.tableView indexPathForSelectedRow]]];
+    main.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:main action:@selector(dismissModalPresentation)];
 }
 
 - (IBAction)barItemSelected:(UIButton *)sender {
@@ -107,6 +118,15 @@
 
 #pragma mark - Table view data source
 
+- (NSArray*) arrayOfUserIds:(NSArray*)users
+{
+    NSMutableArray *userIds = [NSMutableArray array];
+    [users enumerateObjectsUsingBlock:^(User* _Nonnull user, NSUInteger idx, BOOL * _Nonnull stop) {
+        [userIds addObject:user.objectId];
+    }];
+    return userIds;
+}
+
 - (void)usersNear:(User*)user completionHandler:(UsersArrayBlock)block condition:(NSUInteger)condition
 {
     PFQuery *query = [User query];
@@ -118,7 +138,7 @@
             [query whereKey:@"sex" equalTo:@(kSexMale)];
             break;
         case 3:
-            [query whereKey:@"objectId" containedIn:[[PFUser currentUser] objectForKey:@"friends"]];
+            [query whereKey:@"objectId" containedIn:[self arrayOfUserIds:[User me].likes]];
             break;
         default:
             break;
@@ -147,6 +167,7 @@
 
 - (void)reloadAllUsersOnCondition:(NSUInteger)condition
 {
+//    self.selectedIndexPath = nil;
     if (![self.refresh isRefreshing]) {
         [self.refresh beginRefreshing];
     }
@@ -192,16 +213,43 @@
     cell.backgroundColor = indexPath.row % 2 ? [UIColor colorWithRed:252/255.f green:252./255.f blue:252/255.f alpha:1.0f] : [UIColor whiteColor];
 }
 
+- (User*)userAtIndexPath:(NSIndexPath*)indexPath
+{
+    id key = [[self.users allKeys] objectAtIndex:indexPath.section];
+    return [[self.users objectForKey:key] objectAtIndex:indexPath.row];
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     NearMeCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NearMe" forIndexPath:indexPath];
     
-    id key = [[self.users allKeys] objectAtIndex:indexPath.section];
-    User *user = [[self.users objectForKey:key] objectAtIndex:indexPath.row];
-    
-    cell.user = user;
-    
+    cell.user = [self userAtIndexPath:indexPath];
+    cell.parent = self;
+
     return cell;
 }
+
+//- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    if ([indexPath isEqual:self.selectedIndexPath]) {
+//        return 200;
+//    }
+//    else {
+//        return 80;
+//    }
+//}
+
+//- (void)setSelectedIndexPath:(NSIndexPath *)selectedIndexPath
+//{
+//    _selectedIndexPath = selectedIndexPath;
+//    
+//}
+
+//- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    self.selectedIndexPath = [indexPath isEqual:self.selectedIndexPath] ? nil : indexPath;
+//    [tableView deselectRowAtIndexPath:indexPath animated:TRUE];
+//    [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+//}
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {

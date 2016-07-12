@@ -24,3 +24,5 @@ MediaTypes  mediaTypeFromProfileMediaTypes(ProfileMediaTypes type);
 NSString*   randomObjectId();
 NSString*   distanceString(double distance);
 CGFloat     ampAtIndex(NSUInteger index, NSData* data);
+void        setShadowOnView(UIView* view, CGFloat radius, CGFloat opacity);
+CGFloat     widthForNumberOfCells(UICollectionView* cv, UICollectionViewFlowLayout *flowLayout, CGFloat cpr);

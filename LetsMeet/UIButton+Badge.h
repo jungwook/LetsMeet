@@ -27,6 +27,7 @@
 // Values for offseting the badge over the BarButtonItem you picked
 @property (nonatomic) CGFloat badgeOriginX;
 @property (nonatomic) CGFloat badgeOriginY;
+@property (nonatomic) BOOL buttonIsCircle;
 // In case of numbers, remove the badge when reaching zero
 @property BOOL shouldHideBadgeAtZero;
 // Badge has a bounce animation when value changes

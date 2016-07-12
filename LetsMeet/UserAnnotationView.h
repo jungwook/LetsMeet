@@ -18,4 +18,5 @@
 
 @interface UserAnnotationView : MKAnnotationView
 @property (nonatomic, strong) UIImageView *photoView;
+@property (nonatomic, strong) UIView *ball;
 @end

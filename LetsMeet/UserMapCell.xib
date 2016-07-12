@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="UserMapCell" id="GYC-YJ-zeB" customClass="UserMapCell">
+            <rect key="frame" x="0.0" y="0.0" width="509" height="299"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="509" height="299"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="dxa-6p-QGS">
+                        <rect key="frame" x="0.0" y="0.0" width="509" height="269"/>
+                    </mapView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="26V-G1-9eC">
+                        <rect key="frame" x="8" y="269" width="493" height="30"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            </view>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="dxa-6p-QGS" secondAttribute="bottom" constant="30" id="1ax-gJ-eRp"/>
+                <constraint firstItem="dxa-6p-QGS" firstAttribute="leading" secondItem="GYC-YJ-zeB" secondAttribute="leading" id="5rT-jD-h2w"/>
+                <constraint firstItem="26V-G1-9eC" firstAttribute="leading" secondItem="GYC-YJ-zeB" secondAttribute="leading" constant="8" id="6fG-fN-4a8"/>
+                <constraint firstAttribute="trailing" secondItem="26V-G1-9eC" secondAttribute="trailing" constant="8" id="7fX-ex-73F"/>
+                <constraint firstAttribute="bottom" secondItem="26V-G1-9eC" secondAttribute="bottom" id="UXl-Pu-zSd"/>
+                <constraint firstItem="dxa-6p-QGS" firstAttribute="top" secondItem="GYC-YJ-zeB" secondAttribute="top" id="h0p-IP-I7l"/>
+                <constraint firstAttribute="trailing" secondItem="dxa-6p-QGS" secondAttribute="trailing" id="kGr-Tc-TbH"/>
+                <constraint firstItem="26V-G1-9eC" firstAttribute="top" secondItem="dxa-6p-QGS" secondAttribute="bottom" id="l2X-Sy-rpW"/>
+            </constraints>
+            <size key="customSize" width="509" height="299"/>
+            <connections>
+                <outlet property="map" destination="dxa-6p-QGS" id="WcK-J1-Bee"/>
+            </connections>
+            <point key="canvasLocation" x="342.5" y="381.5"/>
+        </collectionViewCell>
+    </objects>
+</document>

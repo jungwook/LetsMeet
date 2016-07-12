@@ -16,6 +16,10 @@
 #define MAIN_SCREEN_ID @"Profile"
 #undef MAIN_SCREEN_ID
 #define MAIN_SCREEN_ID @"NearMe"
+#undef MAIN_SCREEN_ID
+#define MAIN_SCREEN_ID @"Profile"
+#undef MAIN_SCREEN_ID
+#define MAIN_SCREEN_ID @"Near"
 
 @interface MainController ()
 @end
@@ -92,8 +96,9 @@
     if ([self initializeViewControllers]) {
         NSLog(@"All systems go...");
         
+        UIViewController *center = self.screens[screenId][@"screen"];
         self.leftViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"LeftMenu"];
-        self.centerViewController = self.screens[screenId][@"screen"];
+        self.centerViewController = center ? center : [self.storyboard instantiateViewControllerWithIdentifier:screenId];
         self.animator = [[FloatingDrawerSpringAnimator alloc] init];
         
         [AppDelegate globalDelegate].mainMenu = self;
@@ -104,12 +109,24 @@
     
     
     self.screens = @{
+                     @"Profile" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Profile"],
+                                    @"title"   : @"프로필",
+                                    @"menu"    : @"프로필",
+                                    @"icon"    : @"488-github",
+                                    @"badge"   : @(NO)
+                                    },
                       @"Search" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Search"],
                                      @"title"   : @"주변",
                                      @"menu"    : @"주변",
                                      @"icon"    : @"488-github",
                                      @"badge"   : @(NO)
                                      },
+                     @"Near" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Near"],
+                                    @"title"   : @"Near",
+                                    @"menu"    : @"Near",
+                                    @"icon"    : @"488-github",
+                                    @"badge"   : @(NO)
+                                    },
                       @"NearMe" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"NearMe"],
                                      @"title"   : @"Near...",
                                      @"menu"    : @"Near...",
@@ -122,7 +139,7 @@
                                     @"icon"    : @"488-github",
                                     @"badge"   : @(YES)
                                     },
-                      @"Profile" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"ProfileMain"],
+                      @"Profile2" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"ProfileNav"],
                                     @"title"   : @"사용자",
                                     @"menu"    : @"사용자 2",
                                     @"icon"    : @"488-github",
@@ -134,12 +151,13 @@
                                       @"icon"    : @"488-github",
                                       @"badge"   : @(YES)
                                       },
-                      @"Account" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Account"],
-                                      @"title"   : @"사용자",
-                                      @"menu"    : @"사용자 설정",
-                                      @"icon"    : @"488-github",
-                                      @"badge"   : @(NO)
-                                      }};
+//                      @"Account" : @{ @"screen"  : [self.storyboard instantiateViewControllerWithIdentifier:@"Account"],
+//                                      @"title"   : @"사용자",
+//                                      @"menu"    : @"사용자 설정",
+//                                      @"icon"    : @"488-github",
+//                                      @"badge"   : @(NO)
+//                                      }
+                      };
     
     static BOOL init = true;
     [self.screens enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {

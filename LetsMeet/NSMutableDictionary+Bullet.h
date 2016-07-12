@@ -111,13 +111,23 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
     kProfileMediaVideo
 };
 
+typedef void(^ReadyBlock)(void);
+typedef void(^FetchedNoErrorBlock)(void);
+typedef void(^SavedNoErrorBlock)(void);
+typedef void(^UsersReadyBlock)(NSArray* users);
+
 @interface UserMedia : PFObject <PFSubclassing>
 @property (retain) NSString* userId;
-@property ProfileMediaTypes mediaType;
+@property (retain) NSString* comment;
 @property (retain) NSString* thumbailFile;
 @property (retain) NSString* mediaFile;
+@property ProfileMediaTypes mediaType;
 @property CGSize mediaSize;
 @property BOOL isRealMedia;
+
+- (void) ready:(ReadyBlock)block;
+- (void) fetched:(FetchedNoErrorBlock)handler;
+- (void) saved:(SavedNoErrorBlock)handler;
 @end
 
 @interface User : PFUser<PFSubclassing>
@@ -128,6 +138,8 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
 @property (retain) NSString* intro;
 @property (retain) NSString* profileMedia;
 @property (retain) NSString* thumbnail;
+@property (retain) NSArray* media;
+@property (retain) NSArray* likes;
 @property ProfileMediaTypes profileMediaType;
 @property BOOL isRealMedia;
 @property BOOL isSimulated;
@@ -135,10 +147,16 @@ typedef NS_OPTIONS(BOOL, ProfileMediaTypes)
 
 + (instancetype) me;
 - (void) removeMe;
+- (BOOL) isMe;
 - (NSString*) sexString;
 - (BOOL) profileIsVideo;
 - (BOOL) profileIsPhoto;
 - (void) setSexFromString:(NSString*)sex;
 - (NSString*) sexImageName;
+- (UIColor*) sexColor;
+- (UIImage*) sexImage;
+- (void) mediaReady:(ReadyBlock)handler;
+- (void) fetched:(FetchedNoErrorBlock)handler;
+- (void) saved:(SavedNoErrorBlock)handler;
 @end
 

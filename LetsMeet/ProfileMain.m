@@ -23,6 +23,13 @@
 @property (weak, nonatomic) IBOutlet UITextField *sex;
 @property (weak, nonatomic) IBOutlet UIButton *gps;
 @property (weak, nonatomic) IBOutlet UILabel *location;
+@property (weak, nonatomic) IBOutlet UIButton *edit;
+@property (weak, nonatomic) IBOutlet UIButton *addMedia;
+@property (weak, nonatomic) IBOutlet UIButton *inbox;
+@property (weak, nonatomic) IBOutlet UILabel *ilike;
+@property (weak, nonatomic) IBOutlet UILabel *likesme;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *topMargin;
+@property (strong, nonatomic) UIView *band;
 @property (strong, nonatomic) NSString* currentLocationAddress;
 @property (weak, nonatomic) User *me;
 @end
@@ -35,16 +42,18 @@
     self.currentLocationAddress = nil;
     self.backgroundColor = [UIColor clearColor];
     [self.mainPhoto setIsCircle:YES];
+    [self setupWhiteEditBand];
+}
 
-    UIView *band = [UIView new];
+- (void) setupWhiteEditBand
+{
+    self.band = [UIView new];
     
     const CGFloat w = self.mainPhoto.bounds.size.width, h = self.mainPhoto.bounds.size.height;
     const CGFloat H = 25;
-    
-    band.frame = CGRectMake(0, h-H, w, H);
-    band.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.2f];
-    
-    [self.mainPhoto.imageView addSubview:band];
+    self.band.frame = CGRectMake(0, h-H, w, H);
+    self.band.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.2f];
+    [self.mainPhoto.imageView addSubview:self.band];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
@@ -59,11 +68,13 @@
 - (void)drawRect:(CGRect)rect
 {
     CGFloat xs = self.intro.frame.origin.x,
-            xe = self.sex.frame.origin.x + self.sex.frame.size.width,
+            xe = self.likesme.frame.origin.x + self.likesme.frame.size.width,
             ys = self.intro.frame.origin.y,
             ye = self.intro.frame.origin.y + self.intro.frame.size.height,
             x1 = self.age.frame.origin.x,
-            x2 = self.sex.frame.origin.x;
+            x2 = self.sex.frame.origin.x,
+            x3 = self.ilike.frame.origin.x,
+            x4 = self.likesme.frame.origin.x;
     
     UIBezierPath *path = [UIBezierPath bezierPath];
     [path moveToPoint:CGPointMake(xs, ys)];
@@ -72,6 +83,10 @@
     [path addLineToPoint:CGPointMake(x1, ye)];
     [path moveToPoint:CGPointMake(x2, ys)];
     [path addLineToPoint:CGPointMake(x2, ye)];
+    [path moveToPoint:CGPointMake(x3, ys)];
+    [path addLineToPoint:CGPointMake(x3, ye)];
+    [path moveToPoint:CGPointMake(x4, ys)];
+    [path addLineToPoint:CGPointMake(x4, ye)];
 
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextSetLineWidth(context, 0.5);
@@ -89,9 +104,7 @@
     
     self.parent = parent;
     [self.mainPhoto loadMediaFromUser:user animated:YES];
-    [self.mainPhoto setHasShadow:YES];
     self.nickname.text = self.me.nickname;
-    self.intro.text = self.me.intro;
     
     self.intro.text = self.me.intro ? self.me.intro : @"";
     [ListPicker pickerWithArray:@[@"우리 만나요!", @"애인 찾아요", @"함께 드라이브 해요", @"나쁜 친구 찾아요", @"착한 친구 찾아요", @"함께 먹으러 가요", @"술친구 찾아요"] onTextField:self.intro selection:^(id data) {
@@ -99,13 +112,52 @@
         [self.me saveInBackground];
     }];
     
+    self.age.text = self.me.age ? self.me.age : @"";
+    [ListPicker pickerWithArray:@[@"고딩", @"20대", @"30대", @"40대", @"비밀"] onTextField:self.age selection:^(id data) {
+        self.me.age = data;
+        [self.me saveInBackground];
+    }];
+    
     self.sex.text = self.me.sexString;
-    self.age.text = self.me.age;
+    [ListPicker pickerWithArray:@[@"여자", @"남자"] onTextField:self.sex selection:^(id data) {
+        self.me.sex = [data isEqualToString:@"여자"] ? kSexFemale : kSexMale ;
+        [self.me saveInBackground];
+    }];
     
     if (!self.currentLocationAddress) {
         self.currentLocationAddress = @"Locating...";
         [self getCurrentGeoLocationForUser:self.me];
     }
+    
+    self.ilike.text = [NSString stringWithFormat:@"%ld", self.me.likes.count];
+    [self countLikesMe];
+    
+    
+    // EDITABLE PROPERTIES
+    
+    BOOL editable = self.me.isMe;
+    self.edit.hidden = !editable;
+    self.band.hidden = !editable;
+    self.nickname.userInteractionEnabled = editable;
+    self.intro.userInteractionEnabled = editable;
+    self.age.userInteractionEnabled = editable;
+    self.sex.userInteractionEnabled = editable;
+    self.gps.hidden = !editable;
+    self.inbox.hidden = !editable;
+    self.addMedia.hidden = !editable;
+    self.mainPhoto.showsShadow = editable;
+    
+    self.topMargin.constant = editable ? 42 : 72;
+}
+
+- (void) countLikesMe
+{
+    PFQuery *query = [User query];
+    [query whereKey:@"likes" containsString:self.me.objectId];
+    
+    [query countObjectsInBackgroundWithBlock:^(int number, NSError * _Nullable error) {
+        self.likesme.text = [NSString stringWithFormat:@"%d", number];
+    }];
 }
 
 - (IBAction)editProfileMedia:(id)sender
@@ -144,7 +196,7 @@
         
         [self.me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
             if (!error) {
-                [self.mainPhoto loadMediaFromUser:self.me];
+                [self.mainPhoto loadMediaFromUser:self.me animated:NO];
             }
             else {
                 NSLog(@"ERROR:%@", error.localizedDescription);
@@ -213,6 +265,7 @@
 @property (weak, nonatomic) IBOutlet MediaView *thumbnail;
 @property (weak, nonatomic) ProfileMain* parent;
 @property (weak, nonatomic) UserMedia *media;
+@property (nonatomic) BOOL editable;
 @end
 
 @implementation ProfileMediaCell
@@ -226,11 +279,15 @@
     __LF
 }
 
+- (void)setEditable:(BOOL)editable
+{
+    _editable = editable;
+    self.delete.hidden = !editable;
+}
+
 - (IBAction)deleteMedia:(id)sender {
     __LF
-    if ([self.parent respondsToSelector:@selector(removeMedia:row:)]) {
-        [self.parent removeMedia:self.media row:self.tag];
-    }
+    [self.parent removeMedia:self.media row:self.tag];
 }
 
 - (void)setMedia:(UserMedia *)media
@@ -244,7 +301,6 @@
 
 @interface AddMediaCell : UICollectionViewCell
 @property (nonatomic, weak) ProfileMain* parent;
-@property (nonatomic, weak) NSMutableArray *media;
 @property (nonatomic, weak) User *user;
 @end
 
@@ -252,16 +308,18 @@
 
 - (IBAction)addMedia:(UIButton *)sender {
     __LF
-    if ([self.parent respondsToSelector:@selector(addMedia)]) {
-        [self.parent addMedia];
-    }
+    [self.parent addMedia];
 }
 
 @end
 
+
+#pragma ProfileMain
+
+
 @interface ProfileMain ()
 @property (nonatomic, strong) User *me;
-@property (nonatomic, strong) NSMutableArray *media;
+@property (nonatomic) BOOL editable;
 @end
 
 @implementation ProfileMain
@@ -269,12 +327,16 @@
 - (void)awakeFromNib
 {
     self.me = [User me];
+    if (!self.me.media) {
+        self.me.media = [NSMutableArray array];
+        [self.me saveInBackground];
+    }
 }
 
 - (void)setMe:(User *)user
 {
     _me = user;
-    [self refreshMedia];
+    self.editable = user.isMe;
 }
 
 - (void)setCellSpacing
@@ -292,37 +354,44 @@
 
 - (void)viewDidLoad
 {
+    [super viewDidLoad];
+    [self setupTransparentNavigationBar];
+    [self setCellSpacing];
+    [self setupBackgroundImageView];
+    [self setupTapGestureRecognizerForExit];
+}
+
+- (void) setupTapGestureRecognizerForExit
+{
+    if (self.editable)
+        return;
     
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dissmissProfile)];
+    [self.view addGestureRecognizer:tap];
+}
+
+- (void) dissmissProfile
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void) setupTransparentNavigationBar
+{
     [self.navigationController.navigationBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.navigationBar.shadowImage = [UIImage new];
     self.navigationController.navigationBar.translucent = YES;
     self.navigationController.navigationBar.titleTextAttributes = @{ NSForegroundColorAttributeName: [UIColor whiteColor]};
     self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
-    [super viewDidLoad];
-    [self setCellSpacing];
-    
+}
+
+- (void) setupBackgroundImageView
+{
     UIImageView *backgroundImageView = [UIImageView new];
     backgroundImageView.frame = self.collectionView.bounds;
     
     backgroundImageView.image = [UIImage imageNamed:@"bg"];
     backgroundImageView.contentMode = UIViewContentModeScaleAspectFill;
     self.collectionView.backgroundView = backgroundImageView;
-}
-
-- (void) refreshMedia
-{
-    PFQuery *query = [UserMedia query];
-    [query whereKey:@"userId" equalTo:self.me.objectId];
-    [query orderByAscending:@"updatedAt"];
-    [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
-        if (!error) {
-            self.media = [NSMutableArray arrayWithArray:objects];
-            [self.collectionView reloadData];
-        }
-        else {
-            NSLog(@"ERROR:%@", error.localizedDescription);
-        }
-    }];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -346,6 +415,7 @@
     
     if (kind == UICollectionElementKindSectionHeader) {
         [view sayHiFromUser:self.me parent:self];
+        
         return view;
     }
     else {
@@ -355,21 +425,23 @@
 
 #pragma mark <UICollectionViewDataSource>
 
-- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
+{
     return 1;
 }
 
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.media.count + 1;
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+{
+    return self.me.media.count + self.editable;
 }
 
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    NSInteger count = self.media.count;
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSInteger count = self.me.media.count;
     
-    if (count == indexPath.row) {
+    if (count == indexPath.row && self.editable) {
         AddMediaCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"AddMedia" forIndexPath:indexPath];
         cell.parent = self;
-        cell.media = self.media;
         cell.user = self.me;
         return cell;
     }
@@ -377,17 +449,24 @@
         ProfileMediaCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"ProfileMedia" forIndexPath:indexPath];
         cell.parent = self;
         cell.tag = indexPath.row;
-        [cell setMedia:[self.media objectAtIndex:indexPath.row]];
+        cell.media = [self.me.media objectAtIndex:indexPath.row];
+        cell.editable = self.editable;
         return cell;
     }
 }
 
 - (void) removeMedia:(UserMedia*)media row:(NSInteger)row
 {
+    if (!self.editable) {
+        NSLog(@"ERROR: Cannot remove other's media");
+        return;
+    }
+    
     [media deleteInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
         if (!error && succeeded) {
             [self.collectionView performBatchUpdates:^{
-                [self.media removeObject:self.media];
+                [self.me removeObjectsInArray:@[media] forKey:@"media"];
+                [self.me saveInBackground];
                 [self.collectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:row inSection:0]]];
             } completion:^(BOOL finished) {
             }];
@@ -430,11 +509,12 @@
         media.mediaType = mediaType;
         media.userId = self.me.objectId;
         media.isRealMedia = isRealMedia;
-        [media saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        
+        [self.me addUniqueObject:media forKey:@"media"];
+        [self.me saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
             if (!error) {
-                [self.media addObject:media];
                 [self.collectionView performBatchUpdates:^{
-                    [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.media.count-1 inSection:0]]];
+                    [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.me.media.count-self.editable inSection:0]]];
                 } completion:nil];
             }
             else {
@@ -444,7 +524,6 @@
     }];
     [self presentViewController:mediaPicker animated:YES completion:nil];
 }
-
 
 #pragma mark <UICollectionViewDelegate>
 

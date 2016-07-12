@@ -10,19 +10,17 @@
 #import "S3File.h"
 @import MapKit;
 
-typedef BOOL(^ShouldRefreshBlock)(NSData * data, NSError * error, BOOL fromCache);
-
 @interface MediaView : UIButton
 @property (nonatomic, assign) BOOL isCircle;
-@property (nonatomic, assign) BOOL hasShadow;
-- (void)setImage:(UIImage *)image;
+@property (nonatomic, assign) BOOL showsShadow;
+@property (nonatomic, assign) BOOL showsSex;
+@property (nonatomic, assign) BOOL showsBorder;
+- (void) setImage:(UIImage *)image;
 - (void) loadMediaFromMessage:(Bullet*)message completion:(S3GetBlock)block;
-- (void) loadMediaFromMessage:(Bullet*)message shouldRefresh:(ShouldRefreshBlock)block;
 - (void) loadMediaFromUserMedia:(UserMedia*)media animated:(BOOL)animated;
+- (void) loadMediaFromUserMedia:(UserMedia *)media completion:(S3GetBlock)block;
 - (void) loadMediaFromUser:(User*)user animated:(BOOL)animated;
-- (void) loadMediaFromUser:(User*)user;
-- (void) loadMediaFromUser:(User*)user completion:(S3GetBlock)block;
-- (void) loadMediaFromUser:(User*)user shouldRefresh:(ShouldRefreshBlock)block;
+- (void) loadMediaFromUser:(User*)user completion:(S3GetBlock)block animated:(BOOL)animated;
 - (void) setMapLocationForUser:(User*)user;
 @end
 

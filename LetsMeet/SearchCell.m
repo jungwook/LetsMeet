@@ -29,7 +29,7 @@
     [self setCornerRadiusOnView:self.distance radius:2.0f];
     [self setCornerRadiusOnView:self.badge radius:2.0f];
     [self.photo setIsCircle:YES];
-    [self.photo setHasShadow:YES];
+    [self.photo setShowsShadow:YES];
 }
 
 - (void) setCornerRadiusOnView:(UIView*) view radius:(CGFloat)radius;
@@ -78,7 +78,7 @@
                     }];
                 }
             }
-        }];
+        } animated:NO];
     }
 }
 

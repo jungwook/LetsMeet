@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="UserMediaCell" id="zeP-sB-OCq" customClass="UserMediaCell">
+            <rect key="frame" x="0.0" y="0.0" width="215" height="259"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="215" height="259"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ley-9T-bUK">
+                        <rect key="frame" x="0.0" y="0.0" width="215" height="215"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bAU-nk-Jrv" customClass="MediaView">
+                                <rect key="frame" x="-4" y="-4" width="223" height="223"/>
+                                <color key="backgroundColor" red="0.71764707569999997" green="0.91372549530000002" blue="0.44705882670000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="09J-A4-Dbv">
+                                <rect key="frame" x="4" y="4" width="25" height="25"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="25" id="Af5-bY-Sge"/>
+                                    <constraint firstAttribute="width" constant="25" id="DoG-K4-143"/>
+                                </constraints>
+                                <state key="normal" image="trash"/>
+                                <connections>
+                                    <action selector="removeMedia:" destination="zeP-sB-OCq" eventType="touchUpInside" id="7dv-Hh-5TQ"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="0.99607843159999998" green="0.68235296010000002" blue="0.35686275360000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="09J-A4-Dbv" firstAttribute="leading" secondItem="ley-9T-bUK" secondAttribute="leading" constant="4" id="5yJ-7g-XV5"/>
+                            <constraint firstAttribute="width" secondItem="ley-9T-bUK" secondAttribute="height" multiplier="1:1" id="Avb-ea-lyH"/>
+                            <constraint firstAttribute="bottom" secondItem="bAU-nk-Jrv" secondAttribute="bottom" constant="-4" id="Dik-Hz-AIR"/>
+                            <constraint firstItem="bAU-nk-Jrv" firstAttribute="top" secondItem="ley-9T-bUK" secondAttribute="top" constant="-4" id="VpD-cc-S2B"/>
+                            <constraint firstAttribute="trailing" secondItem="bAU-nk-Jrv" secondAttribute="trailing" constant="-4" id="Yzv-bz-YGg"/>
+                            <constraint firstItem="bAU-nk-Jrv" firstAttribute="leading" secondItem="ley-9T-bUK" secondAttribute="leading" constant="-4" id="cap-Yb-Pny"/>
+                            <constraint firstItem="09J-A4-Dbv" firstAttribute="top" secondItem="ley-9T-bUK" secondAttribute="top" constant="4" id="eBz-7r-rFD"/>
+                        </constraints>
+                    </view>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="comment" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AR8-Og-mP1">
+                        <rect key="frame" x="8" y="218" width="199" height="21"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="uex-ob-c8i"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" name="AvenirNextCondensed-DemiBold" family="Avenir Next Condensed" pointSize="12"/>
+                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WYr-m2-UGB">
+                        <rect key="frame" x="8" y="218" width="199" height="21"/>
+                        <fontDescription key="fontDescription" name="AvenirNextCondensed-DemiBold" family="Avenir Next Condensed" pointSize="12"/>
+                        <connections>
+                            <action selector="editComment:" destination="zeP-sB-OCq" eventType="touchUpInside" id="ftB-Cl-ezY"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            </view>
+            <constraints>
+                <constraint firstItem="ley-9T-bUK" firstAttribute="leading" secondItem="zeP-sB-OCq" secondAttribute="leading" id="4ja-Ew-Md4"/>
+                <constraint firstAttribute="trailing" secondItem="AR8-Og-mP1" secondAttribute="trailing" constant="8" id="Egg-0Z-22a"/>
+                <constraint firstItem="WYr-m2-UGB" firstAttribute="width" secondItem="AR8-Og-mP1" secondAttribute="width" id="HpB-lL-9hM"/>
+                <constraint firstItem="AR8-Og-mP1" firstAttribute="top" secondItem="bAU-nk-Jrv" secondAttribute="bottom" constant="-1" id="SDM-zl-l3T"/>
+                <constraint firstItem="AR8-Og-mP1" firstAttribute="leading" secondItem="zeP-sB-OCq" secondAttribute="leading" constant="8" id="XTd-FR-Zyq"/>
+                <constraint firstItem="WYr-m2-UGB" firstAttribute="height" secondItem="AR8-Og-mP1" secondAttribute="height" id="bAi-re-GlZ"/>
+                <constraint firstItem="ley-9T-bUK" firstAttribute="top" secondItem="zeP-sB-OCq" secondAttribute="top" id="jZ4-ZL-xcw"/>
+                <constraint firstItem="WYr-m2-UGB" firstAttribute="top" secondItem="AR8-Og-mP1" secondAttribute="top" id="jjm-FT-1O3"/>
+                <constraint firstItem="WYr-m2-UGB" firstAttribute="centerX" secondItem="AR8-Og-mP1" secondAttribute="centerX" id="msQ-wB-Rbr"/>
+                <constraint firstAttribute="trailing" secondItem="ley-9T-bUK" secondAttribute="trailing" id="pSP-9N-4C6"/>
+            </constraints>
+            <size key="customSize" width="215" height="259"/>
+            <connections>
+                <outlet property="back" destination="ley-9T-bUK" id="vOA-TF-9yN"/>
+                <outlet property="comment" destination="AR8-Og-mP1" id="HMw-Ya-2eH"/>
+                <outlet property="delete" destination="09J-A4-Dbv" id="y6d-nC-G4H"/>
+                <outlet property="edit" destination="WYr-m2-UGB" id="KeO-Ry-eFm"/>
+                <outlet property="photo" destination="bAU-nk-Jrv" id="539-8C-o4t"/>
+            </connections>
+            <point key="canvasLocation" x="362.5" y="373.5"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="trash" width="502" height="502"/>
+    </resources>
+</document>

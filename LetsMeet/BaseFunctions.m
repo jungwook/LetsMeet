@@ -190,6 +190,18 @@ CGFloat ampAtIndex(NSUInteger index, NSData* data)
     return ret;
 }
 
+void setShadowOnView(UIView* view, CGFloat radius, CGFloat opacity)
+{
+    view.layer.shadowColor = [UIColor colorWithWhite:0.0f alpha:1.0f].CGColor;
+    view.layer.shadowOffset = CGSizeZero;
+    view.layer.shadowRadius = radius;
+    view.layer.shadowOpacity = opacity;
+}
+
+CGFloat widthForNumberOfCells(UICollectionView* cv, UICollectionViewFlowLayout *flowLayout, CGFloat cpr)
+{
+    return (CGRectGetWidth(cv.bounds) - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * (cpr - 1))/cpr;
+}
 
 
 

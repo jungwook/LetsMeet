@@ -7,7 +7,8 @@
 //
 
 #import "NSMutableDictionary+Bullet.h"
-#import "CachedFile.h"
+//#import "CachedFile.h"
+#import "S3File.h"
 
 #define ASSERTNOTNULL(__A__) NSAssert(__A__, @"__A__ cannot be nil")
 
@@ -393,7 +394,7 @@
 @end
 
 @implementation User
-@dynamic nickname,location,locationUdateAt, sex, age, intro, isSimulated, profileMedia, thumbnail, profileMediaType, isRealMedia;
+@dynamic nickname,location,locationUdateAt, sex, age, intro, isSimulated, profileMedia, thumbnail, profileMediaType, isRealMedia, media, likes;
 
 + (instancetype) me
 {
@@ -455,16 +456,94 @@
 
 - (NSString *)sexImageName
 {
-    return self.sex == kSexMale ? @"guy" : @"girl";
+    return (self.sex == kSexMale) ? @"guy" : @"girl";
+}
+
+- (UIColor*) sexColor
+{
+    return (self.sex == kSexMale) ?
+    [UIColor colorWithRed:95/255.f green:167/255.f blue:229/255.f alpha:1.0f] :
+    [UIColor colorWithRed:240/255.f green:82/255.f blue:10/255.f alpha:1.0f];
+}
+
+- (UIImage*) sexImage
+{
+    return (self.sex == kSexMale) ? [UIImage imageNamed:@"guy"] : [UIImage imageNamed:@"girl"] ;
+}
+
+- (BOOL)isMe
+{
+    return ([self.objectId isEqualToString:[User me].objectId]);
+}
+
+- (void)mediaReady:(ReadyBlock)handler
+{
+    __block NSUInteger count = self.media.count;
+    if (count == 0) {
+        if (handler) {
+            handler();
+        }
+    }
+    else {
+        [self.media enumerateObjectsUsingBlock:^(UserMedia* _Nonnull userMedia, NSUInteger idx, BOOL * _Nonnull stop) {
+            [userMedia ready:^{
+                if (--count == 0) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (handler) {
+                            handler();
+                        }
+                    });
+                }
+            }];
+        }];
+    }
+}
+
+- (void)fetched:(FetchedNoErrorBlock)handler
+{
+    [self fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+        }
+        else {
+            if (handler) {
+                handler();
+            }
+        }
+    }];
+}
+
+- (void)saved:(SavedNoErrorBlock)handler
+{
+    [self saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+        }
+        else {
+            if (handler) {
+                handler();
+            }
+        }
+    }];
+}
+
+- (BOOL)isEqual:(User*)object
+{
+    return [self.objectId isEqualToString:object.objectId];
 }
 
 @end
 
 @implementation UserMedia
-@dynamic userId, mediaType, thumbailFile, mediaFile, mediaSize, isRealMedia;
+@dynamic userId, comment, mediaType, thumbailFile, mediaFile, mediaSize, isRealMedia;
 
 + (NSString *)parseClassName {
     return @"UserMedia";
+}
+
+- (BOOL)isEqual:(UserMedia*)object
+{
+    return [self.objectId isEqual:object.objectId];
 }
 
 - (void)setMediaSize:(CGSize)mediaSize
@@ -477,5 +556,44 @@
 {
     return CGSizeMake([[self objectForKey:@"mediaWidth"] floatValue], [[self objectForKey:@"mediaHeight"] floatValue]);
 }
+
+- (void)ready:(ReadyBlock)block
+{
+    [self fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+        [S3File getDataFromFile:self.thumbailFile completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
+            if (block)
+                block();
+        }];
+    }];
+}
+
+- (void)fetched:(FetchedNoErrorBlock)handler
+{
+    [self fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+        }
+        else {
+            if (handler) {
+                handler();
+            }
+        }
+    }];
+}
+
+- (void)saved:(SavedNoErrorBlock)handler
+{
+    [self saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+        }
+        else {
+            if (handler) {
+                handler();
+            }
+        }
+    }];
+}
+
 @end
 
