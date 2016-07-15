@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="SayMediaCell" rowHeight="181" id="ioK-h8-dbH" customClass="SayMediaCell">
+            <rect key="frame" x="0.0" y="0.0" width="184" height="181"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ioK-h8-dbH" id="edP-0r-Kr5">
+                <rect key="frame" x="0.0" y="0.0" width="184" height="180.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Uid-dw-9SG">
+                        <rect key="frame" x="8" y="8" width="168" height="134"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="G7x-Xf-1Af" customClass="MediaView">
+                                <rect key="frame" x="-4" y="-4" width="176" height="142"/>
+                                <color key="backgroundColor" red="0.71764707569999997" green="0.91372549530000002" blue="0.44705882670000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="G7x-Xf-1Af" secondAttribute="trailing" constant="-4" id="0Ze-38-VX9"/>
+                            <constraint firstItem="G7x-Xf-1Af" firstAttribute="leading" secondItem="Uid-dw-9SG" secondAttribute="leading" constant="-4" id="2Xk-bx-Fda"/>
+                            <constraint firstAttribute="bottom" secondItem="G7x-Xf-1Af" secondAttribute="bottom" constant="-4" id="asi-j1-yVr"/>
+                            <constraint firstItem="G7x-Xf-1Af" firstAttribute="top" secondItem="Uid-dw-9SG" secondAttribute="top" constant="-4" id="rhm-CI-5NJ"/>
+                        </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                <integer key="value" value="3"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </view>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Comment" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PfH-nP-eYr">
+                        <rect key="frame" x="8" y="150" width="168" height="22"/>
+                        <fontDescription key="fontDescription" name="AvenirNextCondensed-DemiBold" family="Avenir Next Condensed" pointSize="16"/>
+                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="topMargin" secondItem="Uid-dw-9SG" secondAttribute="top" id="6xC-j2-eFd"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="PfH-nP-eYr" secondAttribute="trailing" id="77F-rG-8Rf"/>
+                    <constraint firstAttribute="leadingMargin" secondItem="Uid-dw-9SG" secondAttribute="leading" id="Ach-A5-fYC"/>
+                    <constraint firstAttribute="leadingMargin" secondItem="PfH-nP-eYr" secondAttribute="leading" id="E9V-Pr-kVM"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="Uid-dw-9SG" secondAttribute="trailing" id="Jih-n5-5TT"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="Uid-dw-9SG" secondAttribute="bottom" constant="30.5" id="ak5-ag-q6q"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="PfH-nP-eYr" secondAttribute="bottom" constant="0.5" id="cbY-59-OLt"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="comment" destination="PfH-nP-eYr" id="8lx-uq-QLG"/>
+                <outlet property="photo" destination="G7x-Xf-1Af" id="L1j-dQ-KDL"/>
+            </connections>
+            <point key="canvasLocation" x="319" y="540.5"/>
+        </tableViewCell>
+    </objects>
+</document>

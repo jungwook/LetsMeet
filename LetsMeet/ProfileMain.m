@@ -185,7 +185,7 @@
 
 - (void) selectProfileMediaFromSource:(UIImagePickerControllerSourceType)sourceType
 {
-    MediaPicker *mediaPicker = [MediaPicker mediaPickerWithSourceType:sourceType mediaBlock:^(ProfileMediaTypes mediaType, NSData *thumbnailData, NSString *thumbnailFile, NSString *mediaFile, CGSize mediaSize, BOOL isRealMedia) {
+    MediaPicker *mediaPicker = [MediaPicker mediaPickerWithSourceType:sourceType userMediaInfoBlock:^(ProfileMediaTypes mediaType, NSData *thumbnailData, NSString *thumbnailFile, NSString *mediaFile, CGSize mediaSize, BOOL isRealMedia) {
         
         NSLog(@"I'M :%@ sAVING:%@ %@ %d %d", self.me, mediaFile, thumbnailFile, mediaType, isRealMedia);
         
@@ -501,7 +501,13 @@
 
 - (void) selectMediaFromSource:(UIImagePickerControllerSourceType)sourceType
 {
-    MediaPicker *mediaPicker = [MediaPicker mediaPickerWithSourceType:sourceType mediaBlock:^(ProfileMediaTypes mediaType, NSData *thumbnailData, NSString *thumbnailFile, NSString *mediaFile, CGSize mediaSize, BOOL isRealMedia) {
+    MediaPicker *mediaPicker = [MediaPicker mediaPickerWithSourceType:sourceType
+                                                       userMediaInfoBlock:^(ProfileMediaTypes mediaType,
+                                                                        NSData *thumbnailData,
+                                                                        NSString *thumbnailFile,
+                                                                        NSString *mediaFile,
+                                                                        CGSize mediaSize,
+                                                                        BOOL isRealMedia) {
         UserMedia *media = [UserMedia object];
         media.mediaSize = mediaSize;
         media.mediaFile = mediaFile;

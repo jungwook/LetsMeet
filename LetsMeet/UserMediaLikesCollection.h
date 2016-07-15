@@ -12,6 +12,7 @@
 #import "UserMediaCell.h"
 #import "UserLikesCell.h"
 #import "UserProfileHeader.h"
+#import "NearHeader.h"
 
 typedef enum : NSInteger {
     kSectionUserMedia = 0,

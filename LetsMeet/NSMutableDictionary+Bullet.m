@@ -527,9 +527,44 @@
     }];
 }
 
-- (BOOL)isEqual:(User*)object
+//- (BOOL)isEqual:(User*)object
+//{
+//    return [self.objectId isEqualToString:object.objectId];
+//}
+
+@end
+
+@implementation UserPost
+@dynamic userId, nickname, thumbnail, title, posts, location;
+
++ (NSString *)parseClassName {
+    return @"UserPost";
+}
+
++ (instancetype)mine
 {
-    return [self.objectId isEqualToString:object.objectId];
+    User *me = [User me];
+    
+    UserPost *post = [UserPost new];
+    post.userId = me.objectId;
+    post.nickname = me.nickname;
+    post.thumbnail = me.thumbnail;
+    
+    return post;
+}
+
+- (void)fetched:(FetchedNoErrorBlock)handler
+{
+    [self fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+        }
+        else {
+            if (handler) {
+                handler();
+            }
+        }
+    }];
 }
 
 @end
@@ -541,10 +576,10 @@
     return @"UserMedia";
 }
 
-- (BOOL)isEqual:(UserMedia*)object
-{
-    return [self.objectId isEqual:object.objectId];
-}
+//- (BOOL)isEqual:(UserMedia*)object
+//{
+//    return [self.objectId isEqualToString:object.objectId];
+//}
 
 - (void)setMediaSize:(CGSize)mediaSize
 {

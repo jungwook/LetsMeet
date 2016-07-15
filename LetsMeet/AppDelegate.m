@@ -26,6 +26,7 @@
     [MessageObject registerSubclass];
     [User registerSubclass];
     [UserMedia registerSubclass];
+    [UserPost registerSubclass];
     
     self.system = [FileSystem new];
     

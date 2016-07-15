@@ -8,79 +8,109 @@
 
 #import "MediaPicker.h"
 #import "S3File.h"
+#import "ActivityView.h"
+
 @import MobileCoreServices;
 
 @interface MediaPicker ()
-@property (nonatomic, strong) MediaPickerBulletBlock bulletBlock;
-@property (nonatomic, strong) MediaPickerMediaBlock mediaBlock;
-
+@property (nonatomic, copy) MediaPickerBulletBlock bulletBlock;
+@property (nonatomic, copy) MediaPickerMediaInfoBlock userMediaInfoBlock;
+@property (nonatomic, copy) MediaPickerUserMediaBlock userMediaBlock;
 @end
 
 @implementation MediaPicker
 
-+(void) addMediaOnViewController:(UIViewController*)viewController withMediaHandler:(MediaPickerMediaBlock)handler
+typedef void(^ActionHandlers)(UIAlertAction * _Nonnull action);
+
++ (void) addMediaOnViewController:(UIViewController*)viewController withMediaInfoHandler:(MediaPickerMediaInfoBlock)handler
 {
-    __LF
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    
-    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
-        [alert addAction:[UIAlertAction actionWithTitle:@"Library"
-                                                  style:UIAlertActionStyleDefault
-                                                handler:^(UIAlertAction * _Nonnull action) {
-                                                    [viewController presentViewController:[MediaPicker mediaPickerWithSourceType:UIImagePickerControllerSourceTypePhotoLibrary mediaBlock:handler] animated:YES completion:nil];
-                                                }]];
+    [MediaPicker handleAlertOnViewController:viewController
+                              libraryHandler:^(UIAlertAction * _Nonnull action) {
+        [viewController presentViewController:[MediaPicker mediaPickerWithSourceType:UIImagePickerControllerSourceTypePhotoLibrary
+                                                                  userMediaInfoBlock:handler]
+                                     animated:YES
+                                   completion:nil];
     }
-    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        [alert addAction:[UIAlertAction actionWithTitle:@"Camera"
-                                                  style:UIAlertActionStyleDefault
-                                                handler:^(UIAlertAction * _Nonnull action) {
-                                                    [viewController presentViewController:[MediaPicker mediaPickerWithSourceType:UIImagePickerControllerSourceTypeCamera mediaBlock:handler] animated:YES completion:nil];
-                                                }]];
-    }
-    [alert addAction:[UIAlertAction actionWithTitle:@"CANCEL" style:UIAlertActionStyleCancel handler:nil]];
-    [viewController presentViewController:alert animated:YES completion:nil];
+                               cameraHandler:^(UIAlertAction * _Nonnull action) {
+        [viewController presentViewController:[MediaPicker mediaPickerWithSourceType:UIImagePickerControllerSourceTypeCamera
+                                                                  userMediaInfoBlock:handler]
+                                     animated:YES
+                                   completion:nil];
+    }];
 }
 
-+(instancetype)mediaPickerWithSourceType:(UIImagePickerControllerSourceType)sourceType bulletBlock:(MediaPickerBulletBlock)block
++ (void) addMediaOnViewController:(UIViewController *)viewController withUserMediaHandler:(MediaPickerUserMediaBlock)handler
+{
+    [MediaPicker handleAlertOnViewController:viewController
+                              libraryHandler:^(UIAlertAction * _Nonnull action) {
+                                  [viewController presentViewController:[MediaPicker mediaPickerWithSourceType:UIImagePickerControllerSourceTypePhotoLibrary userMediaBlock:handler]
+                                                               animated:YES
+                                                             completion:nil];
+                              }
+                               cameraHandler:^(UIAlertAction * _Nonnull action) {
+                                   [viewController presentViewController:[MediaPicker mediaPickerWithSourceType:UIImagePickerControllerSourceTypeCamera userMediaBlock:handler]
+                                                                animated:YES
+                                                              completion:nil];
+                               }];
+}
+
++ (instancetype) mediaPickerWithSourceType:(UIImagePickerControllerSourceType)sourceType bulletBlock:(MediaPickerBulletBlock)block
 {
     return [[MediaPicker alloc] initWithSourceType:sourceType completionBlock:block];
 }
 
-+(instancetype)mediaPickerWithSourceType:(UIImagePickerControllerSourceType)sourceType mediaBlock:(MediaPickerMediaBlock)block
++ (instancetype) mediaPickerWithSourceType:(UIImagePickerControllerSourceType)sourceType userMediaInfoBlock:(MediaPickerMediaInfoBlock)block
 {
-    return [[MediaPicker alloc] initWithSourceType:sourceType mediaBlock:block];
+    return [[MediaPicker alloc] initWithSourceType:sourceType userMediaInfoBlock:block];
 }
+
++ (instancetype) mediaPickerWithSourceType:(UIImagePickerControllerSourceType)sourceType userMediaBlock:(MediaPickerUserMediaBlock)block
+{
+    return [[MediaPicker alloc] initWithSourceType:sourceType userMediaBlock:block];
+}
+
 
 - (instancetype) initWithSourceType:(UIImagePickerControllerSourceType)sourceType completionBlock:(MediaPickerBulletBlock)block
 {
     self = [super init];
     if (self) {
-        self.delegate = self;
-        self.allowsEditing = YES;
-        self.videoMaximumDuration = 10;
-        self.sourceType = sourceType;
-        self.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:sourceType];
-        self.modalPresentationStyle = UIModalPresentationOverFullScreen;
-        self.bulletBlock = block;
-        self.mediaBlock = nil;
+        [self selfInitializersWithSourceType:sourceType bulletBlock:block userMediaInfoBlock:nil userMediaBlock:nil];
     }
     return self;
 }
 
-- (instancetype) initWithSourceType:(UIImagePickerControllerSourceType)sourceType mediaBlock:(MediaPickerMediaBlock)block
+- (instancetype) initWithSourceType:(UIImagePickerControllerSourceType)sourceType userMediaInfoBlock:(MediaPickerMediaInfoBlock)block
 {
     self = [super init];
     if (self) {
-        self.delegate = self;
-        self.allowsEditing = YES;
-        self.videoMaximumDuration = 10;
-        self.sourceType = sourceType;
-        self.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:sourceType];
-        self.modalPresentationStyle = UIModalPresentationOverFullScreen;
-        self.bulletBlock = nil;
-        self.mediaBlock = block;
+        [self selfInitializersWithSourceType:sourceType bulletBlock:nil userMediaInfoBlock:block userMediaBlock:nil];
     }
     return self;
+}
+
+- (instancetype) initWithSourceType:(UIImagePickerControllerSourceType)sourceType userMediaBlock:(MediaPickerUserMediaBlock)block
+{
+    self = [super init];
+    if (self) {
+        [self selfInitializersWithSourceType:sourceType bulletBlock:nil userMediaInfoBlock:nil userMediaBlock:block];
+    }
+    return self;
+}
+
+- (void) selfInitializersWithSourceType:(UIImagePickerControllerSourceType)sourceType
+                            bulletBlock:(MediaPickerBulletBlock)bulletBlock
+                     userMediaInfoBlock:(MediaPickerMediaInfoBlock)userMediaInfoBlock
+                         userMediaBlock:(MediaPickerUserMediaBlock)userMediaBlock
+{
+    self.delegate = self;
+    self.allowsEditing = YES;
+    self.videoMaximumDuration = 10;
+    self.sourceType = sourceType;
+    self.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:sourceType];
+    self.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    self.bulletBlock = bulletBlock;
+    self.userMediaInfoBlock = userMediaInfoBlock;
+    self.userMediaBlock = userMediaBlock;
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
@@ -105,30 +135,75 @@
 
 - (void) handlePhoto:(NSDictionary<NSString*, id>*)info url:(NSURL*)url source:(UIImagePickerControllerSourceType)sourceType
 {
+    // Original image
     UIImage *image = (UIImage *) [info objectForKey:UIImagePickerControllerEditedImage];
+    
+    // Original image data
     NSData *imageData = UIImageJPEGRepresentation(image, 1.0);
+    
+    // Thumbnail data
     NSData *thumbnailData = compressedImageData(imageData, kThumbnailWidth);
     
-    [S3File saveImageData:thumbnailData completedBlock:^(NSString *thumbnailFile, BOOL succeeded, NSError *error) {
-        NSString *mediaFile = [S3File saveImageData:imageData];
-        
-        NSLog(@"source type:%ld", sourceType);
-        
-        if (self.bulletBlock) {
-            Bullet* bullet = [Bullet bulletWithPhoto:mediaFile thumbnail:thumbnailFile mediaSize:image.size realMedia:(sourceType == UIImagePickerControllerSourceTypeCamera)];
-            self.bulletBlock(bullet);
+//    ActivityView *activity = [ActivityView activityView];
+    [S3File saveImageData:thumbnailData completedBlock:^(NSString *thumbnailFile, BOOL succeeded, NSError *error)
+    {
+        if (succeeded && !error) {
+            [S3File saveImageData:imageData completedBlock:^(NSString *mediaFile, BOOL succeeded, NSError *error) {
+//                [activity stopAndDie];
+
+                if (succeeded && !error) {
+                    if (self.bulletBlock) {
+                        Bullet* bullet = [Bullet bulletWithPhoto:mediaFile
+                                                       thumbnail:thumbnailFile
+                                                       mediaSize:image.size
+                                                       realMedia:(sourceType == UIImagePickerControllerSourceTypeCamera)];
+                        self.bulletBlock(bullet);
+                    }
+                    if (self.userMediaInfoBlock) {
+                        self.userMediaInfoBlock( kProfileMediaPhoto,
+                                                thumbnailData,
+                                                thumbnailFile,
+                                                mediaFile,
+                                                image.size,
+                                                (sourceType == UIImagePickerControllerSourceTypeCamera));
+                    }
+                    
+                    if (self.userMediaBlock) {
+                        UserMedia *media = [UserMedia object];
+                        media.mediaSize = image.size;
+                        media.mediaFile = mediaFile;
+                        media.thumbailFile = thumbnailFile;
+                        media.mediaType = kProfileMediaPhoto;
+                        media.isRealMedia = (sourceType == UIImagePickerControllerSourceTypeCamera);
+                        
+                        self.userMediaBlock(media);
+                    }
+                }
+                else {
+                    NSLog(@"ERROR:%@", error.localizedDescription);
+                }
+            }];
         }
-        if (self.mediaBlock) {
-            self.mediaBlock( kProfileMediaPhoto, thumbnailData, thumbnailFile, mediaFile, image.size, (sourceType == UIImagePickerControllerSourceTypeCamera));
+        else {
+            NSLog(@"ERROR:%@", error.localizedDescription);
+//            [activity stopAndDie];
         }
+    } progressBlock:^(int percentDone) {
+        // Thumbnail progress.
     }];
 }
 
 - (void) handleVideo:(NSDictionary<NSString*, id>*)info url:(NSURL*)url source:(UIImagePickerControllerSourceType)sourceType
 {
+    // Video Asset
     AVAsset *asset = [AVAsset assetWithURL:url];
+    
+    // Thumbnail Image
     UIImage *thumbnailImage = [self thumbnailFromVideoAsset:asset source:sourceType];
+    
+    // Thumbnail Image data @ full compression
     NSData *thumbnailData = compressedImageData(UIImageJPEGRepresentation(thumbnailImage, kJPEGCompressionFull), kThumbnailWidth);
+    
     
     [S3File saveImageData:thumbnailData completedBlock:^(NSString *thumbnailFile, BOOL succeeded, NSError *error) {
         NSString *tempId = randomObjectId();
@@ -141,11 +216,31 @@
                 [S3File saveMovieData:videoData completedBlock:^(NSString *mediaFile, BOOL succeeded, NSError *error) {
                     if (succeeded && !error) {
                         if (self.bulletBlock) {
-                            Bullet* bullet = [Bullet bulletWithVideo:mediaFile thumbnail:thumbnailFile mediaSize:thumbnailImage.size realMedia:(sourceType == UIImagePickerControllerSourceTypeCamera)];
+                            Bullet* bullet = [Bullet bulletWithVideo:mediaFile
+                                                           thumbnail:thumbnailFile
+                                                           mediaSize:thumbnailImage.size
+                                                           realMedia:(sourceType == UIImagePickerControllerSourceTypeCamera)];
                             self.bulletBlock(bullet);
                         }
-                        if (self.mediaBlock) {
-                            self.mediaBlock(kProfileMediaVideo, thumbnailData, thumbnailFile, mediaFile, thumbnailImage.size, (sourceType == UIImagePickerControllerSourceTypeCamera));
+                        
+                        if (self.userMediaInfoBlock) {
+                            self.userMediaInfoBlock(kProfileMediaVideo,
+                                                thumbnailData,
+                                                thumbnailFile,
+                                                mediaFile,
+                                                thumbnailImage.size,
+                                                (sourceType == UIImagePickerControllerSourceTypeCamera));
+                        }
+                        
+                        if (self.userMediaBlock) {
+                            UserMedia *media = [UserMedia object];
+                            media.mediaSize = thumbnailImage.size;
+                            media.mediaFile = mediaFile;
+                            media.thumbailFile = thumbnailFile;
+                            media.mediaType = kProfileMediaVideo;
+                            media.isRealMedia = (sourceType == UIImagePickerControllerSourceTypeCamera);
+                        
+                            self.userMediaBlock(media);
                         }
                     }
                     else {
@@ -155,6 +250,8 @@
                 }];
             }
         }];
+    } progressBlock:^(int percentDone) {
+        // Thumbnail progress.
     }];
 }
 
@@ -179,14 +276,24 @@
     return thumbnail;
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
++ (void) handleAlertOnViewController:(UIViewController*)viewController
+                      libraryHandler:(ActionHandlers)library
+                       cameraHandler:(ActionHandlers)camera
+{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
+        [alert addAction:[UIAlertAction actionWithTitle:@"Library"
+                                                  style:UIAlertActionStyleDefault
+                                                handler:library]];
+    }
+    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        [alert addAction:[UIAlertAction actionWithTitle:@"Camera"
+                                                  style:UIAlertActionStyleDefault
+                                                handler:camera]];
+    }
+    [alert addAction:[UIAlertAction actionWithTitle:@"CANCEL" style:UIAlertActionStyleCancel handler:nil]];
+    [viewController presentViewController:alert animated:YES completion:nil];
 }
-*/
 
 @end

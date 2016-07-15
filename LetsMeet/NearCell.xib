@@ -17,17 +17,17 @@
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Epf-Rh-Tdh">
                         <rect key="frame" x="0.0" y="0.0" width="156" height="156"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QZI-Np-wRh">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="U7f-cK-k9T">
                                 <rect key="frame" x="-4" y="-4" width="164" height="164"/>
-                                <color key="backgroundColor" red="0.65790163590604023" green="1" blue="0.32605390100671139" alpha="1" colorSpace="calibratedRGB"/>
-                            </view>
+                                <state key="normal" title="Button"/>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="QZI-Np-wRh" secondAttribute="trailing" constant="-4" id="N6Z-Xl-8wR"/>
-                            <constraint firstItem="QZI-Np-wRh" firstAttribute="top" secondItem="Epf-Rh-Tdh" secondAttribute="top" constant="-4" id="PL8-xY-YUv"/>
-                            <constraint firstItem="QZI-Np-wRh" firstAttribute="leading" secondItem="Epf-Rh-Tdh" secondAttribute="leading" constant="-4" id="Wrb-0q-EYJ"/>
-                            <constraint firstAttribute="bottom" secondItem="QZI-Np-wRh" secondAttribute="bottom" constant="-4" id="e1Y-UV-VGe"/>
+                            <constraint firstItem="U7f-cK-k9T" firstAttribute="leading" secondItem="Epf-Rh-Tdh" secondAttribute="leading" constant="-4" id="168-XU-P4R"/>
+                            <constraint firstItem="U7f-cK-k9T" firstAttribute="top" secondItem="Epf-Rh-Tdh" secondAttribute="top" constant="-4" id="HI0-Hr-zpK"/>
+                            <constraint firstAttribute="trailing" secondItem="U7f-cK-k9T" secondAttribute="trailing" constant="-4" id="Pge-CR-zb4"/>
+                            <constraint firstAttribute="bottom" secondItem="U7f-cK-k9T" secondAttribute="bottom" constant="-4" id="lFz-5N-clh"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
@@ -47,7 +47,7 @@
             <size key="customSize" width="156" height="156"/>
             <connections>
                 <outlet property="back" destination="Epf-Rh-Tdh" id="DMq-15-O5f"/>
-                <outlet property="photo" destination="QZI-Np-wRh" id="QlH-DS-S8a"/>
+                <outlet property="photo" destination="U7f-cK-k9T" id="yB4-ga-jIz"/>
             </connections>
             <point key="canvasLocation" x="334" y="501"/>
         </collectionViewCell>

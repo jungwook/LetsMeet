@@ -12,6 +12,7 @@
 #import "MediaPicker.h"
 #import "ListPicker.h"
 #import "UIImage+AverageColor.h"
+#import "UIColor+LightAndDark.h"
 #import "PageSelectionView.h"
 #import "UserMap.h"
 
@@ -103,7 +104,6 @@
         [self processUserLikedForUser:self.user];           
         
         [self.mediaCollection setEditable:self.editable];
-        [self.mediaCollection setCommentColor:[UIColor redColor]];
         
         // Map information
         [self.map setUser:self.user];
@@ -122,7 +122,7 @@
         [self.photo setIsCircle:YES];
         [self.photo setShowsBorder:YES];
         
-        [self setBackgroundViewImage:self.backgroundImage];
+        [self setAmbiantImageAndColorsToUserPreference];
         
         [self.photoEdit setHidden:!self.user.isMe];
         [self.nickname setUserInteractionEnabled:self.user.isMe];
@@ -145,6 +145,7 @@
         self.sex.text = self.user.sexString;
         [ListPicker pickerWithArray:@[@"여자", @"남자"] onTextField:self.sex selection:^(id data) {
             self.user.sex = [data isEqualToString:@"여자"] ? kSexFemale : kSexMale ;
+            [self setAmbiantImageAndColorsToUserPreference];
             [self.user saveInBackground];
         }];
     }];
@@ -228,13 +229,23 @@ typedef void(^UsersBlock)(NSArray<User*>* users);
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    [self setAmbiantImageAndColorsToUserPreference];
+    [self.mediaCollection reloadData];
+}
+
+- (void) setAmbiantImageAndColorsToUserPreference
+{
     [self.navigationController.navigationBar setTintColor:self.backgroundColor];
     [self.navigationController.navigationBar setTitleTextAttributes:@{
                                                                       NSForegroundColorAttributeName:self.backgroundColor,
                                                                       NSFontAttributeName: [UIFont systemFontOfSize:16 weight:UIFontWeightBold]
                                                                       }];
     
-    [self.mediaCollection reloadData];
+    [self setBackgroundViewImage:self.backgroundImage];
+    [self.page setTextColor:self.backgroundColor];
+    [self.mediaCollection setCommentColor:self.backgroundColor.lighterColor];
+    
+    [self.view setNeedsDisplay];
 }
 
 - (void) setupTapGestureRecognizerForExit
@@ -296,7 +307,7 @@ typedef void(^UsersBlock)(NSArray<User*>* users);
 - (IBAction)editProfileMedia:(id)sender
 {
     __LF
-    MediaPickerMediaBlock handler = ^(ProfileMediaTypes mediaType,
+    MediaPickerMediaInfoBlock handler = ^(ProfileMediaTypes mediaType,
                                       NSData *thumbnailData,
                                       NSString *thumbnailFile,
                                       NSString *mediaFile,
@@ -317,31 +328,19 @@ typedef void(^UsersBlock)(NSArray<User*>* users);
         }
     };
     
-    [MediaPicker addMediaOnViewController:self withMediaHandler:handler];
+    [MediaPicker addMediaOnViewController:self withMediaInfoHandler:handler];
 }
 
 - (void)collectionAddMedia
 {
     __LF
-    MediaPickerMediaBlock handler = ^(ProfileMediaTypes mediaType,
-                                      NSData *thumbnailData,
-                                      NSString *thumbnailFile,
-                                      NSString *mediaFile,
-                                      CGSize mediaSize,
-                                      BOOL isRealMedia)
-    {
+    MediaPickerUserMediaBlock handler = ^(UserMedia *media) {
         if (self.editable) {
             UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"JUST 1 SEC" message:@"enter comment for your media" preferredStyle:UIAlertControllerStyleAlert];
             
             [alert addTextFieldWithConfigurationHandler:nil];
             [alert addAction:[UIAlertAction actionWithTitle:@"SAVE" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                UserMedia *media = [UserMedia object];
-                media.mediaSize = mediaSize;
-                media.mediaFile = mediaFile;
-                media.thumbailFile = thumbnailFile;
-                media.mediaType = mediaType;
                 media.userId = self.user.objectId;
-                media.isRealMedia = isRealMedia;
                 media.comment = [alert.textFields firstObject].text;
                 
                 NSUInteger index = self.user.media.count;
@@ -360,7 +359,7 @@ typedef void(^UsersBlock)(NSArray<User*>* users);
             NSLog(@"ERROR: Cannot add on other user media.");
         }
     };
-    [MediaPicker addMediaOnViewController:self withMediaHandler:handler];
+    [MediaPicker addMediaOnViewController:self withUserMediaHandler:handler];
 }
 
 - (void)collectionRemoveMedia:(UserMedia *)media

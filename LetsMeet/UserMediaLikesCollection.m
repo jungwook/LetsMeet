@@ -13,6 +13,7 @@
 #define kUserMediaCell @"UserMediaCell"
 #define kUserLikesCell @"UserLikesCell"
 #define kUserProfileHeader @"UserProfileHeader"
+#define kNearHeader @"NearHeader"
 
 #define kNumCellsPerRow 3
 #define kPadding 0
@@ -127,11 +128,12 @@
     [self registerNib:[UINib nibWithNibName:kUserMediaCell bundle:[NSBundle mainBundle]] forCellWithReuseIdentifier:kUserMediaCell];
     [self registerNib:[UINib nibWithNibName:kUserLikesCell bundle:[NSBundle mainBundle]] forCellWithReuseIdentifier:kUserLikesCell];
     [self registerNib:[UINib nibWithNibName:kAddMoreUserMediaCell bundle:[NSBundle mainBundle]] forCellWithReuseIdentifier:kAddMoreUserMediaCell];
-    [self registerNib:[UINib nibWithNibName:kUserProfileHeader bundle:[NSBundle mainBundle]] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kUserProfileHeader];
+//    [self registerNib:[UINib nibWithNibName:kUserProfileHeader bundle:[NSBundle mainBundle]] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kUserProfileHeader];
+    [self registerNib:[UINib nibWithNibName:kNearHeader bundle:[NSBundle mainBundle]] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kNearHeader];
 
     
     self.commentColor = [UIColor darkGrayColor];
-    self.commentFont = [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:11];
+    self.commentFont = nil;
     self.backgroundColor = [UIColor groupTableViewBackgroundColor];
     self.alwaysBounceVertical = YES;
     self.allowsSelection = YES;
@@ -390,8 +392,10 @@
 {
     UserMediaLikesCollectionSections section = indexPath.section;
     if (kind == UICollectionElementKindSectionHeader) {
-        UserProfileHeader *header = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kUserProfileHeader forIndexPath:indexPath];
-        header.title.textColor = [UIColor darkGrayColor];
+//        UserProfileHeader *header = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kUserProfileHeader forIndexPath:indexPath];
+        NearHeader *header = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kNearHeader forIndexPath:indexPath];
+        header.title.textColor = self.commentColor;
+        header.title.font = self.commentFont ? self.commentFont : header.title.font;
         switch (section) {
             case kSectionUserMedia:
                 header.title.text = [NSString stringWithFormat:@"USER PHOTOS (%ld)", self.media.count];

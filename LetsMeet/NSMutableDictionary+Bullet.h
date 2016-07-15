@@ -130,6 +130,17 @@ typedef void(^UsersReadyBlock)(NSArray* users);
 - (void) saved:(SavedNoErrorBlock)handler;
 @end
 
+@interface UserPost : PFObject<PFSubclassing>
+@property (retain) NSString* userId;
+@property (retain) NSString* nickname;
+@property (retain) NSString* thumbnail;
+@property (retain) NSString* title;
+@property (retain) NSArray* posts;
+@property (retain) PFGeoPoint *location;
++ (instancetype)mine;
+- (void) fetched:(FetchedNoErrorBlock)handler;
+@end
+
 @interface User : PFUser<PFSubclassing>
 @property (retain) NSString* nickname;
 @property (retain) PFGeoPoint* location;
@@ -159,4 +170,6 @@ typedef void(^UsersReadyBlock)(NSArray* users);
 - (void) fetched:(FetchedNoErrorBlock)handler;
 - (void) saved:(SavedNoErrorBlock)handler;
 @end
+
+
 

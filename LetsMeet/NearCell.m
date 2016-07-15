@@ -11,7 +11,7 @@
 
 @interface NearCell()
 @property (weak, nonatomic) IBOutlet UIView *back;
-@property (weak, nonatomic) IBOutlet UIView *photo;
+@property (weak, nonatomic) IBOutlet UIButton *photo;
 @end
 
 @implementation NearCell
@@ -22,26 +22,47 @@
     [super awakeFromNib];
     self.back.layer.cornerRadius = 2.0f;
     self.back.layer.masksToBounds = YES;
+    self.back.userInteractionEnabled = NO;
 }
+
 - (void)setUser:(User *)user
 {
     _user = user;
     [self.user fetched:^{
         NSData *data = [S3File objectForKey:self.user.thumbnail];
         if (data) {
-            drawImage([UIImage imageWithData:data], self.photo);
+            [self.photo setImage:[UIImage imageWithData:data] forState:UIControlStateNormal];
         }
         else {
             [S3File getDataFromFile:self.user.thumbnail completedBlock:^(NSData *data, NSError *error, BOOL fromCache) {
                 if (error || !data) {
-                    drawImage(self.user.sexImage, self.photo);
+                    [self.photo setImage:self.user.sexImage forState:UIControlStateNormal];
                 }
                 else {
-                    drawImage([UIImage imageWithData:data], self.photo);
+                    [self.photo setImage:[UIImage imageWithData:data] forState:UIControlStateNormal];
                 }
             }];
         }
     }];
 }
+
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    [super touchesBegan:touches withEvent:event];
+    self.photo.highlighted = YES;
+}
+
+-(void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    [super touchesEnded:touches withEvent:event];
+    self.photo.highlighted = NO;
+}
+
+- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    [super touchesCancelled:touches withEvent:event];
+    self.photo.highlighted = NO;
+}
+
 
 @end

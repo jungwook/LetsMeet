@@ -20,6 +20,8 @@
 #define MAIN_SCREEN_ID @"Profile"
 #undef MAIN_SCREEN_ID
 #define MAIN_SCREEN_ID @"Near"
+#undef MAIN_SCREEN_ID
+#define MAIN_SCREEN_ID @"Say"
 
 @interface MainController ()
 @end
@@ -39,14 +41,10 @@
     
     User *user = [User me];
     if (user) {
-        [user fetchInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
-            if (!error) {
-                [[FileSystem new] initializeSystem];
-                [self initializeMainViewControllerToScreenId:MAIN_SCREEN_ID];
-            }
-            else {
-                NSLog(@"ERROR:%@", error.localizedDescription);
-            }
+        [user fetched:^{
+            [user saveInBackground];
+            [[FileSystem new] initializeSystem];
+            [self initializeMainViewControllerToScreenId:MAIN_SCREEN_ID];
         }];
     }
     else {
