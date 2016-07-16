@@ -139,6 +139,8 @@ typedef void(^UsersReadyBlock)(NSArray* users);
 @property (retain) PFGeoPoint *location;
 + (instancetype)mine;
 - (void) fetched:(FetchedNoErrorBlock)handler;
+- (void) loaded:(FetchedNoErrorBlock)handler;
+- (CGFloat)estimatedViewHeightOnWidth:(CGFloat)width usingTextFont:(UIFont *)textFont andCommentFont:(UIFont*)commentFont edgeIndest:(UIEdgeInsets)inset;
 @end
 
 @interface User : PFUser<PFSubclassing>

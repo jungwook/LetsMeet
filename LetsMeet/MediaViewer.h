@@ -15,6 +15,8 @@
 @property (nonatomic, assign) BOOL showsShadow;
 @property (nonatomic, assign) BOOL showsSex;
 @property (nonatomic, assign) BOOL showsBorder;
+@property (nonatomic, readonly) UIImage* image;
+@property (nonatomic, strong) UserMedia *media;
 - (void) setImage:(UIImage *)image;
 - (void) loadMediaFromMessage:(Bullet*)message completion:(S3GetBlock)block;
 - (void) loadMediaFromUserMedia:(UserMedia*)media animated:(BOOL)animated;

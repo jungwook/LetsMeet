@@ -26,7 +26,6 @@
 
 - (instancetype) initWithCoder:(NSCoder *)aDecoder
 {
-//    __LF
     self = [super initWithCoder:aDecoder];
     if (self) {
         [self initialize];
@@ -36,8 +35,17 @@
 
 - (instancetype) init
 {
-//    __LF
     self = [super init];
+    if (self) {
+        [self initialize];
+        [self awakeFromNib];
+    }
+    return self;
+}
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
     if (self) {
         [self initialize];
         [self awakeFromNib];
@@ -187,6 +195,11 @@
     }
 }
 
+- (UIImage *)image
+{
+    return [self imageForState:UIControlStateNormal];
+}
+
 - (UIImage*) imageFromFile:(id)filename mediaType:(MediaTypes)mediaType
 {
     switch (mediaType) {
@@ -269,6 +282,7 @@
 
 - (void)loadMediaFromUserMedia:(UserMedia *)media completion:(S3GetBlock)block
 {
+    self.media = media;
     self.playBut.hidden = YES;
 
     [media fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {
@@ -289,6 +303,7 @@
 
 - (void)loadMediaFromUserMedia:(UserMedia *)media animated:(BOOL)animated
 {
+    self.media = media;
     self.playBut.hidden = YES;
 
     [media fetchIfNeededInBackgroundWithBlock:^(PFObject * _Nullable object, NSError * _Nullable error) {

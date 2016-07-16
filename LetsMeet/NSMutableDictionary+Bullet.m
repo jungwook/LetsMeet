@@ -534,6 +534,13 @@
 
 @end
 
+
+@interface UserPost()
+{
+    NSNumber *count;
+}
+@end
+
 @implementation UserPost
 @dynamic userId, nickname, thumbnail, title, posts, location;
 
@@ -551,6 +558,71 @@
     post.thumbnail = me.thumbnail;
     
     return post;
+}
+
+CGRect getPostRect(NSString *string, UIFont *font, CGFloat maxWidth);
+
+- (CGFloat)estimatedViewHeightOnWidth:(CGFloat)width usingTextFont:(UIFont *)textFont andCommentFont:(UIFont*)commentFont edgeIndest:(UIEdgeInsets)inset
+{
+    const CGFloat imagePadding = 4.f;
+
+    __block CGFloat top = 0.f;
+    const CGFloat l = inset.left, r = inset.right, t = inset.top, b = inset.bottom;
+    const CGFloat w = width - l - r;
+    
+    [self.posts enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj isKindOfClass:[NSString class]]) {
+            CGRect rect = getPostRect(obj, textFont, w);
+            top += rect.size.height;
+        }
+        else if ([obj isKindOfClass:[UserMedia class]]) {
+            UserMedia *media = obj;
+            CGSize size = media.mediaSize;
+            if (size.width == 0 || size.height == 0) {
+                size = CGSizeMake(w, 0.75*w);
+            }
+            top+= w * size.height / size.width;
+            CGRect rect = getPostRect(media.comment, commentFont, w);
+            top += (rect.size.height+imagePadding);
+        }
+    }];
+    
+    return top + b + t;
+}
+
+- (void)loaded:(FetchedNoErrorBlock)handler
+{
+    if (!count) {
+        count = @(0.f);
+    }
+    [self fetched:^{
+        @synchronized (count) {
+            count = @(self.posts.count);
+        }
+        [self.posts enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if ([obj isKindOfClass:[NSString class]]) {
+                @synchronized (count) {
+                    count = @(count.floatValue - 1);
+                    if (count.floatValue == 0) {
+                        if (handler)
+                            handler();
+                    }
+                }
+            }
+            else if ([obj isKindOfClass:[UserMedia class]]) {
+                UserMedia *media = obj;
+                [media fetched:^{
+                    @synchronized (count) {
+                        count = @(count.floatValue - 1);
+                        if (count.floatValue == 0) {
+                            if (handler)
+                                handler();
+                        }
+                    }
+                }];
+            }
+        }];
+    }];
 }
 
 - (void)fetched:(FetchedNoErrorBlock)handler

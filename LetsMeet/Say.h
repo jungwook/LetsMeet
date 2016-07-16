@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "SayLayout.h"
 
-CGRect __rect(NSString *string, UIFont *font, CGFloat maxWidth);
+CGRect getPostRect(NSString *string, UIFont *font, CGFloat maxWidth);
 
 @interface Say : UIViewController <UICollectionViewDelegate, UICollectionViewDataSource, SayDelegateLayout>
 
