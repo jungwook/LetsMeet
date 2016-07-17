@@ -15,7 +15,6 @@
 
 
 @interface Say ()
-@property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (strong, nonatomic) NSArray *posts;
 @property (strong, nonatomic) NSMutableDictionary *heights;
 @property (strong, nonatomic) UIFont *textFont;
@@ -37,8 +36,9 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGF
     [super viewDidLoad];
     
     self.viewDic = [NSMutableDictionary dictionary];
+    [self.collectionView setBackgroundView:nil];
+    [self.collectionView setBackgroundColor:[UIColor groupTableViewBackgroundColor]];
     [self.collectionView registerNib:[UINib nibWithNibName:kCellIdentifier bundle:[NSBundle mainBundle]] forCellWithReuseIdentifier:kCellIdentifier];
-    [self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"Cell"];
     [self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:SayElementKindSectionHeader withReuseIdentifier:SayElementKindSectionHeader];
     [self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:SayElementKindSectionFooter withReuseIdentifier:SayElementKindSectionFooter];
     
@@ -50,11 +50,11 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGF
     layout.minimumInteritemSpacing = 10;
 
     layout.sectionInset = UIEdgeInsetsMake(10, 10, 10, 10);
-    layout.headerHeight = 10;
-    layout.footerHeight = 10;
+//    layout.headerHeight = 10;
+//    layout.footerHeight = 10;
     
-    layout.headerInset = UIEdgeInsetsMake(10, 0, 10, 0);
-    layout.footerInset = UIEdgeInsetsMake(10, 0, 10, 0);
+    layout.headerInset = UIEdgeInsetsZero;
+    layout.footerInset = UIEdgeInsetsZero;
     
     self.heights = [NSMutableDictionary dictionary];
     
@@ -76,20 +76,41 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGF
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
         [objects enumerateObjectsUsingBlock:^(UserPost* _Nonnull post, NSUInteger idx, BOOL * _Nonnull stop) {
             [post loaded:^{
-                UserPostView *pv = [[UserPostView alloc] initWithWidth:self.cellWidth];
-                [self.viewDic setObject:pv forKey:post.objectId];
-                self.posts = [self sortedArrayByAddingAnObject:post toSortedArray:self.posts];
-                [self.collectionView reloadData];
+                User *user = [User objectWithoutDataWithObjectId:post.userId];
+                [user fetched:^{
+                    UserPostView *pv = [[UserPostView alloc] initWithWidth:self.cellWidth properties:nil];
+                    [self.viewDic setObject:pv forKey:post.objectId];
+                    [pv setLoadedPost:post andUser:user ready:^{
+                        [self.collectionView performBatchUpdates:^{
+                            self.posts = [self sortedArrayByAddingAnObject:post toSortedArray:self.posts];
+                            NSInteger index = [self.posts indexOfObject:post];
+                            [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:index inSection:0]]];
+                        } completion:nil];
+                    }];
+                }];
             }];
         }];
     }];
 }
 
+- (NSInteger)insertPost:(UserPost*)postToInsert
+{
+    __block NSInteger index =0;
+    [self.posts enumerateObjectsUsingBlock:^(UserPost* _Nonnull post, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (postToInsert.createdAt > post.createdAt) {
+            *stop = YES;
+        }
+        index++;
+    }];
+    return index;
+}
+
+
 - (NSArray*)sortedArrayByAddingAnObject:(id)object toSortedArray:(NSArray*)objects
 {
     NSMutableArray *temp = [NSMutableArray arrayWithArray:objects];
     [temp addObject:object];
-    return [temp sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"updatedAt" ascending:YES]]];
+    return [temp sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"updatedAt" ascending:NO]]];
 }
 
 /*
@@ -123,22 +144,18 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGF
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     __LF
-    UserPost *post = [self.posts objectAtIndex:indexPath.row];
-    UserPostView *pv = [self.viewDic objectForKey:post.objectId];
     SayCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier forIndexPath:indexPath];
-    cell.backgroundColor = [UIColor whiteColor];
-    cell.post = [self.posts objectAtIndex:indexPath.item];
-    cell.textFont = self.textFont;
-    cell.commentFont = self.commentFont;
-    cell.commentColor = [UIColor redColor];
-    cell.textColor = [UIColor yellowColor];
-    cell.titleFont = [UIFont boldSystemFontOfSize:11];
-    cell.nicknameFont = [UIFont boldSystemFontOfSize:11];
-    cell.dateFont = [UIFont systemFontOfSize:9];
-    cell.userPostView = pv;
+    cell.userPostView = [self postViewAtIndexPath:indexPath];
     return cell;
 }
 
+- (UserPostView*)postViewAtIndexPath:(NSIndexPath*)indexPath
+{
+    UserPost *post = [self.posts objectAtIndex:indexPath.row];
+    return [self.viewDic objectForKey:post.objectId];
+}
+
+/*
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
     __LF
@@ -159,13 +176,11 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGF
     return reusableView;
 }
 
+*/
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    UserPost *post = [self.posts objectAtIndex:indexPath.row];
-    UserPostView *pv = [self.viewDic objectForKey:post.objectId];
-    return CGSizeMake(self.cellWidth, 500);
-    return CGSizeMake(self.cellWidth, pv.viewHeight);
+    return CGSizeMake(self.cellWidth, [self postViewAtIndexPath:indexPath].viewHeight);
 }
 
 @end
