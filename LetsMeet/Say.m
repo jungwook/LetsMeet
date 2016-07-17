@@ -9,6 +9,7 @@
 #import "Say.h"
 #import "SayCell.h"
 #import "S3File.h"
+#import "UserPostView.h"
 
 #define kCellIdentifier @"SayCell"
 
@@ -20,10 +21,11 @@
 @property (strong, nonatomic) UIFont *textFont;
 @property (strong, nonatomic) UIFont *commentFont;
 @property (nonatomic) CGFloat cellWidth;
+@property (strong, nonatomic) NSMutableDictionary *viewDic;
+
 @end
 
 @implementation Say
-
 
 CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGFloat cpr)
 {
@@ -34,6 +36,7 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGF
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.viewDic = [NSMutableDictionary dictionary];
     [self.collectionView registerNib:[UINib nibWithNibName:kCellIdentifier bundle:[NSBundle mainBundle]] forCellWithReuseIdentifier:kCellIdentifier];
     [self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"Cell"];
     [self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:SayElementKindSectionHeader withReuseIdentifier:SayElementKindSectionHeader];
@@ -66,13 +69,15 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGF
     // Dispose of any resources that can be recreated.
 }
 
-- (void) loadPosts {
-
+- (void) loadPosts
+{
     PFQuery *query = [UserPost query];
     [query orderByAscending:@"updatedAt"];
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
         [objects enumerateObjectsUsingBlock:^(UserPost* _Nonnull post, NSUInteger idx, BOOL * _Nonnull stop) {
             [post loaded:^{
+                UserPostView *pv = [[UserPostView alloc] initWithWidth:self.cellWidth];
+                [self.viewDic setObject:pv forKey:post.objectId];
                 self.posts = [self sortedArrayByAddingAnObject:post toSortedArray:self.posts];
                 [self.collectionView reloadData];
             }];
@@ -118,14 +123,19 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGF
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     __LF
+    UserPost *post = [self.posts objectAtIndex:indexPath.row];
+    UserPostView *pv = [self.viewDic objectForKey:post.objectId];
     SayCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier forIndexPath:indexPath];
     cell.backgroundColor = [UIColor whiteColor];
     cell.post = [self.posts objectAtIndex:indexPath.item];
     cell.textFont = self.textFont;
     cell.commentFont = self.commentFont;
+    cell.commentColor = [UIColor redColor];
+    cell.textColor = [UIColor yellowColor];
     cell.titleFont = [UIFont boldSystemFontOfSize:11];
     cell.nicknameFont = [UIFont boldSystemFontOfSize:11];
     cell.dateFont = [UIFont systemFontOfSize:9];
+    cell.userPostView = pv;
     return cell;
 }
 
@@ -152,9 +162,10 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGF
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    __LF
-    CGFloat height = [[self.posts objectAtIndex:indexPath.row] estimatedViewHeightOnWidth:self.cellWidth usingTextFont:self.textFont andCommentFont:self.commentFont edgeIndest:UIEdgeInsetsMake(67, 8, 0, 8)];
-    return CGSizeMake(self.cellWidth, height);
+    UserPost *post = [self.posts objectAtIndex:indexPath.row];
+    UserPostView *pv = [self.viewDic objectForKey:post.objectId];
+    return CGSizeMake(self.cellWidth, 500);
+    return CGSizeMake(self.cellWidth, pv.viewHeight);
 }
 
 @end

@@ -7,11 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Say.h"
+#import "UserPostView.h"
 
 @interface SayCell : UICollectionViewCell
 @property (nonatomic, weak) UserPost *post;
-@property (nonatomic) CGFloat postHeight;
+@property (nonatomic, weak) UserPostView* userPostView;
 
 @property (nonatomic, strong) UIColor *textColor;
 @property (nonatomic, strong) UIColor *titleColor;

@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface UserPostView : UIView
-@property (nonatomic, strong) UserPost *post;
+@property (nonatomic) CGFloat viewHeight;
 
 @property (nonatomic, strong) UIColor *textColor;
 @property (nonatomic, strong) UIColor *titleColor;
@@ -23,4 +23,6 @@
 @property (nonatomic, strong) UIFont *nicknameFont;
 @property (nonatomic, strong) UIFont *commentFont;
 
+- (void)setLoadedPost:(UserPost*)post andUser:(User*)user;
+- (instancetype)initWithWidth:(CGFloat)width;
 @end

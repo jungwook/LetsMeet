@@ -12,6 +12,9 @@
 #define kPostStartTag 1199
 
 @interface UserPostView()
+@property (nonatomic, weak) UserPost *post;
+@property (nonatomic, weak) User *user;
+
 @property (nonatomic) CGFloat width;
 @property (nonatomic) UIEdgeInsets titleInset;
 @property (nonatomic) UIEdgeInsets textInset;
@@ -66,14 +69,32 @@
     self.nickname = [UILabel new];
     self.date = [UILabel new];
     self.title = [UILabel new];
+    
+    [self addSubview:self.photo];
+    [self addSubview:self.nickname];
+    [self addSubview:self.date];
+    [self addSubview:self.title];
     roundCorner(self.photo);
 }
 
 - (void)initializePostViews
 {
     __block NSInteger index = 0;
+    [self.photo loadMediaFromUser:self.user animated:NO];
+    self.nickname.text = self.post.nickname;
+    self.nickname.font = self.nicknameFont;
+    self.nickname.textColor = self.nicknameColor;
+    
+    self.date.text = [NSDateFormatter localizedStringFromDate:self.post.updatedAt dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterMediumStyle];
+    self.date.font = self.dateFont;
+    self.date.textColor = self.dateColor;
+    
+    self.title.text = self.post.title;
+    self.title.font = self.titleFont;
+    self.title.textColor = self.titleColor;
+    
     [self.post.posts enumerateObjectsUsingBlock:^(id _Nonnull line, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (line && [line isKindOfClass:[UILabel class]]) {
+        if (line && [line isKindOfClass:[NSString class]]) {
             [self addSubview:[self labelAtIndex:kPostStartTag+index++ line:line font:self.textFont color:self.textColor]];
         }
         else if (line && [line isKindOfClass:[UserMedia class]]){
@@ -107,13 +128,12 @@
     return view;
 }
 
-- (void)setPost:(UserPost *)post
+- (void)setLoadedPost:(UserPost*)post andUser:(User*)user
 {
-    [post loaded:^{
-        _post = post;
-        [self initializePostViews];
-        [self setNeedsLayout];
-    }];
+    _post = post;
+    _user = user;
+    [self initializePostViews];
+    [self setNeedsLayout];
 }
 
 #define sF(__X__) __X__.frame.origin.x
@@ -121,14 +141,9 @@
 #define tF(__X__) __X__.frame.origin.y
 #define bF(__X__) (__X__.frame.origin.y+__X__.frame.size.height)
 
-
-CGFloat xFR(UIView* v)
-{
-    return v.frame.origin.x;
-}
-
 - (void)layoutSubviews
 {
+    __LF
     const CGFloat photoSize = 30, w = self.bounds.size.width, p = self.padding;
     
     [super layoutSubviews];
@@ -146,22 +161,29 @@ CGFloat xFR(UIView* v)
             view = viewWithTag(self, kPostStartTag+index++);
             if (view && [view isKindOfClass:[UILabel class]]) {
                 UILabel *label = (UILabel*)view;
-                CGFloat h = heightWithPadding(label.text, label.font, w-p-p);
-                label.frame = CGRectMake(p, top, w-p-p, h+4);
-                top += bF(label);
+                CGFloat h = labelHeight(label.text, label.font, w-p-p);
+                view.frame = CGRectMake(p, top, w-p-p, h+4);
+                top += bF(view);
+                _viewHeight = top;
             }
             else if (view && [view isKindOfClass:[MediaView class]]) {
                 MediaView *mediaView = (MediaView*)view;
                 CGSize size = mediaView.media.mediaSize;
                 CGFloat h = (w-p-p)*size.height/size.width;
-                mediaView.frame = CGRectMake(p, top+p, w-p-p, h);
-                top+=bF(mediaView);
+                view.frame = CGRectMake(p, top+p, w-p-p, h);
+                top+=bF(view);
+                _viewHeight = top;
             }
         } while(view);
     }
 }
 
-CGFloat heightWithPadding(NSString *string, UIFont *font, CGFloat maxWidth)
+- (CGFloat) viewHeight
+{
+    return _viewHeight + self.padding;
+}
+
+CGFloat labelHeight(NSString *string, UIFont *font, CGFloat maxWidth)
 {
     string = [string stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     

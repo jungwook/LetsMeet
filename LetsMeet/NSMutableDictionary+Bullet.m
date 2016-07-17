@@ -560,6 +560,65 @@
     return post;
 }
 
+- (UIImage*) postImageWithWidth:(CGFloat)width textFont:(UIFont *)textFont commentFont:(UIFont*)commentFont
+{
+    CGSize size = CGSizeMake(width, [self imageHeightWithWidth:width textFont:textFont commentFont:commentFont]);
+
+    UIGraphicsBeginImageContext(size);
+    UIImage *retImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    __block CGFloat top = 0.f;
+    const CGFloat p = 4;
+    [self.posts enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj isKindOfClass:[NSString class]]) {
+            CGFloat h = labelHeight(obj, textFont, width);
+            top += (h+p);
+        }
+        else if ([obj isKindOfClass:[UserMedia class]]) {
+            UserMedia *media = obj;
+            CGSize size = media.mediaSize;
+            if (size.width == 0 || size.height == 0) {
+                size = CGSizeMake(width, 0.75*width);
+            }
+            top+= (p+ width * size.height / size.width);
+            CGFloat h = labelHeight(media.comment, commentFont, width);
+            top += (h+p);
+        }
+    }];
+    
+    
+    UIGraphicsEndImageContext();
+    
+    return retImage;
+}
+
+CGFloat labelHeight(NSString *string, UIFont *font, CGFloat maxWidth);
+
+- (CGFloat) imageHeightWithWidth:(CGFloat)width textFont:(UIFont *)textFont commentFont:(UIFont*)commentFont
+{
+    const CGFloat p = 4.f;
+    __block CGFloat top = 0.f;
+    
+    [self.posts enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj isKindOfClass:[NSString class]]) {
+            CGFloat h = labelHeight(obj, textFont, width);
+            top += (h+p);
+        }
+        else if ([obj isKindOfClass:[UserMedia class]]) {
+            UserMedia *media = obj;
+            CGSize size = media.mediaSize;
+            if (size.width == 0 || size.height == 0) {
+                size = CGSizeMake(width, 0.75*width);
+            }
+            top+= (p+ width * size.height / size.width);
+            CGFloat h = labelHeight(media.comment, commentFont, width);
+            top += (h+p);
+        }
+    }];
+    
+    return top;
+}
+/*
 CGRect getPostRect(NSString *string, UIFont *font, CGFloat maxWidth);
 
 - (CGFloat)estimatedViewHeightOnWidth:(CGFloat)width usingTextFont:(UIFont *)textFont andCommentFont:(UIFont*)commentFont edgeIndest:(UIEdgeInsets)inset
@@ -589,7 +648,7 @@ CGRect getPostRect(NSString *string, UIFont *font, CGFloat maxWidth);
     
     return top + b + t;
 }
-
+*/
 - (void)loaded:(FetchedNoErrorBlock)handler
 {
     if (!count) {
