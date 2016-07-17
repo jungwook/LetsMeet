@@ -11,15 +11,13 @@
 
 @interface UserLikesCell()
 @property (weak, nonatomic) IBOutlet UIButton *photo;
-//@property (weak, nonatomic) UserMediaLikesCollection *parent;
 @end
 
 @implementation UserLikesCell
 
 - (void)awakeFromNib
 {
-    self.photo.layer.cornerRadius = 4.0f;
-    self.photo.layer.masksToBounds = YES;
+    roundCorner(self.photo);
 }
 
 -(instancetype)initWithFrame:(CGRect)frame

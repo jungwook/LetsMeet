@@ -22,8 +22,7 @@
 
 - (void)awakeFromNib
 {
-    self.back.layer.cornerRadius = 2.0f;
-    self.back.layer.masksToBounds = YES;    
+    roundCorner(self.back);
     setShadowOnView(self.delete, 1.5f, 0.4f);
 }
 

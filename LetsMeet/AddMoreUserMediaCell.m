@@ -16,9 +16,7 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
-    
-    self.back.layer.cornerRadius = 2.0f;
-    self.back.layer.masksToBounds = YES;
+    roundCorner(self.back);
 }
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor

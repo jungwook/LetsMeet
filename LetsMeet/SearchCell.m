@@ -26,16 +26,10 @@
     [super awakeFromNib];
     self.system = [FileSystem new];
     
-    [self setCornerRadiusOnView:self.distance radius:2.0f];
-    [self setCornerRadiusOnView:self.badge radius:2.0f];
+    roundCorner(self.distance);
+    roundCorner(self.badge);
     [self.photo setIsCircle:YES];
     [self.photo setShowsShadow:YES];
-}
-
-- (void) setCornerRadiusOnView:(UIView*) view radius:(CGFloat)radius;
-{
-    view.layer.cornerRadius = radius;
-    view.layer.masksToBounds = YES;
 }
 
 - (void) setUser:(User*)user tableView:(UITableView*)tableView

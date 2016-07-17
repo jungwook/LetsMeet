@@ -52,6 +52,7 @@
 //                                                    [NSNumber numberWithFloat:0.9f],
 //                                                    [NSNumber numberWithFloat:1.0f],
 //                                                    nil];
+        
         ((CAGradientLayer*)self.layer).cornerRadius = 2.0f;
         ((CAGradientLayer*)self.layer).masksToBounds = YES;
     }

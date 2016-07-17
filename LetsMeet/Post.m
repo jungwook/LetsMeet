@@ -56,7 +56,7 @@
 {
     [super awakeFromNib];
     
-    self.photo.layer.cornerRadius = 2.0f;
+    roundCorner(self.photo);
     self.tableView.backgroundView = nil;
     self.tableView.backgroundColor = [UIColor clearColor];
     self.tableView.delegate = self;

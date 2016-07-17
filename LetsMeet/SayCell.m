@@ -72,18 +72,6 @@ CGRect getPostRect(NSString *string, UIFont *font, CGFloat maxWidth)
     }];
 }
 
-UIView* viewWithTag(UIView *view, NSInteger tag)
-{
-    __block UIView *retView = nil;
-    [view.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (obj.tag == tag) {
-            retView = obj;
-            *stop = YES;
-        }
-    }];
-    return retView;
-}
-
 - (void)layoutSubviews
 {
     const CGFloat imagePadding = 4.f;
@@ -146,8 +134,7 @@ UIView* viewWithTag(UIView *view, NSInteger tag)
                 MediaView *mediaView = [[MediaView alloc] initWithFrame:CGRectMake(l, top+imagePadding, w, w*image.size.height/image.size.width)];
                 [mediaView loadMediaFromUserMedia:media animated:NO];
                 [mediaView setTag:kPostStartTag+counter++];
-                mediaView.layer.cornerRadius = 2.0f;
-                mediaView.layer.masksToBounds = YES;
+                roundCorner(mediaView);
                 [self addSubview:mediaView];
                 top+=(imagePadding+w*image.size.height/image.size.width);
             }

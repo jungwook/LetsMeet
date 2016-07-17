@@ -86,6 +86,7 @@
 		12A7E3921D27620700592CFA /* Map.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A7E3911D27620700592CFA /* Map.m */; };
 		12D168EE1D3897A70092322A /* SayCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 12D168ED1D3897A70092322A /* SayCell.m */; };
 		12D168F01D3897B20092322A /* SayCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 12D168EF1D3897B20092322A /* SayCell.xib */; };
+		12D168F31D3B11540092322A /* UserPostView.m in Sources */ = {isa = PBXBuildFile; fileRef = 12D168F21D3B11540092322A /* UserPostView.m */; };
 		12DB01B21D0E317700E33359 /* Chat.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB01B11D0E317700E33359 /* Chat.m */; };
 		12DE5FA91CFD43A7009B315F /* Balloon.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FA81CFD43A7009B315F /* Balloon.m */; };
 		12DE5FB31CFEF58A009B315F /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12DE5FB21CFEF58A009B315F /* Photos.framework */; };
@@ -282,6 +283,8 @@
 		12D168EC1D3897A70092322A /* SayCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SayCell.h; sourceTree = "<group>"; };
 		12D168ED1D3897A70092322A /* SayCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SayCell.m; sourceTree = "<group>"; };
 		12D168EF1D3897B20092322A /* SayCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SayCell.xib; sourceTree = "<group>"; };
+		12D168F11D3B11540092322A /* UserPostView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserPostView.h; sourceTree = "<group>"; };
+		12D168F21D3B11540092322A /* UserPostView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserPostView.m; sourceTree = "<group>"; };
 		12DB01B01D0E317700E33359 /* Chat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chat.h; sourceTree = "<group>"; };
 		12DB01B11D0E317700E33359 /* Chat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Chat.m; sourceTree = "<group>"; };
 		12DE5FA71CFD43A7009B315F /* Balloon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Balloon.h; sourceTree = "<group>"; };
@@ -553,6 +556,8 @@
 				12D168EF1D3897B20092322A /* SayCell.xib */,
 				12D168EC1D3897A70092322A /* SayCell.h */,
 				12D168ED1D3897A70092322A /* SayCell.m */,
+				12D168F11D3B11540092322A /* UserPostView.h */,
+				12D168F21D3B11540092322A /* UserPostView.m */,
 			);
 			name = Say;
 			sourceTree = "<group>";
@@ -912,6 +917,7 @@
 				12DE5FA91CFD43A7009B315F /* Balloon.m in Sources */,
 				124928B81CF2ED810038A2F3 /* UIBarButtonItem+Badge.m in Sources */,
 				1285AAF41D331B3B00F508AC /* UserLikesCell.m in Sources */,
+				12D168F31D3B11540092322A /* UserPostView.m in Sources */,
 				126AF40B1CEDAE0E00E3ED67 /* IndentedLabel.m in Sources */,
 				1285AB421D35F2D100F508AC /* SayBarButtonItem.m in Sources */,
 				125AEF3C1CF9F08300553475 /* SimulatedUsers.m in Sources */,

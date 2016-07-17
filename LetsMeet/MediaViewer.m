@@ -24,20 +24,10 @@
 
 @implementation MediaView
 
-- (instancetype) initWithCoder:(NSCoder *)aDecoder
-{
-    self = [super initWithCoder:aDecoder];
-    if (self) {
-        [self initialize];
-    }
-    return self;
-}
-
 - (instancetype) init
 {
     self = [super init];
     if (self) {
-        [self initialize];
         [self awakeFromNib];
     }
     return self;
@@ -47,7 +37,6 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        [self initialize];
         [self awakeFromNib];
     }
     return self;
@@ -55,7 +44,6 @@
 
 - (void)awakeFromNib
 {
-//    __LF
     self.backgroundColor = [UIColor clearColor];
     [self setupPlayButton];
     self.imageView.backgroundColor = [UIColor blackColor];
@@ -68,6 +56,7 @@
         [self updateBadge];
     }];
     [self.notifications on];
+    [self addTarget:self action:@selector(tapped:) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void) setupPlayButton
@@ -139,12 +128,6 @@
 {
     _user = user;
 //    [self updateBadge];
-}
-
-- (void) initialize
-{
-//    __LF
-    [self addTarget:self action:@selector(tapped:) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void) tapped:(id)sender

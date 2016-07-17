@@ -42,6 +42,12 @@ void circleizeView(UIView* view, CGFloat percent)
     view.layer.masksToBounds = YES;
 }
 
+void roundCorner(UIView* view)
+{
+    view.layer.cornerRadius = 2.0f;
+    view.layer.masksToBounds = YES;
+}
+
 #define degreesToRadians(x) (M_PI * x / 180.0)
 #define radiansToDegrees(x) (x * 180.0 / M_PI)
 
@@ -202,6 +208,19 @@ CGFloat widthForNumberOfCells(UICollectionView* cv, UICollectionViewFlowLayout *
 {
     return (CGRectGetWidth(cv.bounds) - flowLayout.sectionInset.left - flowLayout.sectionInset.right - flowLayout.minimumInteritemSpacing * (cpr - 1))/cpr;
 }
+
+UIView* viewWithTag(UIView *view, NSInteger tag)
+{
+    __block UIView *retView = nil;
+    [view.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (obj.tag == tag) {
+            retView = obj;
+            *stop = YES;
+        }
+    }];
+    return retView;
+}
+
 
 
 
