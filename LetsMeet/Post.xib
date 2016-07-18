@@ -50,7 +50,7 @@
                                             <constraint firstAttribute="height" constant="50" id="Fm1-Xf-vM8"/>
                                         </constraints>
                                     </imageView>
-                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Title is optional" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="cw7-E3-7nI" customClass="BorderedTextView">
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Select a purpose" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="cw7-E3-7nI" customClass="BorderedTextView">
                                         <rect key="frame" x="20" y="113" width="334" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="40" id="sDY-iJ-a27"/>
@@ -107,7 +107,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>
-                                <color key="backgroundColor" white="1" alpha="0.80458192569999998" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" red="0.97963035106658936" green="0.97960102558135986" blue="0.97961771488189697" alpha="0.80057010135135132" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="cDv-Hi-kEy" secondAttribute="trailing" constant="8" id="2T0-q0-gdi"/>
                                     <constraint firstItem="IGP-ji-L6r" firstAttribute="leading" secondItem="ggW-ri-PtP" secondAttribute="trailing" constant="8" id="3f8-sf-gkU"/>

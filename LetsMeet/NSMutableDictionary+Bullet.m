@@ -542,7 +542,7 @@
 @end
 
 @implementation UserPost
-@dynamic userId, nickname, thumbnail, title, posts, location;
+@dynamic user, title, posts, location;
 
 + (NSString *)parseClassName {
     return @"UserPost";
@@ -550,12 +550,8 @@
 
 + (instancetype)mine
 {
-    User *me = [User me];
-    
     UserPost *post = [UserPost new];
-    post.userId = me.objectId;
-    post.nickname = me.nickname;
-    post.thumbnail = me.thumbnail;
+    post.user = [User me];
     
     return post;
 }
@@ -566,22 +562,12 @@
         count = @(0.f);
     }
     [self fetched:^{
-        @synchronized (count) {
-            count = @(self.posts.count);
-        }
-        [self.posts enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if ([obj isKindOfClass:[NSString class]]) {
-                @synchronized (count) {
-                    count = @(count.floatValue - 1);
-                    if (count.floatValue == 0) {
-                        if (handler)
-                            handler();
-                    }
-                }
+        [self.user fetched:^{
+            @synchronized (count) {
+                count = @(self.posts.count);
             }
-            else if ([obj isKindOfClass:[UserMedia class]]) {
-                UserMedia *media = obj;
-                [media fetched:^{
+            [self.posts enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                if ([obj isKindOfClass:[NSString class]]) {
                     @synchronized (count) {
                         count = @(count.floatValue - 1);
                         if (count.floatValue == 0) {
@@ -589,8 +575,20 @@
                                 handler();
                         }
                     }
-                }];
-            }
+                }
+                else if ([obj isKindOfClass:[UserMedia class]]) {
+                    UserMedia *media = obj;
+                    [media fetched:^{
+                        @synchronized (count) {
+                            count = @(count.floatValue - 1);
+                            if (count.floatValue == 0) {
+                                if (handler)
+                                    handler();
+                            }
+                        }
+                    }];
+                }
+            }];
         }];
     }];
 }

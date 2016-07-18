@@ -87,6 +87,9 @@
 		12D168EE1D3897A70092322A /* SayCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 12D168ED1D3897A70092322A /* SayCell.m */; };
 		12D168F01D3897B20092322A /* SayCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 12D168EF1D3897B20092322A /* SayCell.xib */; };
 		12D168F31D3B11540092322A /* UserPostView.m in Sources */ = {isa = PBXBuildFile; fileRef = 12D168F21D3B11540092322A /* UserPostView.m */; };
+		12D168F61D3CA9740092322A /* FS.m in Sources */ = {isa = PBXBuildFile; fileRef = 12D168F51D3CA9740092322A /* FS.m */; };
+		12D168F91D3CD30D0092322A /* SayHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 12D168F81D3CD30D0092322A /* SayHeader.xib */; };
+		12D168FC1D3CD31E0092322A /* SayHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 12D168FB1D3CD31E0092322A /* SayHeader.m */; };
 		12DB01B21D0E317700E33359 /* Chat.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB01B11D0E317700E33359 /* Chat.m */; };
 		12DE5FA91CFD43A7009B315F /* Balloon.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DE5FA81CFD43A7009B315F /* Balloon.m */; };
 		12DE5FB31CFEF58A009B315F /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12DE5FB21CFEF58A009B315F /* Photos.framework */; };
@@ -285,6 +288,11 @@
 		12D168EF1D3897B20092322A /* SayCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SayCell.xib; sourceTree = "<group>"; };
 		12D168F11D3B11540092322A /* UserPostView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserPostView.h; sourceTree = "<group>"; };
 		12D168F21D3B11540092322A /* UserPostView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserPostView.m; sourceTree = "<group>"; };
+		12D168F41D3CA9740092322A /* FS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FS.h; sourceTree = "<group>"; };
+		12D168F51D3CA9740092322A /* FS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FS.m; sourceTree = "<group>"; };
+		12D168F81D3CD30D0092322A /* SayHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SayHeader.xib; sourceTree = "<group>"; };
+		12D168FA1D3CD31E0092322A /* SayHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SayHeader.h; sourceTree = "<group>"; };
+		12D168FB1D3CD31E0092322A /* SayHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SayHeader.m; sourceTree = "<group>"; };
 		12DB01B01D0E317700E33359 /* Chat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chat.h; sourceTree = "<group>"; };
 		12DB01B11D0E317700E33359 /* Chat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Chat.m; sourceTree = "<group>"; };
 		12DE5FA71CFD43A7009B315F /* Balloon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Balloon.h; sourceTree = "<group>"; };
@@ -558,6 +566,9 @@
 				12D168ED1D3897A70092322A /* SayCell.m */,
 				12D168F11D3B11540092322A /* UserPostView.h */,
 				12D168F21D3B11540092322A /* UserPostView.m */,
+				12D168F81D3CD30D0092322A /* SayHeader.xib */,
+				12D168FA1D3CD31E0092322A /* SayHeader.h */,
+				12D168FB1D3CD31E0092322A /* SayHeader.m */,
 			);
 			name = Say;
 			sourceTree = "<group>";
@@ -584,6 +595,15 @@
 				12A7E3911D27620700592CFA /* Map.m */,
 			);
 			name = Map;
+			sourceTree = "<group>";
+		};
+		12D168F71D3CA97C0092322A /* Foursquare */ = {
+			isa = PBXGroup;
+			children = (
+				12D168F41D3CA9740092322A /* FS.h */,
+				12D168F51D3CA9740092322A /* FS.m */,
+			);
+			name = Foursquare;
 			sourceTree = "<group>";
 		};
 		12DE5FDF1D02BC1F009B315F /* File Manager */ = {
@@ -706,6 +726,7 @@
 		12F741D31CE56DD400E8267A /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				12D168F71D3CA97C0092322A /* Foursquare */,
 				1285AAF81D33648400F508AC /* UserProfileCollection */,
 				1285AAEB1D331A2E00F508AC /* PageSelectionViews */,
 				1285AACB1D2C8C3300F508AC /* Profile */,
@@ -829,6 +850,7 @@
 				1285AB071D33681C00F508AC /* UserProfileHeader.xib in Resources */,
 				1235BC931D0FF97B00E4AA27 /* NSDateTimeAgo.bundle in Resources */,
 				12F741971CE4B97100E8267A /* Assets.xcassets in Resources */,
+				12D168F91D3CD30D0092322A /* SayHeader.xib in Resources */,
 				1285AAF11D331AFA00F508AC /* UserLikesHeader.xib in Resources */,
 				1285AB021D33662F00F508AC /* UserMapCell.xib in Resources */,
 				1285AB111D337CDB00F508AC /* AddMoreUserMediaCell.xib in Resources */,
@@ -920,6 +942,7 @@
 				12D168F31D3B11540092322A /* UserPostView.m in Sources */,
 				126AF40B1CEDAE0E00E3ED67 /* IndentedLabel.m in Sources */,
 				1285AB421D35F2D100F508AC /* SayBarButtonItem.m in Sources */,
+				12D168F61D3CA9740092322A /* FS.m in Sources */,
 				125AEF3C1CF9F08300553475 /* SimulatedUsers.m in Sources */,
 				1285AB1B1D34EB5700F508AC /* NearCell.m in Sources */,
 				1235BC8E1D0FD30E00E4AA27 /* ChatLeft.m in Sources */,
@@ -942,6 +965,7 @@
 				120A52381D17A75400EB8269 /* GradientView.m in Sources */,
 				124928841CEFF7F70038A2F3 /* ImagePicker.m in Sources */,
 				12DB01B21D0E317700E33359 /* Chat.m in Sources */,
+				12D168FC1D3CD31E0092322A /* SayHeader.m in Sources */,
 				1285AADD1D2F58AD00F508AC /* UIImage+AverageColor.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -22,6 +22,8 @@
 #define MAIN_SCREEN_ID @"Near"
 #undef MAIN_SCREEN_ID
 #define MAIN_SCREEN_ID @"Say"
+//#undef MAIN_SCREEN_ID
+//#define MAIN_SCREEN_ID @"FS"
 
 @interface MainController ()
 @end

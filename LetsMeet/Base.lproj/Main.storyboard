@@ -1696,7 +1696,7 @@ Hello</string>
             </objects>
             <point key="canvasLocation" x="5570" y="2807"/>
         </scene>
-        <!--Say-->
+        <!--Says near me-->
         <scene sceneID="DJT-pQ-zcx">
             <objects>
                 <viewController id="bFz-q6-q8O" customClass="Say" sceneMemberID="viewController">
@@ -1717,18 +1717,34 @@ Hello</string>
                                     <outlet property="delegate" destination="bFz-q6-q8O" id="aXE-0Z-1GC"/>
                                 </connections>
                             </collectionView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gxp-dG-Gog">
+                                <rect key="frame" x="0.0" y="64" width="414" height="200"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="200" id="LPy-va-UOX"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="trailingMargin" secondItem="orc-TO-pCe" secondAttribute="trailing" constant="-20" id="9Xf-Rb-dCH"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="gxp-dG-Gog" secondAttribute="trailing" constant="-20" id="Ei0-xp-0fx"/>
                             <constraint firstItem="orc-TO-pCe" firstAttribute="leading" secondItem="eJ8-au-qce" secondAttribute="leadingMargin" constant="-20" id="JwB-h8-yAG"/>
+                            <constraint firstItem="gxp-dG-Gog" firstAttribute="top" secondItem="grw-R9-OgE" secondAttribute="bottom" id="UUi-uG-YuX"/>
+                            <constraint firstItem="gxp-dG-Gog" firstAttribute="leading" secondItem="eJ8-au-qce" secondAttribute="leadingMargin" constant="-20" id="VoI-DL-YKu"/>
+                            <constraint firstItem="orc-TO-pCe" firstAttribute="top" secondItem="grw-R9-OgE" secondAttribute="bottom" constant="-64" id="dDr-Yp-j6f"/>
                             <constraint firstItem="mXX-ca-qE1" firstAttribute="top" secondItem="orc-TO-pCe" secondAttribute="bottom" id="l3h-V7-PsF"/>
-                            <constraint firstItem="orc-TO-pCe" firstAttribute="top" secondItem="grw-R9-OgE" secondAttribute="bottom" constant="-64" id="rnw-0n-q8Y"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="igh-zE-Z6c"/>
+                    <navigationItem key="navigationItem" title="Says near me" id="igh-zE-Z6c">
+                        <barButtonItem key="leftBarButtonItem" image="399-list1" id="kwo-TO-Pnb" customClass="ToggleButton">
+                            <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="0.80104518579999995" colorSpace="calibratedRGB"/>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="SAY" id="JeP-ga-YS9" customClass="SayBarButtonItem"/>
+                    </navigationItem>
                     <connections>
                         <outlet property="collectionView" destination="orc-TO-pCe" id="S3V-6j-TyL"/>
+                        <outlet property="headerBackView" destination="gxp-dG-Gog" id="lKm-wP-NNT"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="WTt-gP-klG" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1751,6 +1767,43 @@ Hello</string>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KDY-uN-aCt" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="6090" y="1888"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="bKe-XH-Ewa">
+            <objects>
+                <navigationController storyboardIdentifier="FS" id="Fbt-ix-IjT" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="61P-3V-9fx">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="0FB-7f-L6x" kind="relationship" relationship="rootViewController" id="L8X-0Q-NKH"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ha1-y7-apC" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="6666" y="1823"/>
+        </scene>
+        <!--FS-->
+        <scene sceneID="Gnz-vr-UtA">
+            <objects>
+                <viewController id="0FB-7f-L6x" customClass="FS" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="jhf-a9-fSY"/>
+                        <viewControllerLayoutGuide type="bottom" id="MEx-WF-l8F"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="AKp-0y-fbX">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="zHT-hU-rzz">
+                        <barButtonItem key="rightBarButtonItem" title="SAY" id="q3L-eu-BVB" customClass="SayBarButtonItem"/>
+                    </navigationItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Jgr-OJ-VNo" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="6666" y="2575"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="fVF-lC-ik9">

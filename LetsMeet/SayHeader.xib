@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionReusableView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="SayHeader" id="upr-vH-xaS" customClass="SayHeader">
+            <rect key="frame" x="0.0" y="0.0" width="449" height="207"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="hK5-Ol-mbx">
+                    <rect key="frame" x="10" y="37" width="429" height="170"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                            <integer key="value" value="2"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </mapView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IkF-Y7-kTE">
+                    <rect key="frame" x="10" y="8" width="205.5" height="24"/>
+                    <attributedString key="attributedText">
+                        <fragment content="LET's MEET">
+                            <attributes>
+                                <color key="NSColor" red="0.13333334029999999" green="0.1176470593" blue="0.1215686277" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <font key="NSFont" size="17" name="AvenirNextCondensed-DemiBold"/>
+                                <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                            </attributes>
+                        </fragment>
+                        <fragment content="s within 1 km from here!">
+                            <attributes>
+                                <color key="NSColor" red="0.45490196350000001" green="0.46274510029999999" blue="0.47058823700000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <font key="NSFont" size="16" name="AvenirNextCondensed-Regular"/>
+                                <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                            </attributes>
+                        </fragment>
+                    </attributedString>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <constraints>
+                <constraint firstItem="hK5-Ol-mbx" firstAttribute="top" secondItem="IkF-Y7-kTE" secondAttribute="bottom" constant="4.5" id="05h-6L-bCg"/>
+                <constraint firstAttribute="bottom" secondItem="hK5-Ol-mbx" secondAttribute="bottom" id="Ew4-N4-of2"/>
+                <constraint firstItem="hK5-Ol-mbx" firstAttribute="leading" secondItem="upr-vH-xaS" secondAttribute="leading" constant="10" id="Gde-vN-puZ"/>
+                <constraint firstItem="IkF-Y7-kTE" firstAttribute="leading" secondItem="upr-vH-xaS" secondAttribute="leading" constant="10" id="KjZ-Qk-FGl"/>
+                <constraint firstItem="IkF-Y7-kTE" firstAttribute="top" secondItem="upr-vH-xaS" secondAttribute="top" constant="8" id="LRi-sL-W7J"/>
+                <constraint firstAttribute="trailing" secondItem="hK5-Ol-mbx" secondAttribute="trailing" constant="10" id="zu2-z9-ep2"/>
+            </constraints>
+            <connections>
+                <outlet property="map" destination="hK5-Ol-mbx" id="Me6-9z-Whq"/>
+            </connections>
+            <point key="canvasLocation" x="408.5" y="373.5"/>
+        </collectionReusableView>
+    </objects>
+</document>

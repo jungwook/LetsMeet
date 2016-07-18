@@ -11,7 +11,7 @@
 
 CGRect getPostRect(NSString *string, UIFont *font, CGFloat maxWidth);
 
-@interface Say : UIViewController <UICollectionViewDelegate, UICollectionViewDataSource, SayDelegateLayout>
+@interface Say : UIViewController <UICollectionViewDelegate, UICollectionViewDataSource, SayDelegateLayout, UINavigationControllerDelegate>
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 
 @end

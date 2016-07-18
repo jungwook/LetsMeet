@@ -131,9 +131,7 @@ typedef void(^UsersReadyBlock)(NSArray* users);
 @end
 
 @interface UserPost : PFObject<PFSubclassing>
-@property (retain) NSString* userId;
-@property (retain) NSString* nickname;
-@property (retain) NSString* thumbnail;
+@property (retain) User* user;
 @property (retain) NSString* title;
 @property (retain) NSArray* posts;
 @property (retain) PFGeoPoint *location;

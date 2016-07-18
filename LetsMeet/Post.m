@@ -11,6 +11,7 @@
 #import "SayMediaCell.h"
 #import "MediaPicker.h"
 #import "S3File.h"
+#import "ListPicker.h"
 
 @interface BorderedTextView : UITextField
 
@@ -66,6 +67,11 @@
     [self.tableView registerNib:[UINib nibWithNibName:@"SayMediaCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"SayMediaCell"];
     [self addEffectsOnView:self.view];
     [self.postTitle becomeFirstResponder];
+    
+    self.postTitle.text = @"";
+    [ListPicker pickerWithArray:@[@"우리 만나요!", @"애인 찾아요", @"함께 드라이브 해요", @"나쁜 친구 찾아요", @"착한 친구 찾아요", @"함께 먹으러 가요", @"술친구 찾아요"] onTextField:self.postTitle selection:^(id data) {
+        self.postTitle.text = data;
+    }];
     
     self.post = [UserPost mine];
     self.posts = [NSMutableArray array];
@@ -150,7 +156,7 @@
     [self.view endEditing:YES];
     
     MediaPickerUserMediaBlock handler = ^(UserMedia* media) {
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"JUST 1 SEC" message:@"enter comment for your media" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"JUST 1 SEC" message:@"media successfully uploaded" preferredStyle:UIAlertControllerStyleAlert];
         
         [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
             textField.placeholder = @"Enter a comment for your media";
@@ -191,8 +197,6 @@
 
 - (IBAction)sendPost:(UIButton *)sender {
     __LF
-    NSLog(@"DS:%@", self.posts);
-    
     self.post.title = self.postTitle.text;
     self.post.location = [User me].location;
     [self.posts enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -207,6 +211,7 @@
     }];
     
     [self.post saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        NSLog(@"DS:%@", self.post.posts);
         [self.view endEditing:YES];
         [self killThisView];
     }];
@@ -228,7 +233,14 @@
 
 - (void) killThisView
 {
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [self.view endEditing:YES];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:0.25 animations:^{
+            self.view.alpha = 0.0f;
+        } completion:^(BOOL finished) {
+            [self dismissViewControllerAnimated:YES completion:nil];
+        }];
+    });
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView

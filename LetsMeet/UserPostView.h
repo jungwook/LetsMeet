@@ -8,8 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-typedef void(^UserPostReadyBlock)(void);
-
 @interface UserPostView : UIView
 @property (nonatomic) CGFloat viewHeight;
 @property (nonatomic, strong) UIColor *textColor;
@@ -24,6 +22,6 @@ typedef void(^UserPostReadyBlock)(void);
 @property (nonatomic, strong) UIFont *nicknameFont;
 @property (nonatomic, strong) UIFont *commentFont;
 
-- (void)setLoadedPost:(UserPost*)post andUser:(User*)user ready:(UserPostReadyBlock)ready;
-- (instancetype)initWithWidth:(CGFloat)width properties:(id)properties;
+- (instancetype)initWithWidth:(CGFloat)width post:(UserPost*)post properties:(id)properties;
+
 @end

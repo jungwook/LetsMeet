@@ -59,7 +59,9 @@
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
 {
     if ([text isEqualToString:@"\n"]) {
-        [self.parent startNewLine];
+        if (![textView.text isEqualToString:@""]) {
+            [self.parent startNewLine];
+        }
         return NO;
     }
     return YES;

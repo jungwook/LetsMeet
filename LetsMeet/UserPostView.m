@@ -14,7 +14,6 @@
 
 @interface UserPostView()
 @property (nonatomic, strong) UserPost *post;
-@property (nonatomic, strong) User *user;
 @property (nonatomic, strong) UIView* lastView;
 
 @property (nonatomic) CGFloat width;
@@ -28,71 +27,54 @@
 
 @implementation UserPostView
 
-- (instancetype)initWithWidth:(CGFloat)width properties:(id)properties
+#define PROP(__X__,__Y__) self.__X__ = properties[@"__X__"] ? properties[@"__X__"] : __Y__
+
+- (instancetype)initWithWidth:(CGFloat)width post:(UserPost*)post properties:(id)properties
 {
     self = [super init];
     if (self) {
-        [self initializeWithWidth:width properties:properties];
+        self.width = width;
+        self.padding = 4.0f;
+        
+        self.photo = [MediaView new];
+        self.nickname = [UILabel new];
+        self.date = [UILabel new];
+        self.title = [UILabel new];
+        self.backgroundColor = [UIColor whiteColor];
+        
+        [self addSubview:self.photo];
+        [self addSubview:self.nickname];
+        [self addSubview:self.date];
+        [self addSubview:self.title];
+        
+        self.textFont = properties[@"textFont"] ? properties[@"textFont"] : [UIFont systemFontOfSize:10];
+        self.titleFont = properties[@"titleFont"] ? properties[@"titleFont"] : [UIFont systemFontOfSize:10];
+        self.nicknameFont = properties[@"nicknameFont"] ? properties[@"nicknameFont"] : [UIFont systemFontOfSize:10];
+        self.commentFont = properties[@"commentFont"] ? properties[@"commentFont"] : [UIFont systemFontOfSize:10];
+        self.dateFont = properties[@"dateFont"] ? properties[@"dateFont"] : [UIFont systemFontOfSize:10];
+        
+        self.textColor = properties[@"textColor"] ? properties[@"textColor"] : [UIColor darkGrayColor];
+        self.titleColor = properties[@"titleColor"] ? properties[@"titleColor"] : [UIColor darkGrayColor];
+        self.nicknameColor = properties[@"nicknameColor"] ? properties[@"nicknameColor"] : [UIColor darkGrayColor];
+        self.commentColor = properties[@"commentColor"] ? properties[@"commentColor"] : [UIColor darkGrayColor];
+        self.dateColor = properties[@"dateColor"] ? properties[@"dateColor"] : [UIColor darkGrayColor];
+        
+        roundCorner(self.photo);
+        roundCorner(self);
+
+        _post = post;
+        [self initializePostViews];
     }
     return self;
 }
-
-#define PROP(__X__,__Y__) self.__X__ = properties[@"__X__"] ? properties[@"__X__"] : __Y__
-
-- (void)initializeWithWidth:(CGFloat)width properties:(id)properties
-{
-    self.width = width;
-    self.padding = 4.0f;
-
-    self.photo = [MediaView new];
-    self.nickname = [UILabel new];
-    self.date = [UILabel new];
-    self.title = [UILabel new];
-    self.backgroundColor = [UIColor whiteColor];
-    
-    [self addSubview:self.photo];
-    [self addSubview:self.nickname];
-    [self addSubview:self.date];
-    [self addSubview:self.title];
-    
-    PROP(textColor, [UIColor darkGrayColor]);
-    PROP(textFont, [UIFont systemFontOfSize:10]);
-    PROP(titleColor, [UIColor darkGrayColor]);
-    PROP(titleFont, [UIFont boldSystemFontOfSize:12]);
-    PROP(dateFont, [UIFont systemFontOfSize:8]);
-    PROP(dateColor, [UIColor darkGrayColor]);
-    PROP(nicknameFont, [UIFont boldSystemFontOfSize:11]);
-    PROP(nicknameColor, [UIColor darkGrayColor]);
-    PROP(commentFont, [UIFont boldSystemFontOfSize:10]);
-    PROP(commentColor, [UIColor darkGrayColor]);
-    
-    roundCorner(self.photo);
-    roundCorner(self);
-}
-
-- (void)setLoadedPost:(UserPost*)post andUser:(User*)user ready:(UserPostReadyBlock)ready
-{
-    [post loaded:^{
-        [user fetched:^{
-            _post = post;
-            _user = user;
-            [self initializePostViews];
-            if (ready) {
-                ready();
-            }
-        }];
-    }];
-}
-
 
 - (void)initializePostViews
 {
     __LF
 
     __block NSInteger index = 0;
-    [self.photo loadMediaFromUser:self.user animated:NO];
-    self.nickname.text = self.post.nickname;
-    NSLog(@"NICK FONT:%@", self.nicknameFont);
+    [self.photo loadMediaFromUser:self.post.user animated:NO];
+    self.nickname.text = self.post.user.nickname;
     self.nickname.font = self.nicknameFont;
     self.nickname.textColor = self.nicknameColor;
     
@@ -164,7 +146,7 @@
     [self addSubview:label];
     
     [[label.leadingAnchor constraintEqualToAnchor:lastView.leadingAnchor] setActive:YES];
-    [[label.topAnchor constraintEqualToAnchor:lastView.bottomAnchor constant:self.padding] setActive:YES];
+    [[label.topAnchor constraintEqualToAnchor:lastView.bottomAnchor constant:isComment ? self.padding : 0 ] setActive:YES];
     [[label.trailingAnchor constraintEqualToAnchor:lastView.trailingAnchor] setActive:YES];
     [label invalidateIntrinsicContentSize];
     
