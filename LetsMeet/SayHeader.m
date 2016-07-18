@@ -7,6 +7,7 @@
 //
 
 #import "SayHeader.h"
+#import "UserAnnotationView.h"
 
 @interface SayHeader()
 @property (weak, nonatomic) IBOutlet MKMapView *map;
@@ -24,6 +25,10 @@
     MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(location, 2000, 2000);
     self.map.delegate = self;
     [self.map setRegion:region];
+
+    User *user = [User me];
+    UserAnnotation *annotation = [[UserAnnotation alloc] initWithLocation:CLLocationCoordinate2DMake(user.location.latitude, user.location.longitude)];
+    [self.map addAnnotation:annotation];
 }
 
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
@@ -41,4 +46,24 @@
         self.map.alpha = 1.0f;
     } completion:nil];
 }
+
+
+- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation
+{
+    if ([annotation isKindOfClass:[UserAnnotation class]])
+    {
+        MarkerAnnotationView* pinView = (MarkerAnnotationView*)[mapView dequeueReusableAnnotationViewWithIdentifier:@"Marker"];
+        
+        if (!pinView)
+        {
+            pinView = [[MarkerAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"Marker"];
+        }
+        else {
+            pinView.annotation = annotation;
+        }
+        return pinView;
+    }
+    return nil;
+}
+
 @end

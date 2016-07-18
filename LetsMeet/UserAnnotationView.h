@@ -16,6 +16,9 @@
 - (id)initWithLocation:(CLLocationCoordinate2D)coord;
 @end
 
+@interface MarkerAnnotationView : MKAnnotationView
+@end
+
 @interface UserAnnotationView : MKAnnotationView
 @property (nonatomic, strong) UIImageView *photoView;
 @property (nonatomic, strong) UIView *ball;
