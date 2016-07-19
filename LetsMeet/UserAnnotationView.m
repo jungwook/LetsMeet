@@ -18,6 +18,13 @@
     return self;
 }
 
+- (void)setCoordinate:(CLLocationCoordinate2D)coordinate
+{
+    __LF
+    
+    _coordinate = coordinate;
+}
+
 @end
 
 @implementation MarkerAnnotationView
@@ -33,8 +40,8 @@
         self.layer.contents = (id) image.CGImage;
         self.layer.contentsGravity = kCAGravityResizeAspectFill;
         self.layer.masksToBounds = YES;
-        [self setCenterOffset:CGPointMake(0, -height/2.0f)];        
-        [self rotationOnLayer:self.layer];
+        [self setCenterOffset:CGPointMake(0, -height/2.0f)];
+//        [self rotationOnLayer:self.layer];
     }
     return self;
 }
@@ -42,17 +49,16 @@
 - (void) rotationOnLayer:(CALayer*)layer
 {
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.y"];
-    animation.toValue = [NSNumber numberWithFloat: M_PI];
-    animation.duration = 0.25;
+    animation.toValue = [NSNumber numberWithFloat: M_PI_2];
+    animation.duration = 0.5;
     animation.cumulative = NO;
-    animation.autoreverses = YES;
-    animation.repeatCount = 4;
+    animation.autoreverses = NO;
+    animation.repeatCount = INFINITY;
     animation.removedOnCompletion = YES;
 
     CATransform3D transform = CATransform3DIdentity;
     transform.m34 = 12 / 500.0;
     self.layer.transform = transform;
-    
     [layer addAnimation:animation forKey:@"rotationAnimation"];
 }
 

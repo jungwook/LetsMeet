@@ -49,6 +49,7 @@
 @property (strong, nonatomic) UserPost* post;
 @property (strong, nonatomic) NSMutableArray *posts;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *height;
+@property (weak, nonatomic) IBOutlet UIView *sayView;
 @end
 
 @implementation Post
@@ -143,11 +144,21 @@
 
 - (void)startNewLine
 {
+    [self.tableView beginUpdates];
     [self.posts addObject:@""];
-    [self.tableView reloadData];
+    [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.posts.count-1 inSection:0]] withRowAnimation:UITableViewRowAnimationFade];
+    [self.tableView endUpdates];
     [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self.posts.count-1 inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
     
     [self scrollToEnd];
+}
+
+- (void) trimLastStringObjectFromPosts
+{
+    if ([[self.posts lastObject] isKindOfClass:[NSString class]]) {
+        NSString* lastString = [[self.posts lastObject] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        [self.posts replaceObjectAtIndex:self.posts.count-1 withObject:lastString];
+    }
 }
 
 - (IBAction)addUserMedia:(UIButton *)sender
@@ -155,41 +166,33 @@
     __LF
     [self.view endEditing:YES];
     
+    
+    
     MediaPickerUserMediaBlock handler = ^(UserMedia* media) {
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"JUST 1 SEC" message:@"media successfully uploaded" preferredStyle:UIAlertControllerStyleAlert];
+        [self trimLastStringObjectFromPosts];
+        media.userId = [User me].objectId;
         
-        [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-            textField.placeholder = @"Enter a comment for your media";
-        }];
-        [alert addAction:[UIAlertAction actionWithTitle:@"SAVE" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            media.userId = [User me].objectId;
-            media.comment = [alert.textFields firstObject].text;
-            
-            if ([[self.posts lastObject] isKindOfClass:[NSString class]] && [[self.posts lastObject] isEqualToString:@""]) {
-                NSUInteger index = self.posts.count - 1;
-                [self.posts insertObject:media atIndex:index];
-                [self.tableView reloadData];
-                [self scrollToEnd];
-            }
-            else {
-                NSUInteger index = self.posts.count;
-                [self.tableView beginUpdates];
-                [self.posts addObject:media];
-                [self.posts addObject:@""];
-                [self.tableView insertRowsAtIndexPaths:@[
-                                                         [NSIndexPath indexPathForRow:index inSection:0],
-                                                         [NSIndexPath indexPathForRow:index+1 inSection:0],
-                                                         ] withRowAnimation:UITableViewRowAnimationFade];
-                [self.tableView endUpdates];
-                [self scrollToEnd];
-            }
-            self.done.enabled = YES;
-        }]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"CANCEL" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-            NSLog(@"Add media cancelled");
-        }]];
-        alert.modalPresentationStyle = UIModalPresentationOverFullScreen;
-        [self presentViewController:alert animated:YES completion:nil];
+        if ([[self.posts lastObject] isKindOfClass:[NSString class]] && [[self.posts lastObject] isEqualToString:@""]) {
+            [self.tableView beginUpdates];
+            NSUInteger index = self.posts.count - 1;
+            [self.posts insertObject:media atIndex:index];
+            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:0]] withRowAnimation:UITableViewRowAnimationFade];
+            [self.tableView endUpdates];
+            [self scrollToEnd];
+        }
+        else {
+            NSUInteger index = self.posts.count;
+            [self.tableView beginUpdates];
+            [self.posts addObject:media];
+            [self.posts addObject:@""];
+            [self.tableView insertRowsAtIndexPaths:@[
+                                                     [NSIndexPath indexPathForRow:index inSection:0],
+                                                     [NSIndexPath indexPathForRow:index+1 inSection:0],
+                                                     ] withRowAnimation:UITableViewRowAnimationFade];
+            [self.tableView endUpdates];
+            [self scrollToEnd];
+        }
+        self.done.enabled = YES;
     };
     
     [MediaPicker addMediaOnViewController:self withUserMediaHandler:handler];

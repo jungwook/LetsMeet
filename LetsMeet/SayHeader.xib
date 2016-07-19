@@ -7,49 +7,105 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <collectionReusableView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="SayHeader" id="upr-vH-xaS" customClass="SayHeader">
+        <collectionReusableView opaque="NO" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="SayHeader" id="upr-vH-xaS" customClass="SayHeader">
             <rect key="frame" x="0.0" y="0.0" width="449" height="207"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
-                <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="hK5-Ol-mbx">
-                    <rect key="frame" x="10" y="37" width="429" height="170"/>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                            <integer key="value" value="2"/>
-                        </userDefinedRuntimeAttribute>
-                    </userDefinedRuntimeAttributes>
-                </mapView>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IkF-Y7-kTE">
-                    <rect key="frame" x="10" y="8" width="205.5" height="24"/>
-                    <attributedString key="attributedText">
-                        <fragment content="LET's MEET">
-                            <attributes>
-                                <color key="NSColor" red="0.13333334029999999" green="0.1176470593" blue="0.1215686277" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <font key="NSFont" size="17" name="AvenirNextCondensed-DemiBold"/>
-                                <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                            </attributes>
-                        </fragment>
-                        <fragment content="s within 1 km from here!">
-                            <attributes>
-                                <color key="NSColor" red="0.45490196350000001" green="0.46274510029999999" blue="0.47058823700000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <font key="NSFont" size="16" name="AvenirNextCondensed-Regular"/>
-                                <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                            </attributes>
-                        </fragment>
-                    </attributedString>
-                    <nil key="highlightedColor"/>
-                </label>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SIR-WL-Pa9">
+                    <rect key="frame" x="4" y="4" width="441" height="203"/>
+                    <subviews>
+                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HCy-50-Ky0">
+                            <rect key="frame" x="0.0" y="0.0" width="441" height="203"/>
+                            <subviews>
+                                <mapView multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="hK5-Ol-mbx">
+                                    <rect key="frame" x="0.0" y="0.0" width="441" height="203"/>
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                            <integer key="value" value="2"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </mapView>
+                                <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Jpp-LO-h2w">
+                                    <rect key="frame" x="170" y="52" width="100" height="100"/>
+                                    <color key="backgroundColor" red="0.71764707569999997" green="0.91372549530000002" blue="0.44705882670000002" alpha="0.40036423141891891" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="100" id="8lt-w5-WC9"/>
+                                        <constraint firstAttribute="height" constant="100" id="iWM-RP-Ai5"/>
+                                    </constraints>
+                                </view>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IkF-Y7-kTE">
+                                    <rect key="frame" x="0.0" y="0.0" width="441" height="24"/>
+                                    <color key="backgroundColor" red="0.13333334029999999" green="0.1176470593" blue="0.1215686277" alpha="0.69998416385135132" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <attributedString key="attributedText">
+                                        <fragment content="LET's MEET">
+                                            <attributes>
+                                                <color key="NSColor" red="0.9913043483871834" green="0.99565217419359164" blue="1" alpha="0.95143581081081086" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <font key="NSFont" size="17" name="AvenirNextCondensed-DemiBold"/>
+                                                <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                            </attributes>
+                                        </fragment>
+                                        <fragment content="s">
+                                            <attributes>
+                                                <color key="NSColor" red="0.9913043483871834" green="0.99565217419359164" blue="1" alpha="0.95143581081081086" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <font key="NSFont" size="16" name="AvenirNextCondensed-Regular"/>
+                                                <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                            </attributes>
+                                        </fragment>
+                                        <fragment content=" within 1 km from here!">
+                                            <attributes>
+                                                <color key="NSColor" red="0.9913043483871834" green="0.99565217419359164" blue="1" alpha="0.8695893158783784" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <font key="NSFont" size="16" name="AvenirNextCondensed-Regular"/>
+                                                <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                            </attributes>
+                                        </fragment>
+                                    </attributedString>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                            </subviews>
+                            <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstItem="hK5-Ol-mbx" firstAttribute="top" secondItem="HCy-50-Ky0" secondAttribute="top" id="1xD-3v-wOm"/>
+                                <constraint firstItem="hK5-Ol-mbx" firstAttribute="leading" secondItem="HCy-50-Ky0" secondAttribute="leading" id="DHF-Hp-B5o"/>
+                                <constraint firstAttribute="bottom" secondItem="hK5-Ol-mbx" secondAttribute="bottom" id="Pq3-OG-HCj"/>
+                                <constraint firstItem="Jpp-LO-h2w" firstAttribute="centerY" secondItem="hK5-Ol-mbx" secondAttribute="centerY" id="YAF-ls-LrK"/>
+                                <constraint firstItem="IkF-Y7-kTE" firstAttribute="leading" secondItem="HCy-50-Ky0" secondAttribute="leading" id="n6k-Ha-7p1"/>
+                                <constraint firstAttribute="trailing" secondItem="hK5-Ol-mbx" secondAttribute="trailing" id="s1i-5w-S4r"/>
+                                <constraint firstAttribute="trailing" secondItem="IkF-Y7-kTE" secondAttribute="trailing" id="tjC-pR-SIL"/>
+                                <constraint firstItem="IkF-Y7-kTE" firstAttribute="top" secondItem="HCy-50-Ky0" secondAttribute="top" id="z0l-8H-yHu"/>
+                                <constraint firstItem="Jpp-LO-h2w" firstAttribute="centerX" secondItem="hK5-Ol-mbx" secondAttribute="centerX" id="zuk-EK-G5g"/>
+                            </constraints>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                    <integer key="value" value="2"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                        </view>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="HCy-50-Ky0" firstAttribute="top" secondItem="SIR-WL-Pa9" secondAttribute="top" id="0ZX-r7-SyT"/>
+                        <constraint firstItem="HCy-50-Ky0" firstAttribute="leading" secondItem="SIR-WL-Pa9" secondAttribute="leading" id="6tp-0k-9SG"/>
+                        <constraint firstItem="HCy-50-Ky0" firstAttribute="top" secondItem="SIR-WL-Pa9" secondAttribute="top" id="KGR-Ne-lMb"/>
+                        <constraint firstAttribute="trailing" secondItem="HCy-50-Ky0" secondAttribute="trailing" id="KLC-oT-hQx"/>
+                        <constraint firstAttribute="bottom" secondItem="HCy-50-Ky0" secondAttribute="bottom" id="atx-u3-S4p"/>
+                    </constraints>
+                    <variation key="default">
+                        <mask key="constraints">
+                            <exclude reference="0ZX-r7-SyT"/>
+                        </mask>
+                    </variation>
+                </view>
             </subviews>
             <constraints>
-                <constraint firstItem="hK5-Ol-mbx" firstAttribute="top" secondItem="IkF-Y7-kTE" secondAttribute="bottom" constant="4.5" id="05h-6L-bCg"/>
-                <constraint firstAttribute="bottom" secondItem="hK5-Ol-mbx" secondAttribute="bottom" id="Ew4-N4-of2"/>
-                <constraint firstItem="hK5-Ol-mbx" firstAttribute="leading" secondItem="upr-vH-xaS" secondAttribute="leading" constant="10" id="Gde-vN-puZ"/>
-                <constraint firstItem="IkF-Y7-kTE" firstAttribute="leading" secondItem="upr-vH-xaS" secondAttribute="leading" constant="10" id="KjZ-Qk-FGl"/>
-                <constraint firstItem="IkF-Y7-kTE" firstAttribute="top" secondItem="upr-vH-xaS" secondAttribute="top" constant="8" id="LRi-sL-W7J"/>
-                <constraint firstAttribute="trailing" secondItem="hK5-Ol-mbx" secondAttribute="trailing" constant="10" id="zu2-z9-ep2"/>
+                <constraint firstItem="SIR-WL-Pa9" firstAttribute="leading" secondItem="upr-vH-xaS" secondAttribute="leading" constant="4" id="Psj-5R-jx0"/>
+                <constraint firstItem="SIR-WL-Pa9" firstAttribute="top" secondItem="upr-vH-xaS" secondAttribute="top" constant="4" id="Sg6-To-xDI"/>
+                <constraint firstAttribute="trailing" secondItem="SIR-WL-Pa9" secondAttribute="trailing" constant="4" id="hEQ-Cs-KkZ"/>
+                <constraint firstAttribute="bottom" secondItem="SIR-WL-Pa9" secondAttribute="bottom" id="nTR-G5-xtS"/>
             </constraints>
             <connections>
+                <outlet property="backView" destination="SIR-WL-Pa9" id="9ov-ft-xFv"/>
                 <outlet property="map" destination="hK5-Ol-mbx" id="Me6-9z-Whq"/>
+                <outlet property="overlay" destination="Jpp-LO-h2w" id="cFD-4C-1Ei"/>
             </connections>
             <point key="canvasLocation" x="408.5" y="373.5"/>
         </collectionReusableView>

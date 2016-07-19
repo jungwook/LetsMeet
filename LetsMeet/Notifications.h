@@ -14,6 +14,9 @@ typedef void(^RefreshBadgeBlock)();
 typedef void(^ActionBlock)(id actionParams);
 
 @interface Notifications : NSObject
++ (instancetype) notificationWithMessage:(BulletBlock)block broadcast:(BroadcastBlock)broadcast refresh:(RefreshBadgeBlock)refresh;
++ (instancetype) notification;
+
 - (void)notify:(id)notification object:(id)object;
 - (void)setNotification:(id)notification forAction:(ActionBlock)notificationActionBlock;
 - (void)removeNotification:(id)notification;
@@ -21,7 +24,6 @@ typedef void(^ActionBlock)(id actionParams);
 - (void)setBulletAction:(BulletBlock)bulletAction;
 - (void)setBroadcastAction:(BroadcastBlock)broadcastAction;
 - (void)setRefreshBadgeAction:(RefreshBadgeBlock)refreshBadgeAction;
-+ (instancetype) notificationWithMessage:(BulletBlock)block broadcast:(BroadcastBlock)broadcast refresh:(RefreshBadgeBlock)refresh;
 - (void)off;
 - (void)on;
 @end

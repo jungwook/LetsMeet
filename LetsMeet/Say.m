@@ -12,6 +12,7 @@
 #import "UserPostView.h"
 #import "RefreshControl.h"
 #import "SayHeader.h"
+#import "Notifications.h"
 
 #define kCellIdentifier @"SayCell"
 
@@ -88,6 +89,7 @@
 @property (strong, nonatomic) id properties;
 @property (weak, nonatomic) IBOutlet UIView *headerBackView;
 @property (strong, nonatomic) SayHeader *headerView;
+@property (strong, nonatomic) Notifications *notifications;
 @end
 
 #define kSayHeader @"SayHeader"
@@ -101,14 +103,23 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGF
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    [self loadPosts];
+    [self loadPostsFromLocation:[User me].location];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
-    self.columnCount = 3;
+    self.notifications = [Notifications notification];
+    ActionBlock action = ^(id actionParams) {
+        __LF
+        PFGeoPoint *location = actionParams[@"location"];
+        self.posts = nil;
+        [self.collectionView reloadData];
+        [self loadPostsFromLocation:location];
+    };
+    [self.notifications setNotification:@"NotificationUserAnnotationMoved" forAction:action];
+    [self.notifications on];
     self.properties = @{
                       @"titleFont" : [UIFont fontWithName:@"AvenirNextCondensed-Bold" size:11],
                       @"nicknameFont" : [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:12],
@@ -129,10 +140,12 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGF
 
 - (void)initializeLayoutAttributes
 {
+    self.columnCount = 3;
+    
     SayLayout* layout = (SayLayout*) self.collectionView.collectionViewLayout;
     layout.columnCount = self.columnCount;
-    layout.minimumColumnSpacing = 2;
-    layout.minimumInteritemSpacing = 2;
+    layout.minimumColumnSpacing = 4;
+    layout.minimumInteritemSpacing = 4;
     //    layout.itemRenderDirection = SayLayoutItemRenderDirectionLeftToRight;
     //    layout.headerHeight = 200;
     
@@ -156,16 +169,15 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGF
 - (void)initializeCollectionViewAttributes
 {
     self.refresh = [RefreshControl initWithCompletionBlock:^(UIRefreshControl *refreshControl) {
-        [self loadPosts];
+        [self loadPostsFromLocation:[User me].location];
     }];
     
     [self.collectionView setBackgroundView:nil];
     [self.collectionView setContentInset:UIEdgeInsetsMake(200, 0, 0, 0)];
     [self.collectionView setBackgroundColor:[UIColor groupTableViewBackgroundColor]];
+//    [self.collectionView setBackgroundColor:[UIColor whiteColor]];
     [self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
     [self.collectionView registerNib:[UINib nibWithNibName:kCellIdentifier bundle:[NSBundle mainBundle]] forCellWithReuseIdentifier:kCellIdentifier];
-    //    [self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:SayElementKindSectionFooter withReuseIdentifier:SayElementKindSectionFooter];
-    //    [self.collectionView registerNib:[UINib nibWithNibName:kSayHeader bundle:[NSBundle mainBundle]] forSupplementaryViewOfKind:SayElementKindSectionHeader withReuseIdentifier:kSayHeader];
     [self.collectionView addSubview:self.refresh];
     self.collectionView.alwaysBounceVertical = YES;
 }
@@ -175,16 +187,21 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGF
     // Dispose of any resources that can be recreated.
 }
 
-- (void) loadPosts
+- (void) loadPostsFromLocation:(PFGeoPoint*)location
 {
     if (![self.refresh isRefreshing]) {
         [self.refresh beginRefreshing];
     }
     
+    location = location ? location : [User me].location;
+    
     PFQuery *query = [UserPost query];
     [query orderByAscending:@"updatedAt"];
-    [query whereKey:@"location" nearGeoPoint:[User me].location withinKilometers:1];
+    [query whereKey:@"location" nearGeoPoint:location withinKilometers:0.5f];
     [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        
+        NSLog(@"Loaded %ld Says", [objects count]);
+        
         [self.refresh endRefreshing];
         [objects enumerateObjectsUsingBlock:^(UserPost* _Nonnull post, NSUInteger idx, BOOL * _Nonnull stop) {
             [post loaded:^{
@@ -201,6 +218,7 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGF
                 }
             }];
         }];
+        [self.headerView showPostLocations:objects];
     }];
 }
 
@@ -277,21 +295,25 @@ CGFloat __widthForNumberOfCells(UICollectionView* cv, SayLayout *flowLayout, CGF
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     __LF
+    
     UserPost *post = [self.posts objectAtIndex:indexPath.row];
-    UserPostView* view = [[UserPostView alloc] initWithWidth:self.cellWidth
-                                                        post:post
-                                                  properties:self.properties];
+    CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(post.location.latitude, post.location.longitude);
+    [self.headerView showCoordinate:coordinate];
     
-//    SayCell* cell = (SayCell*)[self collectionView:collectionView cellForItemAtIndexPath:indexPath];
-    UserPostView *pv = [self postViewAtIndexPath:indexPath];
-    originalFrame = [pv convertRect:pv.frame toView:self.view];
-    
-    UIViewController *vc = [UIViewController new];
-    
-    [vc.view addSubview:view];
-    view.frame = originalFrame;
-
-    [self.navigationController pushViewController:vc animated:YES];
+//    UserPost *post = [self.posts objectAtIndex:indexPath.row];
+//    UserPostView* view = [[UserPostView alloc] initWithWidth:self.cellWidth
+//                                                        post:post
+//                                                  properties:self.properties];
+//    
+//    UserPostView *pv = [self postViewAtIndexPath:indexPath];
+//    originalFrame = [pv convertRect:pv.frame toView:self.view];
+//    
+//    UIViewController *vc = [UIViewController new];
+//    
+//    [vc.view addSubview:view];
+//    view.frame = originalFrame;
+//
+//    [self.navigationController pushViewController:vc animated:YES];
 }
 
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController

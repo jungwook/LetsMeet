@@ -10,5 +10,6 @@
 @import MapKit;
 
 @interface SayHeader : UICollectionReusableView <MKMapViewDelegate>
-
+- (void)showCoordinate:(CLLocationCoordinate2D)coordinate;
+- (void)showPostLocations:(NSArray*)posts;
 @end

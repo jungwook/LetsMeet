@@ -173,6 +173,7 @@
                 <outlet property="now" destination="vXV-28-SA0" id="taP-At-i46"/>
                 <outlet property="photo" destination="ggW-ri-PtP" id="nPP-aI-B0N"/>
                 <outlet property="postTitle" destination="cw7-E3-7nI" id="BcP-dh-AUL"/>
+                <outlet property="sayView" destination="RH7-Uu-JIh" id="M4M-Z2-sab"/>
                 <outlet property="tableView" destination="Bd9-2v-NoZ" id="lrT-wf-IVY"/>
             </connections>
             <point key="canvasLocation" x="646" y="443"/>

@@ -622,6 +622,7 @@ Hello</string>
         <!--Near By-->
         <scene sceneID="QgU-qw-uCd">
             <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="qQ9-Ag-hqL" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <collectionViewController id="Enq-TN-9oU" customClass="NearBy" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" indicatorStyle="black" dataMode="prototypes" id="Nun-BU-cLW">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
@@ -770,7 +771,6 @@ Hello</string>
                     </navigationItem>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina55"/>
                 </collectionViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="qQ9-Ag-hqL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2062" y="2807"/>
         </scene>
@@ -941,6 +941,7 @@ Hello</string>
         <!--PROFILE-->
         <scene sceneID="cff-8F-sEG">
             <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="27Z-9z-QZV" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <collectionViewController storyboardIdentifier="ProfileMain" id="fLD-vo-znN" customClass="ProfileMain" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" id="zHh-p4-hZP">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
@@ -1288,7 +1289,6 @@ Hello</string>
                         </barButtonItem>
                     </navigationItem>
                 </collectionViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="27Z-9z-QZV" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3066" y="2807"/>
         </scene>
@@ -1626,6 +1626,7 @@ Hello</string>
         <!--Near-->
         <scene sceneID="hAD-tH-DFd">
             <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ogf-4y-7MF" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController id="xd6-yM-Mdn" customClass="Near" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="gA6-m3-K1Z"/>
@@ -1692,13 +1693,13 @@ Hello</string>
                         <outlet property="searchSwitch" destination="OTH-p4-4XX" id="n4k-BL-SdW"/>
                     </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ogf-4y-7MF" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="5570" y="2807"/>
         </scene>
         <!--Says near me-->
         <scene sceneID="DJT-pQ-zcx">
             <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="WTt-gP-klG" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController id="bFz-q6-q8O" customClass="Say" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="grw-R9-OgE"/>
@@ -1708,9 +1709,9 @@ Hello</string>
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="orc-TO-pCe">
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="orc-TO-pCe">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
-                                <collectionViewLayout key="collectionViewLayout" id="hLM-02-Tt7" customClass="SayLayout"/>
+                                <collectionViewLayout key="collectionViewLayout" id="Dxy-nr-gGl" customClass="SayLayout"/>
                                 <cells/>
                                 <connections>
                                     <outlet property="dataSource" destination="bFz-q6-q8O" id="J0P-AN-Lyp"/>
@@ -1747,7 +1748,6 @@ Hello</string>
                         <outlet property="headerBackView" destination="gxp-dG-Gog" id="lKm-wP-NNT"/>
                     </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="WTt-gP-klG" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="6090" y="2807"/>
         </scene>
